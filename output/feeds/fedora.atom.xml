@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Programming and Writing about it</title><link href="/" rel="alternate"></link><link href="/feeds/fedora.atom.xml" rel="self"></link><id>/</id><updated>2015-04-30T10:20:00+10:00</updated><entry><title>Fedora 22 Scientific</title><link href="/fedora-22-scientific.html" rel="alternate"></link><updated>2015-04-30T10:20:00+10:00</updated><author><name>Amit Saha</name></author><id>tag:,2015-04-30:fedora-22-scientific.html</id><summary type="html">&lt;p&gt;Fedora 22 was &lt;a class="reference external" href="http://fedoramagazine.org/fedora-22-released/"&gt;released recently&lt;/a&gt; which also means we
+have a new Fedora Scientific release. &lt;a class="reference external" href="https://labs.fedoraproject.org/en/scientific/"&gt;Fedora Scientific&lt;/a&gt;
+is now part of &lt;a class="reference external" href="http://fedoramagazine.org/new-websites-fedora-22/"&gt;Fedora labs&lt;/a&gt;.&lt;/p&gt;
+&lt;a class="reference external image-reference" href="https://labs.fedoraproject.org/en/scientific/"&gt;&lt;img alt="Featured Applications Image" class="align-center" src="/images/scientific-featured-applications.png" style="width: 650.0px; height: 550.0px;" /&gt;&lt;/a&gt;
+&lt;p&gt;As you can see, the new home for Fedora Scientific looks
+amazing. The &amp;quot;Featured Applications&amp;quot; section features the most
+important and useful tools in Fedora Scientific. I think that is a
+great idea. Everyone associated with it, thank you very much.&lt;/p&gt;
+&lt;p&gt;I have also updated the &lt;a class="reference external" href="http://fedora-scientific.readthedocs.org/"&gt;Fedora Scientific Guide&lt;/a&gt; to reflect the
+changes.&lt;/p&gt;
+</summary></entry></feed>
