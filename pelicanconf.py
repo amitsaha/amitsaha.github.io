@@ -17,19 +17,15 @@ TRANSLATION_FEED_ATOM = None
 AUTHOR_FEED_ATOM = None
 AUTHOR_FEED_RSS = None
 
-# Blogroll
-# LINKS = (('Pelican', 'http://getpelican.com/'),
-#          ('Python.org', 'http://python.org/'),
-#          ('Jinja2', 'http://jinja.pocoo.org/'),
-#          ('You can modify those links in your config file', '#'),)
-
-# Social widget
-# SOCIAL = (('You can add links in your config file', '#'),
-#           ('Another social link', '#'),)
-
 DEFAULT_PAGINATION = 10
-
-# Uncomment following line if you want document-relative URLs when developing
-#RELATIVE_URLS = True
 DISPLAY_CATEGORIES_ON_MENU = False
+DISPLAY_TAGS_ON_SIDEBAR = False
+
+THEME='../pelican-bootstrap3/'
+
+TWITTER_USERNAME="echorand"
+TWITTER_WIDGET_ID="608854659248181251"
+
+ADDTHIS_PROFILE="ra-557910c01cb1eb5c"
+
 STATIC_PATHS = ['images']
