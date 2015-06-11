@@ -62,10 +62,13 @@ publish:
 
 github: publish
 	cp -r $(OUTPUTDIR) /tmp/
+	git add -A .
+	git commit -m "New post/page"
 	git checkout master
 	cp -r /tmp/output/* .
 	git add -A .
-	git commit -m "New version"
+	git commit -m "New build"
 	git push origin master
+	rm -rf /tmp/output
 
 .PHONY: html help clean regenerate serve devserver publish ssh_upload rsync_upload dropbox_upload ftp_upload s3_upload cf_upload github
