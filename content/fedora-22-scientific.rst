@@ -1,5 +1,5 @@
 :Title: Fedora 22 Scientific
-:Date: 2015-04-30 10:20
+:Date: 2015-06-11 10:20
 :Category: Fedora
 
 Fedora 22 was `released recently <http://fedoramagazine.org/fedora-22-released/>`__ which also means we
