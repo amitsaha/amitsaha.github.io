@@ -63,11 +63,11 @@ publish:
 github: publish
 	cp -r $(OUTPUTDIR) /tmp/
 	git add -A .
-	git commit -m "New post/page"
+	git commit -m "New post/page" || true
 	git checkout master
 	cp -r /tmp/output/* .
 	git add -A .
-	git commit -m "New build"
+	git commit -m "New build" || true
 	git push origin master
 	rm -rf /tmp/output
 
