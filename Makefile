@@ -60,10 +60,12 @@ stopserver:
 publish:
 	$(PELICAN) $(INPUTDIR) -o $(OUTPUTDIR) -s $(PUBLISHCONF) $(PELICANOPTS)
 
+# Commit changes in site, push, update master, commit, push
 github: publish
 	cp -r $(OUTPUTDIR) /tmp/
 	git add -A .
 	git commit -m "New post/page" || true
+	git push origin site
 	git checkout master
 	cp -r /tmp/output/* .
 	git add -A .
