@@ -3,7 +3,7 @@ About
 
 My name is Amit, I am a Software Engineer and `Author
 <{filename}/pages/books.rst>`__ , currently living in
-Brisbane, Australia.
+Sydney, Australia.
 
 You can contact me via `email <mailto:amitsaha.in@gmail.com>`__.
 I am on `Twitter <http://twitter.com/echorand>`__ , `Google+
@@ -13,7 +13,9 @@ I am on `Twitter <http://twitter.com/echorand>`__ , `Google+
 Work
 ----
 
-I work at Red Hat and my primary work is on the `Beaker project <https://beaker-project.org>`__.
+I work as a software engineer at Freelancer.com since July 2015. In
+the past I have worked at Red Hat (my primary work was on the `Beaker
+project <https://beaker-project.org>`__).
 
 Open Source involvements
 ------------------------
