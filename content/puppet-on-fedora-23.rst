@@ -1,4 +1,4 @@
-:Title: Standalone puppet setup on Fedora
+:Title: Standalone open source puppet setup on Fedora
 :Date: 2015-10-01 14:54
 :Category: Fedora
 
