@@ -13,13 +13,14 @@ Setup the host name:
 
 .. code::
 
-   $ cat /etc/hostname 
+   # cat /etc/hostname 
    fedora-23.node
 
 Reboot, verify:
 
 .. code::
-  $ facter | grep node
+
+  # facter | grep node
   domain => node
   fqdn => fedora-23.node
   
