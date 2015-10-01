@@ -82,11 +82,12 @@ Really apply:
 Writing serverspec tests
 ========================
 
-
 .. code::
+
    dnf -y install rubygem-bundler
    
 .. code::
+
    # mkdir /etc/puppet/manifests/tests
    # cd /etc/puppet/manifests/tests
    # cat Gemfile
