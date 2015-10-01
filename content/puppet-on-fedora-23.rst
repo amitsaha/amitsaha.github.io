@@ -82,30 +82,84 @@ Really apply:
 Writing serverspec tests
 ========================
 
-- http://serverspec.org/tutorial.html
-- https://www.debian-administration.org/article/703/A_brief_introduction_to_server-testing_with_serverspec
 
-dnf -y install rubygem-bundler
-bundle exec serverspec-init
+.. code::
+   dnf -y install rubygem-bundler
+   
+.. code::
+   # cat Gemfile
+   source 'https://rubygems.org'
 
-# cat spec/localhost/nginx_spec.rb
-require 'spec_helper'
+   gem 'serverspec'
+   gem 'rake'
+   
+.. code::
 
-describe package('nginx') do
-  it { should be_installed }
-end
+   $ bundle  install --path ./gems/
+   Installing rake 10.4.2
+   Installing diff-lcs 1.2.5
+   Installing multi_json 1.11.2
+   Installing net-ssh 2.9.2
+   Installing net-scp 1.2.1
+   Installing net-telnet 0.1.1
+   Installing rspec-support 3.3.0
+   Installing rspec-core 3.3.2
+   Installing rspec-expectations 3.3.1
+   Installing rspec-mocks 3.3.2
+   Installing rspec 3.3.0
+   Installing rspec-its 1.2.0
+   Installing sfl 2.2
+   Installing specinfra 2.43.10
+   Installing serverspec 2.24.1
+   Using bundler 1.7.8
+   Your bundle is complete!
+   It was installed into ./gems
 
-# bundle exec rake spec
-/usr/bin/ruby -I/etc/puppet/manifests/tests/gems/ruby/gems/rspec-core-3.3.2/lib:/etc/puppet/manifests/tests/gems/ruby/gems/rspec-support-3.3.0/lib /etc/puppet/manifests/tests/gems/ruby/gems/rspec-core-3.3.2/exe/rspec --pattern spec/localhost/\*_spec.rb
 
-Package "nginx"
-  should be installed
+.. code::
+   $ bundle exec serverspec-init
 
-Finished in 0.03447 seconds (files took 0.17465 seconds to load)
-1 example, 0 failures
+   Select OS type:
+
+   1) UN*X
+   2) Windows
+
+   Select number: 1
+
+   Select a backend type:
+
+   1) SSH
+   2) Exec (local)
+
+   Select number: 2
+
+   + spec/
+   + spec/localhost/
+   + spec/localhost/sample_spec.rb
+   + spec/spec_helper.rb
+   + Rakefile
+   + .rspec
 
 
+ .. code::
+ 
+    # cat spec/localhost/nginx_spec.rb
+    require 'spec_helper'
 
+    describe package('nginx') do
+        it { should be_installed }
+    end
+
+.. code::
+
+   # bundle exec rake spec
+   /usr/bin/ruby -I/etc/puppet/manifests/tests/gems/ruby/gems/rspec-core-3.3.2/lib:/etc/puppet/manifests/tests/gems   /ruby/gems/rspec-support-3.3.0/lib /etc/puppet/manifests/tests/gems/ruby/gems/rspec-core-3.3.2/exe/rspec --pattern spec/localhost/\*_spec.rb
+
+   Package "nginx"
+   should be installed
+
+   Finished in 0.03447 seconds (files took 0.17465 seconds to load)
+   1 example, 0 failures
 
 
 Resources
@@ -113,5 +167,7 @@ Resources
 
 - https://docs.puppetlabs.com/references/latest/type.html#package
 - https://www.digitalocean.com/community/tutorials/how-to-install-puppet-in-standalone-mode-on-centos-7
+- http://serverspec.org/tutorial.html
+- https://www.debian-administration.org/article/703/A_brief_introduction_to_server-testing_with_serverspec
 
 
