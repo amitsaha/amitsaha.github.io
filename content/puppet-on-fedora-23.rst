@@ -22,6 +22,9 @@ Reboot, verify:
   $ facter | grep node
   domain => node
   fqdn => fedora-23.node
+  
+  First manifest
+  ==============
 
 .. code::
 
