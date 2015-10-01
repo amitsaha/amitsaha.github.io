@@ -79,6 +79,33 @@ Really apply:
    Notice: Applied catalog in 0.25 seconds
 
 
+Writing serverspec tests
+========================
+
+- http://serverspec.org/tutorial.html
+- https://www.debian-administration.org/article/703/A_brief_introduction_to_server-testing_with_serverspec
+
+dnf -y install rubygem-bundler
+bundle exec serverspec-init
+
+# cat spec/localhost/nginx_spec.rb
+require 'spec_helper'
+
+describe package('nginx') do
+  it { should be_installed }
+end
+
+# bundle exec rake spec
+/usr/bin/ruby -I/etc/puppet/manifests/tests/gems/ruby/gems/rspec-core-3.3.2/lib:/etc/puppet/manifests/tests/gems/ruby/gems/rspec-support-3.3.0/lib /etc/puppet/manifests/tests/gems/ruby/gems/rspec-core-3.3.2/exe/rspec --pattern spec/localhost/\*_spec.rb
+
+Package "nginx"
+  should be installed
+
+Finished in 0.03447 seconds (files took 0.17465 seconds to load)
+1 example, 0 failures
+
+
+
 
 
 Resources
