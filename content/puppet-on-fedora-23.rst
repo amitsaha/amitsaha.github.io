@@ -138,6 +138,7 @@ Install the gems:
 Initialize the serverspec directory tree:
 
 .. code::
+
    # bundle exec serverspec-init
 
    Select OS type:
