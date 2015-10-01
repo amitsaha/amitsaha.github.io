@@ -1,4 +1,4 @@
-:Title: Standalone test puppet system on Fedora
+:Title: Standalone puppet setup on Fedora
 :Date: 2015-10-01 14:54
 :Category: Fedora
 
