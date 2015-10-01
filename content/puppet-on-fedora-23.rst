@@ -7,7 +7,7 @@ Setup
 
 .. code::
   
-   # `dnf -y install puppet`
+   # dnf -y install puppet
 
 Setup the host name:
 
@@ -23,8 +23,8 @@ Reboot, verify:
   domain => node
   fqdn => fedora-23.node
   
-  First manifest
-  ==============
+First manifest
+==============
 
 .. code::
 
@@ -175,5 +175,3 @@ Resources
 - https://www.digitalocean.com/community/tutorials/how-to-install-puppet-in-standalone-mode-on-centos-7
 - http://serverspec.org/tutorial.html
 - https://www.debian-administration.org/article/703/A_brief_introduction_to_server-testing_with_serverspec
-
-
