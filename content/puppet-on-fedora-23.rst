@@ -28,8 +28,8 @@ Reboot, verify:
   domain => node
   fqdn => fedora-23.node
   
-First manifest
-==============
+Our First manifest
+==================
 
 Let's write our first manifest. We will place it in ``/etc/puppet/manifests``. Upon installation, ``/etc/puppet`` looks like:
 

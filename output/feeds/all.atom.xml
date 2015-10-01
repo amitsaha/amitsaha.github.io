@@ -18,8 +18,8 @@ domain =&amp;gt; node
 fqdn =&amp;gt; fedora-23.node
 &lt;/pre&gt;
 &lt;/div&gt;
-&lt;div class="section" id="first-manifest"&gt;
-&lt;h2&gt;First manifest&lt;/h2&gt;
+&lt;div class="section" id="our-first-manifest"&gt;
+&lt;h2&gt;Our First manifest&lt;/h2&gt;
 &lt;p&gt;Let's write our first manifest. We will place it in &lt;tt class="docutils literal"&gt;/etc/puppet/manifests&lt;/tt&gt;. Upon installation, &lt;tt class="docutils literal"&gt;/etc/puppet&lt;/tt&gt; looks like:&lt;/p&gt;
 &lt;pre class="code literal-block"&gt;
 # tree /etc/puppet/
