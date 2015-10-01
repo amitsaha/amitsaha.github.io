@@ -2,7 +2,7 @@
 :Date: 2015-10-01 10:20
 :Category: Fedora
 
-Ny goal in this post is to show how to setup puppet in standalone mode on a Fedora 23 system. That is, this setup will allow writing puppet modules and then you can apply them on your local system and check manually and via serverspec tests that they are doing what you intend them to be doing. Obviously, a VM would be the best test environment for this, or even a container. Let's get started.
+My goal in this post is to show how to setup puppet in standalone mode on a Fedora 23 system. That is, this setup will allow writing puppet modules and then you can apply them on your local system and check manually and via serverspec tests that they are doing what you intend them to be doing. Obviously, a VM would be the best test environment for this, or even a container. Let's get started.
 
 Setup
 =====
@@ -101,7 +101,7 @@ We will put our serverspec test in ``/etc/puppet/manifests/tests``:
    # mkdir /etc/puppet/manifests/tests
    # cd /etc/puppet/manifests/tests
    
-Create a `Gemfile`:
+Create a ``Gemfile``:
 
 .. code::
 
