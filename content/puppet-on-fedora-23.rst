@@ -2,8 +2,12 @@
 :Date: 2015-10-01 10:20
 :Category: Fedora
 
+Ny goal in this post is to show how to setup puppet in standalone mode on a Fedora 23 system. That is, this setup will allow writing puppet modules and then you can apply them on your local system and check manually and via serverspec tests that they are doing what you intend them to be doing. Obviously, a VM would be the best test environment for this, or even a container. Let's get started.
+
 Setup
 =====
+
+Install ``puppet``:
 
 .. code::
   
@@ -27,6 +31,8 @@ Reboot, verify:
 First manifest
 ==============
 
+Let's write our first manifest. We will place it in ``/etc/puppet/manifests``. Upon installation, ``/etc/puppet`` looks like:
+
 .. code::
 
    # tree /etc/puppet/
@@ -35,11 +41,13 @@ First manifest
     ├── modules
     └── puppet.conf
 
+We will create a ``manifests`` sub-directory:
+
 .. code::
 
    # mkdir /etc/puppet/manifests
 
-Create our first manifest `/etc/puppet/manifests/nginx.pp`:
+Now, we will create our first manifest ``/etc/puppet/manifests/nginx.pp``:
 
 .. code::
 
@@ -76,34 +84,36 @@ Really apply:
    # rpm -q nginx
    nginx-1.8.0-13.fc23.x86_64
 
-.. code::
-   
-   # puppet apply nginx.pp --noop
-   Notice: Compiled catalog for fedora-23.node in environment production in 0.59 seconds
-   Notice: Applied catalog in 0.25 seconds
-
-
 
 Writing serverspec tests
 ========================
 
+We will first install ``bundler``:
+
 .. code::
 
    dnf -y install rubygem-bundler
-   
+
+We will put our serverspec test in ``/etc/puppet/manifests/tests``:
+
 .. code::
 
    # mkdir /etc/puppet/manifests/tests
    # cd /etc/puppet/manifests/tests
+   
+Create a `Gemfile`:
+
    # cat Gemfile
    source 'https://rubygems.org'
 
    gem 'serverspec'
    gem 'rake'
    
+Install the gems:
+
 .. code::
 
-   $ bundle  install --path ./gems/
+   # bundle  install --path ./gems/
    Installing rake 10.4.2
    Installing diff-lcs 1.2.5
    Installing multi_json 1.11.2
@@ -123,9 +133,10 @@ Writing serverspec tests
    Your bundle is complete!
    It was installed into ./gems
 
+Initialize the serverspec directory tree:
 
 .. code::
-   $ bundle exec serverspec-init
+   # bundle exec serverspec-init
 
    Select OS type:
 
@@ -149,6 +160,8 @@ Writing serverspec tests
    + .rspec
 
 
+Time to write our test:
+
  .. code::
  
     # cat spec/localhost/nginx_spec.rb
@@ -157,6 +170,8 @@ Writing serverspec tests
     describe package('nginx') do
         it { should be_installed }
     end
+
+Let's run our test:
 
 .. code::
 
@@ -173,6 +188,8 @@ Writing serverspec tests
 Our first module
 ================
 
+We will now write our first puppet module, we will name it ``nginx``:
+
 .. code::
 
    # tree modules/nginx/
@@ -182,6 +199,8 @@ Our first module
       │   ├── config1.pp
       │   └── config.pp
       └── init.pp
+      
+Create ``modules/nginx/manifests/init.pp ``:
 
 .. code::
 
@@ -195,6 +214,7 @@ Our first module
       include nginx::config::config
    }
 
+Create ``modules/nginx/manifests/config/config.pp ``:
 
 .. code::
 
@@ -207,6 +227,8 @@ Our first module
     include nginx::config::config1
    }
 
+Create ``modules/nginx/manifests/config/config1.pp ``:
+
 .. code::
 
   # modules/nginx/manifests/config/config1.pp 
@@ -216,10 +238,14 @@ Our first module
     }  
   }
 
+Let's write a manifest to include this module:
+
 .. code::
    
    # cat manifests/use-nginx-module.pp 
    include nginx
+
+Remove ``nginx`` and appy the manifest above:
 
 .. code::
 
@@ -236,7 +262,9 @@ Our first module
   Notice: Stage[main]: Would have triggered 'refresh' from 3 events
   Notice: Applied catalog in 0.24 seconds
   
-  
+
+And we are done.
+
 Miscellaneous
 =============
 
