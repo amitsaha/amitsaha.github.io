@@ -162,11 +162,9 @@ Initialize the serverspec directory tree:
    + Rakefile
    + .rspec
 
-
 Time to write our test in ``spec/localhost/nginx_spec.rb``:
 
  .. code::
-    
     require 'spec_helper'
 
     describe package('nginx') do
@@ -202,7 +200,7 @@ We will now write our first puppet module, we will name it ``nginx``:
       │   └── config.pp
       └── init.pp
       
-Create ``modules/nginx/manifests/init.pp ``:
+Create ``modules/nginx/manifests/init.pp``:
 
 .. code::
 
@@ -216,7 +214,7 @@ Create ``modules/nginx/manifests/init.pp ``:
       include nginx::config::config
    }
 
-Create ``modules/nginx/manifests/config/config.pp ``:
+Create ``modules/nginx/manifests/config/config.pp``:
 
 .. code::
 
@@ -229,7 +227,7 @@ Create ``modules/nginx/manifests/config/config.pp ``:
     include nginx::config::config1
    }
 
-Create ``modules/nginx/manifests/config/config1.pp ``:
+Create ``modules/nginx/manifests/config/config1.pp``:
 
 .. code::
 
@@ -270,7 +268,7 @@ And we are done.
 Miscellaneous
 =============
 
-Use `puppet parser` to validate your manifest:
+Use ``puppet parser`` to validate your manifest:
 
 .. code::
 
