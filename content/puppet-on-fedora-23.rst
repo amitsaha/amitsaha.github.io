@@ -87,6 +87,8 @@ Writing serverspec tests
    dnf -y install rubygem-bundler
    
 .. code::
+   # mkdir /etc/puppet/manifests/tests
+   # cd /etc/puppet/manifests/tests
    # cat Gemfile
    source 'https://rubygems.org'
 
