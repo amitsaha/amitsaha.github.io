@@ -103,6 +103,8 @@ We will put our serverspec test in ``/etc/puppet/manifests/tests``:
    
 Create a `Gemfile`:
 
+.. code::
+
    # cat Gemfile
    source 'https://rubygems.org'
 
