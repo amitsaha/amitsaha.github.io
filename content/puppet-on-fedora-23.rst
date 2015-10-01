@@ -174,7 +174,8 @@ Our first module
 ================
 
 .. code::
-   $ tree modules/nginx/
+
+   # tree modules/nginx/
    modules/nginx/
    └── manifests
       ├── config
