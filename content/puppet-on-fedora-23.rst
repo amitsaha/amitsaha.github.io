@@ -82,6 +82,72 @@ Really apply:
    Notice: Applied catalog in 0.25 seconds
 
 
+Our first module
+================
+
+.. code::
+   $ tree modules/nginx/
+   modules/nginx/
+   └── manifests
+      ├── config
+      │   ├── config1.pp
+      │   └── config.pp
+      └── init.pp
+
+.. code::
+
+   # modules/nginx/manifests/init.pp 
+
+   class nginx {
+      package { "nginx":
+         ensure => installed
+      }
+
+      include nginx::config::config
+   }
+
+
+.. code::
+
+   # modules/nginx/manifests/config/config.pp 
+   class nginx::config::config{
+  
+   file { '/etc/nginx/nginx.conf':
+       ensure  => present,
+    }
+    include nginx::config::config1
+   }
+
+.. code::
+
+  # modules/nginx/manifests/config/config1.pp 
+  class nginx::config::config1{
+    file { '/etc/nginx/conf.d':
+       ensure  => directory,
+    }  
+  }
+
+.. code::
+   
+   # cat manifests/use-nginx-module.pp 
+   include nginx
+
+.. code::
+
+   # dnf remove nginx
+   
+   # puppet apply manifests/use-nginx-module.pp --noop
+  Notice: Compiled catalog for fedora-23.node in environment production in 0.61 seconds
+  Notice: /Stage[main]/Nginx/Package[nginx]/ensure: current_value purged, should be present (noop)
+  Notice: Class[Nginx]: Would have triggered 'refresh' from 1 events
+  Notice: /Stage[main]/Nginx::Config::Config/File[/etc/nginx/nginx.conf]/ensure: current_value absent, should be   present (noop)
+  Notice: Class[Nginx::Config::Config]: Would have triggered 'refresh' from 1 events
+  Notice: /Stage[main]/Nginx::Config::Config1/File[/etc/nginx/conf.d]/ensure: current_value absent, should be directory (noop)
+  Notice: Class[Nginx::Config::Config1]: Would have triggered 'refresh' from 1 events
+  Notice: Stage[main]: Would have triggered 'refresh' from 3 events
+  Notice: Applied catalog in 0.24 seconds
+
+
 Writing serverspec tests
 ========================
 
@@ -168,6 +234,23 @@ Writing serverspec tests
    1 example, 0 failures
 
 
+Miscellaneous
+=============
+
+Use `puppet parser` to validate your manifest:
+
+.. code::
+
+   $ puppet parser validate nginx.pp
+
+Print current module path:
+
+.. code::
+
+   $ puppet config print modulepath
+   /etc/puppet/modules
+
+
 Resources
 =========
 
@@ -175,3 +258,4 @@ Resources
 - https://www.digitalocean.com/community/tutorials/how-to-install-puppet-in-standalone-mode-on-centos-7
 - http://serverspec.org/tutorial.html
 - https://www.debian-administration.org/article/703/A_brief_introduction_to_server-testing_with_serverspec
+- Advanced serverspec tips: http://serverspec.org/advanced_tips.html
