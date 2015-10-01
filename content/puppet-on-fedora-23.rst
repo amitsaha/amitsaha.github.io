@@ -165,6 +165,7 @@ Initialize the serverspec directory tree:
 Time to write our test in ``spec/localhost/nginx_spec.rb``:
 
  .. code::
+ 
     require 'spec_helper'
 
     describe package('nginx') do
