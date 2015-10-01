@@ -1,5 +1,243 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Programming and Writing about it</title><link href="/" rel="alternate"></link><link href="/feeds/all.atom.xml" rel="self"></link><id>/</id><updated>2015-06-11T10:20:00+10:00</updated><entry><title>Fedora 22 Scientific</title><link href="/fedora-22-scientific.html" rel="alternate"></link><updated>2015-06-11T10:20:00+10:00</updated><author><name>Amit Saha</name></author><id>tag:,2015-06-11:fedora-22-scientific.html</id><summary type="html">&lt;p&gt;Fedora 22 was &lt;a class="reference external" href="http://fedoramagazine.org/fedora-22-released/"&gt;released recently&lt;/a&gt; which also means we
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Programming and Writing about it</title><link href="/" rel="alternate"></link><link href="/feeds/all.atom.xml" rel="self"></link><id>/</id><updated>2015-10-01T10:20:00+10:00</updated><entry><title>Standalone test puppet system on Fedora</title><link href="/standalone-test-puppet-system-on-fedora.html" rel="alternate"></link><published>2015-10-01T10:20:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2015-10-01:standalone-test-puppet-system-on-fedora.html</id><summary type="html">&lt;p&gt;My goal in this post is to show how to setup puppet in standalone mode on a Fedora 23 system. That is, this setup will allow writing puppet modules and then you can apply them on your local system and check manually and via serverspec tests that they are doing what you intend them to be doing. Obviously, a VM would be the best test environment for this, or even a container. Let's get started.&lt;/p&gt;
+&lt;div class="section" id="setup"&gt;
+&lt;h2&gt;Setup&lt;/h2&gt;
+&lt;p&gt;Install &lt;tt class="docutils literal"&gt;puppet&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+# dnf -y install puppet
+&lt;/pre&gt;
+&lt;p&gt;Setup the host name:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+# cat /etc/hostname
+fedora-23.node
+&lt;/pre&gt;
+&lt;p&gt;Reboot, verify:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+# facter | grep node
+domain =&amp;gt; node
+fqdn =&amp;gt; fedora-23.node
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class="section" id="first-manifest"&gt;
+&lt;h2&gt;First manifest&lt;/h2&gt;
+&lt;p&gt;Let's write our first manifest. We will place it in &lt;tt class="docutils literal"&gt;/etc/puppet/manifests&lt;/tt&gt;. Upon installation, &lt;tt class="docutils literal"&gt;/etc/puppet&lt;/tt&gt; looks like:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+# tree /etc/puppet/
+/etc/puppet/
+ ├── auth.conf
+ ├── modules
+ └── puppet.conf
+&lt;/pre&gt;
+&lt;p&gt;We will create a &lt;tt class="docutils literal"&gt;manifests&lt;/tt&gt; sub-directory:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+# mkdir /etc/puppet/manifests
+&lt;/pre&gt;
+&lt;p&gt;Now, we will create our first manifest &lt;tt class="docutils literal"&gt;/etc/puppet/manifests/nginx.pp&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+node &amp;quot;fedora-23.node&amp;quot; {
+   package { &amp;quot;nginx&amp;quot;:
+     ensure =&amp;gt; installed
+   }
+}
+&lt;/pre&gt;
+&lt;p&gt;Apply with &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;--noop&lt;/span&gt;&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+# puppet apply nginx.pp --noop
+Notice: Compiled catalog for fedora-23.node in environment production in 0.66 seconds
+Notice: /Stage[main]/Main/Node[fedora-23.node]/Package[nginx]/ensure: current_value purged, should be present (noop)
+Notice: Node[fedora-23.node]: Would have triggered 'refresh' from 1 events
+Notice: Class[Main]: Would have triggered 'refresh' from 1 events
+Notice: Stage[main]: Would have triggered 'refresh' from 1 events
+Notice: Applied catalog in 0.26 seconds
+&lt;/pre&gt;
+&lt;p&gt;Really apply:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+# puppet apply nginx.pp
+Notice: Compiled catalog for fedora-23.node in environment production in 0.60 seconds
+Notice: /Stage[main]/Main/Node[fedora-23.node]/Package[nginx]/ensure: created
+Notice: Applied catalog in 5.67 seconds
+&lt;/pre&gt;
+&lt;pre class="code literal-block"&gt;
+# rpm -q nginx
+nginx-1.8.0-13.fc23.x86_64
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class="section" id="writing-serverspec-tests"&gt;
+&lt;h2&gt;Writing serverspec tests&lt;/h2&gt;
+&lt;p&gt;We will first install &lt;tt class="docutils literal"&gt;bundler&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+dnf -y install rubygem-bundler
+&lt;/pre&gt;
+&lt;p&gt;We will put our serverspec test in &lt;tt class="docutils literal"&gt;/etc/puppet/manifests/tests&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+# mkdir /etc/puppet/manifests/tests
+# cd /etc/puppet/manifests/tests
+&lt;/pre&gt;
+&lt;p&gt;Create a &lt;tt class="docutils literal"&gt;Gemfile&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+# cat Gemfile
+source 'https://rubygems.org'
+
+gem 'serverspec'
+gem 'rake'
+&lt;/pre&gt;
+&lt;p&gt;Install the gems:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+# bundle  install --path ./gems/
+Installing rake 10.4.2
+Installing diff-lcs 1.2.5
+Installing multi_json 1.11.2
+Installing net-ssh 2.9.2
+Installing net-scp 1.2.1
+Installing net-telnet 0.1.1
+Installing rspec-support 3.3.0
+Installing rspec-core 3.3.2
+Installing rspec-expectations 3.3.1
+Installing rspec-mocks 3.3.2
+Installing rspec 3.3.0
+Installing rspec-its 1.2.0
+Installing sfl 2.2
+Installing specinfra 2.43.10
+Installing serverspec 2.24.1
+Using bundler 1.7.8
+Your bundle is complete!
+It was installed into ./gems
+&lt;/pre&gt;
+&lt;p&gt;Initialize the serverspec directory tree:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+# bundle exec serverspec-init
+
+Select OS type:
+
+1) UN*X
+2) Windows
+
+Select number: 1
+
+Select a backend type:
+
+1) SSH
+2) Exec (local)
+
+Select number: 2
+
++ spec/
++ spec/localhost/
++ spec/localhost/sample_spec.rb
++ spec/spec_helper.rb
++ Rakefile
++ .rspec
+&lt;/pre&gt;
+&lt;p&gt;Time to write our test in &lt;tt class="docutils literal"&gt;spec/localhost/nginx_spec.rb&lt;/tt&gt;:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;pre class="code literal-block"&gt;
+require 'spec_helper'
+describe package('nginx') do
+    it { should be_installed }
+end
+&lt;/pre&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Let's run our test:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+# bundle exec rake spec
+/usr/bin/ruby -I/etc/puppet/manifests/tests/gems/ruby/gems/rspec-core-3.3.2/lib:/etc/puppet/manifests/tests/gems   /ruby/gems/rspec-support-3.3.0/lib /etc/puppet/manifests/tests/gems/ruby/gems/rspec-core-3.3.2/exe/rspec --pattern spec/localhost/\*_spec.rb
+
+Package &amp;quot;nginx&amp;quot;
+should be installed
+
+Finished in 0.03447 seconds (files took 0.17465 seconds to load)
+1 example, 0 failures
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class="section" id="our-first-module"&gt;
+&lt;h2&gt;Our first module&lt;/h2&gt;
+&lt;p&gt;We will now write our first puppet module, we will name it &lt;tt class="docutils literal"&gt;nginx&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+# tree modules/nginx/
+modules/nginx/
+└── manifests
+   ├── config
+   │&amp;nbsp;&amp;nbsp; ├── config1.pp
+   │&amp;nbsp;&amp;nbsp; └── config.pp
+   └── init.pp
+&lt;/pre&gt;
+&lt;p&gt;Create &lt;tt class="docutils literal"&gt;modules/nginx/manifests/init.pp&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+# modules/nginx/manifests/init.pp
+
+class nginx {
+   package { &amp;quot;nginx&amp;quot;:
+      ensure =&amp;gt; installed
+   }
+
+   include nginx::config::config
+}
+&lt;/pre&gt;
+&lt;p&gt;Create &lt;tt class="docutils literal"&gt;modules/nginx/manifests/config/config.pp&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+# modules/nginx/manifests/config/config.pp
+class nginx::config::config{
+
+file { '/etc/nginx/nginx.conf':
+    ensure  =&amp;gt; present,
+ }
+ include nginx::config::config1
+}
+&lt;/pre&gt;
+&lt;p&gt;Create &lt;tt class="docutils literal"&gt;modules/nginx/manifests/config/config1.pp&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+# modules/nginx/manifests/config/config1.pp
+class nginx::config::config1{
+  file { '/etc/nginx/conf.d':
+     ensure  =&amp;gt; directory,
+  }
+}
+&lt;/pre&gt;
+&lt;p&gt;Let's write a manifest to include this module:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+# cat manifests/use-nginx-module.pp
+include nginx
+&lt;/pre&gt;
+&lt;p&gt;Remove &lt;tt class="docutils literal"&gt;nginx&lt;/tt&gt; and appy the manifest above:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+ # dnf remove nginx
+
+ # puppet apply manifests/use-nginx-module.pp --noop
+Notice: Compiled catalog for fedora-23.node in environment production in 0.61 seconds
+Notice: /Stage[main]/Nginx/Package[nginx]/ensure: current_value purged, should be present (noop)
+Notice: Class[Nginx]: Would have triggered 'refresh' from 1 events
+Notice: /Stage[main]/Nginx::Config::Config/File[/etc/nginx/nginx.conf]/ensure: current_value absent, should be   present (noop)
+Notice: Class[Nginx::Config::Config]: Would have triggered 'refresh' from 1 events
+Notice: /Stage[main]/Nginx::Config::Config1/File[/etc/nginx/conf.d]/ensure: current_value absent, should be directory (noop)
+Notice: Class[Nginx::Config::Config1]: Would have triggered 'refresh' from 1 events
+Notice: Stage[main]: Would have triggered 'refresh' from 3 events
+Notice: Applied catalog in 0.24 seconds
+&lt;/pre&gt;
+&lt;p&gt;And we are done.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="miscellaneous"&gt;
+&lt;h2&gt;Miscellaneous&lt;/h2&gt;
+&lt;p&gt;Use &lt;tt class="docutils literal"&gt;puppet parser&lt;/tt&gt; to validate your manifest:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ puppet parser validate nginx.pp
+&lt;/pre&gt;
+&lt;p&gt;Print current module path:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ puppet config print modulepath
+/etc/puppet/modules
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class="section" id="resources"&gt;
+&lt;h2&gt;Resources&lt;/h2&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;a class="reference external" href="https://docs.puppetlabs.com/references/latest/type.html#package"&gt;https://docs.puppetlabs.com/references/latest/type.html#package&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference external" href="https://www.digitalocean.com/community/tutorials/how-to-install-puppet-in-standalone-mode-on-centos-7"&gt;https://www.digitalocean.com/community/tutorials/how-to-install-puppet-in-standalone-mode-on-centos-7&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference external" href="http://serverspec.org/tutorial.html"&gt;http://serverspec.org/tutorial.html&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference external" href="https://www.debian-administration.org/article/703/A_brief_introduction_to_server-testing_with_serverspec"&gt;https://www.debian-administration.org/article/703/A_brief_introduction_to_server-testing_with_serverspec&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Advanced serverspec tips: &lt;a class="reference external" href="http://serverspec.org/advanced_tips.html"&gt;http://serverspec.org/advanced_tips.html&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+</summary></entry><entry><title>Fedora 22 Scientific</title><link href="/fedora-22-scientific.html" rel="alternate"></link><published>2015-06-11T10:20:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2015-06-11:fedora-22-scientific.html</id><summary type="html">&lt;p&gt;Fedora 22 was &lt;a class="reference external" href="http://fedoramagazine.org/fedora-22-released/"&gt;released recently&lt;/a&gt; which also means we
 have a new Fedora Scientific release. &lt;a class="reference external" href="https://labs.fedoraproject.org/en/scientific/"&gt;Fedora Scientific&lt;/a&gt;
 is now part of &lt;a class="reference external" href="http://fedoramagazine.org/new-websites-fedora-22/"&gt;Fedora labs&lt;/a&gt;.&lt;/p&gt;
 &lt;a class="reference external image-reference" href="https://labs.fedoraproject.org/en/scientific/"&gt;&lt;img alt="Featured Applications Image" class="align-center" src="/images/scientific-featured-applications.png" style="width: 650.0px; height: 550.0px;" /&gt;&lt;/a&gt;
@@ -9,6 +247,6 @@ important and useful tools in Fedora Scientific. I think that is a
 great idea. Everyone associated with it, thank you very much.&lt;/p&gt;
 &lt;p&gt;I have also updated the &lt;a class="reference external" href="http://fedora-scientific.readthedocs.org/"&gt;Fedora Scientific Guide&lt;/a&gt; to reflect the
 changes.&lt;/p&gt;
-</summary></entry><entry><title>Remapping http://echorand.me</title><link href="/remapping-httpechorandme.html" rel="alternate"></link><updated>2015-04-30T10:20:00+10:00</updated><author><name>Amit Saha</name></author><id>tag:,2015-04-30:remapping-httpechorandme.html</id><summary type="html">&lt;p&gt;I changed the mapping of my domain to point to my GitHub pages. My old
+</summary></entry><entry><title>Remapping http://echorand.me</title><link href="/remapping-httpechorandme.html" rel="alternate"></link><published>2015-04-30T10:20:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2015-04-30:remapping-httpechorandme.html</id><summary type="html">&lt;p&gt;I changed the mapping of my domain to point to my GitHub pages. My old
 blog content is still available &lt;a class="reference external" href="http://amitksaha.wordpress.com"&gt;here&lt;/a&gt;.&lt;/p&gt;
 </summary></entry></feed>

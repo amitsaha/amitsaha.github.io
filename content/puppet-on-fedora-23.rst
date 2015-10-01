@@ -81,6 +81,7 @@ Really apply:
 
 
 .. code::
+   
    # rpm -q nginx
    nginx-1.8.0-13.fc23.x86_64
 
@@ -167,7 +168,6 @@ Time to write our test in ``spec/localhost/nginx_spec.rb``:
  .. code::
  
     require 'spec_helper'
-
     describe package('nginx') do
         it { should be_installed }
     end
