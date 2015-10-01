@@ -163,11 +163,10 @@ Initialize the serverspec directory tree:
    + .rspec
 
 
-Time to write our test:
+Time to write our test in ``spec/localhost/nginx_spec.rb``:
 
  .. code::
- 
-    # cat spec/localhost/nginx_spec.rb
+    
     require 'spec_helper'
 
     describe package('nginx') do
