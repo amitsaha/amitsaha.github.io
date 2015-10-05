@@ -76,6 +76,20 @@ Programming and Writing about it            </a>
     <div class="row">
         <div class="col-sm-9">
             <article>
+                <h2><a href="/mounting-a-docker-volume-on-selinux-enabled-host.html">Mounting a docker volume on SELinux enabled host</a></h2>
+                <div class="summary"><p>My workflow with docker usually involves volume mounting a host
+directory so that I can read and write to the host directory from my
+container. On a Fedora 23 host with SELinux enabled, this is what I
+have to do differently:</p>
+<pre class="code literal-block">
+Use: -v /var/dir1:var/dir1:Z
+</pre>
+<p>Note the ...</p>
+                    <a class="btn btn-default btn-xs" href="/mounting-a-docker-volume-on-selinux-enabled-host.html">more ...</a>
+                </div>
+            </article>
+            <hr/>
+            <article>
                 <h2><a href="/standalone-open-source-puppet-setup-on-fedora.html">Standalone open source puppet setup on Fedora</a></h2>
                 <div class="summary"><p>My goal in this post is to show how to setup puppet in standalone mode on a Fedora 23 system. This setup will allow writing puppet modules and then you can apply them on your local system and check manually and via serverspec tests that they are doing what you ...</p>
                     <a class="btn btn-default btn-xs" href="/standalone-open-source-puppet-setup-on-fedora.html">more ...</a>
