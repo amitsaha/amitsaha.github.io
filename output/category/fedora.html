@@ -82,12 +82,10 @@ Programming and Writing about it            </a>
                 <h2><a href="/mounting-a-docker-volume-on-selinux-enabled-host.html">Mounting a docker volume on SELinux enabled host</a></h2>
                 <div class="summary"><p>My workflow with docker usually involves volume mounting a host
 directory so that I can read and write to the host directory from my
-container. On a Fedora 23 host with SELinux enabled, this is what I
-have to do differently:</p>
+container as a <em>non-root</em> user. On a Fedora 23 host with SELinux
+enabled, this is what I have to do differently:</p>
 <pre class="code literal-block">
-Use: -v /var/dir1:var/dir1:Z
-</pre>
-<p>Note the ...</p>
+Use: -v /var/dir1:var ...</pre>
                     <a class="btn btn-default btn-xs" href="/mounting-a-docker-volume-on-selinux-enabled-host.html">more ...</a>
                 </div>
             </article>

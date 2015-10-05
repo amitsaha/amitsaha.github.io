@@ -12,13 +12,13 @@
 <link rel="canonical" href="/mounting-a-docker-volume-on-selinux-enabled-host.html">
 
         <meta name="author" content="Amit Saha" />
-        <meta name="description" content="My workflow with docker usually involves volume mounting a host directory so that I can read and write to the host directory from my container. On a Fedora 23 host with SELinux enabled, this is what I have to do differently: Use: -v /var/dir1:var/dir1:Z Note the ..." />
+        <meta name="description" content="My workflow with docker usually involves volume mounting a host directory so that I can read and write to the host directory from my container as a non-root user. On a Fedora 23 host with SELinux enabled, this is what I have to do differently: Use: -v /var/dir1:var ..." />
 
         <meta property="og:site_name" content="Programming and Writing about it" />
         <meta property="og:type" content="article"/>
         <meta property="og:title" content="Mounting a docker volume on SELinux enabled host"/>
         <meta property="og:url" content="/mounting-a-docker-volume-on-selinux-enabled-host.html"/>
-        <meta property="og:description" content="My workflow with docker usually involves volume mounting a host directory so that I can read and write to the host directory from my container. On a Fedora 23 host with SELinux enabled, this is what I have to do differently: Use: -v /var/dir1:var/dir1:Z Note the ..."/>
+        <meta property="og:description" content="My workflow with docker usually involves volume mounting a host directory so that I can read and write to the host directory from my container as a non-root user. On a Fedora 23 host with SELinux enabled, this is what I have to do differently: Use: -v /var/dir1:var ..."/>
         <meta property="article:published_time" content="2015-10-05" />
             <meta property="article:section" content="Fedora" />
             <meta property="article:author" content="Amit Saha" />
@@ -110,8 +110,8 @@ Programming and Writing about it            </a>
                 </div>
                 <p>My workflow with docker usually involves volume mounting a host
 directory so that I can read and write to the host directory from my
-container. On a Fedora 23 host with SELinux enabled, this is what I
-have to do differently:</p>
+container as a <em>non-root</em> user. On a Fedora 23 host with SELinux
+enabled, this is what I have to do differently:</p>
 <pre class="code literal-block">
 Use: -v /var/dir1:var/dir1:Z
 </pre>

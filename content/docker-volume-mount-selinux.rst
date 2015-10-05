@@ -4,8 +4,8 @@
 
 My workflow with docker usually involves volume mounting a host
 directory so that I can read and write to the host directory from my
-container. On a Fedora 23 host with SELinux enabled, this is what I
-have to do differently:
+container as a *non-root* user. On a Fedora 23 host with SELinux
+enabled, this is what I have to do differently:
 
 .. code::
    
