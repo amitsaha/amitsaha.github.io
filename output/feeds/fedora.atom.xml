@@ -6,8 +6,8 @@ have to do differently:&lt;/p&gt;
 &lt;pre class="code literal-block"&gt;
 Use: -v /var/dir1:var/dir1:Z
 &lt;/pre&gt;
-&lt;p&gt;Note the extra Z above? You can learn more about it this &lt;cite&gt;Project Atomic blog post
-&amp;lt;http://www.projectatomic.io/blog/2015/06/using-volumes-with-docker-can-cause-problems-with-selinux/&lt;/cite&gt;&amp;gt;__&lt;/p&gt;
+&lt;p&gt;Note the extra Z above? You can learn more about it this
+&lt;a class="reference external" href="http://www.projectatomic.io/blog/2015/06/using-volumes-with-docker-can-cause-problems-with-selinux/"&gt;Project Atomic blog post&lt;/a&gt;&lt;/p&gt;
 </summary></entry><entry><title>Standalone open source puppet setup on Fedora</title><link href="/standalone-open-source-puppet-setup-on-fedora.html" rel="alternate"></link><updated>2015-10-01T14:54:00+10:00</updated><author><name>Amit Saha</name></author><id>tag:,2015-10-01:standalone-open-source-puppet-setup-on-fedora.html</id><summary type="html">&lt;p&gt;My goal in this post is to show how to setup puppet in standalone mode on a Fedora 23 system. This setup will allow writing puppet modules and then you can apply them on your local system and check manually and via serverspec tests that they are doing what you intend them to be doing. Obviously, a VM would be the best test environment for this, or even a container. Let's get started.&lt;/p&gt;
 &lt;div class="section" id="setup"&gt;
 &lt;h2&gt;Setup&lt;/h2&gt;

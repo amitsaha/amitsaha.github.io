@@ -11,5 +11,5 @@ have to do differently:
    
    Use: -v /var/dir1:var/dir1:Z
 
-Note the extra Z above? You can learn more about it this `Project Atomic blog post
-<http://www.projectatomic.io/blog/2015/06/using-volumes-with-docker-can-cause-problems-with-selinux/`>__
+Note the extra Z above? You can learn more about it this
+`Project Atomic blog post <http://www.projectatomic.io/blog/2015/06/using-volumes-with-docker-can-cause-problems-with-selinux/>`__
