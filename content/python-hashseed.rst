@@ -2,20 +2,20 @@
 :Date: 2015-11-10 11:00
 :Category: Python
 
-Recently at work, I wanted to test a string which was being created by the ``urlllib.urlencode()`` function. My first attempt was simple - test my expected string with that being created by the function above using unittest's ``assertEquals()`` function. It passed all the times I ran the tests before I committed the code, but it started failing when the tests were ran as part of the deployment process. 
+Recently at work, I wanted to test a string which was being created by the ``urllib.urlencode()`` function. My first attempt was simple - test my expected string with that being created by the function above using unittest's ``assertEquals()`` function. It passed all the times I ran the tests before I committed the code, but it started failing when the tests were ran as part of the deployment process. 
 
-The input to the ``urlllib.urlencode()`` function is a dictionary of key value pairs and hence the returned value can really be any of the arrangements of the key value pairs. So, for example ``{'key1':'value', 'key2':'value'}`` can result in the query string ``key1=value&key2=value`` or ``key1=value&key2=value``. We cannot know for sure and we shouldn't need to. Hence, we cannot use ``self.assertEquals(urllib.urlencode({'key1':'value', {'key2':'value'}), 'key1=value&key2=value')`` without the possibility that it will fail eventually. The reason why we see such behaviour of course is that for dictionaries specifically, the order in which the keys are stored is not deterministic - or known apriori. You can see this behaviour by explicitly setting the value of `PYTHONHASHSEED <https://docs.python.org/3.3/using/cmdline.html#envvar-PYTHONHASHSEED>`__ to different values.
+The input to the ``urllib.urlencode()`` function is a dictionary of key value pairs and hence the returned value can really be any of the arrangements of the key value pairs. So, for example ``{'key1':'value', 'key2':'value'}`` can result in the query string ``key1=value&key2=value`` or ``key1=value&key2=value``. We cannot know for sure and we shouldn't need to. Hence, we cannot use ``self.assertEquals(urllib.urlencode({'key1':'value', {'key2':'value'}), 'key1=value&key2=value')`` without the possibility that it will fail eventually. The reason why we see such behaviour of course is that for dictionaries specifically, the order in which the keys are stored is not deterministic - or known apriori. You can see this behaviour by explicitly setting the value of `PYTHONHASHSEED <https://docs.python.org/3.3/using/cmdline.html#envvar-PYTHONHASHSEED>`__ to different values.
 
 So, how should we write such tests? Let's see one possible way which I will state as - **Insted of asserting the equality of entire objects, we should be testing for the presence of the expected constituent objects**. I demonstrate it via two similar examples:
 
-URL encoding via urlllib.urlencode()
+URL encoding via urllib.urlencode()
 ====================================
 
 As our first example, let's consider the ``urllib.urlencode()`` function:
 
 .. code::
   
-   # Test for the role of PYTHONHASHSEED - urlllib urlencode
+   # Test for the role of PYTHONHASHSEED - urllib urlencode
 
   import urllib
   urlencode_input = {'param1': 'value', 'param2': 'value'}
