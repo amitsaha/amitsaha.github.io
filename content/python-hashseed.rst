@@ -8,7 +8,7 @@ The input to the ``urllib.urlencode()`` function is a dictionary of key value pa
 
 Thus, we cannot use ``self.assertEquals(urllib.urlencode({'key1':'value', {'key2':'value'}), 'key1=value&key2=value')`` without the possibility that it will fail eventually. The reason why we see such behaviour of course is that for dictionaries, the order in which the keys are stored is not deterministic - or known apriori. You can see this behaviour by explicitly setting the value of `PYTHONHASHSEED <https://docs.python.org/3.3/using/cmdline.html#envvar-PYTHONHASHSEED>`__ to different values.
 
-So, how should we write such tests? Let's see one possible way which I will state as - **Insted of asserting the equality of entire objects, we should be testing for the presence of the expected constituent objects**. I demonstrate it via two similar examples: 
+So, how should we write such tests? Let's see one possible way which I will state as - **Instead of asserting the equality of entire objects, we should be testing for the presence of the expected constituent objects**. I demonstrate it via two similar examples: 
 
 (Note that I have used the builtin ``assert`` statement to test here)
 
