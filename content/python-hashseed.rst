@@ -1,5 +1,5 @@
 :Title: PYTHONHASHSEED and your tests
-:Date: 2015-11-10 11:00
+:Date: 2015-11-19 11:00
 :Category: Python
 
 Recently at work, I wanted to test a string which was being created by the ``urllib.urlencode()`` function. My first attempt was simple - test my expected string with that being created by the function above using unittest's ``assertEquals()`` function. It passed all the times I ran the tests before I committed the code, but it started failing when the tests were ran as part of the deployment process. 
