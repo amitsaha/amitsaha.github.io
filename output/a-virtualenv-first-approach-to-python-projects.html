@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: http://ogp.me/ns# fb: https://www.facebook.com/2008/fbml">
+<head>
+    <title>A virtualenv first approach to Python projects - Programming and Writing about it</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+<link rel="canonical" href="/a-virtualenv-first-approach-to-python-projects.html">
+
+        <meta name="author" content="Amit Saha" />
+        <meta name="description" content="I have until the last few months (of my ~4 years of working with Python) always worked without virtualenv for all my Python projects. Why? I think I found the whole idea of having to do the following two steps before I work on something cumbersome: Remember the exact virtualenv ..." />
+
+        <meta property="og:site_name" content="Programming and Writing about it" />
+        <meta property="og:type" content="article"/>
+        <meta property="og:title" content="A virtualenv first approach to Python projects"/>
+        <meta property="og:url" content="/a-virtualenv-first-approach-to-python-projects.html"/>
+        <meta property="og:description" content="I have until the last few months (of my ~4 years of working with Python) always worked without virtualenv for all my Python projects. Why? I think I found the whole idea of having to do the following two steps before I work on something cumbersome: Remember the exact virtualenv ..."/>
+        <meta property="article:published_time" content="2015-11-30" />
+            <meta property="article:section" content="Python" />
+            <meta property="article:author" content="Amit Saha" />
+
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="/theme/css/pygments/native.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Programming and Writing about it ATOM Feed"/>
+
+
+
+        <link href="/feeds/python.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Programming and Writing about it Python ATOM Feed"/>
+
+</head>
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+	<div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="/" class="navbar-brand">
+Programming and Writing about it            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                         <li><a href="/pages/articles.html">
+                             Articles
+                          </a></li>
+                         <li><a href="/pages/books.html">
+                             Books
+                          </a></li>
+                         <li><a href="/pages/personal-projects.html">
+                             Personal Projects
+                          </a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+              <li><a href="/archives.html"><i class="fa fa-th-list"></i><span class="icon-label">Archives</span></a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</div> <!-- /.navbar -->
+<!-- Banner -->
+<!-- End Banner -->
+<div class="container">
+    <div class="row">
+        <div class="col-sm-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/a-virtualenv-first-approach-to-python-projects.html"
+                       rel="bookmark"
+                       title="Permalink to A virtualenv first approach to Python projects">
+                        A virtualenv first approach to Python projects
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="fa fa-calendar"></i><time datetime="2015-11-30T12:00:00+10:00"> Mon 30 November 2015</time>
+    </span>
+
+
+
+
+
+    
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>I have until the last few months (of my ~4 years of working with
+Python) always worked without virtualenv for all my Python
+projects. Why? I think I found the whole idea of having to do the
+following two steps before I work on something cumbersome:</p>
+<ul class="simple">
+<li>Remember the exact virtualenv name, and then</li>
+<li>Activate it</li>
+</ul>
+<p>That said, I was veery much aware that it was certainly a good thing
+to do and would cause me less headaches someday. That someday finally
+came, and I ran into conflicting package requirements for applications
+which needed to run simultaneously. This forced me to start using
+virtualenvs. I think I also found the tool which will make me  keep
+using them even when I don't <em>need</em> to. The tool is <a class="reference external" href="https://github.com/berdario/pew">pew</a>.</p>
+<p>## Installation and Basics</p>
+<p>The home page lists various options of installing <tt class="docutils literal">pew</tt>. The most
+straightforward is of course to just use <tt class="docutils literal">pip install pew</tt>. Once you
+have it installed, typing <tt class="docutils literal">pew</tt> lists the various sub-commands, such
+as <tt class="docutils literal">new</tt>, <tt class="docutils literal">workon</tt>, <tt class="docutils literal">ls</tt> and others. Eac of the sub-commands is
+accompanied by a summary of they will do.</p>
+<p>So far, I have been mostly working with the above sub-commands. Here
+is how we can create a new virtualenv:</p>
+<pre class="code literal-block">
+$ pew new flask-graphql-demo
+New python executable in flask-graphql-demo/bin/python2
+Also creating executable in flask-graphql-demo/bin/python
+Installing setuptools, pip...done.
+Launching subshell in virtual environment. Type 'exit' or 'Ctrl+D' to return.
+flask-graphql-demo $
+</pre>
+<p>Our virtualenv <tt class="docutils literal"><span class="pre">flask-graphql-demo</span></tt> is created and we are in it nowm which we can check:</p>
+<pre class="code literal-block">
+$ which pip
+~/.local/share/virtualenvs/flask-graphql-demo/bin/pip
+</pre>
+<p>We can do all our usual work now (installing other packages, running
+our applications) and once done, we can simply <tt class="docutils literal">exit</tt> and we will be
+out of the virtualenv.</p>
+<p>Now, if I want to resume work on this particular project, I can first
+use <tt class="docutils literal">pew ls</tt> to list the currently created virtualenvs:</p>
+<pre class="code literal-block">
+~&gt; pew ls
+flask-graphql-demo
+</pre>
+<p>and then use <tt class="docutils literal">pew workon <span class="pre">flask-graphql-demo</span></tt> to start working on it
+again. On Linux, <tt class="docutils literal">pew workon</tt> also gives me all the available
+virtualenvs as suggestions automatically.</p>
+<p>## Conclusion</p>
+<p>As you may have already seen, <tt class="docutils literal">pew</tt> has a number of other features
+which should make working with <tt class="docutils literal">virtualenvs</tt> really easy. It has
+definitely made me change my approach to working on Python projects.</p>
+
+            </div>
+            <!-- /.entry-content -->
+    <hr />
+    <!-- AddThis Button BEGIN -->
+    <div class="addthis_toolbox addthis_default_style">
+            <a class="addthis_button_facebook_like" fb:like:layout="button_count"></a>
+            <a class="addthis_button_tweet"></a>
+            <a class="addthis_button_google_plusone" g:plusone:size="medium"></a>
+    </div>
+    <!-- AddThis Button END -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-sm-3" id="sidebar">
+            <aside>
+
+<section class="well well-sm">
+    <ul class="list-group list-group-flush">
+
+
+
+
+
+
+    <li class="list-group-item"><h4><i class="fa fa-twitter fa-lg"></i><span class="icon-label">Latest Tweets</span></h4></li>
+    <div id="twitter_timeline">
+        <a class="twitter-timeline" data-chrome="noheader" href="https://twitter.com/echorand" data-widget-id="608854659248181251">Tweets by echorand</a>
+    </div>
+
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+    </ul>
+</section>
+            </aside>
+        </div>
+    </div>
+</div>
+<footer>
+   <div class="container">
+      <hr>
+      <div class="row">
+         <div class="col-xs-10">&copy; 2015 Amit Saha
+            &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a>         </div>
+         <div class="col-xs-2"><p class="pull-right"><i class="fa fa-arrow-up"></i> <a href="#">Back to top</a></p></div>
+      </div>
+   </div>
+</footer>
+<script src="/theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+        <script type="text/javascript">var addthis_config = {"data_track_addressbar": true};</script>
+    <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-557910c01cb1eb5c"></script>
+</body>
+</html>
