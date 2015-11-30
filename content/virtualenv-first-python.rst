@@ -10,7 +10,7 @@ following two steps before I work on something cumbersome:
 * Remember the exact virtualenv name, and then
 * Activate it
 
-That said, I was veery much aware that it was certainly a good thing
+That said, I was very much aware that it was certainly a good thing
 to do and would cause me less headaches someday. That someday finally
 came, and I ran into conflicting package requirements for applications
 which needed to run simultaneously. This forced me to start using
@@ -18,7 +18,8 @@ virtualenvs. I think I also found the tool which will make me  keep
 using them even when I don't *need* to. The tool is `pew
 <https://github.com/berdario/pew>`__. 
 
-## Installation and Basics
+Installation and Basics
+=======================
 
 The home page lists various options of installing ``pew``. The most
 straightforward is of course to just use ``pip install pew``. Once you
@@ -61,7 +62,8 @@ and then use ``pew workon flask-graphql-demo`` to start working on it
 again. On Linux, ``pew workon`` also gives me all the available
 virtualenvs as suggestions automatically.
 
-## Conclusion
+Conclusion
+==========
 
 As you may have already seen, ``pew`` has a number of other features
 which should make working with ``virtualenvs`` really easy. It has

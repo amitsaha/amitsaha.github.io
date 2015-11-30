@@ -7,13 +7,14 @@ following two steps before I work on something cumbersome:&lt;/p&gt;
 &lt;li&gt;Remember the exact virtualenv name, and then&lt;/li&gt;
 &lt;li&gt;Activate it&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;That said, I was veery much aware that it was certainly a good thing
+&lt;p&gt;That said, I was very much aware that it was certainly a good thing
 to do and would cause me less headaches someday. That someday finally
 came, and I ran into conflicting package requirements for applications
 which needed to run simultaneously. This forced me to start using
 virtualenvs. I think I also found the tool which will make me  keep
 using them even when I don't &lt;em&gt;need&lt;/em&gt; to. The tool is &lt;a class="reference external" href="https://github.com/berdario/pew"&gt;pew&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;## Installation and Basics&lt;/p&gt;
+&lt;div class="section" id="installation-and-basics"&gt;
+&lt;h2&gt;Installation and Basics&lt;/h2&gt;
 &lt;p&gt;The home page lists various options of installing &lt;tt class="docutils literal"&gt;pew&lt;/tt&gt;. The most
 straightforward is of course to just use &lt;tt class="docutils literal"&gt;pip install pew&lt;/tt&gt;. Once you
 have it installed, typing &lt;tt class="docutils literal"&gt;pew&lt;/tt&gt; lists the various sub-commands, such
@@ -46,10 +47,13 @@ flask-graphql-demo
 &lt;p&gt;and then use &lt;tt class="docutils literal"&gt;pew workon &lt;span class="pre"&gt;flask-graphql-demo&lt;/span&gt;&lt;/tt&gt; to start working on it
 again. On Linux, &lt;tt class="docutils literal"&gt;pew workon&lt;/tt&gt; also gives me all the available
 virtualenvs as suggestions automatically.&lt;/p&gt;
-&lt;p&gt;## Conclusion&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="conclusion"&gt;
+&lt;h2&gt;Conclusion&lt;/h2&gt;
 &lt;p&gt;As you may have already seen, &lt;tt class="docutils literal"&gt;pew&lt;/tt&gt; has a number of other features
 which should make working with &lt;tt class="docutils literal"&gt;virtualenvs&lt;/tt&gt; really easy. It has
 definitely made me change my approach to working on Python projects.&lt;/p&gt;
+&lt;/div&gt;
 </summary></entry><entry><title>PYTHONHASHSEED and your tests</title><link href="/pythonhashseed-and-your-tests.html" rel="alternate"></link><published>2015-11-19T11:00:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2015-11-19:pythonhashseed-and-your-tests.html</id><summary type="html">&lt;p&gt;Recently at work, I wanted to test a string which was being created by the &lt;tt class="docutils literal"&gt;urllib.urlencode()&lt;/tt&gt; function. My first attempt was simple - test my expected string with that being created by the function above using unittest's &lt;tt class="docutils literal"&gt;assertEquals()&lt;/tt&gt; function. It passed all the times I ran the tests before I committed the code, but it started failing when the tests were ran as part of the deployment process.&lt;/p&gt;
 &lt;p&gt;The input to the &lt;tt class="docutils literal"&gt;urllib.urlencode()&lt;/tt&gt; function is a dictionary of key value pairs and hence the returned value can really be any of the arrangements of the key value pairs. So, for example &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;{'key1':'value',&lt;/span&gt; &lt;span class="pre"&gt;'key2':'value'}&lt;/span&gt;&lt;/tt&gt; can result in the query string &lt;tt class="docutils literal"&gt;key1=value&amp;amp;key2=value&lt;/tt&gt; or &lt;tt class="docutils literal"&gt;key2=value&amp;amp;key1=value&lt;/tt&gt;. We cannot know for sure and we shouldn't need to.&lt;/p&gt;
 &lt;p&gt;Thus, we cannot use &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;self.assertEquals(urllib.urlencode({'key1':'value',&lt;/span&gt; &lt;span class="pre"&gt;{'key2':'value'}),&lt;/span&gt; 'key1=value&amp;amp;key2=value')&lt;/tt&gt; without the possibility that it will fail eventually. The reason why we see such behaviour of course is that for dictionaries, the order in which the keys are stored is not deterministic - or known apriori. You can see this behaviour by explicitly setting the value of &lt;a class="reference external" href="https://docs.python.org/3.3/using/cmdline.html#envvar-PYTHONHASHSEED"&gt;PYTHONHASHSEED&lt;/a&gt; to different values.&lt;/p&gt;
