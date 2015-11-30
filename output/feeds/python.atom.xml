@@ -41,7 +41,7 @@ out of the virtualenv.&lt;/p&gt;
 &lt;p&gt;Now, if I want to resume work on this particular project, I can first
 use &lt;tt class="docutils literal"&gt;pew ls&lt;/tt&gt; to list the currently created virtualenvs:&lt;/p&gt;
 &lt;pre class="code literal-block"&gt;
-~&amp;gt; pew ls
+$ pew ls
 flask-graphql-demo
 &lt;/pre&gt;
 &lt;p&gt;and then use &lt;tt class="docutils literal"&gt;pew workon &lt;span class="pre"&gt;flask-graphql-demo&lt;/span&gt;&lt;/tt&gt; to start working on it

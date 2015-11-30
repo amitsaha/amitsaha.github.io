@@ -55,7 +55,7 @@ use ``pew ls`` to list the currently created virtualenvs:
 
 .. code::
 
-   ~> pew ls
+   $ pew ls
    flask-graphql-demo
 
 and then use ``pew workon flask-graphql-demo`` to start working on it
