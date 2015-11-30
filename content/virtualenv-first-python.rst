@@ -39,7 +39,7 @@ is how we can create a new virtualenv:
    Launching subshell in virtual environment. Type 'exit' or 'Ctrl+D' to return.
    flask-graphql-demo $ 
 
-Our virtualenv ``flask-graphql-demo`` is created and we are in it nowm which we can check:
+Our virtualenv ``flask-graphql-demo`` is created and we are in it, which we can check:
 
 .. code::
 

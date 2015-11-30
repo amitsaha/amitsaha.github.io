@@ -30,7 +30,7 @@ Installing setuptools, pip...done.
 Launching subshell in virtual environment. Type 'exit' or 'Ctrl+D' to return.
 flask-graphql-demo $
 &lt;/pre&gt;
-&lt;p&gt;Our virtualenv &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;flask-graphql-demo&lt;/span&gt;&lt;/tt&gt; is created and we are in it nowm which we can check:&lt;/p&gt;
+&lt;p&gt;Our virtualenv &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;flask-graphql-demo&lt;/span&gt;&lt;/tt&gt; is created and we are in it, which we can check:&lt;/p&gt;
 &lt;pre class="code literal-block"&gt;
 $ which pip
 ~/.local/share/virtualenvs/flask-graphql-demo/bin/pip
