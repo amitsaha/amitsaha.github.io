@@ -97,10 +97,9 @@ be visible. We are no more restricted to starting and stopping the
 same container since our ``jenkins-data`` container will have all our
 changes stored in its ``/var/jenkins_home``. You can have other
 containers (perhaps a container for
-[backing](https://github.com/discordianfish/docker-lloyd) up your
+`backing up <https://github.com/discordianfish/docker-lloyd>`__ your
 ``/var/jenkins_home``) being able to access the same data by using the
 same ``volumes-from`` option.
-
 
 Comparison to volume mounting a host directory
 ==============================================

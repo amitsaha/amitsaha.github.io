@@ -80,7 +80,7 @@ be visible. We are no more restricted to starting and stopping the
 same container since our &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;jenkins-data&lt;/span&gt;&lt;/tt&gt; container will have all our
 changes stored in its &lt;tt class="docutils literal"&gt;/var/jenkins_home&lt;/tt&gt;. You can have other
 containers (perhaps a container for
-[backing](&lt;a class="reference external" href="https://github.com/discordianfish/docker-lloyd"&gt;https://github.com/discordianfish/docker-lloyd&lt;/a&gt;) up your
+&lt;a class="reference external" href="https://github.com/discordianfish/docker-lloyd"&gt;backing up&lt;/a&gt; your
 &lt;tt class="docutils literal"&gt;/var/jenkins_home&lt;/tt&gt;) being able to access the same data by using the
 same &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;volumes-from&lt;/span&gt;&lt;/tt&gt; option.&lt;/p&gt;
 &lt;/div&gt;
