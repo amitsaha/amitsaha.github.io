@@ -1,5 +1,125 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Programming and Writing about it</title><link href="/" rel="alternate"></link><link href="/feeds/all.atom.xml" rel="self"></link><id>/</id><updated>2015-11-30T12:00:00+10:00</updated><entry><title>A virtualenv first approach to Python projects</title><link href="/a-virtualenv-first-approach-to-python-projects.html" rel="alternate"></link><published>2015-11-30T12:00:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2015-11-30:a-virtualenv-first-approach-to-python-projects.html</id><summary type="html">&lt;p&gt;I have until the last few months (of my ~4 years of working with
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Programming and Writing about it</title><link href="/" rel="alternate"></link><link href="/feeds/all.atom.xml" rel="self"></link><id>/</id><updated>2015-12-13T11:00:00+10:00</updated><entry><title>Data only Docker containers</title><link href="/data-only-docker-containers.html" rel="alternate"></link><updated>2015-12-13T11:00:00+10:00</updated><author><name>Amit Saha</name></author><id>tag:,2015-12-13:data-only-docker-containers.html</id><summary type="html">&lt;p&gt;In this post, we shall take a look at the idea of data only
+containers - containers whose sole purpose is to exist on the &lt;em&gt;docker
+host&lt;/em&gt; so that other containers can have portable access to a
+persistent data volume.&lt;/p&gt;
+&lt;div class="section" id="why-do-we-need-a-persistent-data-volume"&gt;
+&lt;h2&gt;Why do we need a persistent data volume?&lt;/h2&gt;
+&lt;p&gt;We will experiment with the &lt;tt class="docutils literal"&gt;jenkins&lt;/tt&gt; image from the &lt;a class="reference external" href="https://hub.docker.com/_/jenkins/"&gt;docker
+hub&lt;/a&gt;. Let's run a jenkins
+container using &lt;cite&gt;$ sudo docker run -p 8080:8080 jenkins&lt;/cite&gt;. Now, if we
+visit the URL &lt;cite&gt;http://docker-host-ip:8080&lt;/cite&gt;, we will see the familiar
+Jenkins home page.&lt;/p&gt;
+&lt;p&gt;By default, a Jenkins installation doesn't come with any
+authentication configured. Hence, we will first setup a simple
+authentication setup using Jenkins' own user password database. To do
+so, we will visit the URL:
+&lt;cite&gt;http://docker-host-ip:8080/configureSecurity/&lt;/cite&gt; and check the &lt;tt class="docutils literal"&gt;Enable
+security&lt;/tt&gt; checkbox and then select the &lt;tt class="docutils literal"&gt;Jenkins&lt;/tt&gt; own user database`
+option, and check the &lt;tt class="docutils literal"&gt;Allow users to sign up&lt;/tt&gt; check box under
+&lt;tt class="docutils literal"&gt;Security Realm&lt;/tt&gt;, select the &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;Logged-in&lt;/span&gt; users can do anything&lt;/tt&gt;
+option and finally click on &lt;tt class="docutils literal"&gt;Save&lt;/tt&gt;. This will bring us to the login
+page from where we can create a new account since we don't have one
+yet. Now, we will exit out of the container - we can use &lt;tt class="docutils literal"&gt;Ctrl + c&lt;/tt&gt;
+combination for that. Now, if we restart the container using the
+previous command, you will see that none of the configuration changes
+above has been saved.&lt;/p&gt;
+&lt;p&gt;The reason for that is because none of the changes we make during a
+container's lifetime in it's own file system is preserved. So, we need
+&lt;em&gt;data volumes&lt;/em&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="persistent-data-with-a-volume-mount"&gt;
+&lt;h2&gt;Persistent data with a volume mount&lt;/h2&gt;
+&lt;p&gt;If you look at the
+&lt;a class="reference external" href="https://github.com/jenkinsci/docker/blob/master/Dockerfile"&gt;Dockerfile&lt;/a&gt;
+you will see the command &lt;tt class="docutils literal"&gt;VOLUME /var/jenkins_home&lt;/tt&gt;. This
+essentially means that the mount point &lt;tt class="docutils literal"&gt;/var/jenkins_home&lt;/tt&gt; points to
+a location on the docker host. Hence, the changes made in that
+directory will be available from the host even after you have exited
+the container. However, the catch here is that every time you run a
+new container, the host location it mounts to will change and hence as
+we saw above, the data we wrote (via the configuration changes) were
+not visible the next time we started a container from the same
+image. To achieve that, we have to do things slightly differently. We
+will start the container and give a name to it:&lt;/p&gt;
+&lt;p&gt;&lt;tt class="docutils literal"&gt;`
+$ sudo docker run &lt;span class="pre"&gt;-p&lt;/span&gt; 8080:8080 &lt;span class="pre"&gt;--name&lt;/span&gt; jenkins jenkins
+`&lt;/tt&gt;&lt;/p&gt;
+&lt;p&gt;We will perform the same configuration changes above and exit the
+container using Ctrl + C. Next, we will &lt;tt class="docutils literal"&gt;start&lt;/tt&gt; the container using
+&lt;tt class="docutils literal"&gt;sudo docker start jenkins&lt;/tt&gt;. You will see all your changes have been
+preserved.&lt;/p&gt;
+&lt;p&gt;So, now we have a setup of jenkins where our changes are preserved, so
+long as we make sure we start/stop the containers and not run a new
+container from the &lt;tt class="docutils literal"&gt;jenkins&lt;/tt&gt; image. The key point to take away from
+here is that for a specific container, the host directory the volume
+maps to is always the same. This leads to the use of what is commonly
+referred to as &lt;tt class="docutils literal"&gt;data containers&lt;/tt&gt; for persistent data storage in
+containers.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="using-data-containers-for-persistent-storage"&gt;
+&lt;h2&gt;Using data containers for persistent storage&lt;/h2&gt;
+&lt;p&gt;The idea here is that you use the same base image from which your
+actual container will run to only create a container (using &lt;tt class="docutils literal"&gt;docker
+create&lt;/tt&gt;), not run it:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ sudo docker create --name jenkins-data jenkins
+&lt;/pre&gt;
+&lt;p&gt;We gave the name &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;jenkins-data&lt;/span&gt;&lt;/tt&gt; to this container and it's only
+purpose is to be there on our filesystem to serve as a source of
+persistent &lt;tt class="docutils literal"&gt;/var/jenkins_home&lt;/tt&gt; for other jenkins containers. Let's
+run a jenkins container now:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ sudo docker run --volumes-from jenkins-data -p 8080:8080 jenkins
+&lt;/pre&gt;
+&lt;p&gt;As earlier, we can now go to the Jenkins home page at
+&lt;cite&gt;http://docker-host-ip:8080/configureSecurity/&lt;/cite&gt; and make the above
+configuration changes. You can now exit the container and use the
+above command to run another jenkins container. The changes will still
+be visible. We are no more restricted to starting and stopping the
+same container since our &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;jenkins-data&lt;/span&gt;&lt;/tt&gt; container will have all our
+changes stored in its &lt;tt class="docutils literal"&gt;/var/jenkins_home&lt;/tt&gt;. You can have other
+containers (perhaps a container for
+[backing](&lt;a class="reference external" href="https://github.com/discordianfish/docker-lloyd"&gt;https://github.com/discordianfish/docker-lloyd&lt;/a&gt;) up your
+&lt;tt class="docutils literal"&gt;/var/jenkins_home&lt;/tt&gt;) being able to access the same data by using the
+same &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;volumes-from&lt;/span&gt;&lt;/tt&gt; option.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="comparison-to-volume-mounting-a-host-directory"&gt;
+&lt;h2&gt;Comparison to volume mounting a host directory&lt;/h2&gt;
+&lt;p&gt;The alternative to using data containers is to mount a directory from
+the host as &lt;tt class="docutils literal"&gt;/var/jenkins_home&lt;/tt&gt; in the container. This approach will
+solve our end-goal, but there are two additional steps that one would
+need to do:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;Decide which host location to use, perhaps creating it&lt;/li&gt;
+&lt;li&gt;Making sure the container will have appropriate read-write permissions (including &lt;a class="reference external" href="www.projectatomic.io/blog/2015/06/using-volumes-with-docker-can-cause-problems-with-selinux/"&gt;SELinux
+labels&lt;/a&gt;).&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;We don't need to do either of these when using data containers. As
+long as the image we plan to use has the appropriate &lt;tt class="docutils literal"&gt;VOLUME&lt;/tt&gt;
+command in it's Dockerfile, we can adopt the same approach we did
+here to make sure the data we care about is persisted. For images,
+which don't, we can easily enough create our own image and add the
+appropriate &lt;tt class="docutils literal"&gt;VOLUME&lt;/tt&gt; commands. And hence, this is a &lt;strong&gt;portable&lt;/strong&gt;
+approach to data persistence - it is not reliant on the host
+setup.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="conclusion"&gt;
+&lt;h2&gt;Conclusion&lt;/h2&gt;
+&lt;p&gt;In conclusion, these are the main reasons why data containers are a
+good approach to have persistent storage for your containers:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;No requirement to setup host&lt;/li&gt;
+&lt;li&gt;The permissions are automatically taken care of since we are using the same base image&lt;/li&gt;
+&lt;li&gt;Multiple containers can easily have access to the same data&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The following links may be helpful to learn more:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;a class="reference external" href="https://docs.docker.com/userguide/dockervolumes/"&gt;Managing data in Containers&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference external" href="https://medium.com/&amp;#64;ramangupta/why-docker-data-containers-are-good-589b3c6c749e"&gt;Why Docker Data Containers are Good&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+</summary></entry><entry><title>A virtualenv first approach to Python projects</title><link href="/a-virtualenv-first-approach-to-python-projects.html" rel="alternate"></link><updated>2015-11-30T12:00:00+10:00</updated><author><name>Amit Saha</name></author><id>tag:,2015-11-30:a-virtualenv-first-approach-to-python-projects.html</id><summary type="html">&lt;p&gt;I have until the last few months (of my ~4 years of working with
 Python) always worked without virtualenv for all my Python
 projects. Why? I think I found the whole idea of having to do the
 following two steps before I work on something cumbersome:&lt;/p&gt;
@@ -54,7 +174,7 @@ virtualenvs as suggestions automatically.&lt;/p&gt;
 which should make working with &lt;tt class="docutils literal"&gt;virtualenvs&lt;/tt&gt; really easy. It has
 definitely made me change my approach to working on Python projects.&lt;/p&gt;
 &lt;/div&gt;
-</summary></entry><entry><title>PYTHONHASHSEED and your tests</title><link href="/pythonhashseed-and-your-tests.html" rel="alternate"></link><published>2015-11-19T11:00:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2015-11-19:pythonhashseed-and-your-tests.html</id><summary type="html">&lt;p&gt;Recently at work, I wanted to test a string which was being created by the &lt;tt class="docutils literal"&gt;urllib.urlencode()&lt;/tt&gt; function. My first attempt was simple - test my expected string with that being created by the function above using unittest's &lt;tt class="docutils literal"&gt;assertEquals()&lt;/tt&gt; function. It passed all the times I ran the tests before I committed the code, but it started failing when the tests were ran as part of the deployment process.&lt;/p&gt;
+</summary></entry><entry><title>PYTHONHASHSEED and your tests</title><link href="/pythonhashseed-and-your-tests.html" rel="alternate"></link><updated>2015-11-19T11:00:00+10:00</updated><author><name>Amit Saha</name></author><id>tag:,2015-11-19:pythonhashseed-and-your-tests.html</id><summary type="html">&lt;p&gt;Recently at work, I wanted to test a string which was being created by the &lt;tt class="docutils literal"&gt;urllib.urlencode()&lt;/tt&gt; function. My first attempt was simple - test my expected string with that being created by the function above using unittest's &lt;tt class="docutils literal"&gt;assertEquals()&lt;/tt&gt; function. It passed all the times I ran the tests before I committed the code, but it started failing when the tests were ran as part of the deployment process.&lt;/p&gt;
 &lt;p&gt;The input to the &lt;tt class="docutils literal"&gt;urllib.urlencode()&lt;/tt&gt; function is a dictionary of key value pairs and hence the returned value can really be any of the arrangements of the key value pairs. So, for example &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;{'key1':'value',&lt;/span&gt; &lt;span class="pre"&gt;'key2':'value'}&lt;/span&gt;&lt;/tt&gt; can result in the query string &lt;tt class="docutils literal"&gt;key1=value&amp;amp;key2=value&lt;/tt&gt; or &lt;tt class="docutils literal"&gt;key2=value&amp;amp;key1=value&lt;/tt&gt;. We cannot know for sure and we shouldn't need to.&lt;/p&gt;
 &lt;p&gt;Thus, we cannot use &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;self.assertEquals(urllib.urlencode({'key1':'value',&lt;/span&gt; &lt;span class="pre"&gt;{'key2':'value'}),&lt;/span&gt; 'key1=value&amp;amp;key2=value')&lt;/tt&gt; without the possibility that it will fail eventually. The reason why we see such behaviour of course is that for dictionaries, the order in which the keys are stored is not deterministic - or known apriori. You can see this behaviour by explicitly setting the value of &lt;a class="reference external" href="https://docs.python.org/3.3/using/cmdline.html#envvar-PYTHONHASHSEED"&gt;PYTHONHASHSEED&lt;/a&gt; to different values.&lt;/p&gt;
 &lt;p&gt;So, how should we write such tests? Let's see one possible way which I will state as - &lt;strong&gt;Instead of asserting the equality of entire objects, we should be testing for the presence of the expected constituent objects&lt;/strong&gt;. I demonstrate it via two similar examples:&lt;/p&gt;
@@ -114,7 +234,7 @@ def test_where_clause_2():
 &lt;p&gt;If you run the above tests with different &lt;tt class="docutils literal"&gt;PYTHONHASHSEED&lt;/tt&gt; values, you will notice similar behaviour to the previous example.&lt;/p&gt;
 &lt;p&gt;If you are using &lt;a class="reference external" href="https://testrun.org/tox/latest/example/basic.html#special-handling-of-pythonhashseed"&gt;tox&lt;/a&gt; to run your tests, it automatically sets &lt;tt class="docutils literal"&gt;PYTHONHASHSEED&lt;/tt&gt; to a random integer when it is invoked. Hence, if you have never had your tests fail so far, there is a good chance your tests do not make any assumptions of order when dealing with Python dictionaries - but that of course is no guarantee that your tests are completely free since there may be this particular random number that has not been tried yet! So, ideally you may just want to do run your tests (especially if they don't take long) for a large number of PYTHONHASHSEED values just to be more confident.&lt;/p&gt;
 &lt;/div&gt;
-</summary></entry><entry><title>Mounting a docker volume on SELinux enabled host</title><link href="/mounting-a-docker-volume-on-selinux-enabled-host.html" rel="alternate"></link><published>2015-10-05T11:00:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2015-10-05:mounting-a-docker-volume-on-selinux-enabled-host.html</id><summary type="html">&lt;p&gt;My workflow with docker usually involves volume mounting a host
+</summary></entry><entry><title>Mounting a docker volume on SELinux enabled host</title><link href="/mounting-a-docker-volume-on-selinux-enabled-host.html" rel="alternate"></link><updated>2015-10-05T11:00:00+10:00</updated><author><name>Amit Saha</name></author><id>tag:,2015-10-05:mounting-a-docker-volume-on-selinux-enabled-host.html</id><summary type="html">&lt;p&gt;My workflow with docker usually involves volume mounting a host
 directory so that I can read and write to the host directory from my
 container as a &lt;em&gt;non-root&lt;/em&gt; user. On a Fedora 23 host with SELinux
 enabled, this is what I have to do differently:&lt;/p&gt;
@@ -123,7 +243,7 @@ Use: -v /var/dir1:var/dir1:Z
 &lt;/pre&gt;
 &lt;p&gt;Note the extra Z above? You can learn more about it this
 &lt;a class="reference external" href="http://www.projectatomic.io/blog/2015/06/using-volumes-with-docker-can-cause-problems-with-selinux/"&gt;Project Atomic blog post&lt;/a&gt;&lt;/p&gt;
-</summary></entry><entry><title>Standalone open source puppet setup on Fedora</title><link href="/standalone-open-source-puppet-setup-on-fedora.html" rel="alternate"></link><published>2015-10-01T14:54:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2015-10-01:standalone-open-source-puppet-setup-on-fedora.html</id><summary type="html">&lt;p&gt;My goal in this post is to show how to setup puppet in standalone mode on a Fedora 23 system. This setup will allow writing puppet modules and then you can apply them on your local system and check manually and via serverspec tests that they are doing what you intend them to be doing. Obviously, a VM would be the best test environment for this, or even a container. Let's get started.&lt;/p&gt;
+</summary></entry><entry><title>Standalone open source puppet setup on Fedora</title><link href="/standalone-open-source-puppet-setup-on-fedora.html" rel="alternate"></link><updated>2015-10-01T14:54:00+10:00</updated><author><name>Amit Saha</name></author><id>tag:,2015-10-01:standalone-open-source-puppet-setup-on-fedora.html</id><summary type="html">&lt;p&gt;My goal in this post is to show how to setup puppet in standalone mode on a Fedora 23 system. This setup will allow writing puppet modules and then you can apply them on your local system and check manually and via serverspec tests that they are doing what you intend them to be doing. Obviously, a VM would be the best test environment for this, or even a container. Let's get started.&lt;/p&gt;
 &lt;div class="section" id="setup"&gt;
 &lt;h2&gt;Setup&lt;/h2&gt;
 &lt;p&gt;Install &lt;tt class="docutils literal"&gt;puppet&lt;/tt&gt;:&lt;/p&gt;
@@ -362,7 +482,7 @@ $ puppet config print modulepath
 &lt;li&gt;Advanced serverspec tips: &lt;a class="reference external" href="http://serverspec.org/advanced_tips.html"&gt;http://serverspec.org/advanced_tips.html&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/div&gt;
-</summary></entry><entry><title>Fedora 22 Scientific</title><link href="/fedora-22-scientific.html" rel="alternate"></link><published>2015-06-11T10:20:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2015-06-11:fedora-22-scientific.html</id><summary type="html">&lt;p&gt;Fedora 22 was &lt;a class="reference external" href="http://fedoramagazine.org/fedora-22-released/"&gt;released recently&lt;/a&gt; which also means we
+</summary></entry><entry><title>Fedora 22 Scientific</title><link href="/fedora-22-scientific.html" rel="alternate"></link><updated>2015-06-11T10:20:00+10:00</updated><author><name>Amit Saha</name></author><id>tag:,2015-06-11:fedora-22-scientific.html</id><summary type="html">&lt;p&gt;Fedora 22 was &lt;a class="reference external" href="http://fedoramagazine.org/fedora-22-released/"&gt;released recently&lt;/a&gt; which also means we
 have a new Fedora Scientific release. &lt;a class="reference external" href="https://labs.fedoraproject.org/en/scientific/"&gt;Fedora Scientific&lt;/a&gt;
 is now part of &lt;a class="reference external" href="http://fedoramagazine.org/new-websites-fedora-22/"&gt;Fedora labs&lt;/a&gt;.&lt;/p&gt;
 &lt;a class="reference external image-reference" href="https://labs.fedoraproject.org/en/scientific/"&gt;&lt;img alt="Featured Applications Image" class="align-center" src="/images/scientific-featured-applications.png" style="width: 650.0px; height: 550.0px;" /&gt;&lt;/a&gt;
@@ -372,6 +492,6 @@ important and useful tools in Fedora Scientific. I think that is a
 great idea. Everyone associated with it, thank you very much.&lt;/p&gt;
 &lt;p&gt;I have also updated the &lt;a class="reference external" href="http://fedora-scientific.readthedocs.org/"&gt;Fedora Scientific Guide&lt;/a&gt; to reflect the
 changes.&lt;/p&gt;
-</summary></entry><entry><title>Remapping http://echorand.me</title><link href="/remapping-httpechorandme.html" rel="alternate"></link><published>2015-04-30T10:20:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2015-04-30:remapping-httpechorandme.html</id><summary type="html">&lt;p&gt;I changed the mapping of my domain to point to my GitHub pages. My old
+</summary></entry><entry><title>Remapping http://echorand.me</title><link href="/remapping-httpechorandme.html" rel="alternate"></link><updated>2015-04-30T10:20:00+10:00</updated><author><name>Amit Saha</name></author><id>tag:,2015-04-30:remapping-httpechorandme.html</id><summary type="html">&lt;p&gt;I changed the mapping of my domain to point to my GitHub pages. My old
 blog content is still available &lt;a class="reference external" href="http://amitksaha.wordpress.com"&gt;here&lt;/a&gt;.&lt;/p&gt;
 </summary></entry></feed>
