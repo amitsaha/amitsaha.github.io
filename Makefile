@@ -39,12 +39,12 @@ github: publish
 	cp -r $(OUTPUTDIR) /tmp/
 	git add -A .
 	git commit -m "New post/page" || true
-	git push origin site
+	git push -f origin site
 	git checkout master
 	cp -r /tmp/output/* .
 	git add -A .
 	git commit -m "New build" || true
-	git push origin master
+	git push -f origin master
 	rm -rf /tmp/output
 
 .PHONY: html help clean regenerate serve devserver publish ssh_upload rsync_upload dropbox_upload ftp_upload s3_upload cf_upload github
