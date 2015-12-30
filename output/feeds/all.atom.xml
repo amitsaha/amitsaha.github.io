@@ -27,7 +27,11 @@ File &amp;quot;/home/asaha/.local/share/virtualenvs/606fc8723c1a01b/lib/python2.
   raise AttributeError(name)
   AttributeError: assert_foo
 &lt;/pre&gt;
-&lt;p&gt;I guessed that there is likely a check explicitly for &lt;strong&gt;non-existent attributes&lt;/strong&gt; starting with &lt;tt class="docutils literal"&gt;assert&lt;/tt&gt; and if it is not one of the existing methods or attributes, it will raise a &lt;tt class="docutils literal"&gt;AttributeError&lt;/tt&gt;.  If you look at the &lt;a class="reference external" href="https://github.com/testing-cabal/mock/blob/master/mock/mock.py#L708"&gt;__getattr__&lt;/a&gt; method in &lt;tt class="docutils literal"&gt;mock.py&lt;/tt&gt;, you will see that this is pretty much what is happening. The exact lines are below:&lt;/p&gt;
+&lt;p&gt;I guessed that there is likely a check explicitly for &lt;strong&gt;non-existent
+attributes&lt;/strong&gt; starting with &lt;tt class="docutils literal"&gt;assert&lt;/tt&gt;, and if it finds so, it will
+raise a &lt;tt class="docutils literal"&gt;AttributeError&lt;/tt&gt;.  If you look at the &lt;a class="reference external" href="https://github.com/testing-cabal/mock/blob/master/mock/mock.py#L708"&gt;__getattr__&lt;/a&gt;
+method in &lt;tt class="docutils literal"&gt;mock.py&lt;/tt&gt;, you will see that this is pretty much what is
+happening. The exact lines are below:&lt;/p&gt;
 &lt;pre class="code literal-block"&gt;
 if not self._mock_unsafe: # self._mock_unsafe is by default False
     if name.startswith(('assert', 'assret')): # It comes here and an AttributeError is raised

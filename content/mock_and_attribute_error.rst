@@ -37,7 +37,12 @@ And the following as well:
     raise AttributeError(name)
     AttributeError: assert_foo
 
-I guessed that there is likely a check explicitly for **non-existent attributes** starting with ``assert`` and if it is not one of the existing methods or attributes, it will raise a ``AttributeError``.  If you look at the `__getattr__ <https://github.com/testing-cabal/mock/blob/master/mock/mock.py#L708>`__ method in ``mock.py``, you will see that this is pretty much what is happening. The exact lines are below:
+I guessed that there is likely a check explicitly for **non-existent
+attributes** starting with ``assert``, and if it finds so, it will
+raise a ``AttributeError``.  If you look at the `__getattr__
+<https://github.com/testing-cabal/mock/blob/master/mock/mock.py#L708>`__
+method in ``mock.py``, you will see that this is pretty much what is
+happening. The exact lines are below: 
 
 .. code::
     
