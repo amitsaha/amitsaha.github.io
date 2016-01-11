@@ -12,14 +12,14 @@
 <link rel="canonical" href="/mock-objects-and-non-existent-attributesmethods-in-python.html">
 
         <meta name="author" content="Amit Saha" />
-        <meta name="description" content="Today, I was curious to see this behavior of Mock() objects when using mock: &gt;&gt;&gt; from mock import Mock &gt;&gt;&gt; m = Mock() &gt;&gt;&gt; m.i_dont_exist &lt;Mock name=&#39;mock.i_dont_exist&#39; id=&#39;139841609578768&#39;&gt; &gt;&gt;&gt; m.i_dont_exist() &lt;Mock name=&#39;mock.i_dont_exist()&#39; id=&#39;139841609106896&#39;&gt; The above is expected, since I have not declared a spec when creating the ..." />
+        <meta name="description" content="Updated: Fixed typo in the last paragraph. Today, I was curious to see this behavior of Mock() objects when using mock: &gt;&gt;&gt; from mock import Mock &gt;&gt;&gt; m = Mock() &gt;&gt;&gt; m.i_dont_exist &lt;Mock name=&#39;mock.i_dont_exist&#39; id=&#39;139841609578768&#39;&gt; &gt;&gt;&gt; m.i_dont_exist() &lt;Mock name=&#39;mock.i_dont_exist()&#39; id=&#39;139841609106896&#39;&gt; The above is expected, since I have ..." />
 
         <meta property="og:site_name" content="Programming and Writing about it" />
         <meta property="og:type" content="article"/>
         <meta property="og:title" content="Mock objects and non-existent attributes/methods in Python"/>
         <meta property="og:url" content="/mock-objects-and-non-existent-attributesmethods-in-python.html"/>
-        <meta property="og:description" content="Today, I was curious to see this behavior of Mock() objects when using mock: &gt;&gt;&gt; from mock import Mock &gt;&gt;&gt; m = Mock() &gt;&gt;&gt; m.i_dont_exist &lt;Mock name=&#39;mock.i_dont_exist&#39; id=&#39;139841609578768&#39;&gt; &gt;&gt;&gt; m.i_dont_exist() &lt;Mock name=&#39;mock.i_dont_exist()&#39; id=&#39;139841609106896&#39;&gt; The above is expected, since I have not declared a spec when creating the ..."/>
-        <meta property="article:published_time" content="2015-12-30" />
+        <meta property="og:description" content="Updated: Fixed typo in the last paragraph. Today, I was curious to see this behavior of Mock() objects when using mock: &gt;&gt;&gt; from mock import Mock &gt;&gt;&gt; m = Mock() &gt;&gt;&gt; m.i_dont_exist &lt;Mock name=&#39;mock.i_dont_exist&#39; id=&#39;139841609578768&#39;&gt; &gt;&gt;&gt; m.i_dont_exist() &lt;Mock name=&#39;mock.i_dont_exist()&#39; id=&#39;139841609106896&#39;&gt; The above is expected, since I have ..."/>
+        <meta property="article:published_time" content="2015-01-11" />
             <meta property="article:section" content="Python" />
             <meta property="article:author" content="Amit Saha" />
 
@@ -98,7 +98,7 @@ Programming and Writing about it            </a>
 <footer class="post-info">
     <span class="label label-default">Date</span>
     <span class="published">
-        <i class="fa fa-calendar"></i><time datetime="2015-12-30T14:00:00+10:00"> Wed 30 December 2015</time>
+        <i class="fa fa-calendar"></i><time datetime="2015-01-11T14:00:00+10:00"> Sun 11 January 2015</time>
     </span>
 
 
@@ -108,7 +108,8 @@ Programming and Writing about it            </a>
     
 </footer><!-- /.post-info -->                    </div>
                 </div>
-                <p>Today, I was curious to see this behavior of <tt class="docutils literal">Mock()</tt> objects when using <a class="reference external" href="https://github.com/testing-cabal/mock">mock</a>:</p>
+                <p><em>Updated</em>: Fixed typo in the last paragraph.</p>
+<p>Today, I was curious to see this behavior of <tt class="docutils literal">Mock()</tt> objects when using <a class="reference external" href="https://github.com/testing-cabal/mock">mock</a>:</p>
 <pre class="code literal-block">
 &gt;&gt;&gt; from mock import Mock
 &gt;&gt;&gt; m = Mock()
@@ -146,7 +147,9 @@ if not self._mock_unsafe: # self._mock_unsafe is by default False
     if name.startswith(('assert', 'assret')): # It comes here and an AttributeError is raised
         raise AttributeError(name)
 </pre>
-<p>This is certainly a good thing, since I have often seen <a class="reference external" href="http://engineeringblog.yelp.com/2015/02/assert_called_once-threat-or-menace.html">assert_called_once</a> more often than not found in codebases and is fairly easy to get wrong.</p>
+<p>This is certainly a good thing, since I have often seen
+<a class="reference external" href="http://engineeringblog.yelp.com/2015/02/assert_called_once-threat-or-menace.html">assert_called_once</a>
+in codebases, and is fairly easy to overlook.</p>
 
             </div>
             <!-- /.entry-content -->

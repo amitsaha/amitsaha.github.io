@@ -1,6 +1,8 @@
 :Title: Mock objects and non-existent attributes/methods in Python
-:Date: 2015-12-30 14:00
+:Date: 2015-01-11 14:00
 :Category: Python
+
+*Updated*: Fixed typo in the last paragraph.
 
 Today, I was curious to see this behavior of ``Mock()`` objects when using `mock <https://github.com/testing-cabal/mock>`__:
 
@@ -50,5 +52,7 @@ happening. The exact lines are below:
         if name.startswith(('assert', 'assret')): # It comes here and an AttributeError is raised
             raise AttributeError(name)
 
-This is certainly a good thing, since I have often seen `assert_called_once <http://engineeringblog.yelp.com/2015/02/assert_called_once-threat-or-menace.html>`__ more often than not found in codebases and is fairly easy to get wrong. 
-
+This is certainly a good thing, since I have often seen
+`assert_called_once
+<http://engineeringblog.yelp.com/2015/02/assert_called_once-threat-or-menace.html>`__
+in codebases, and is fairly easy to overlook.
