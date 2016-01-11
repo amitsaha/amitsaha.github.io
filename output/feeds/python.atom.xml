@@ -1,5 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Programming and Writing about it</title><link href="/" rel="alternate"></link><link href="/feeds/python.atom.xml" rel="self"></link><id>/</id><updated>2015-11-30T12:00:00+10:00</updated><entry><title>A virtualenv first approach to Python projects</title><link href="/a-virtualenv-first-approach-to-python-projects.html" rel="alternate"></link><published>2015-11-30T12:00:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2015-11-30:a-virtualenv-first-approach-to-python-projects.html</id><summary type="html">&lt;p&gt;I have until the last few months (of my ~4 years of working with
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Programming and Writing about it</title><link href="/" rel="alternate"></link><link href="/feeds/python.atom.xml" rel="self"></link><id>/</id><updated>2016-01-11T14:00:00+10:00</updated><entry><title>Mock objects and non-existent attributes/methods in Python</title><link href="/mock-objects-and-non-existent-attributesmethods-in-python.html" rel="alternate"></link><published>2016-01-11T14:00:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2016-01-11:mock-objects-and-non-existent-attributesmethods-in-python.html</id><summary type="html">&lt;p&gt;&lt;em&gt;Updated&lt;/em&gt;: Fixed typo in the last paragraph.&lt;/p&gt;
+&lt;p&gt;Today, I was curious to see this behavior of &lt;tt class="docutils literal"&gt;Mock()&lt;/tt&gt; objects when using &lt;a class="reference external" href="https://github.com/testing-cabal/mock"&gt;mock&lt;/a&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+&amp;gt;&amp;gt;&amp;gt; from mock import Mock
+&amp;gt;&amp;gt;&amp;gt; m = Mock()
+&amp;gt;&amp;gt;&amp;gt; m.i_dont_exist
+&amp;lt;Mock name='mock.i_dont_exist' id='139841609578768'&amp;gt;
+&amp;gt;&amp;gt;&amp;gt; m.i_dont_exist()
+&amp;lt;Mock name='mock.i_dont_exist()' id='139841609106896'&amp;gt;
+&lt;/pre&gt;
+&lt;p&gt;The above is expected, since I have not declared a spec when creating the &lt;tt class="docutils literal"&gt;Mock()&lt;/tt&gt; object, so even when you call a non-existent method or get/set a non-existent attribute, you will not get a &lt;tt class="docutils literal"&gt;AttributeError&lt;/tt&gt;.&lt;/p&gt;
+&lt;p&gt;However, I was suprised by the following:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+&amp;gt;&amp;gt;&amp;gt; m.assert_not_calledd
+Traceback (most recent call last):
+ File &amp;quot;&amp;lt;stdin&amp;gt;&amp;quot;, line 1, in &amp;lt;module&amp;gt;
+File &amp;quot;/home/asaha/.local/share/virtualenvs/606fc8723c1a01b/lib/python2.7/site-packages/mock/mock.py&amp;quot;, line 721, in _    _getattr__
+   raise AttributeError(name)
+ AttributeError: assert_not_calledd
+&lt;/pre&gt;
+&lt;p&gt;And the following as well:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+&amp;gt;&amp;gt;&amp;gt; m.assert_foo
+Traceback (most recent call last):
+File &amp;quot;&amp;lt;stdin&amp;gt;&amp;quot;, line 1, in &amp;lt;module&amp;gt;
+File &amp;quot;/home/asaha/.local/share/virtualenvs/606fc8723c1a01b/lib/python2.7/site-packages/mock/mock.py&amp;quot;, line 721, in __getattr__
+  raise AttributeError(name)
+  AttributeError: assert_foo
+&lt;/pre&gt;
+&lt;p&gt;I guessed that there is likely a check explicitly for &lt;strong&gt;non-existent
+attributes&lt;/strong&gt; starting with &lt;tt class="docutils literal"&gt;assert&lt;/tt&gt;, and if it finds so, it will
+raise a &lt;tt class="docutils literal"&gt;AttributeError&lt;/tt&gt;.  If you look at the &lt;a class="reference external" href="https://github.com/testing-cabal/mock/blob/master/mock/mock.py#L708"&gt;__getattr__&lt;/a&gt;
+method in &lt;tt class="docutils literal"&gt;mock.py&lt;/tt&gt;, you will see that this is pretty much what is
+happening. The exact lines are below:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+if not self._mock_unsafe: # self._mock_unsafe is by default False
+    if name.startswith(('assert', 'assret')): # It comes here and an AttributeError is raised
+        raise AttributeError(name)
+&lt;/pre&gt;
+&lt;p&gt;This is certainly a good thing, since I have often seen
+&lt;a class="reference external" href="http://engineeringblog.yelp.com/2015/02/assert_called_once-threat-or-menace.html"&gt;assert_called_once&lt;/a&gt;
+in codebases, and is fairly easy to overlook.&lt;/p&gt;
+</summary></entry><entry><title>A virtualenv first approach to Python projects</title><link href="/a-virtualenv-first-approach-to-python-projects.html" rel="alternate"></link><published>2015-11-30T12:00:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2015-11-30:a-virtualenv-first-approach-to-python-projects.html</id><summary type="html">&lt;p&gt;I have until the last few months (of my ~4 years of working with
 Python) always worked without virtualenv for all my Python
 projects. Why? I think I found the whole idea of having to do the
 following two steps before I work on something cumbersome:&lt;/p&gt;
@@ -114,46 +156,4 @@ def test_where_clause_2():
 &lt;p&gt;If you run the above tests with different &lt;tt class="docutils literal"&gt;PYTHONHASHSEED&lt;/tt&gt; values, you will notice similar behaviour to the previous example.&lt;/p&gt;
 &lt;p&gt;If you are using &lt;a class="reference external" href="https://testrun.org/tox/latest/example/basic.html#special-handling-of-pythonhashseed"&gt;tox&lt;/a&gt; to run your tests, it automatically sets &lt;tt class="docutils literal"&gt;PYTHONHASHSEED&lt;/tt&gt; to a random integer when it is invoked. Hence, if you have never had your tests fail so far, there is a good chance your tests do not make any assumptions of order when dealing with Python dictionaries - but that of course is no guarantee that your tests are completely free since there may be this particular random number that has not been tried yet! So, ideally you may just want to do run your tests (especially if they don't take long) for a large number of PYTHONHASHSEED values just to be more confident.&lt;/p&gt;
 &lt;/div&gt;
-</summary></entry><entry><title>Mock objects and non-existent attributes/methods in Python</title><link href="/mock-objects-and-non-existent-attributesmethods-in-python.html" rel="alternate"></link><published>2015-01-11T14:00:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2015-01-11:mock-objects-and-non-existent-attributesmethods-in-python.html</id><summary type="html">&lt;p&gt;&lt;em&gt;Updated&lt;/em&gt;: Fixed typo in the last paragraph.&lt;/p&gt;
-&lt;p&gt;Today, I was curious to see this behavior of &lt;tt class="docutils literal"&gt;Mock()&lt;/tt&gt; objects when using &lt;a class="reference external" href="https://github.com/testing-cabal/mock"&gt;mock&lt;/a&gt;:&lt;/p&gt;
-&lt;pre class="code literal-block"&gt;
-&amp;gt;&amp;gt;&amp;gt; from mock import Mock
-&amp;gt;&amp;gt;&amp;gt; m = Mock()
-&amp;gt;&amp;gt;&amp;gt; m.i_dont_exist
-&amp;lt;Mock name='mock.i_dont_exist' id='139841609578768'&amp;gt;
-&amp;gt;&amp;gt;&amp;gt; m.i_dont_exist()
-&amp;lt;Mock name='mock.i_dont_exist()' id='139841609106896'&amp;gt;
-&lt;/pre&gt;
-&lt;p&gt;The above is expected, since I have not declared a spec when creating the &lt;tt class="docutils literal"&gt;Mock()&lt;/tt&gt; object, so even when you call a non-existent method or get/set a non-existent attribute, you will not get a &lt;tt class="docutils literal"&gt;AttributeError&lt;/tt&gt;.&lt;/p&gt;
-&lt;p&gt;However, I was suprised by the following:&lt;/p&gt;
-&lt;pre class="code literal-block"&gt;
-&amp;gt;&amp;gt;&amp;gt; m.assert_not_calledd
-Traceback (most recent call last):
- File &amp;quot;&amp;lt;stdin&amp;gt;&amp;quot;, line 1, in &amp;lt;module&amp;gt;
-File &amp;quot;/home/asaha/.local/share/virtualenvs/606fc8723c1a01b/lib/python2.7/site-packages/mock/mock.py&amp;quot;, line 721, in _    _getattr__
-   raise AttributeError(name)
- AttributeError: assert_not_calledd
-&lt;/pre&gt;
-&lt;p&gt;And the following as well:&lt;/p&gt;
-&lt;pre class="code literal-block"&gt;
-&amp;gt;&amp;gt;&amp;gt; m.assert_foo
-Traceback (most recent call last):
-File &amp;quot;&amp;lt;stdin&amp;gt;&amp;quot;, line 1, in &amp;lt;module&amp;gt;
-File &amp;quot;/home/asaha/.local/share/virtualenvs/606fc8723c1a01b/lib/python2.7/site-packages/mock/mock.py&amp;quot;, line 721, in __getattr__
-  raise AttributeError(name)
-  AttributeError: assert_foo
-&lt;/pre&gt;
-&lt;p&gt;I guessed that there is likely a check explicitly for &lt;strong&gt;non-existent
-attributes&lt;/strong&gt; starting with &lt;tt class="docutils literal"&gt;assert&lt;/tt&gt;, and if it finds so, it will
-raise a &lt;tt class="docutils literal"&gt;AttributeError&lt;/tt&gt;.  If you look at the &lt;a class="reference external" href="https://github.com/testing-cabal/mock/blob/master/mock/mock.py#L708"&gt;__getattr__&lt;/a&gt;
-method in &lt;tt class="docutils literal"&gt;mock.py&lt;/tt&gt;, you will see that this is pretty much what is
-happening. The exact lines are below:&lt;/p&gt;
-&lt;pre class="code literal-block"&gt;
-if not self._mock_unsafe: # self._mock_unsafe is by default False
-    if name.startswith(('assert', 'assret')): # It comes here and an AttributeError is raised
-        raise AttributeError(name)
-&lt;/pre&gt;
-&lt;p&gt;This is certainly a good thing, since I have often seen
-&lt;a class="reference external" href="http://engineeringblog.yelp.com/2015/02/assert_called_once-threat-or-menace.html"&gt;assert_called_once&lt;/a&gt;
-in codebases, and is fairly easy to overlook.&lt;/p&gt;
 </summary></entry></feed>

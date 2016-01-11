@@ -1,5 +1,5 @@
 :Title: Mock objects and non-existent attributes/methods in Python
-:Date: 2015-01-11 14:00
+:Date: 2016-01-11 14:00
 :Category: Python
 
 *Updated*: Fixed typo in the last paragraph.
