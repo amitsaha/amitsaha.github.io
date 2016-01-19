@@ -5,7 +5,7 @@ function in the &lt;tt class="docutils literal"&gt;tempfile&lt;/tt&gt; module is
 cases that I think one might use it for.&lt;/p&gt;
 &lt;p&gt;&lt;em&gt;Case #1: You simply need a named empty temporary file&lt;/em&gt;&lt;/p&gt;
 &lt;p&gt;You just want a file object (pointing to an &lt;em&gt;empty&lt;/em&gt; file) which has a
-filename associated to it and hence you cannot use a &lt;a class="reference external" href="https://docs.python.org/2/library/stringio.html"&gt;StringIO&lt;/a&gt; objects:&lt;/p&gt;
+filename associated to it and hence you cannot use a &lt;a class="reference external" href="https://docs.python.org/2/library/stringio.html"&gt;StringIO&lt;/a&gt; object:&lt;/p&gt;
 &lt;pre class="code literal-block"&gt;
 from tempfile import NamedTemporaryFile
 f = NamedTemporaryFile()

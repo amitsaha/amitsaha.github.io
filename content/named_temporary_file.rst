@@ -12,7 +12,7 @@ cases that I think one might use it for.
 
 You just want a file object (pointing to an *empty* file) which has a
 filename associated to it and hence you cannot use a `StringIO
-<https://docs.python.org/2/library/stringio.html>`__ objects:
+<https://docs.python.org/2/library/stringio.html>`__ object:
 
 .. code::
 
