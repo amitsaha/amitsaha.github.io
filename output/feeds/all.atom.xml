@@ -1,5 +1,96 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Programming and Writing about it</title><link href="/" rel="alternate"></link><link href="/feeds/all.atom.xml" rel="self"></link><id>/</id><updated>2016-01-11T14:00:00+10:00</updated><entry><title>Mock objects and non-existent attributes/methods in Python</title><link href="/mock-objects-and-non-existent-attributesmethods-in-python.html" rel="alternate"></link><published>2016-01-11T14:00:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2016-01-11:mock-objects-and-non-existent-attributesmethods-in-python.html</id><summary type="html">&lt;p&gt;&lt;em&gt;Updated&lt;/em&gt;: Fixed typo in the last paragraph.&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Programming and Writing about it</title><link href="/" rel="alternate"></link><link href="/feeds/all.atom.xml" rel="self"></link><id>/</id><updated>2016-01-20T11:00:00+10:00</updated><entry><title>tempfile.NamedTemporaryFile() in Python</title><link href="/tempfilenamedtemporaryfile-in-python.html" rel="alternate"></link><published>2016-01-20T11:00:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2016-01-20:tempfilenamedtemporaryfile-in-python.html</id><summary type="html">&lt;p&gt;In Python, when you need to create a temporary file with a filename
+associated to it on disk, &lt;a class="reference external" href="https://docs.python.org/2/library/tempfile.html#tempfile.TemporaryFile"&gt;NamedTemporaryFile&lt;/a&gt;
+function in the &lt;tt class="docutils literal"&gt;tempfile&lt;/tt&gt; is the goto function. Here are some use
+cases that I think one might use it for and&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Case #1: You simply need a named empty temporary file&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;You just want a file object (pointing to an &lt;em&gt;empty&lt;/em&gt; file) which has a
+filename associated to it and hence you cannot use a &lt;a class="reference external" href="https://docs.python.org/2/library/stringio.html"&gt;StringIO&lt;/a&gt; objects:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+from tempfile import NamedTemporaryFile
+f = NamedTemporaryFile()
+
+# use f
+..
+&lt;/pre&gt;
+&lt;p&gt;Once &lt;tt class="docutils literal"&gt;f&lt;/tt&gt; is garbage collected, or closed explicitly, the file will automatically be
+removed from disk.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Case #2: You need a empty temporary file with a custom name&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;You need a temporary file, but want to change the filename to
+something you need:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+from tempfile import NamedTemporaryFile
+f = NamedTemporaryFile()
+
+# Change the file name to something
+f.name = 'myfilename.myextension'
+
+# use f
+&lt;/pre&gt;
+&lt;p&gt;Since you change the name of the file, this file will automatically
+&lt;em&gt;not&lt;/em&gt; be removed from disk when you close the file or the file object is
+garbage collected. Hence, you will need to do so yourself:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+from tempfile import NamedTemporaryFile
+f = NamedTemporaryFile()
+
+# Save original name (the &amp;quot;name&amp;quot; actually is the absolute path)
+original_path = f.name
+
+# Change the file name to something
+f.name = 'myfilename.myextension'
+
+# use f
+
+..
+
+# Remove the file
+os.unlink(original_path)
+assert not os.path.exists(original_path)
+&lt;/pre&gt;
+&lt;p&gt;&lt;em&gt;Case #3: You need a temporary file, write some contents, read from it later&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;This use case is where you need a temporary file, but you want to work
+with it like a &amp;quot;normal&amp;quot; file on disk - write something to it and
+later, read it from it. In other words, you just want to control when
+the file gets removed from disk.&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+from tempfile import NamedTemporaryFile
+# When delete=False is specified, this file will not be
+# removed from disk automatically upon close/garbage collection
+f = NamedTemporaryFile(delete=False)
+
+# Save the file path
+path = f.name
+
+# Write something to it
+f.write('Some random data')
+
+# You can now close the file and later
+# open and read it again
+f.close()
+data = open(path).read()
+
+# do some work with the data
+
+# Or, make a seek(0) call on the file object and read from it
+# The file mode is by default &amp;quot;w+&amp;quot; which means, you can read from
+# and write to it.
+f.seek(0)
+data = f.read()
+
+# Close the file
+f.close()
+
+..
+
+# Remove the file
+os.unlink(path)
+assert not os.path.exists(path)
+&lt;/pre&gt;
+&lt;p&gt;By default &lt;tt class="docutils literal"&gt;delete&lt;/tt&gt; is set to &lt;tt class="docutils literal"&gt;True&lt;/tt&gt; when calling
+&lt;tt class="docutils literal"&gt;NamedTemporaryFile()&lt;/tt&gt;, and thus setting it to &lt;tt class="docutils literal"&gt;False&lt;/tt&gt; gives more
+control on when the file gets removed from disk.&lt;/p&gt;
+</summary></entry><entry><title>Mock objects and non-existent attributes/methods in Python</title><link href="/mock-objects-and-non-existent-attributesmethods-in-python.html" rel="alternate"></link><published>2016-01-11T14:00:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2016-01-11:mock-objects-and-non-existent-attributesmethods-in-python.html</id><summary type="html">&lt;p&gt;&lt;em&gt;Updated&lt;/em&gt;: Fixed typo in the last paragraph.&lt;/p&gt;
 &lt;p&gt;Today, I was curious to see this behavior of &lt;tt class="docutils literal"&gt;Mock()&lt;/tt&gt; objects when using &lt;a class="reference external" href="https://github.com/testing-cabal/mock"&gt;mock&lt;/a&gt;:&lt;/p&gt;
 &lt;pre class="code literal-block"&gt;
 &amp;gt;&amp;gt;&amp;gt; from mock import Mock
