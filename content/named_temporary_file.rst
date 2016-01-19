@@ -5,8 +5,8 @@
 In Python, when you need to create a temporary file with a filename
 associated to it on disk, `NamedTemporaryFile
 <https://docs.python.org/2/library/tempfile.html#tempfile.TemporaryFile>`__
-function in the ``tempfile`` is the goto function. Here are some use
-cases that I think one might use it for and
+function in the ``tempfile`` module is the goto function. Here are some use
+cases that I think one might use it for.
 
 *Case #1: You simply need a named empty temporary file*
 
