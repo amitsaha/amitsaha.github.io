@@ -1,5 +1,94 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Programming and Writing about it</title><link href="/" rel="alternate"></link><link href="/feeds/all.atom.xml" rel="self"></link><id>/</id><updated>2016-01-20T11:00:00+10:00</updated><entry><title>tempfile.NamedTemporaryFile() in Python</title><link href="/tempfilenamedtemporaryfile-in-python.html" rel="alternate"></link><published>2016-01-20T11:00:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2016-01-20:tempfilenamedtemporaryfile-in-python.html</id><summary type="html">&lt;p&gt;In Python, when you need to create a temporary file with a filename
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Programming and Writing about it</title><link href="/" rel="alternate"></link><link href="/feeds/all.atom.xml" rel="self"></link><id>/</id><updated>2016-01-25T16:00:00+10:00</updated><entry><title>Replacing boto S3 mocks using moto</title><link href="/replacing-boto-s3-mocks-using-moto.html" rel="alternate"></link><published>2016-01-25T16:00:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2016-01-25:replacing-boto-s3-mocks-using-moto.html</id><summary type="html">&lt;p&gt;Let's say you have some Python application code which connects to Amazon S3 which
+retrieves the keys in a bucket. Very likely, the application would be
+using &lt;a class="reference external" href="http://boto.cloudhackers.com/en/latest/s3_tut.html"&gt;boto&lt;/a&gt;
+and the code would like this:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+import boto
+
+def get_s3_conn():
+    return boto.connect_s3('&amp;lt;aws-access-key', '&amp;lt;aws-secret-key&amp;gt;')
+
+def list_keys():
+    s3_conn = get_s3_conn()
+    b = s3_conn.get_bucket('bucket_name')
+    keys = b.list()
+    return keys
+&lt;/pre&gt;
+&lt;p&gt;The corresponding test would presumably use some &lt;a class="reference external" href="mock.readthedocs.org"&gt;mocks and patching&lt;/a&gt;. Here is one way to write a test for the
+above code:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+# Assume the code above is in a module list_keys
+# in a function list_keys
+
+from list_keys import list_keys
+
+from mock import patch, Mock
+
+def test_list_keys():
+   mocked_keys = [Mock(key='mykey1'), Mock(key='key2')]
+   mocked_connection = Mock()
+   # Start with patching connect_s3
+   with patch('boto.connect_s3', Mock(return_value=mocked_connection)):
+       mocked_bucket = Mock()
+       # Mock get_bucket() call
+       mocked_connection.get_bucket = Mock(return_value=mocked_bucket)
+       # Mock the list() call to return the keys you want
+       mocked_bucket.list = Mock(return_value=mocked_keys)
+       keys = list_keys()
+
+       assert keys == mocked_keys
+&lt;/pre&gt;
+&lt;p&gt;I thought I really had no other way to get around mocks and patches if
+I wanted to test this part of my application. But, I discovered &lt;a class="reference external" href="https://github.com/spulec/moto"&gt;moto&lt;/a&gt;. Then life became easier.&lt;/p&gt;
+&lt;p&gt;Using moto's S3 support, I don't need to worry about the mocking and
+patching the boto calls any more. Here is the same test above, but
+using moto:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+from list_keys import get_s3_conn, list_keys
+from moto import mock_s3
+
+def test_list_keys():
+
+    expected_keys = ['key1', 'key2']
+
+    moto = mock_s3()
+    # We enter &amp;quot;moto&amp;quot; mode using this
+    moto.start()
+
+    # Get the connection object
+    conn = get_s3_conn()
+
+    # Set up S3 as we expect it to be
+    conn.create_bucket('bucket_name')
+    for name in expected_keys:
+        k = conn.get_bucket('bucket_name').new_key(name)
+        k.set_contents_from_string('abcdedsd')
+
+    # Now call the actual function
+    keys = list_keys()
+    assert expected_keys == [k.name for k in keys]
+
+    # get out of moto mode
+    moto.stop()
+&lt;/pre&gt;
+&lt;p&gt;Unless it is obvious, here are two major differences from the previous
+test:&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;We don't mock or patch anything&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;The point #1 above is the direct reason I would consider using moto
+for testing S3 interactions rather than setting up mocks. This helps us in
+the scenario in which this section of the code lies in another
+package, not the one you are writing tests for currently. You can
+actually call this section of the code and let the interaction with S3
+happen as if it were interacting directly with Amazon S3. I think this
+allows deeper penetration of your tests and as a result your code's
+interactions with others.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;The test code has to explicitly first setup the expected state&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;This may seem like more work, but I think it still outweighs the
+benefits as mentioned previously.&lt;/p&gt;
+&lt;p&gt;Please checkout &lt;cite&gt;moto  &amp;lt;https://github.com/spulec/moto&amp;gt;&lt;/cite&gt; here.&lt;/p&gt;
+&lt;p&gt;If you like this post, please follow &lt;a class="reference external" href="https://twitter.com/PythonTestTips"&gt;PythonTestTips&lt;/a&gt; on Twitter.&lt;/p&gt;
+</summary></entry><entry><title>tempfile.NamedTemporaryFile() in Python</title><link href="/tempfilenamedtemporaryfile-in-python.html" rel="alternate"></link><published>2016-01-20T11:00:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2016-01-20:tempfilenamedtemporaryfile-in-python.html</id><summary type="html">&lt;p&gt;In Python, when you need to create a temporary file with a filename
 associated to it on disk, &lt;a class="reference external" href="https://docs.python.org/2/library/tempfile.html#tempfile.TemporaryFile"&gt;NamedTemporaryFile&lt;/a&gt;
 function in the &lt;tt class="docutils literal"&gt;tempfile&lt;/tt&gt; module is the goto function. Here are some use
 cases that I think one might use it for.&lt;/p&gt;
