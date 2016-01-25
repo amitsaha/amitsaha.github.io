@@ -1,4 +1,4 @@
-:Title: Replacing boto S3 mocks using moto
+:Title: Replacing boto S3 mocks using moto in Python
 :Date: 2016-01-25 16:00
 :Category: Python
 
@@ -104,7 +104,7 @@ interactions with others.
 This may seem like more work, but I think it still outweighs the
 benefits as mentioned previously.
 
-Please checkout `moto  <https://github.com/spulec/moto>` here.
+Please checkout `moto <https://github.com/spulec/moto>`__ here.
 
 If you like this post, please follow `PythonTestTips
 <https://twitter.com/PythonTestTips>`__ on Twitter.
