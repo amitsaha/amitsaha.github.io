@@ -1,5 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Programming and Writing about it</title><link href="/" rel="alternate"></link><link href="/feeds/all.atom.xml" rel="self"></link><id>/</id><updated>2016-01-25T16:00:00+10:00</updated><entry><title>Replacing boto S3 mocks using moto in Python</title><link href="/replacing-boto-s3-mocks-using-moto-in-python.html" rel="alternate"></link><published>2016-01-25T16:00:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2016-01-25:replacing-boto-s3-mocks-using-moto-in-python.html</id><summary type="html">&lt;p&gt;Let's say you have some Python application code which connects to Amazon S3 which
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Programming and Writing about it</title><link href="/" rel="alternate"></link><link href="/feeds/all.atom.xml" rel="self"></link><id>/</id><updated>2016-02-17T11:00:00+10:00</updated><entry><title>Did your Fedora live cd build fail?</title><link href="/did-your-fedora-live-cd-build-fail.html" rel="alternate"></link><published>2016-02-17T11:00:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2016-02-17:did-your-fedora-live-cd-build-fail.html</id><summary type="html">&lt;p&gt;As the &lt;a class="reference external" href="http://fedora-scientific.readthedocs.org/en/latest/"&gt;Fedora Scientific&lt;/a&gt; maintainer, I
+have to make sure I look into why the nightly build may be failing. So
+far I have been doing that by going to the koji &lt;a class="reference external" href="http://koji.fedoraproject.org/koji/tasks?state=all&amp;amp;view=tree&amp;amp;method=livecd"&gt;url&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;But I think there is a better way - make a program do it
+regularly. First, the program (a Python script):&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+from lxml import html
+import requests
+
+def main():
+   page = requests.get('http://koji.fedoraproject.org/koji/tasks?state=all&amp;amp;view=tree&amp;amp;method=livecd')
+   tree = html.fromstring(page.content)
+
+   a_class_failed = tree.xpath('//a[&amp;#64;class=&amp;quot;taskfailed&amp;quot;]')
+   for image in  a_class_failed:
+   print image.text
+
+if __name__ == '__main__':
+   main()
+&lt;/pre&gt;
+&lt;p&gt;This incidentally happens to be my first scraping program and I got
+the help I needed &lt;a class="reference external" href="http://docs.python-guide.org/en/latest/scenarios/scrape/"&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;If you install the &lt;tt class="docutils literal"&gt;requests&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;lxml&lt;/tt&gt; packages and run the
+script, it will print the list of failing builds.&lt;/p&gt;
+&lt;p&gt;Next step: I want to set this up regularly and send me an email. The
+script is &lt;a class="reference external" href="https://github.com/amitsaha/fedora_livecd_build_failed/blob/master/failing_images.py"&gt;here&lt;/a&gt;.
+As you can see, I have used &lt;a class="reference external" href="https://sendgrid.com/"&gt;sendgrid&lt;/a&gt; to
+send myself the email using their  &lt;a class="reference external" href="https://github.com/sendgrid/sendgrid-python"&gt;Python library&lt;/a&gt;. So you will need to
+get an API key to use this program. Before you can use the script,
+please install the dependencies using &lt;tt class="docutils literal"&gt;pip install &lt;span class="pre"&gt;-r&lt;/span&gt;
+requirements.txt&lt;/tt&gt; preferably in it's own &lt;a class="reference external" href="http://python-packaging-user-guide.readthedocs.org/en/develop/using-a-virtualenv/"&gt;virtualenv&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;I set this up in a cron job as follows:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+0 8 * * * /home/asaha/.local/share/virtualenvs/koji_scraper/bin/python /home/asaha/work/koji_livecd_scraper/python/failing_images.py
+&lt;/pre&gt;
+&lt;p&gt;You will of course have to setup the path correctly for your
+setup. The script will send me an email every morning at 8 as follows:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+  livecd (rawhide, Fedora-Live-Workstation-x86_64-rawhide, fedora-live-workstation-db37b44.ks)
+
+  createLiveCD (rawhide, Fedora-Live-Workstation-x86_64-rawhide-20160216, fedora-live-workstation-db37b44.ks, x86_64)
+
+  livecd (rawhide, Fedora-Live-Workstation-i686-rawhide, fedora-live-workstation-db37b44.ks)
+
+  createLiveCD (rawhide, Fedora-Live-Workstation-i686-rawhide-20160216, fedora-live-workstation-db37b44.ks, i386)
+
+  livecd (rawhide, Fedora-Live-Scientific_KDE-x86_64-rawhide, fedora-live-scientific_kde-db37b44.ks)
+
+  createLiveCD (rawhide, Fedora-Live-Scientific_KDE-x86_64-rawhide-20160216, fedora-live-scientific_kde-db37b44.ks, x86_64)
+
+  livecd (rawhide, Fedora-Live-Scientific_KDE-i686-rawhide, fedora-live-scientific_kde-db37b44.ks)
+
+  createLiveCD (rawhide, Fedora-Live-Scientific_KDE-i686-rawhide-20160216, fedora-live-scientific_kde-db37b44.ks, i386)
+
+
+The GitHub repository for the code is available `here
+&amp;lt;https://github.com/amitsaha/fedora_livecd_build_failed&amp;gt;`__.
+&lt;/pre&gt;
+</summary></entry><entry><title>Replacing boto S3 mocks using moto in Python</title><link href="/replacing-boto-s3-mocks-using-moto-in-python.html" rel="alternate"></link><published>2016-01-25T16:00:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2016-01-25:replacing-boto-s3-mocks-using-moto-in-python.html</id><summary type="html">&lt;p&gt;Let's say you have some Python application code which connects to Amazon S3 which
 retrieves the keys in a bucket. Very likely, the application would be
 using &lt;a class="reference external" href="http://boto.cloudhackers.com/en/latest/s3_tut.html"&gt;boto&lt;/a&gt;
 and the code would like this:&lt;/p&gt;
@@ -716,62 +774,4 @@ great idea. Everyone associated with it, thank you very much.&lt;/p&gt;
 changes.&lt;/p&gt;
 </summary></entry><entry><title>Remapping http://echorand.me</title><link href="/remapping-httpechorandme.html" rel="alternate"></link><published>2015-04-30T10:20:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2015-04-30:remapping-httpechorandme.html</id><summary type="html">&lt;p&gt;I changed the mapping of my domain to point to my GitHub pages. My old
 blog content is still available &lt;a class="reference external" href="http://amitksaha.wordpress.com"&gt;here&lt;/a&gt;.&lt;/p&gt;
-</summary></entry><entry><title>Did your Fedora live cd build fail?</title><link href="/did-your-fedora-live-cd-build-fail.html" rel="alternate"></link><published>2015-02-17T11:00:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2015-02-17:did-your-fedora-live-cd-build-fail.html</id><summary type="html">&lt;p&gt;As the &lt;a class="reference external" href="http://fedora-scientific.readthedocs.org/en/latest/"&gt;Fedora Scientific&lt;/a&gt; maintainer, I
-have to make sure I look into why the nightly build may be failing. So
-far I have been doing that by going to the koji &lt;a class="reference external" href="http://koji.fedoraproject.org/koji/tasks?state=all&amp;amp;view=tree&amp;amp;method=livecd"&gt;url&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;But I think there is a better way - make a program do it
-regularly. First, the program (a Python script):&lt;/p&gt;
-&lt;pre class="code literal-block"&gt;
-from lxml import html
-import requests
-
-def main():
-   page = requests.get('http://koji.fedoraproject.org/koji/tasks?state=all&amp;amp;view=tree&amp;amp;method=livecd')
-   tree = html.fromstring(page.content)
-
-   a_class_failed = tree.xpath('//a[&amp;#64;class=&amp;quot;taskfailed&amp;quot;]')
-   for image in  a_class_failed:
-   print image.text
-
-if __name__ == '__main__':
-   main()
-&lt;/pre&gt;
-&lt;p&gt;This incidentally happens to be my first scraping program and I got
-the help I needed &lt;a class="reference external" href="http://docs.python-guide.org/en/latest/scenarios/scrape/"&gt;here&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;If you install the &lt;tt class="docutils literal"&gt;requests&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;lxml&lt;/tt&gt; packages and run the
-script, it will print the list of failing builds.&lt;/p&gt;
-&lt;p&gt;Next step: I want to set this up regularly and send me an email. The
-script is &lt;a class="reference external" href="https://github.com/amitsaha/fedora_livecd_build_failed/blob/master/failing_images.py"&gt;here&lt;/a&gt;.
-As you can see, I have used &lt;a class="reference external" href="https://sendgrid.com/"&gt;sendgrid&lt;/a&gt; to
-send myself the email using their  &lt;a class="reference external" href="https://github.com/sendgrid/sendgrid-python"&gt;Python library&lt;/a&gt;. So you will need to
-get an API key to use this program. Before you can use the script,
-please install the dependencies using &lt;tt class="docutils literal"&gt;pip install &lt;span class="pre"&gt;-r&lt;/span&gt;
-requirements.txt&lt;/tt&gt; preferably in it's own &lt;a class="reference external" href="http://python-packaging-user-guide.readthedocs.org/en/develop/using-a-virtualenv/"&gt;virtualenv&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;I set this up in a cron job as follows:&lt;/p&gt;
-&lt;pre class="code literal-block"&gt;
-0 8 * * * /home/asaha/.local/share/virtualenvs/koji_scraper/bin/python /home/asaha/work/koji_livecd_scraper/python/failing_images.py
-&lt;/pre&gt;
-&lt;p&gt;You will of course have to setup the path correctly for your
-setup. The script will send me an email every morning at 8 as follows:&lt;/p&gt;
-&lt;pre class="code literal-block"&gt;
-  livecd (rawhide, Fedora-Live-Workstation-x86_64-rawhide, fedora-live-workstation-db37b44.ks)
-
-  createLiveCD (rawhide, Fedora-Live-Workstation-x86_64-rawhide-20160216, fedora-live-workstation-db37b44.ks, x86_64)
-
-  livecd (rawhide, Fedora-Live-Workstation-i686-rawhide, fedora-live-workstation-db37b44.ks)
-
-  createLiveCD (rawhide, Fedora-Live-Workstation-i686-rawhide-20160216, fedora-live-workstation-db37b44.ks, i386)
-
-  livecd (rawhide, Fedora-Live-Scientific_KDE-x86_64-rawhide, fedora-live-scientific_kde-db37b44.ks)
-
-  createLiveCD (rawhide, Fedora-Live-Scientific_KDE-x86_64-rawhide-20160216, fedora-live-scientific_kde-db37b44.ks, x86_64)
-
-  livecd (rawhide, Fedora-Live-Scientific_KDE-i686-rawhide, fedora-live-scientific_kde-db37b44.ks)
-
-  createLiveCD (rawhide, Fedora-Live-Scientific_KDE-i686-rawhide-20160216, fedora-live-scientific_kde-db37b44.ks, i386)
-
-
-The GitHub repository for the code is available `here
-&amp;lt;https://github.com/amitsaha/fedora_livecd_build_failed&amp;gt;`__.
-&lt;/pre&gt;
 </summary></entry></feed>
