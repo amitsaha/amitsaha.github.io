@@ -4,8 +4,8 @@
 
 As the `Fedora Scientific
 <http://fedora-scientific.readthedocs.org/en/latest/>`__ maintainer, I
-have to make sure I look into why the nightly build may be failing. So
-far I have been doing that by going to the koji `url
+have to make sure I look into whether the nightly build is failing so
+that I can look into the why. So far I have been doing that by going to the koji `url
 <http://koji.fedoraproject.org/koji/tasks?state=all&view=tree&method=livecd>`__.
 
 But I think there is a better way - make a program do it
@@ -51,8 +51,7 @@ I set this up in a cron job as follows:
 
    0 8 * * * /home/asaha/.local/share/virtualenvs/koji_scraper/bin/python /home/asaha/work/koji_livecd_scraper/python/failing_images.py
 
-You will of course have to setup the path correctly for your
-setup. The script will send me an email every morning at 8 as follows:
+You will of course have to setup the path correctly for your setup. The script will send me an email every morning at 8 as follows:
 
 .. code::
 
@@ -74,5 +73,4 @@ setup. The script will send me an email every morning at 8 as follows:
    createLiveCD (rawhide, Fedora-Live-Scientific_KDE-i686-rawhide-20160216, fedora-live-scientific_kde-db37b44.ks, i386)
 
 
- The GitHub repository for the code is available `here
- <https://github.com/amitsaha/fedora_livecd_build_failed>`__.
+The GitHub repository for the code is available `here <https://github.com/amitsaha/fedora_livecd_build_failed>`__.

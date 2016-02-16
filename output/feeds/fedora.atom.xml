@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom"><title>Programming and Writing about it</title><link href="/" rel="alternate"></link><link href="/feeds/fedora.atom.xml" rel="self"></link><id>/</id><updated>2016-02-17T11:00:00+10:00</updated><entry><title>Did your Fedora live cd build fail?</title><link href="/did-your-fedora-live-cd-build-fail.html" rel="alternate"></link><published>2016-02-17T11:00:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2016-02-17:did-your-fedora-live-cd-build-fail.html</id><summary type="html">&lt;p&gt;As the &lt;a class="reference external" href="http://fedora-scientific.readthedocs.org/en/latest/"&gt;Fedora Scientific&lt;/a&gt; maintainer, I
-have to make sure I look into why the nightly build may be failing. So
-far I have been doing that by going to the koji &lt;a class="reference external" href="http://koji.fedoraproject.org/koji/tasks?state=all&amp;amp;view=tree&amp;amp;method=livecd"&gt;url&lt;/a&gt;.&lt;/p&gt;
+have to make sure I look into whether the nightly build is failing so
+that I can look into the why. So far I have been doing that by going to the koji &lt;a class="reference external" href="http://koji.fedoraproject.org/koji/tasks?state=all&amp;amp;view=tree&amp;amp;method=livecd"&gt;url&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;But I think there is a better way - make a program do it
 regularly. First, the program (a Python script):&lt;/p&gt;
 &lt;pre class="code literal-block"&gt;
@@ -34,29 +34,25 @@ requirements.txt&lt;/tt&gt; preferably in it's own &lt;a class="reference extern
 &lt;pre class="code literal-block"&gt;
 0 8 * * * /home/asaha/.local/share/virtualenvs/koji_scraper/bin/python /home/asaha/work/koji_livecd_scraper/python/failing_images.py
 &lt;/pre&gt;
-&lt;p&gt;You will of course have to setup the path correctly for your
-setup. The script will send me an email every morning at 8 as follows:&lt;/p&gt;
+&lt;p&gt;You will of course have to setup the path correctly for your setup. The script will send me an email every morning at 8 as follows:&lt;/p&gt;
 &lt;pre class="code literal-block"&gt;
-  livecd (rawhide, Fedora-Live-Workstation-x86_64-rawhide, fedora-live-workstation-db37b44.ks)
+livecd (rawhide, Fedora-Live-Workstation-x86_64-rawhide, fedora-live-workstation-db37b44.ks)
 
-  createLiveCD (rawhide, Fedora-Live-Workstation-x86_64-rawhide-20160216, fedora-live-workstation-db37b44.ks, x86_64)
+createLiveCD (rawhide, Fedora-Live-Workstation-x86_64-rawhide-20160216, fedora-live-workstation-db37b44.ks, x86_64)
 
-  livecd (rawhide, Fedora-Live-Workstation-i686-rawhide, fedora-live-workstation-db37b44.ks)
+livecd (rawhide, Fedora-Live-Workstation-i686-rawhide, fedora-live-workstation-db37b44.ks)
 
-  createLiveCD (rawhide, Fedora-Live-Workstation-i686-rawhide-20160216, fedora-live-workstation-db37b44.ks, i386)
+createLiveCD (rawhide, Fedora-Live-Workstation-i686-rawhide-20160216, fedora-live-workstation-db37b44.ks, i386)
 
-  livecd (rawhide, Fedora-Live-Scientific_KDE-x86_64-rawhide, fedora-live-scientific_kde-db37b44.ks)
+livecd (rawhide, Fedora-Live-Scientific_KDE-x86_64-rawhide, fedora-live-scientific_kde-db37b44.ks)
 
-  createLiveCD (rawhide, Fedora-Live-Scientific_KDE-x86_64-rawhide-20160216, fedora-live-scientific_kde-db37b44.ks, x86_64)
+createLiveCD (rawhide, Fedora-Live-Scientific_KDE-x86_64-rawhide-20160216, fedora-live-scientific_kde-db37b44.ks, x86_64)
 
-  livecd (rawhide, Fedora-Live-Scientific_KDE-i686-rawhide, fedora-live-scientific_kde-db37b44.ks)
+livecd (rawhide, Fedora-Live-Scientific_KDE-i686-rawhide, fedora-live-scientific_kde-db37b44.ks)
 
-  createLiveCD (rawhide, Fedora-Live-Scientific_KDE-i686-rawhide-20160216, fedora-live-scientific_kde-db37b44.ks, i386)
-
-
-The GitHub repository for the code is available `here
-&amp;lt;https://github.com/amitsaha/fedora_livecd_build_failed&amp;gt;`__.
+createLiveCD (rawhide, Fedora-Live-Scientific_KDE-i686-rawhide-20160216, fedora-live-scientific_kde-db37b44.ks, i386)
 &lt;/pre&gt;
+&lt;p&gt;The GitHub repository for the code is available &lt;a class="reference external" href="https://github.com/amitsaha/fedora_livecd_build_failed"&gt;here&lt;/a&gt;.&lt;/p&gt;
 </summary></entry><entry><title>Data only Docker containers</title><link href="/data-only-docker-containers.html" rel="alternate"></link><published>2015-12-13T11:00:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2015-12-13:data-only-docker-containers.html</id><summary type="html">&lt;p&gt;In this post, we shall take a look at the idea of data only
 containers - containers whose sole purpose is to exist on the &lt;em&gt;docker
 host&lt;/em&gt; so that other containers can have portable access to a

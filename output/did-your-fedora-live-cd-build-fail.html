@@ -12,13 +12,13 @@
 <link rel="canonical" href="/did-your-fedora-live-cd-build-fail.html">
 
         <meta name="author" content="Amit Saha" />
-        <meta name="description" content="As the Fedora Scientific maintainer, I have to make sure I look into why the nightly build may be failing. So far I have been doing that by going to the koji url. But I think there is a better way - make a program do it regularly. First, the program ..." />
+        <meta name="description" content="As the Fedora Scientific maintainer, I have to make sure I look into whether the nightly build is failing so that I can look into the why. So far I have been doing that by going to the koji url. But I think there is a better way - make a ..." />
 
         <meta property="og:site_name" content="Programming and Writing about it" />
         <meta property="og:type" content="article"/>
         <meta property="og:title" content="Did your Fedora live cd build fail?"/>
         <meta property="og:url" content="/did-your-fedora-live-cd-build-fail.html"/>
-        <meta property="og:description" content="As the Fedora Scientific maintainer, I have to make sure I look into why the nightly build may be failing. So far I have been doing that by going to the koji url. But I think there is a better way - make a program do it regularly. First, the program ..."/>
+        <meta property="og:description" content="As the Fedora Scientific maintainer, I have to make sure I look into whether the nightly build is failing so that I can look into the why. So far I have been doing that by going to the koji url. But I think there is a better way - make a ..."/>
         <meta property="article:published_time" content="2016-02-17" />
             <meta property="article:section" content="Fedora" />
             <meta property="article:author" content="Amit Saha" />
@@ -109,8 +109,8 @@ Programming and Writing about it            </a>
 </footer><!-- /.post-info -->                    </div>
                 </div>
                 <p>As the <a class="reference external" href="http://fedora-scientific.readthedocs.org/en/latest/">Fedora Scientific</a> maintainer, I
-have to make sure I look into why the nightly build may be failing. So
-far I have been doing that by going to the koji <a class="reference external" href="http://koji.fedoraproject.org/koji/tasks?state=all&amp;view=tree&amp;method=livecd">url</a>.</p>
+have to make sure I look into whether the nightly build is failing so
+that I can look into the why. So far I have been doing that by going to the koji <a class="reference external" href="http://koji.fedoraproject.org/koji/tasks?state=all&amp;view=tree&amp;method=livecd">url</a>.</p>
 <p>But I think there is a better way - make a program do it
 regularly. First, the program (a Python script):</p>
 <pre class="code literal-block">
@@ -143,29 +143,25 @@ requirements.txt</tt> preferably in it's own <a class="reference external" href=
 <pre class="code literal-block">
 0 8 * * * /home/asaha/.local/share/virtualenvs/koji_scraper/bin/python /home/asaha/work/koji_livecd_scraper/python/failing_images.py
 </pre>
-<p>You will of course have to setup the path correctly for your
-setup. The script will send me an email every morning at 8 as follows:</p>
+<p>You will of course have to setup the path correctly for your setup. The script will send me an email every morning at 8 as follows:</p>
 <pre class="code literal-block">
-  livecd (rawhide, Fedora-Live-Workstation-x86_64-rawhide, fedora-live-workstation-db37b44.ks)
+livecd (rawhide, Fedora-Live-Workstation-x86_64-rawhide, fedora-live-workstation-db37b44.ks)
 
-  createLiveCD (rawhide, Fedora-Live-Workstation-x86_64-rawhide-20160216, fedora-live-workstation-db37b44.ks, x86_64)
+createLiveCD (rawhide, Fedora-Live-Workstation-x86_64-rawhide-20160216, fedora-live-workstation-db37b44.ks, x86_64)
 
-  livecd (rawhide, Fedora-Live-Workstation-i686-rawhide, fedora-live-workstation-db37b44.ks)
+livecd (rawhide, Fedora-Live-Workstation-i686-rawhide, fedora-live-workstation-db37b44.ks)
 
-  createLiveCD (rawhide, Fedora-Live-Workstation-i686-rawhide-20160216, fedora-live-workstation-db37b44.ks, i386)
+createLiveCD (rawhide, Fedora-Live-Workstation-i686-rawhide-20160216, fedora-live-workstation-db37b44.ks, i386)
 
-  livecd (rawhide, Fedora-Live-Scientific_KDE-x86_64-rawhide, fedora-live-scientific_kde-db37b44.ks)
+livecd (rawhide, Fedora-Live-Scientific_KDE-x86_64-rawhide, fedora-live-scientific_kde-db37b44.ks)
 
-  createLiveCD (rawhide, Fedora-Live-Scientific_KDE-x86_64-rawhide-20160216, fedora-live-scientific_kde-db37b44.ks, x86_64)
+createLiveCD (rawhide, Fedora-Live-Scientific_KDE-x86_64-rawhide-20160216, fedora-live-scientific_kde-db37b44.ks, x86_64)
 
-  livecd (rawhide, Fedora-Live-Scientific_KDE-i686-rawhide, fedora-live-scientific_kde-db37b44.ks)
+livecd (rawhide, Fedora-Live-Scientific_KDE-i686-rawhide, fedora-live-scientific_kde-db37b44.ks)
 
-  createLiveCD (rawhide, Fedora-Live-Scientific_KDE-i686-rawhide-20160216, fedora-live-scientific_kde-db37b44.ks, i386)
-
-
-The GitHub repository for the code is available `here
-&lt;https://github.com/amitsaha/fedora_livecd_build_failed&gt;`__.
+createLiveCD (rawhide, Fedora-Live-Scientific_KDE-i686-rawhide-20160216, fedora-live-scientific_kde-db37b44.ks, i386)
 </pre>
+<p>The GitHub repository for the code is available <a class="reference external" href="https://github.com/amitsaha/fedora_livecd_build_failed">here</a>.</p>
 
             </div>
             <!-- /.entry-content -->
