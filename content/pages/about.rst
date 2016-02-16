@@ -1,9 +1,11 @@
 About
 =====
 
-My name is Amit, I am a Software Engineer and `Author
-<{filename}/pages/books.rst>`__ , currently living in
-Sydney, Australia.
+My name is Amit, I am a Software Engineer and Author (most recently of
+`Doing Math with Python <https://doingmathwithpython.github.io>`__),
+currently living in Sydney, Australia. Besides my books, I have
+written articles for Linux Magazine, Linux Journal and (soon) Linux
+Voice.
 
 You can contact me via `email <mailto:amitsaha.in@gmail.com>`__.
 I am on `Twitter <http://twitter.com/echorand>`__ , `Google+
@@ -13,12 +15,12 @@ I am on `Twitter <http://twitter.com/echorand>`__ , `Google+
 Work
 ----
 
-I work as a software engineer at Freelancer.com since July 2015. In
-the past I have worked at Red Hat (my primary work was on the `Beaker
-project <https://beaker-project.org>`__).
+I work as a software engineer at Freelancer.com since July 2015.
+
 
 Open Source involvements
 ------------------------
 
-- https://github.com/amitsaha
 - `Fedora Scientific Spin Creator and Maintainer <http://fedora-scientific.readthedocs.org/en/latest/>`__
+- https://github.com/amitsaha
+
