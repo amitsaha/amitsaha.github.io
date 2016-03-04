@@ -2,11 +2,13 @@
 :Date: 2016-02-17 11:00
 :Category: Fedora
 
+*Update: Changed the Koji URL to reflect the change to livemedia*
+
 As the `Fedora Scientific
 <http://fedora-scientific.readthedocs.org/en/latest/>`__ maintainer, I
 have to make sure I look into whether the nightly build is failing so
 that I can look into the why. So far I have been doing that by going to the koji `url
-<http://koji.fedoraproject.org/koji/tasks?state=all&view=tree&method=livecd>`__.
+<http://koji.fedoraproject.org/koji/tasks?state=all&view=tree&method=livemedia>`__.
 
 But I think there is a better way - make a program do it
 regularly. First, the program (a Python script):
@@ -17,7 +19,7 @@ regularly. First, the program (a Python script):
    import requests
 
    def main():
-      page = requests.get('http://koji.fedoraproject.org/koji/tasks?state=all&view=tree&method=livecd')
+      page = requests.get('http://koji.fedoraproject.org/koji/tasks?state=all&view=tree&method=livemedia')
       tree = html.fromstring(page.content)
 
       a_class_failed = tree.xpath('//a[@class="taskfailed"]')

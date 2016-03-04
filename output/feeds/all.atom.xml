@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Programming and Writing about it</title><link href="/" rel="alternate"></link><link href="/feeds/all.atom.xml" rel="self"></link><id>/</id><updated>2016-02-17T11:00:00+10:00</updated><entry><title>Did your Fedora live cd build fail?</title><link href="/did-your-fedora-live-cd-build-fail.html" rel="alternate"></link><published>2016-02-17T11:00:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2016-02-17:did-your-fedora-live-cd-build-fail.html</id><summary type="html">&lt;p&gt;As the &lt;a class="reference external" href="http://fedora-scientific.readthedocs.org/en/latest/"&gt;Fedora Scientific&lt;/a&gt; maintainer, I
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Programming and Writing about it</title><link href="/" rel="alternate"></link><link href="/feeds/all.atom.xml" rel="self"></link><id>/</id><updated>2016-02-17T11:00:00+10:00</updated><entry><title>Did your Fedora live cd build fail?</title><link href="/did-your-fedora-live-cd-build-fail.html" rel="alternate"></link><published>2016-02-17T11:00:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2016-02-17:did-your-fedora-live-cd-build-fail.html</id><summary type="html">&lt;p&gt;&lt;em&gt;Update: Changed the Koji URL to reflect the change to livemedia&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;As the &lt;a class="reference external" href="http://fedora-scientific.readthedocs.org/en/latest/"&gt;Fedora Scientific&lt;/a&gt; maintainer, I
 have to make sure I look into whether the nightly build is failing so
-that I can look into the why. So far I have been doing that by going to the koji &lt;a class="reference external" href="http://koji.fedoraproject.org/koji/tasks?state=all&amp;amp;view=tree&amp;amp;method=livecd"&gt;url&lt;/a&gt;.&lt;/p&gt;
+that I can look into the why. So far I have been doing that by going to the koji &lt;a class="reference external" href="http://koji.fedoraproject.org/koji/tasks?state=all&amp;amp;view=tree&amp;amp;method=livemedia"&gt;url&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;But I think there is a better way - make a program do it
 regularly. First, the program (a Python script):&lt;/p&gt;
 &lt;pre class="code literal-block"&gt;
@@ -9,7 +10,7 @@ from lxml import html
 import requests
 
 def main():
-   page = requests.get('http://koji.fedoraproject.org/koji/tasks?state=all&amp;amp;view=tree&amp;amp;method=livecd')
+   page = requests.get('http://koji.fedoraproject.org/koji/tasks?state=all&amp;amp;view=tree&amp;amp;method=livemedia')
    tree = html.fromstring(page.content)
 
    a_class_failed = tree.xpath('//a[&amp;#64;class=&amp;quot;taskfailed&amp;quot;]')

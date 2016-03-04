@@ -12,13 +12,13 @@
 <link rel="canonical" href="/did-your-fedora-live-cd-build-fail.html">
 
         <meta name="author" content="Amit Saha" />
-        <meta name="description" content="As the Fedora Scientific maintainer, I have to make sure I look into whether the nightly build is failing so that I can look into the why. So far I have been doing that by going to the koji url. But I think there is a better way - make a ..." />
+        <meta name="description" content="Update: Changed the Koji URL to reflect the change to livemedia As the Fedora Scientific maintainer, I have to make sure I look into whether the nightly build is failing so that I can look into the why. So far I have been doing that by going to the koji ..." />
 
         <meta property="og:site_name" content="Programming and Writing about it" />
         <meta property="og:type" content="article"/>
         <meta property="og:title" content="Did your Fedora live cd build fail?"/>
         <meta property="og:url" content="/did-your-fedora-live-cd-build-fail.html"/>
-        <meta property="og:description" content="As the Fedora Scientific maintainer, I have to make sure I look into whether the nightly build is failing so that I can look into the why. So far I have been doing that by going to the koji url. But I think there is a better way - make a ..."/>
+        <meta property="og:description" content="Update: Changed the Koji URL to reflect the change to livemedia As the Fedora Scientific maintainer, I have to make sure I look into whether the nightly build is failing so that I can look into the why. So far I have been doing that by going to the koji ..."/>
         <meta property="article:published_time" content="2016-02-17" />
             <meta property="article:section" content="Fedora" />
             <meta property="article:author" content="Amit Saha" />
@@ -108,9 +108,10 @@ Programming and Writing about it            </a>
     
 </footer><!-- /.post-info -->                    </div>
                 </div>
-                <p>As the <a class="reference external" href="http://fedora-scientific.readthedocs.org/en/latest/">Fedora Scientific</a> maintainer, I
+                <p><em>Update: Changed the Koji URL to reflect the change to livemedia</em></p>
+<p>As the <a class="reference external" href="http://fedora-scientific.readthedocs.org/en/latest/">Fedora Scientific</a> maintainer, I
 have to make sure I look into whether the nightly build is failing so
-that I can look into the why. So far I have been doing that by going to the koji <a class="reference external" href="http://koji.fedoraproject.org/koji/tasks?state=all&amp;view=tree&amp;method=livecd">url</a>.</p>
+that I can look into the why. So far I have been doing that by going to the koji <a class="reference external" href="http://koji.fedoraproject.org/koji/tasks?state=all&amp;view=tree&amp;method=livemedia">url</a>.</p>
 <p>But I think there is a better way - make a program do it
 regularly. First, the program (a Python script):</p>
 <pre class="code literal-block">
@@ -118,7 +119,7 @@ from lxml import html
 import requests
 
 def main():
-   page = requests.get('http://koji.fedoraproject.org/koji/tasks?state=all&amp;view=tree&amp;method=livecd')
+   page = requests.get('http://koji.fedoraproject.org/koji/tasks?state=all&amp;view=tree&amp;method=livemedia')
    tree = html.fromstring(page.content)
 
    a_class_failed = tree.xpath('//a[&#64;class=&quot;taskfailed&quot;]')
