@@ -29,3 +29,8 @@ TWITTER_WIDGET_ID="608854659248181251"
 ADDTHIS_PROFILE="ra-557910c01cb1eb5c"
 
 STATIC_PATHS = ['images']
+
+
+PLUGINS = [
+    'pelican_youtube',
+]
