@@ -2,7 +2,7 @@
 :Date: 2016-04-17 10:00
 :Category: Go
 
-My article "Write an Image Cropping with Go" is out in `Linux Voice <https://linuxvoice.com>`__. It is my first article to be published in Linux Voice and I am very excited about it.
+My article "Write an Image Cropping with Go" is out in `Linux Voice <https://linuxvoice.com>`__ (Issue 26). It is my first article to be published in Linux Voice and I am very excited about it.
 
 It is challenging to write an introductory article without being able to explain everything the reader needs to know so as to follow the article, while keeping the article concise. Therefore I have updated the `GitHub repo <https://github.com/amitsaha/linux_voice_1>`__ of the final code with a README which points you to various resources and tips I found useful while I was learning myself.
 
