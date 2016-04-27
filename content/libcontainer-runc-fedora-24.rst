@@ -1,8 +1,8 @@
-:Title: runc and libcontainer on Fedora 23/24
-:Date: 2016-04-24 23:00
+:Title: runC and libcontainer on Fedora 23/24
+:Date: 2016-04-27 17:00
 :Category: Fedora
 
-In this post, I will post my notes on how I got `runc <https://github.com/opencontainers/runc/>`__ and then using
+In this post, I will post my notes on how I got `runC <https://github.com/opencontainers/runc/>`__ and then using
 `libcontainer` on Fedora. The first step is to install ``golang``:
 
 .. code::
@@ -54,11 +54,14 @@ Now that we have a rootfs, we have one final step - generate the spec for our co
    
 This will generate a ``config.json`` (`config
 <https://github.com/opencontainers/runtime-spec/blob/master/config.md>`__)
-file and then we can start a container using the rootfs above: 
+file and then we can start a container using the rootfs above:
+(runC expects to find ``config.json`` and ``rootfs`` in the same
+directory as you are going to start the container from)
    
 .. code::
-   
-   $ sudo /usr/local/bin/runc start test
+
+   # for some reason, i have to pass the absolute path to runc when using sudo
+   $ sudo /usr/local/bin/runc start test #  test is the "container-id"
    / # ps
 	PID   USER     TIME   COMMAND
     1 root       0:00 sh
@@ -69,7 +72,7 @@ file and then we can start a container using the rootfs above:
 Getting started with libcontainer
 =================================
 
-``runc`` is built upon `libcontainer <https://github.com/opencontainers/runc/tree/master/libcontainer>`__. This
+``runC`` is built upon `libcontainer <https://github.com/opencontainers/runc/tree/master/libcontainer>`__. This
 means that wcan write our own Golang programs which will start a
 container and do stuff in it. An example program is available `here <https://github.com/amitsaha/libcontainer_examples/blob/master/example1.go>`__
 (thanks to the fine folks on #opencontainers on Freenode for helpful
