@@ -24,6 +24,8 @@ runc version 0.0.9
 commit: 89ab7f2ccc1e45ddf6485eaa802c35dcf321dfc8
 spec: 0.5.0-dev
 &lt;/pre&gt;
+&lt;p&gt;Now we need a rootfs that we will use for our container, we will use
+the &amp;quot;busybox&amp;quot; docker image - pull it and export a tar archive:&lt;/p&gt;
 &lt;pre class="code literal-block"&gt;
 $ sudo dnf -y install docker
 $ sudo systemctl start docker

@@ -34,6 +34,8 @@ At this stage, ``runc`` should be installed and ready to use:
    spec: 0.5.0-dev
 
 
+Now we need a rootfs that we will use for our container, we will use
+the "busybox" docker image - pull it and export a tar archive:
 
 .. code::
 
