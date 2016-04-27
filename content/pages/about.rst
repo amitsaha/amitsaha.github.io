@@ -3,9 +3,9 @@ About
 
 My name is Amit, I am a Software Engineer and Author (most recently of
 `Doing Math with Python <https://doingmathwithpython.github.io>`__),
-currently living in Sydney, Australia. Besides my books, I have
-written articles for Linux Magazine, Linux Journal and (soon) Linux
-Voice.
+currently living in Sydney, Australia. Besides my books, I write
+articles for various Linux magazines (Linux Voice, Linux Journal,
+Linux Magazine, Linux For You).
 
 You can contact me via `email <mailto:amitsaha.in@gmail.com>`__.
 I am on `Twitter <http://twitter.com/echorand>`__ , `Google+
