@@ -38,7 +38,8 @@ $ tar -C ~/rootfs -xf busybox.tar
 &lt;pre class="code literal-block"&gt;
 $ runc spec
 &lt;/pre&gt;
-&lt;p&gt;This will generate a &lt;tt class="docutils literal"&gt;config.json&lt;/tt&gt; file and then we can start a container using the rootfs above:&lt;/p&gt;
+&lt;p&gt;This will generate a &lt;tt class="docutils literal"&gt;config.json&lt;/tt&gt; (&lt;a class="reference external" href="https://github.com/opencontainers/runtime-spec/blob/master/config.md"&gt;config&lt;/a&gt;)
+file and then we can start a container using the rootfs above:&lt;/p&gt;
 &lt;pre class="code literal-block"&gt;
 $ sudo /usr/local/bin/runc start test
 / # ps

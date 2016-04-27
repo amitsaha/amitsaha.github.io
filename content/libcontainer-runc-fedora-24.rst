@@ -52,7 +52,9 @@ Now that we have a rootfs, we have one final step - generate the spec for our co
 
    $ runc spec
    
-This will generate a ``config.json`` file and then we can start a container using the rootfs above:
+This will generate a ``config.json`` (`config
+<https://github.com/opencontainers/runtime-spec/blob/master/config.md>`__)
+file and then we can start a container using the rootfs above: 
    
 .. code::
    
