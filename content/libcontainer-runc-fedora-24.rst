@@ -1,0 +1,86 @@
+:Title: runc and libcontainer on Fedora 23/24
+:Date: 2016-04-24 23:00
+:Category: Fedora
+
+In this post, I will post my notes on how I got `runc <https://github.com/opencontainers/runc/>`__ and then using
+`libcontainer` on Fedora. The first step is to install ``golang``:
+
+.. code::
+
+   $ sudo dnf -y install golang
+   $ go version
+   go version go1.6 linux/amd64
+
+We will set GOPATH=~/golang/ and then do the following:
+
+.. code::
+
+   $ mkdir -p ~/golang/github.com/opencontainers
+   $ cd ~/golang/github.com/opencontainers
+   $ git clone https://github.com/opencontainers/runc.git
+   $ cd runc
+
+   $ sudo dnf -y install libseccomp-devel
+   $ make
+   $ sudo make install
+
+At this stage, ``runc`` should be installed and ready to use:
+
+.. code::
+
+   $ runc --version
+   runc version 0.0.9
+   commit: 89ab7f2ccc1e45ddf6485eaa802c35dcf321dfc8
+   spec: 0.5.0-dev
+
+
+
+.. code::
+
+  $ sudo dnf -y install docker
+  $ sudo systemctl start docker
+  $ docker pull busybox
+  $ sudo docker export $(sudo docker create busybox) > busybox.tar
+  $ mkdir ~/rootfs
+  $ tar -C ~/rootfs -xf busybox.tar
+
+Now that we have a rootfs, we have one final step - generate the spec for our container:
+
+.. code::
+
+   $ runc spec
+   
+This will generate a ``config.json`` file and then we can start a container using the rootfs above:
+   
+.. code::
+   
+   $ sudo /usr/local/bin/runc start test
+   / # ps
+	PID   USER     TIME   COMMAND
+    1 root       0:00 sh
+    8 root       0:00 ps
+   /# exit
+
+
+Getting started with libcontainer
+=================================
+
+``runc`` is built upon `libcontainer <https://github.com/opencontainers/runc/tree/master/libcontainer>`__. This
+means that wcan write our own Golang programs which will start a
+container and do stuff in it. An example program is available `here <https://github.com/amitsaha/libcontainer_examples/blob/master/example1.go>`__
+(thanks to the fine folks on #opencontainers on Freenode for helpful
+pointers). It starts a container using the above rootfs, runs ``ps``
+in it and exits.
+
+Once you have saved it somewhere on your go path (or ``go get
+https://github.com/amitsaha/libcontainer_examples/``), we will first
+need to get all the dependent packages:
+
+.. code::
+
+   $ cd ~/golang/src/github.com/amitsaha/libcontainer_examples
+   $ go get
+   $ sudo GOPATH=/home/asaha/golang go run example1.go /home/asaha/rootfs/
+    [sudo] password for asaha: 
+    PID   USER     TIME   COMMAND
+    1 root       0:00 ps
