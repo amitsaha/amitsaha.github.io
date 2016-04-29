@@ -2,7 +2,8 @@
 :Date: 2016-04-27 17:00
 :Category: Fedora
 
-In this post, I will post my notes on how I got `runC <https://github.com/opencontainers/runc/>`__ and then using
+In this post, I will post my notes on how I got `runC
+<https://github.com/opencontainers/runc/>`__ and then using 
 `libcontainer` on Fedora. The first step is to install ``golang``:
 
 .. code::
@@ -46,7 +47,8 @@ the "busybox" docker image - pull it and export a tar archive:
   $ mkdir ~/rootfs
   $ tar -C ~/rootfs -xf busybox.tar
 
-Now that we have a rootfs, we have one final step - generate the spec for our container:
+Now that we have a rootfs, we have one final step - generate the spec
+for our container:
 
 .. code::
 
@@ -61,6 +63,7 @@ directory as you are going to start the container from)
 .. code::
 
    # for some reason, i have to pass the absolute path to runc when using sudo
+   # UPDATE: (Thanks to Dharmit for pointingme to: http://unix.stackexchange.com/questions/91541/why-is-path-reset-in-a-sudo-command/91556#91556)
    $ sudo /usr/local/bin/runc start test #  test is the "container-id"
    / # ps
 	PID   USER     TIME   COMMAND
@@ -72,22 +75,27 @@ directory as you are going to start the container from)
 Getting started with libcontainer
 =================================
 
-``runC`` is built upon `libcontainer <https://github.com/opencontainers/runc/tree/master/libcontainer>`__. This
+``runC`` is built upon `libcontainer
+<https://github.com/opencontainers/runc/tree/master/libcontainer>`__. This 
 means that wcan write our own Golang programs which will start a
-container and do stuff in it. An example program is available `here <https://github.com/amitsaha/libcontainer_examples/blob/master/example1.go>`__
+container and do stuff in it. An example program is available `here
+<https://github.com/amitsaha/libcontainer_examples/blob/master/example1.go>`__ 
 (thanks to the fine folks on #opencontainers on Freenode for helpful
 pointers). It starts a container using the above rootfs, runs ``ps``
 in it and exits.
 
-Once you have saved it somewhere on your go path (or ``go get
-https://github.com/amitsaha/libcontainer_examples/``), we will first
+Once you have saved it somewhere on your go path, we will first
 need to get all the dependent packages:
 
 .. code::
 
+   $ # My program is in the below directory
    $ cd ~/golang/src/github.com/amitsaha/libcontainer_examples
    $ go get
    $ sudo GOPATH=/home/asaha/golang go run example1.go /home/asaha/rootfs/
     [sudo] password for asaha: 
     PID   USER     TIME   COMMAND
     1 root       0:00 ps
+
+
+(Thanks Dharmit for all the suggestions)

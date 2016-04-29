@@ -143,7 +143,8 @@ $ sudo docker export $(sudo docker create busybox) &gt; busybox.tar
 $ mkdir ~/rootfs
 $ tar -C ~/rootfs -xf busybox.tar
 </pre>
-<p>Now that we have a rootfs, we have one final step - generate the spec for our container:</p>
+<p>Now that we have a rootfs, we have one final step - generate the spec
+for our container:</p>
 <pre class="code literal-block">
 $ runc spec
 </pre>
@@ -153,6 +154,7 @@ file and then we can start a container using the rootfs above:
 directory as you are going to start the container from)</p>
 <pre class="code literal-block">
 # for some reason, i have to pass the absolute path to runc when using sudo
+# UPDATE: (Thanks to Dharmit for pointingme to: http://unix.stackexchange.com/questions/91541/why-is-path-reset-in-a-sudo-command/91556#91556)
 $ sudo /usr/local/bin/runc start test #  test is the &quot;container-id&quot;
 / # ps
      PID   USER     TIME   COMMAND
@@ -168,10 +170,10 @@ container and do stuff in it. An example program is available <a class="referenc
 (thanks to the fine folks on #opencontainers on Freenode for helpful
 pointers). It starts a container using the above rootfs, runs <tt class="docutils literal">ps</tt>
 in it and exits.</p>
-<p>Once you have saved it somewhere on your go path (or <tt class="docutils literal">go get
-<span class="pre">https://github.com/amitsaha/libcontainer_examples/</span></tt>), we will first
+<p>Once you have saved it somewhere on your go path, we will first
 need to get all the dependent packages:</p>
 <pre class="code literal-block">
+$ # My program is in the below directory
 $ cd ~/golang/src/github.com/amitsaha/libcontainer_examples
 $ go get
 $ sudo GOPATH=/home/asaha/golang go run example1.go /home/asaha/rootfs/
@@ -179,6 +181,7 @@ $ sudo GOPATH=/home/asaha/golang go run example1.go /home/asaha/rootfs/
  PID   USER     TIME   COMMAND
  1 root       0:00 ps
 </pre>
+<p>(Thanks Dharmit for all the suggestions)</p>
 </div>
 
             </div>

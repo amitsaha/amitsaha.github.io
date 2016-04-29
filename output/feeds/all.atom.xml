@@ -34,7 +34,8 @@ $ sudo docker export $(sudo docker create busybox) &amp;gt; busybox.tar
 $ mkdir ~/rootfs
 $ tar -C ~/rootfs -xf busybox.tar
 &lt;/pre&gt;
-&lt;p&gt;Now that we have a rootfs, we have one final step - generate the spec for our container:&lt;/p&gt;
+&lt;p&gt;Now that we have a rootfs, we have one final step - generate the spec
+for our container:&lt;/p&gt;
 &lt;pre class="code literal-block"&gt;
 $ runc spec
 &lt;/pre&gt;
@@ -44,6 +45,7 @@ file and then we can start a container using the rootfs above:
 directory as you are going to start the container from)&lt;/p&gt;
 &lt;pre class="code literal-block"&gt;
 # for some reason, i have to pass the absolute path to runc when using sudo
+# UPDATE: (Thanks to Dharmit for pointingme to: http://unix.stackexchange.com/questions/91541/why-is-path-reset-in-a-sudo-command/91556#91556)
 $ sudo /usr/local/bin/runc start test #  test is the &amp;quot;container-id&amp;quot;
 / # ps
      PID   USER     TIME   COMMAND
@@ -59,10 +61,10 @@ container and do stuff in it. An example program is available &lt;a class="refer
 (thanks to the fine folks on #opencontainers on Freenode for helpful
 pointers). It starts a container using the above rootfs, runs &lt;tt class="docutils literal"&gt;ps&lt;/tt&gt;
 in it and exits.&lt;/p&gt;
-&lt;p&gt;Once you have saved it somewhere on your go path (or &lt;tt class="docutils literal"&gt;go get
-&lt;span class="pre"&gt;https://github.com/amitsaha/libcontainer_examples/&lt;/span&gt;&lt;/tt&gt;), we will first
+&lt;p&gt;Once you have saved it somewhere on your go path, we will first
 need to get all the dependent packages:&lt;/p&gt;
 &lt;pre class="code literal-block"&gt;
+$ # My program is in the below directory
 $ cd ~/golang/src/github.com/amitsaha/libcontainer_examples
 $ go get
 $ sudo GOPATH=/home/asaha/golang go run example1.go /home/asaha/rootfs/
@@ -70,6 +72,7 @@ $ sudo GOPATH=/home/asaha/golang go run example1.go /home/asaha/rootfs/
  PID   USER     TIME   COMMAND
  1 root       0:00 ps
 &lt;/pre&gt;
+&lt;p&gt;(Thanks Dharmit for all the suggestions)&lt;/p&gt;
 &lt;/div&gt;
 </summary></entry><entry><title>Webucator video: Python classes - basics beyond the absolute basics</title><link href="/webucator-video-python-classes-basics-beyond-the-absolute-basics.html" rel="alternate"></link><published>2016-04-17T14:00:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2016-04-17:webucator-video-python-classes-basics-beyond-the-absolute-basics.html</id><summary type="html">&lt;p&gt;&lt;a class="reference external" href="https://www.webucator.com/"&gt;Webucator&lt;/a&gt; recently created a video based on my &lt;a class="reference external" href="http://echorand.me/site/notes/articles/python_custom_class/article.html"&gt;Python classes: basics beyond the absolute basics&lt;/a&gt; article.&lt;/p&gt;
 &lt;p&gt;You can see the video on &lt;a class="reference external" href="https://www.youtube.com/watch?v=0slsoyEhz40&amp;amp;feature=youtu.be"&gt;YouTube&lt;/a&gt;  or here below:&lt;/p&gt;
