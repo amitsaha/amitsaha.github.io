@@ -1,43 +1,114 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" prefix="og: http://ogp.me/ns# fb: https://www.facebook.com/2008/fbml">
 <head>
-          <title>Programming and Writing about it</title>
-        <meta charset="utf-8" />
-        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Programming and Writing about it Full Atom Feed" />
-        <link href="/feeds/python.atom.xml" type="application/atom+xml" rel="alternate" title="Programming and Writing about it Categories Atom Feed" />
+    <title>PYTHONHASHSEED and your tests - Programming and Writing about it</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 
 
+<link rel="canonical" href="/pythonhashseed-and-your-tests.html">
+
+        <meta name="author" content="Amit Saha" />
+        <meta name="description" content="Recently at work, I wanted to test a string which was being created by the urllib.urlencode() function. My first attempt was simple - test my expected string with that being created by the function above using unittest&#39;s assertEquals() function. It passed all the times I ran the tests before ..." />
+
+        <meta property="og:site_name" content="Programming and Writing about it" />
+        <meta property="og:type" content="article"/>
+        <meta property="og:title" content="PYTHONHASHSEED and your tests"/>
+        <meta property="og:url" content="/pythonhashseed-and-your-tests.html"/>
+        <meta property="og:description" content="Recently at work, I wanted to test a string which was being created by the urllib.urlencode() function. My first attempt was simple - test my expected string with that being created by the function above using unittest&#39;s assertEquals() function. It passed all the times I ran the tests before ..."/>
+        <meta property="article:published_time" content="2015-11-19" />
+            <meta property="article:section" content="Python" />
+            <meta property="article:author" content="Amit Saha" />
+
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="/theme/css/pygments/native.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Programming and Writing about it ATOM Feed"/>
+
+
+
+        <link href="/feeds/python.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Programming and Writing about it Python ATOM Feed"/>
 
 </head>
+<body>
 
-<body id="index" class="home">
-        <header id="banner" class="body">
-                <h1><a href="/">Programming and Writing about it <strong></strong></a></h1>
-        </header><!-- /#banner -->
-        <nav id="menu"><ul>
-            <li><a href="/pages/about.html">About</a></li>
-            <li><a href="/pages/articles.html">Articles</a></li>
-            <li><a href="/pages/books.html">Books</a></li>
-            <li><a href="/pages/personal-projects.html">Personal Projects</a></li>
-        </ul></nav><!-- /#menu -->
-<section id="content" class="body">
-  <header>
-    <h2 class="entry-title">
-      <a href="/pythonhashseed-and-your-tests.html" rel="bookmark"
-         title="Permalink to PYTHONHASHSEED and your tests">PYTHONHASHSEED and your tests</a></h2>
- 
-  </header>
-  <footer class="post-info">
-    <abbr class="published" title="2015-11-19T11:00:00+10:00">
-      Thu 19 November 2015
-    </abbr>
-    <address class="vcard author">
-      By           <a class="url fn" href="/author/amit-saha.html">Amit Saha</a>
-    </address>
-  </footer><!-- /.post-info -->
-  <div class="entry-content">
-    <p>Recently at work, I wanted to test a string which was being created by the <tt class="docutils literal">urllib.urlencode()</tt> function. My first attempt was simple - test my expected string with that being created by the function above using unittest's <tt class="docutils literal">assertEquals()</tt> function. It passed all the times I ran the tests before I committed the code, but it started failing when the tests were ran as part of the deployment process.</p>
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+	<div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="/" class="navbar-brand">
+Programming and Writing about it            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                         <li><a href="/pages/articles.html">
+                             Articles
+                          </a></li>
+                         <li><a href="/pages/books.html">
+                             Books
+                          </a></li>
+                         <li><a href="/pages/personal-projects.html">
+                             Personal Projects
+                          </a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+              <li><a href="/archives.html"><i class="fa fa-th-list"></i><span class="icon-label">Archives</span></a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</div> <!-- /.navbar -->
+<!-- Banner -->
+<!-- End Banner -->
+<div class="container">
+    <div class="row">
+        <div class="col-sm-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/pythonhashseed-and-your-tests.html"
+                       rel="bookmark"
+                       title="Permalink to PYTHONHASHSEED and your tests">
+                        PYTHONHASHSEED and your tests
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="fa fa-calendar"></i><time datetime="2015-11-19T11:00:00+10:00"> Thu 19 November 2015</time>
+    </span>
+
+
+
+
+
+    
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>Recently at work, I wanted to test a string which was being created by the <tt class="docutils literal">urllib.urlencode()</tt> function. My first attempt was simple - test my expected string with that being created by the function above using unittest's <tt class="docutils literal">assertEquals()</tt> function. It passed all the times I ran the tests before I committed the code, but it started failing when the tests were ran as part of the deployment process.</p>
 <p>The input to the <tt class="docutils literal">urllib.urlencode()</tt> function is a dictionary of key value pairs and hence the returned value can really be any of the arrangements of the key value pairs. So, for example <tt class="docutils literal"><span class="pre">{'key1':'value',</span> <span class="pre">'key2':'value'}</span></tt> can result in the query string <tt class="docutils literal">key1=value&amp;key2=value</tt> or <tt class="docutils literal">key2=value&amp;key1=value</tt>. We cannot know for sure and we shouldn't need to.</p>
 <p>Thus, we cannot use <tt class="docutils literal"><span class="pre">self.assertEquals(urllib.urlencode({'key1':'value',</span> <span class="pre">{'key2':'value'}),</span> 'key1=value&amp;key2=value')</tt> without the possibility that it will fail eventually. The reason why we see such behaviour of course is that for dictionaries, the order in which the keys are stored is not deterministic - or known apriori. You can see this behaviour by explicitly setting the value of <a class="reference external" href="https://docs.python.org/3.3/using/cmdline.html#envvar-PYTHONHASHSEED">PYTHONHASHSEED</a> to different values.</p>
 <p>So, how should we write such tests? Let's see one possible way which I will state as - <strong>Instead of asserting the equality of entire objects, we should be testing for the presence of the expected constituent objects</strong>. I demonstrate it via two similar examples:</p>
@@ -98,13 +169,66 @@ def test_where_clause_2():
 <p>If you are using <a class="reference external" href="https://testrun.org/tox/latest/example/basic.html#special-handling-of-pythonhashseed">tox</a> to run your tests, it automatically sets <tt class="docutils literal">PYTHONHASHSEED</tt> to a random integer when it is invoked. Hence, if you have never had your tests fail so far, there is a good chance your tests do not make any assumptions of order when dealing with Python dictionaries - but that of course is no guarantee that your tests are completely free since there may be this particular random number that has not been tried yet! So, ideally you may just want to do run your tests (especially if they don't take long) for a large number of PYTHONHASHSEED values just to be more confident.</p>
 </div>
 
-  </div><!-- /.entry-content -->
+            </div>
+            <!-- /.entry-content -->
+    <hr />
+    <!-- AddThis Button BEGIN -->
+    <div class="addthis_toolbox addthis_default_style">
+            <a class="addthis_button_facebook_like" fb:like:layout="button_count"></a>
+            <a class="addthis_button_tweet"></a>
+            <a class="addthis_button_google_plusone" g:plusone:size="medium"></a>
+    </div>
+    <!-- AddThis Button END -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-sm-3" id="sidebar">
+            <aside>
+
+<section class="well well-sm">
+    <ul class="list-group list-group-flush">
+
+
+
+
+
+
+    <li class="list-group-item"><h4><i class="fa fa-twitter fa-lg"></i><span class="icon-label">Latest Tweets</span></h4></li>
+    <div id="twitter_timeline">
+        <a class="twitter-timeline" data-chrome="noheader" href="https://twitter.com/echorand" data-widget-id="608854659248181251">Tweets by echorand</a>
+    </div>
+
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+    </ul>
 </section>
-        <footer id="contentinfo" class="body">
-                <address id="about" class="vcard body">
-                Proudly powered by <a href="http://getpelican.com/">Pelican</a>,
-                which takes great advantage of <a href="http://python.org">Python</a>.
-                </address><!-- /#about -->
-        </footer><!-- /#contentinfo -->
+            </aside>
+        </div>
+    </div>
+</div>
+<footer>
+   <div class="container">
+      <hr>
+      <div class="row">
+         <div class="col-xs-10">&copy; 2016 Amit Saha
+            &middot; Powered by <a href="https://github.com/getpelican/pelican-themes/tree/master/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a>         </div>
+         <div class="col-xs-2"><p class="pull-right"><i class="fa fa-arrow-up"></i> <a href="#">Back to top</a></p></div>
+      </div>
+   </div>
+</footer>
+<script src="/theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+        <script type="text/javascript">var addthis_config = {"data_track_addressbar": true};</script>
+    <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-557910c01cb1eb5c"></script>
 </body>
 </html>
