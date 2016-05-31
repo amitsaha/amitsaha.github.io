@@ -33,7 +33,7 @@ Your slides should now be live at http://<user-github-username>.github.io/jupyte
 publish.sh script
 ~~~~~~~~~~~~~~~~~
 
-The ``publish.sh`` script is as follows::
+The ``publish.sh`` script is as follows:
 
 .. code::
 

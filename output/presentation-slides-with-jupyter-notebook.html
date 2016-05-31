@@ -132,12 +132,10 @@ $ ./publish.sh
 <div class="section" id="publish-sh-script">
 <h2>publish.sh script</h2>
 <p>The <tt class="docutils literal">publish.sh</tt> script is as follows:</p>
-<pre class="literal-block">
-.. code::
-</pre>
-<blockquote>
-<p>#!/bin/bash</p>
-<p>$ jupyter-nbconvert --to slides slides.ipynb --reveal-prefix=reveal.js
+<pre class="code literal-block">
+#!/bin/bash
+
+$ jupyter-nbconvert --to slides slides.ipynb --reveal-prefix=reveal.js
 $ mv slides.slides.html  index.html
 $ mkdir -p /tmp/workspace
 $ cp -r * /tmp/workspace/
@@ -149,8 +147,8 @@ $ git add -A .
 $ git commit -m &quot;new version&quot;
 $ git push origin master gh-pages
 $ git checkout master
-$ rm -rf /tmp/workspace</p>
-</blockquote>
+$ rm -rf /tmp/workspace
+</pre>
 <p>The part of the script above where I update the <cite>gh-pages</cite> branch is of a quality where it does its job.</p>
 </div>
 <div class="section" id="viewing-your-slides-locally">

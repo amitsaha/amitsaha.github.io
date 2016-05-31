@@ -23,12 +23,10 @@ $ ./publish.sh
 &lt;div class="section" id="publish-sh-script"&gt;
 &lt;h2&gt;publish.sh script&lt;/h2&gt;
 &lt;p&gt;The &lt;tt class="docutils literal"&gt;publish.sh&lt;/tt&gt; script is as follows:&lt;/p&gt;
-&lt;pre class="literal-block"&gt;
-.. code::
-&lt;/pre&gt;
-&lt;blockquote&gt;
-&lt;p&gt;#!/bin/bash&lt;/p&gt;
-&lt;p&gt;$ jupyter-nbconvert --to slides slides.ipynb --reveal-prefix=reveal.js
+&lt;pre class="code literal-block"&gt;
+#!/bin/bash
+
+$ jupyter-nbconvert --to slides slides.ipynb --reveal-prefix=reveal.js
 $ mv slides.slides.html  index.html
 $ mkdir -p /tmp/workspace
 $ cp -r * /tmp/workspace/
@@ -40,8 +38,8 @@ $ git add -A .
 $ git commit -m &amp;quot;new version&amp;quot;
 $ git push origin master gh-pages
 $ git checkout master
-$ rm -rf /tmp/workspace&lt;/p&gt;
-&lt;/blockquote&gt;
+$ rm -rf /tmp/workspace
+&lt;/pre&gt;
 &lt;p&gt;The part of the script above where I update the &lt;cite&gt;gh-pages&lt;/cite&gt; branch is of a quality where it does its job.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="viewing-your-slides-locally"&gt;
