@@ -1,86 +1,35 @@
 <!DOCTYPE html>
-<html lang="en" prefix="og: http://ogp.me/ns# fb: https://www.facebook.com/2008/fbml">
+<html lang="en">
 <head>
-    <title>Fedora - Programming and Writing about it</title>
-    <!-- Using the latest rendering mode for IE -->
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-
-
-
-    <meta name="author" content="Amit Saha" />
-    <meta name="keywords" content="Fedora" />
-
-    <!-- Open Graph tags -->
-        <meta property="og:site_name" content="Programming and Writing about it" />
-        <meta property="og:type" content="website"/>
-        <meta property="og:title" content="Programming and Writing about it"/>
-        <meta property="og:url" content=""/>
-        <meta property="og:description" content="Programming and Writing about it"/>
-
-
-    <!-- Bootstrap -->
-        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
-    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
-
-    <link href="/theme/css/pygments/native.css" rel="stylesheet">
-    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
-
-        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
-              title="Programming and Writing about it ATOM Feed"/>
-
-
-
-        <link href="/feeds/fedora.atom.xml" type="application/atom+xml" rel="alternate"
-              title="Programming and Writing about it Fedora ATOM Feed"/>
-
+        <title>Programming and Writing about it</title>
+        <meta charset="utf-8" />
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Programming and Writing about it Full Atom Feed" />
+        <link href="/feeds/fedora.atom.xml" type="application/atom+xml" rel="alternate" title="Programming and Writing about it Categories Atom Feed" />
 </head>
-<body>
 
-<div class="navbar navbar-default navbar-fixed-top" role="navigation">
-	<div class="container">
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a href="/" class="navbar-brand">
-Programming and Writing about it            </a>
-        </div>
-        <div class="collapse navbar-collapse navbar-ex1-collapse">
-            <ul class="nav navbar-nav">
-                         <li><a href="/pages/about.html">
-                             About
-                          </a></li>
-                         <li><a href="/pages/articles.html">
-                             Articles
-                          </a></li>
-                         <li><a href="/pages/books.html">
-                             Books
-                          </a></li>
-                         <li><a href="/pages/personal-projects.html">
-                             Personal Projects
-                          </a></li>
-            </ul>
-            <ul class="nav navbar-nav navbar-right">
-              <li><a href="/archives.html"><i class="fa fa-th-list"></i><span class="icon-label">Archives</span></a></li>
-            </ul>
-        </div>
-        <!-- /.navbar-collapse -->
-    </div>
-</div> <!-- /.navbar -->
-<!-- Banner -->
-<!-- End Banner -->
-<div class="container">
-    <div class="row">
-        <div class="col-sm-9">
-            <article>
-                <h2><a href="/runc-and-libcontainer-on-fedora-2324.html">runC and libcontainer on Fedora 23/24</a></h2>
-                <div class="summary"><p>In this post, I will post my notes on how I got <a class="reference external" href="https://github.com/opencontainers/runc/">runC</a> and then using
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">Programming and Writing about it <strong></strong></a></h1>
+        </header><!-- /#banner -->
+        <nav id="menu"><ul>
+            <li><a href="/pages/about.html">About</a></li>
+            <li><a href="/pages/articles.html">Articles</a></li>
+            <li><a href="/pages/books.html">Books</a></li>
+            <li><a href="/pages/personal-projects.html">Personal Projects</a></li>
+        </ul></nav><!-- /#menu -->
+<section id="content">
+<h2>Articles in the Fedora category</h2>
+
+<ol id="post-list">
+        <li><article class="hentry">
+                <header> <h2 class="entry-title"><a href="/runc-and-libcontainer-on-fedora-2324.html" rel="bookmark" title="Permalink to runC and libcontainer on Fedora 23/24">runC and libcontainer on Fedora 23/24</a></h2> </header>
+                <footer class="post-info">
+                    <abbr class="published" title="2016-04-27T17:00:00+10:00"> Wed 27 April 2016 </abbr>
+                    <address class="vcard author">By
+                        <a class="url fn" href="/author/amit-saha.html">Amit Saha</a>
+                    </address>
+                </footer><!-- /.post-info -->
+                <div class="entry-content"> <p>In this post, I will post my notes on how I got <a class="reference external" href="https://github.com/opencontainers/runc/">runC</a> and then using
 <cite>libcontainer</cite> on Fedora. The first step is to install <tt class="docutils literal">golang</tt>:</p>
 <pre class="code literal-block">
 $ sudo dnf -y install golang
@@ -89,112 +38,85 @@ go version go1.6 linux/amd64
 </pre>
 <p>We will set GOPATH=~/golang/ and then do the following:</p>
 <pre class="code literal-block">
-$ mkdir ...</pre>
-                    <a class="btn btn-default btn-xs" href="/runc-and-libcontainer-on-fedora-2324.html">more ...</a>
-                </div>
-            </article>
-            <hr/>
-            <article>
-                <h2><a href="/did-your-fedora-live-cd-build-fail.html">Did your Fedora live cd build fail?</a></h2>
-                <div class="summary"><p><em>Update: Changed the Koji URL to reflect the change to livemedia</em></p>
+$ mkdir ...</pre> </div><!-- /.entry-content -->
+        </article></li>
+        <li><article class="hentry">
+                <header> <h2 class="entry-title"><a href="/did-your-fedora-live-cd-build-fail.html" rel="bookmark" title="Permalink to Did your Fedora live cd build fail?">Did your Fedora live cd build fail?</a></h2> </header>
+                <footer class="post-info">
+                    <abbr class="published" title="2016-02-17T11:00:00+10:00"> Wed 17 February 2016 </abbr>
+                    <address class="vcard author">By
+                        <a class="url fn" href="/author/amit-saha.html">Amit Saha</a>
+                    </address>
+                </footer><!-- /.post-info -->
+                <div class="entry-content"> <p><em>Update: Changed the Koji URL to reflect the change to livemedia</em></p>
 <p>As the <a class="reference external" href="http://fedora-scientific.readthedocs.org/en/latest/">Fedora Scientific</a> maintainer, I
 have to make sure I look into whether the nightly build is failing so
-that I can look into the why. So far I have been doing that by going to the koji ...</p>
-                    <a class="btn btn-default btn-xs" href="/did-your-fedora-live-cd-build-fail.html">more ...</a>
-                </div>
-            </article>
-            <hr/>
-            <article>
-                <h2><a href="/data-only-docker-containers.html">Data only Docker containers</a></h2>
-                <div class="summary"><p>In this post, we shall take a look at the idea of data only
+that I can look into the why. So far I have been doing that by going to the koji ...</p> </div><!-- /.entry-content -->
+        </article></li>
+        <li><article class="hentry">
+                <header> <h2 class="entry-title"><a href="/data-only-docker-containers.html" rel="bookmark" title="Permalink to Data only Docker containers">Data only Docker containers</a></h2> </header>
+                <footer class="post-info">
+                    <abbr class="published" title="2015-12-13T11:00:00+10:00"> Sun 13 December 2015 </abbr>
+                    <address class="vcard author">By
+                        <a class="url fn" href="/author/amit-saha.html">Amit Saha</a>
+                    </address>
+                </footer><!-- /.post-info -->
+                <div class="entry-content"> <p>In this post, we shall take a look at the idea of data only
 containers - containers whose sole purpose is to exist on the <em>docker
 host</em> so that other containers can have portable access to a
 persistent data volume.</p>
 <div class="section" id="why-do-we-need-a-persistent-data-volume">
 <h2>Why do we need a persistent data volume?</h2>
-<p>We will experiment ...</p></div>
-                    <a class="btn btn-default btn-xs" href="/data-only-docker-containers.html">more ...</a>
-                </div>
-            </article>
-            <hr/>
-            <article>
-                <h2><a href="/mounting-a-docker-volume-on-selinux-enabled-host.html">Mounting a docker volume on SELinux enabled host</a></h2>
-                <div class="summary"><p>My workflow with docker usually involves volume mounting a host
+<p>We will experiment ...</p></div> </div><!-- /.entry-content -->
+        </article></li>
+        <li><article class="hentry">
+                <header> <h2 class="entry-title"><a href="/mounting-a-docker-volume-on-selinux-enabled-host.html" rel="bookmark" title="Permalink to Mounting a docker volume on SELinux enabled host">Mounting a docker volume on SELinux enabled host</a></h2> </header>
+                <footer class="post-info">
+                    <abbr class="published" title="2015-10-05T11:00:00+10:00"> Mon 05 October 2015 </abbr>
+                    <address class="vcard author">By
+                        <a class="url fn" href="/author/amit-saha.html">Amit Saha</a>
+                    </address>
+                </footer><!-- /.post-info -->
+                <div class="entry-content"> <p>My workflow with docker usually involves volume mounting a host
 directory so that I can read and write to the host directory from my
 container as a <em>non-root</em> user. On a Fedora 23 host with SELinux
 enabled, this is what I have to do differently:</p>
 <pre class="code literal-block">
-Use: -v /var/dir1:var ...</pre>
-                    <a class="btn btn-default btn-xs" href="/mounting-a-docker-volume-on-selinux-enabled-host.html">more ...</a>
-                </div>
-            </article>
-            <hr/>
-            <article>
-                <h2><a href="/standalone-open-source-puppet-setup-on-fedora.html">Standalone open source puppet setup on Fedora</a></h2>
-                <div class="summary"><p>My goal in this post is to show how to setup puppet in standalone mode on a Fedora 23 system. This setup will allow writing puppet modules and then you can apply them on your local system and check manually and via serverspec tests that they are doing what you ...</p>
-                    <a class="btn btn-default btn-xs" href="/standalone-open-source-puppet-setup-on-fedora.html">more ...</a>
-                </div>
-            </article>
-            <hr/>
-            <article>
-                <h2><a href="/fedora-22-scientific.html">Fedora 22 Scientific</a></h2>
-                <div class="summary"><p>Fedora 22 was <a class="reference external" href="http://fedoramagazine.org/fedora-22-released/">released recently</a> which also means we
+Use: -v /var/dir1:var ...</pre> </div><!-- /.entry-content -->
+        </article></li>
+        <li><article class="hentry">
+                <header> <h2 class="entry-title"><a href="/standalone-open-source-puppet-setup-on-fedora.html" rel="bookmark" title="Permalink to Standalone open source puppet setup on Fedora">Standalone open source puppet setup on Fedora</a></h2> </header>
+                <footer class="post-info">
+                    <abbr class="published" title="2015-10-01T14:54:00+10:00"> Thu 01 October 2015 </abbr>
+                    <address class="vcard author">By
+                        <a class="url fn" href="/author/amit-saha.html">Amit Saha</a>
+                    </address>
+                </footer><!-- /.post-info -->
+                <div class="entry-content"> <p>My goal in this post is to show how to setup puppet in standalone mode on a Fedora 23 system. This setup will allow writing puppet modules and then you can apply them on your local system and check manually and via serverspec tests that they are doing what you ...</p> </div><!-- /.entry-content -->
+        </article></li>
+        <li><article class="hentry">
+                <header> <h2 class="entry-title"><a href="/fedora-22-scientific.html" rel="bookmark" title="Permalink to Fedora 22 Scientific">Fedora 22 Scientific</a></h2> </header>
+                <footer class="post-info">
+                    <abbr class="published" title="2015-06-11T10:20:00+10:00"> Thu 11 June 2015 </abbr>
+                    <address class="vcard author">By
+                        <a class="url fn" href="/author/amit-saha.html">Amit Saha</a>
+                    </address>
+                </footer><!-- /.post-info -->
+                <div class="entry-content"> <p>Fedora 22 was <a class="reference external" href="http://fedoramagazine.org/fedora-22-released/">released recently</a> which also means we
 have a new Fedora Scientific release. <a class="reference external" href="https://labs.fedoraproject.org/en/scientific/">Fedora Scientific</a>
 is now part of <a class="reference external" href="http://fedoramagazine.org/new-websites-fedora-22/">Fedora labs</a>.</p>
 <a class="reference external image-reference" href="https://labs.fedoraproject.org/en/scientific/"><img alt="Featured Applications Image" class="align-center" src="/images/scientific-featured-applications.png" style="width: 650.0px; height: 550.0px;" /></a>
 <p>As you can see, the new home for Fedora Scientific looks
 amazing. The &quot;Featured Applications&quot; section features the most
-important and useful tools in Fedora Scientific. I ...</p>
-                    <a class="btn btn-default btn-xs" href="/fedora-22-scientific.html">more ...</a>
-                </div>
-            </article>
-            <hr/>
-
-        </div>
-        <div class="col-sm-3" id="sidebar">
-            <aside>
-
-<section class="well well-sm">
-    <ul class="list-group list-group-flush">
-
-
-
-
-
-
-    <li class="list-group-item"><h4><i class="fa fa-twitter fa-lg"></i><span class="icon-label">Latest Tweets</span></h4></li>
-    <div id="twitter_timeline">
-        <a class="twitter-timeline" data-chrome="noheader" href="https://twitter.com/echorand" data-widget-id="608854659248181251">Tweets by echorand</a>
-    </div>
-
-<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
-
-    </ul>
-</section>
-            </aside>
-        </div>
-    </div>
-</div>
-<footer>
-   <div class="container">
-      <hr>
-      <div class="row">
-         <div class="col-xs-10">&copy; 2016 Amit Saha
-            &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
-            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
-            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a>         </div>
-         <div class="col-xs-2"><p class="pull-right"><i class="fa fa-arrow-up"></i> <a href="#">Back to top</a></p></div>
-      </div>
-   </div>
-</footer>
-<script src="/theme/js/jquery.min.js"></script>
-
-<!-- Include all compiled plugins (below), or include individual files as needed -->
-<script src="/theme/js/bootstrap.min.js"></script>
-
-<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
-<script src="/theme/js/respond.min.js"></script>
-
-
+important and useful tools in Fedora Scientific. I ...</p> </div><!-- /.entry-content -->
+        </article></li>
+</ol><!-- /#posts-list -->
+</section><!-- /#content -->
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>,
+                which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+        </footer><!-- /#contentinfo -->
 </body>
 </html>

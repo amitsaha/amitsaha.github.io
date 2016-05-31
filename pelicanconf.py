@@ -21,7 +21,7 @@ DEFAULT_PAGINATION = 10
 DISPLAY_CATEGORIES_ON_MENU = False
 DISPLAY_TAGS_ON_SIDEBAR = False
 
-THEME='/home/asaha/work/pelican-bootstrap3/'
+THEME='/Users/asaha/work/pelican-bootstrap3/'
 
 TWITTER_USERNAME="echorand"
 TWITTER_WIDGET_ID="608854659248181251"
