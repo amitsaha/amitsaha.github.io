@@ -98,7 +98,7 @@ Programming and Writing about it            </a>
 <footer class="post-info">
     <span class="label label-default">Date</span>
     <span class="published">
-        <i class="fa fa-calendar"></i><time datetime="2016-05-31T11:00:00+10:00"> Tue 31 May 2016</time>
+        <i class="fa fa-calendar"></i><time datetime="2016-05-31T22:00:00+10:00"> Tue 31 May 2016</time>
     </span>
 
 
@@ -109,6 +109,7 @@ Programming and Writing about it            </a>
 </footer><!-- /.post-info -->                    </div>
                 </div>
                 <p>I presented at the PyCon 2016 Education Summit on &quot;Doing Math with Python&quot; day before yesterday and a lightning talk yesterday. This is the first time, I prepared a <a class="reference external" href="doingmathwithpython.github.io/pycon-us-2016">slide deck</a> using Jupyter Notebook + Reveal.js. I was pleased with the content creation process and the end result. So, here is what worked for me.</p>
+<p><em>Please note that I have basically taken quite a bit of liberty with HTML where I didn't want to search for markdown way of doing something</em></p>
 <p>Basically, there are two steps:</p>
 <ul class="simple">
 <li>Create content in a Jupyter Notebook</li>
@@ -157,6 +158,17 @@ $ rm -rf /tmp/workspace
 <pre class="code literal-block">
 $ jupyter-nbconvert --to slides slides.ipynb --reveal-prefix=reveal.js --post serve
 </pre>
+</div>
+<div class="section" id="understanding-what-s-going-on-in-brief">
+<h2>Understanding what's going on in brief</h2>
+<p>The first step to do before you can start creating your slides is activate the &quot;Slideshow&quot; toolbar from the &quot;View &gt; Cell Toolbar menu&quot;. Once you do that, each of your cells will have a drop down box, and you can select what the cell is. The options you will have are:  Slide, Sub-slide, Fragment, Skip and Notes.</p>
+<p>Like any other notebook, your &quot;slides notebook&quot; is also made up of cells. So, if you want a cell to be in your final slide deck, you will have to choose one of &quot;Slide&quot;, &quot;Sub-slide&quot; or &quot;Fragment&quot;. &quot;Skip&quot; will skip the cell from your final slide deck and cells marked with &quot;Notes&quot; will be visible in the &quot;speaker mode&quot; when you present.</p>
+</div>
+<div class="section" id="other-related-posts-you-may-find-useful">
+<h2>Other related posts you may find useful</h2>
+<ul class="simple">
+<li>I think I found the CSS from <a class="reference external" href="http://neuroscience.telenczuk.pl/?p=607">http://neuroscience.telenczuk.pl/?p=607</a></li>
+</ul>
 <p>Thanks for your work, Damián Avila and everyone else!</p>
 </div>
 

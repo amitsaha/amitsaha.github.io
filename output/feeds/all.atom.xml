@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Programming and Writing about it</title><link href="/" rel="alternate"></link><link href="/feeds/all.atom.xml" rel="self"></link><id>/</id><updated>2016-05-31T11:00:00+10:00</updated><entry><title>Presentation slides with Jupyter Notebook</title><link href="/presentation-slides-with-jupyter-notebook.html" rel="alternate"></link><published>2016-05-31T11:00:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2016-05-31:presentation-slides-with-jupyter-notebook.html</id><summary type="html">&lt;p&gt;I presented at the PyCon 2016 Education Summit on &amp;quot;Doing Math with Python&amp;quot; day before yesterday and a lightning talk yesterday. This is the first time, I prepared a &lt;a class="reference external" href="doingmathwithpython.github.io/pycon-us-2016"&gt;slide deck&lt;/a&gt; using Jupyter Notebook + Reveal.js. I was pleased with the content creation process and the end result. So, here is what worked for me.&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Programming and Writing about it</title><link href="/" rel="alternate"></link><link href="/feeds/all.atom.xml" rel="self"></link><id>/</id><updated>2016-05-31T22:00:00+10:00</updated><entry><title>Presentation slides with Jupyter Notebook</title><link href="/presentation-slides-with-jupyter-notebook.html" rel="alternate"></link><published>2016-05-31T22:00:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2016-05-31:presentation-slides-with-jupyter-notebook.html</id><summary type="html">&lt;p&gt;I presented at the PyCon 2016 Education Summit on &amp;quot;Doing Math with Python&amp;quot; day before yesterday and a lightning talk yesterday. This is the first time, I prepared a &lt;a class="reference external" href="doingmathwithpython.github.io/pycon-us-2016"&gt;slide deck&lt;/a&gt; using Jupyter Notebook + Reveal.js. I was pleased with the content creation process and the end result. So, here is what worked for me.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Please note that I have basically taken quite a bit of liberty with HTML where I didn't want to search for markdown way of doing something&lt;/em&gt;&lt;/p&gt;
 &lt;p&gt;Basically, there are two steps:&lt;/p&gt;
 &lt;ul class="simple"&gt;
 &lt;li&gt;Create content in a Jupyter Notebook&lt;/li&gt;
@@ -48,6 +49,17 @@ $ rm -rf /tmp/workspace
 &lt;pre class="code literal-block"&gt;
 $ jupyter-nbconvert --to slides slides.ipynb --reveal-prefix=reveal.js --post serve
 &lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class="section" id="understanding-what-s-going-on-in-brief"&gt;
+&lt;h2&gt;Understanding what's going on in brief&lt;/h2&gt;
+&lt;p&gt;The first step to do before you can start creating your slides is activate the &amp;quot;Slideshow&amp;quot; toolbar from the &amp;quot;View &amp;gt; Cell Toolbar menu&amp;quot;. Once you do that, each of your cells will have a drop down box, and you can select what the cell is. The options you will have are:  Slide, Sub-slide, Fragment, Skip and Notes.&lt;/p&gt;
+&lt;p&gt;Like any other notebook, your &amp;quot;slides notebook&amp;quot; is also made up of cells. So, if you want a cell to be in your final slide deck, you will have to choose one of &amp;quot;Slide&amp;quot;, &amp;quot;Sub-slide&amp;quot; or &amp;quot;Fragment&amp;quot;. &amp;quot;Skip&amp;quot; will skip the cell from your final slide deck and cells marked with &amp;quot;Notes&amp;quot; will be visible in the &amp;quot;speaker mode&amp;quot; when you present.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="other-related-posts-you-may-find-useful"&gt;
+&lt;h2&gt;Other related posts you may find useful&lt;/h2&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;I think I found the CSS from &lt;a class="reference external" href="http://neuroscience.telenczuk.pl/?p=607"&gt;http://neuroscience.telenczuk.pl/?p=607&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
 &lt;p&gt;Thanks for your work, Damián Avila and everyone else!&lt;/p&gt;
 &lt;/div&gt;
 </summary></entry><entry><title>New article: Write a program to tee output using Rust</title><link href="/new-article-write-a-program-to-tee-output-using-rust.html" rel="alternate"></link><published>2016-05-04T14:00:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2016-05-04:new-article-write-a-program-to-tee-output-using-rust.html</id><summary type="html">&lt;p&gt;My article &amp;quot;Write a program to tee output using Rust&amp;quot; is out in &lt;a class="reference external" href="https://linuxvoice.com"&gt;Linux
