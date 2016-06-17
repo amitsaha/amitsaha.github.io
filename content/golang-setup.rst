@@ -29,4 +29,6 @@ If we see this, we are all set to go to the next stage
 Setting up the Go workspace
 ===========================
 
+Golang expects us to structure our source code in a certain way. 
+
 
