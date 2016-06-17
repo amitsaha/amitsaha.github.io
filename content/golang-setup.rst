@@ -29,6 +29,14 @@ If we see this, we are all set to go to the next stage
 Setting up the Go workspace
 ===========================
 
-Golang expects us to structure our source code in a certain way. 
+Golang expects us to structure our source code in a certain way. You can read all about it in this `document <https://golang.org/doc/code.html>`__. The summarized version is that:
+
+- All our go code (including those of packages we use) in a single directory
+- The environment variable ``GOPATH`` points to this single directory
+- This single directory has three sub-directories: ``src``, ``bin``, ``pkg``
+- It is in the ``src`` sub-directory where all our Go code will live
+
+
+
 
 
