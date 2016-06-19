@@ -41,21 +41,32 @@ For this guide I will assume that the ``GOPATH`` is set to ``$HOME/work/golang``
 .. code::
 
    $ mkdir -p $HOME/work/golang
+   $ mkdir -p $HOME/work/golang/src $HOME/work/golang/bin $HOME/work/golang/pkg
    
-Next, we will add the line ``export GOPATH=$HOME/work/golang`` in the ``.bashrc`` (or another similar file).
+At this stage, our $GOPATH directory tree looks like this:
 
-If we now start a new terminal session, we should see that ``GOPATH`` is now setup correctly:
+.. code::
+
+   $ tree $GOPATH -L 1
+   /home/vagrant/work/golang
+   ├── bin
+   ├── pkg
+   └── src
+
+Next, we will add the line ``export GOPATH=$HOME/work/golang`` in the ``.bashrc`` (or another similar file). If we now start a new terminal session, we should see that ``GOPATH`` is now setup correctly:
 
 .. code::
    
    $ go env GOPATH
    /home/vagrant/work/golang
-   
+
 
 Writing our first program
 =========================
 
-There are two types of Golang programs we can write - one is an application program (output is an executable program) and the other is a package which is meant to be used in other programs.
+There are two types of Golang programs we can write - one is an application program (output is an executable program) and the other is a package which is meant to be used in other programs. We will first write a program which will be compiled to an executable:
+
+
 
 
 
