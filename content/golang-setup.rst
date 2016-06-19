@@ -60,6 +60,7 @@ Next, we will add the line ``export GOPATH=$HOME/work/golang`` in the ``.bashrc`
    $ go env GOPATH
    /home/vagrant/work/golang
 
+You can learn more about GOPATH `here <https://golang.org/cmd/go/#hdr-GOPATH_environment_variable>`__.
 
 Writing our first program
 =========================
