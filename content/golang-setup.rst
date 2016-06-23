@@ -152,7 +152,7 @@ Working with third-party packages
 
 Let's now replace the ``main.go`` file above by the example code from the package `pb <https://github.com/cheggaaa/pb>`__ which lets us create nice progress bars:
 
-... code::
+.. code::
 
     package main
 
@@ -171,6 +171,43 @@ Let's now replace the ``main.go`` file above by the example code from the packag
 	bar.FinishPrint("The End!")
     }
 
+Let's try and install this package:
+
+.. code::
+
+   $ go install github.com/amitsaha/golang_gettingstarted
+   golang/src/github.com/amitsaha/golang_gettingstarted/main.go:6:5: cannot find package "gopkg.in/cheggaaa/pb.v1" in any of:
+	/usr/lib/golang/src/gopkg.in/cheggaaa/pb.v1 (from $GOROOT)
+	/home/asaha/work/golang/src/gopkg.in/cheggaaa/pb.v1 (from $GOPATH)
+
+Basically, this tells us that Go compiler is not able to find the package ``gopkg.in/cheggaaa/pb.v1``. So, let's get it:
+
+.. code::
+
+  $ go get  gopkg.in/cheggaaa/pb.v1
+  
+ This will download the package and place it in ``$GOPATH/src``:
+ 
+ .. code::
+ 
+    $ tree -L 3 $GOPATH/src/
+     /home/asaha/work/golang/src/
+     ├── github.com
+             │   └── amitsaha
+             │       └── golang_gettingstarted
+     └── gopkg.in
+             └── cheggaaa
+                    └── pb.v1
+
+ 
+If we now install our package again, it will build correclty and an executable ``golang_gettingstarted`` will be placed in ``$GOPATH/bin``:
+
+.. code::
+
+   $ go install github.com/amitsaha/golang_gettingstarted
+   $ $GOPATH/bin/golang_gettingstarted 
+    100000 / 100000 [======================================================================================================]100.00% 1m49s
+    The End!
 
 Golang package objects
 ======================
