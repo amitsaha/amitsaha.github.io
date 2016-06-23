@@ -115,5 +115,42 @@ Great! Our program compiled and ran successfully. Our workspace at this stage on
 Installing Go applications
 ==========================
 
-Now, let's say that we want our 
+Now, let's say that the program above was actually a utility we wrote and we want to use it regularly. Where as we could execute ``go run`` as above, but the more convenient approach is to install the program. ``go install`` command is used to build and install Go packages. Let's try it on our package:
+
+.. code::
+    
+    $ go install github.com/amitsaha/golang_gettingstarted/
+
+You can execute this command from anywhere on your filesystem. Go will figure out the path to the package from GOPATH we set above. Now, you will see that there is a ``golang_gettingstarted`` executable file in the ``$GOPATH/bin`` directory:
+
+.. code::
+
+   $ tree work/golang/
+   work/golang/
+   ├── bin
+   │   └── golang_gettingstarted
+   ├── pkg
+   └── src
+        └── github.com
+            └── amitsaha
+                   └── golang_gettingstarted
+                            └── main.go
+
+We can try executing the command:
+
+.. code::
+
+   $ ./work/golang/bin/golang_gettingstarted 
+   Hello World
+
+
+As a shortcut, we can just execute ``$GOPATH/bin/golang_gettingstarted``. But, you wouldn't need to even do that if ``$GOPATH/bin`` is in your ``$PATH``. So, if you want, you can do that and then you could just specify ``golang_gettingstarted`` and the program would be executed.
+
+
+Installing Go packages
+======================
+
+
+Working with third-party packages
+=================================
 
