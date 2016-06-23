@@ -183,8 +183,8 @@ Let's try and install this package:
 Basically, this tells us that Go compiler is not able to find the package ``gopkg.in/cheggaaa/pb.v1``. So, let's get it:
 
 .. code::
-
-  $ go get  gopkg.in/cheggaaa/pb.v1
+ 
+   $ go get  gopkg.in/cheggaaa/pb.v1
   
  This will download the package and place it in ``$GOPATH/src``:
  
