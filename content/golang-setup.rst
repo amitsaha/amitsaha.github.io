@@ -1,6 +1,6 @@
-:Title: Getting started with Golang on Linux
-:Date: 2016-06-17 17:00
-:Category: Golang
+:Title: Getting started with Golang on Fedora 24 (and other Linux distributions)
+:Date: 2016-06-23 18:00
+:Category: Fedora
 
 This guide will be how I usually setup and get started with Go development environment on Linux. By the end of this document, we will have seen how to:
 
@@ -226,3 +226,7 @@ If we now display the directory contents of ``$GOPATH``, we will see:
            ├── github.com
            └── gopkg.in
            
+
+The contents in ``pkg`` sub-directory are referred to as `package objects` - basically built Golang packages.
+
+That's all for now for this guide.
