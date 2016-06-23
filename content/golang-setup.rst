@@ -227,6 +227,9 @@ If we now display the directory contents of ``$GOPATH``, we will see:
            └── gopkg.in
            
 
-The contents in ``pkg`` sub-directory are referred to as `package objects` - basically built Golang packages.
+The contents in ``pkg`` sub-directory are referred to as `package objects` - basically built Golang packages. This is the difference from application programs (programs having ``package main``).
 
-That's all for now for this guide.
+Conclusion
+==========
+
+That's all for now, you can find the source code above `here <https://github.com/amitsaha/golang_gettingstarted>`__.
