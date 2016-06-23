@@ -70,13 +70,13 @@ Writing our first program
 
 There are two types of Golang programs we can write - one is an application program (output is an executable program) and the other is a package which is meant to be used in other programs. We will first write a program which will be compiled to an executable. 
 
-First, create a directory in ``src`` for our package:
+First, create a directory tree in ``src`` for our package:
 
 .. code::
 
    $ mkdir -p work/golang/src/github.com/amitsaha/golang_gettingstarted
    
-Then, type in the following in ``work/golang/src/github.com/amitsaha/golang_gettingstarted/main.go``:
+Our package name for the above directory tree becomes ``github.com/amitsaha/golang_gettingstarted``. Then, type in the following in ``work/golang/src/github.com/amitsaha/golang_gettingstarted/main.go``:
 
 .. code::
 
@@ -147,10 +147,31 @@ We can try executing the command:
 As a shortcut, we can just execute ``$GOPATH/bin/golang_gettingstarted``. But, you wouldn't need to even do that if ``$GOPATH/bin`` is in your ``$PATH``. So, if you want, you can do that and then you could just specify ``golang_gettingstarted`` and the program would be executed.
 
 
-Installing Go packages
-======================
-
-
 Working with third-party packages
 =================================
+
+Let's now replace the ``main.go`` file above by the example code from the package `pb <https://github.com/cheggaaa/pb>`__ which lets us create nice progress bars:
+
+... code::
+
+    package main
+
+    import (
+         "gopkg.in/cheggaaa/pb.v1"
+        "time"
+    )
+
+    func main() {
+	count := 100000
+	bar := pb.StartNew(count)
+	for i := 0; i < count; i++ {
+	    bar.Increment()
+	    time.Sleep(time.Millisecond)
+	}
+	bar.FinishPrint("The End!")
+    }
+
+
+Golang package objects
+======================
 
