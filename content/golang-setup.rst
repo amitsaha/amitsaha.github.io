@@ -212,3 +212,17 @@ If we now install our package again, it will build correclty and an executable `
 Golang package objects
 ======================
 
+If we now display the directory contents of ``$GOPATH``, we will see:
+
+.. code::
+
+   $ tree -L 2 golang/
+   golang/
+       ├── bin
+       │    └── golang_gettingstarted
+       ├── pkg
+       │   └── linux_amd64
+       └── src
+           ├── github.com
+           └── gopkg.in
+           
