@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: http://ogp.me/ns# fb: https://www.facebook.com/2008/fbml">
+<head>
+    <title>Setup Golang on Fedora 24 (and other Linux distributions) - Programming and Writing about it</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+<link rel="canonical" href="/setup-golang-on-fedora-24-and-other-linux-distributions.html">
+
+        <meta name="author" content="Amit Saha" />
+        <meta name="description" content="This guide will be how I usually setup and get started with Go development environment on Linux. By the end of this document, we will have seen how to: Install the Go compiler and other tools (gofmt, for eaxmple), collectively referred to as go tools Setup Go workspace Working with ..." />
+
+        <meta property="og:site_name" content="Programming and Writing about it" />
+        <meta property="og:type" content="article"/>
+        <meta property="og:title" content="Setup Golang on Fedora 24 (and other Linux distributions)"/>
+        <meta property="og:url" content="/setup-golang-on-fedora-24-and-other-linux-distributions.html"/>
+        <meta property="og:description" content="This guide will be how I usually setup and get started with Go development environment on Linux. By the end of this document, we will have seen how to: Install the Go compiler and other tools (gofmt, for eaxmple), collectively referred to as go tools Setup Go workspace Working with ..."/>
+        <meta property="article:published_time" content="2016-06-23" />
+            <meta property="article:section" content="Fedora" />
+            <meta property="article:author" content="Amit Saha" />
+
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="/theme/css/pygments/native.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Programming and Writing about it ATOM Feed"/>
+
+
+
+        <link href="/feeds/fedora.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Programming and Writing about it Fedora ATOM Feed"/>
+
+</head>
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+	<div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="/" class="navbar-brand">
+Programming and Writing about it            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                         <li><a href="/pages/articles.html">
+                             Articles
+                          </a></li>
+                         <li><a href="/pages/books.html">
+                             Books
+                          </a></li>
+                         <li><a href="/pages/personal-projects.html">
+                             Personal Projects
+                          </a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</div> <!-- /.navbar -->
+<!-- Banner -->
+<!-- End Banner -->
+<div class="container">
+    <div class="row">
+        <div class="col-sm-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/setup-golang-on-fedora-24-and-other-linux-distributions.html"
+                       rel="bookmark"
+                       title="Permalink to Setup Golang on Fedora 24 (and other Linux distributions)">
+                        Setup Golang on Fedora 24 (and other Linux distributions)
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="fa fa-calendar"></i><time datetime="2016-06-23T18:00:00+10:00"> Thu 23 June 2016</time>
+    </span>
+
+
+
+
+
+    
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>This guide will be how I usually setup and get started with Go development environment on Linux. By the end of this document, we will have seen how to:</p>
+<ul class="simple">
+<li>Install the Go compiler and other tools (<tt class="docutils literal">gofmt</tt>, for eaxmple), collectively referred to as go tools</li>
+<li>Setup Go workspace</li>
+<li>Working with Go programs using third-party packages</li>
+</ul>
+<div class="section" id="installing-go-tools">
+<h2>Installing Go tools</h2>
+<p>The first option to install the Go compiler and other tools from your distro's package manager. On Fedora 24, you can do <tt class="docutils literal">sudo dnf <span class="pre">-y</span> install golang</tt> for example. This will install 1.6 version of the Go tools. However, if your distro's packaged version is behind the upstream release we can follow the official <a class="reference external" href="https://golang.org/doc/install">install guide</a> to get the latest stable version of the Go tools:</p>
+<ul class="simple">
+<li>Download the Linux binary tarball from the <a class="reference external" href="https://golang.org/dl/">Downloads page</a></li>
+<li><tt class="docutils literal">sudo tar <span class="pre">-C</span> /usr/local <span class="pre">-xzf</span> <span class="pre">&lt;filename-from-above&gt;</span></tt></li>
+<li><tt class="docutils literal">export <span class="pre">PATH=$PATH:/usr/local/go/bin</span></tt> in your <tt class="docutils literal">.bashrc</tt> or similar file.</li>
+</ul>
+<p>When we now open a new terminal session, we should be able to type in <cite>go version</cite> and get the version we installed:</p>
+<pre class="code literal-block">
+$ go version
+go version go1.6.2 linux/amd64
+</pre>
+<p>If we see this, we are all set to go to the next stage</p>
+</div>
+<div class="section" id="setting-up-the-go-workspace">
+<h2>Setting up the Go workspace</h2>
+<p>Golang expects us to structure our source code in a certain way. You can read all about it in this <a class="reference external" href="https://golang.org/doc/code.html">document</a>. The summarized version is that:</p>
+<ul class="simple">
+<li>All our go code (including those of packages we use) in a single directory</li>
+<li>The environment variable <tt class="docutils literal">GOPATH</tt> points to this single directory</li>
+<li>This single directory has three sub-directories: <tt class="docutils literal">src</tt>, <tt class="docutils literal">bin</tt>, <tt class="docutils literal">pkg</tt></li>
+<li>It is in the <tt class="docutils literal">src</tt> sub-directory where all our Go code will live</li>
+</ul>
+<p>For this guide I will assume that the <tt class="docutils literal">GOPATH</tt> is set to <tt class="docutils literal">$HOME/work/golang</tt>:</p>
+<pre class="code literal-block">
+$ mkdir -p $HOME/work/golang
+$ mkdir -p $HOME/work/golang/src $HOME/work/golang/bin $HOME/work/golang/pkg
+</pre>
+<p>At this stage, our $GOPATH directory tree looks like this:</p>
+<pre class="code literal-block">
+$ tree -L 1 work/golang/
+work/golang/
+├── bin
+├── pkg
+└── src
+</pre>
+<p>Next, we will add the line <tt class="docutils literal">export <span class="pre">GOPATH=$HOME/work/golang</span></tt> in the <tt class="docutils literal">.bashrc</tt> (or another similar file). If we now start a new terminal session, we should see that <tt class="docutils literal">GOPATH</tt> is now setup correctly:</p>
+<pre class="code literal-block">
+$ go env GOPATH
+/home/asaha/work/golang
+</pre>
+<p>You can learn more about GOPATH <a class="reference external" href="https://golang.org/cmd/go/#hdr-GOPATH_environment_variable">here</a>.</p>
+</div>
+<div class="section" id="writing-our-first-program">
+<h2>Writing our first program</h2>
+<p>There are two types of Golang programs we can write - one is an application program (output is an executable program) and the other is a package which is meant to be used in other programs. We will first write a program which will be compiled to an executable.</p>
+<p>First, create a directory tree in <tt class="docutils literal">src</tt> for our package:</p>
+<pre class="code literal-block">
+$ mkdir -p work/golang/src/github.com/amitsaha/golang_gettingstarted
+</pre>
+<p>Our package name for the above directory tree becomes <tt class="docutils literal">github.com/amitsaha/golang_gettingstarted</tt>. Then, type in the following in <tt class="docutils literal">work/golang/src/github.com/amitsaha/golang_gettingstarted/main.go</tt>:</p>
+<pre class="code literal-block">
+package main
+
+import (
+         &quot;fmt&quot;
+)
+
+func main() {
+         fmt.Printf(&quot;Hello World\n&quot;)
+}
+</pre>
+<p>Next, build and run the program as follows:</p>
+<pre class="code literal-block">
+$ go run work/golang/src/github.com/amitsaha/golang_gettingstarted/main.go
+Hello World
+</pre>
+<p>Great! Our program compiled and ran successfully. Our workspace at this stage only has a single file - the one we created above:</p>
+<p>... code:</p>
+<pre class="literal-block">
+$ tree
+.
+├── bin
+├── pkg
+└── src
+         └── github.com
+                 └── amitsaha
+                         └── golang_gettingstarted
+                             └── main.go
+</pre>
+</div>
+<div class="section" id="installing-go-applications">
+<h2>Installing Go applications</h2>
+<p>Now, let's say that the program above was actually a utility we wrote and we want to use it regularly. Where as we could execute <tt class="docutils literal">go run</tt> as above, but the more convenient approach is to install the program. <tt class="docutils literal">go install</tt> command is used to build and install Go packages. Let's try it on our package:</p>
+<pre class="code literal-block">
+$ go install github.com/amitsaha/golang_gettingstarted/
+</pre>
+<p>You can execute this command from anywhere on your filesystem. Go will figure out the path to the package from GOPATH we set above. Now, you will see that there is a <tt class="docutils literal">golang_gettingstarted</tt> executable file in the <tt class="docutils literal">$GOPATH/bin</tt> directory:</p>
+<pre class="code literal-block">
+$ tree work/golang/
+work/golang/
+├── bin
+│&nbsp;&nbsp; └── golang_gettingstarted
+├── pkg
+└── src
+     └── github.com
+         └── amitsaha
+                └── golang_gettingstarted
+                         └── main.go
+</pre>
+<p>We can try executing the command:</p>
+<pre class="code literal-block">
+$ ./work/golang/bin/golang_gettingstarted
+Hello World
+</pre>
+<p>As a shortcut, we can just execute <tt class="docutils literal">$GOPATH/bin/golang_gettingstarted</tt>. But, you wouldn't need to even do that if <tt class="docutils literal">$GOPATH/bin</tt> is in your <tt class="docutils literal">$PATH</tt>. So, if you want, you can do that and then you could just specify <tt class="docutils literal">golang_gettingstarted</tt> and the program would be executed.</p>
+</div>
+<div class="section" id="working-with-third-party-packages">
+<h2>Working with third-party packages</h2>
+<p>Let's now replace the <tt class="docutils literal">main.go</tt> file above by the example code from the package <a class="reference external" href="https://github.com/cheggaaa/pb">pb</a> which lets us create nice progress bars:</p>
+<pre class="code literal-block">
+package main
+
+import (
+     &quot;gopkg.in/cheggaaa/pb.v1&quot;
+    &quot;time&quot;
+)
+
+func main() {
+    count := 100000
+    bar := pb.StartNew(count)
+    for i := 0; i &lt; count; i++ {
+        bar.Increment()
+        time.Sleep(time.Millisecond)
+    }
+    bar.FinishPrint(&quot;The End!&quot;)
+}
+</pre>
+<p>Let's try and install this package:</p>
+<pre class="code literal-block">
+$ go install github.com/amitsaha/golang_gettingstarted
+golang/src/github.com/amitsaha/golang_gettingstarted/main.go:6:5: cannot find package &quot;gopkg.in/cheggaaa/pb.v1&quot; in any of:
+     /usr/lib/golang/src/gopkg.in/cheggaaa/pb.v1 (from $GOROOT)
+     /home/asaha/work/golang/src/gopkg.in/cheggaaa/pb.v1 (from $GOPATH)
+</pre>
+<p>Basically, this tells us that Go compiler is not able to find the package <tt class="docutils literal">gopkg.in/cheggaaa/pb.v1</tt>. So, let's get it:</p>
+<pre class="code literal-block">
+  $ go get  gopkg.in/cheggaaa/pb.v1
+
+This will download the package and place it in ``$GOPATH/src``:
+
+.. code::
+
+   $ tree -L 3 $GOPATH/src/
+    /home/asaha/work/golang/src/
+    ├── github.com
+            │&nbsp;&nbsp; └── amitsaha
+            │&nbsp;&nbsp;     └── golang_gettingstarted
+    └── gopkg.in
+            └── cheggaaa
+                   └── pb.v1
+</pre>
+<p>If we now install our package again, it will build correclty and an executable <tt class="docutils literal">golang_gettingstarted</tt> will be placed in <tt class="docutils literal">$GOPATH/bin</tt>:</p>
+<pre class="code literal-block">
+$ go install github.com/amitsaha/golang_gettingstarted
+$ $GOPATH/bin/golang_gettingstarted
+ 100000 / 100000 [======================================================================================================]100.00% 1m49s
+ The End!
+</pre>
+</div>
+<div class="section" id="golang-package-objects">
+<h2>Golang package objects</h2>
+<p>If we now display the directory contents of <tt class="docutils literal">$GOPATH</tt>, we will see:</p>
+<pre class="code literal-block">
+$ tree -L 2 golang/
+golang/
+    ├── bin
+    │&nbsp;&nbsp;  └── golang_gettingstarted
+    ├── pkg
+    │&nbsp;&nbsp; └── linux_amd64
+    └── src
+        ├── github.com
+        └── gopkg.in
+</pre>
+<p>The contents in <tt class="docutils literal">pkg</tt> sub-directory are referred to as <cite>package objects</cite> - basically built Golang packages. This is the difference from application programs (programs having <tt class="docutils literal">package main</tt>). This question from a while back on the golang-nuts group may be <a class="reference external" href="https://groups.google.com/forum/m/#!topic/golang-nuts/RSd3B5_rIFE">interesting</a> to read.</p>
+<p>If you are to keen to learn more:</p>
+<ul class="simple">
+<li>The <a class="reference external" href="https://golang.org/doc/code.html">How to Write Go Code</a> document covers all I have discussed above and more</li>
+<li>Others in my <a class="reference external" href="https://github.com/amitsaha/linux_voice_1">repository</a> for an article I wrote on Go.</li>
+</ul>
+<p>That's all for now, you can find the simple source code above <a class="reference external" href="https://github.com/amitsaha/golang_gettingstarted">here</a>.</p>
+</div>
+
+            </div>
+            <!-- /.entry-content -->
+    <hr />
+    <!-- AddThis Button BEGIN -->
+    <div class="addthis_toolbox addthis_default_style">
+            <a class="addthis_button_facebook_like" fb:like:layout="button_count"></a>
+            <a class="addthis_button_tweet"></a>
+            <a class="addthis_button_google_plusone" g:plusone:size="medium"></a>
+    </div>
+    <!-- AddThis Button END -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-sm-3" id="sidebar">
+            <aside>
+
+<section class="well well-sm">
+    <ul class="list-group list-group-flush">
+
+
+
+
+
+
+    <li class="list-group-item"><h4><i class="fa fa-twitter fa-lg"></i><span class="icon-label">Latest Tweets</span></h4></li>
+    <div id="twitter_timeline">
+        <a class="twitter-timeline" data-chrome="noheader" href="https://twitter.com/echorand" data-widget-id="608854659248181251">Tweets by echorand</a>
+    </div>
+
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+    </ul>
+</section>
+            </aside>
+        </div>
+    </div>
+</div>
+<footer>
+   <div class="container">
+      <hr>
+      <div class="row">
+         <div class="col-xs-10">&copy; 2016 Amit Saha
+            &middot; Powered by <a href="https://github.com/getpelican/pelican-themes/tree/master/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a>         </div>
+         <div class="col-xs-2"><p class="pull-right"><i class="fa fa-arrow-up"></i> <a href="#">Back to top</a></p></div>
+      </div>
+   </div>
+</footer>
+<script src="/theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+        <script type="text/javascript">var addthis_config = {"data_track_addressbar": true};</script>
+    <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-557910c01cb1eb5c"></script>
+</body>
+</html>
