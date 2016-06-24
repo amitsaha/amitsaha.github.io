@@ -1,4 +1,4 @@
-:Title: Getting started with Golang on Fedora 24 (and other Linux distributions)
+:Title: Setup Golang on Fedora 24 (and other Linux distributions)
 :Date: 2016-06-23 18:00
 :Category: Fedora
 
