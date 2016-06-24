@@ -227,9 +227,11 @@ If we now display the directory contents of ``$GOPATH``, we will see:
            └── gopkg.in
            
 
-The contents in ``pkg`` sub-directory are referred to as `package objects` - basically built Golang packages. This is the difference from application programs (programs having ``package main``).
+The contents in ``pkg`` sub-directory are referred to as `package objects` - basically built Golang packages. This is the difference from application programs (programs having ``package main``). This question from a while back on the golang-nuts group may be `interesting <https://groups.google.com/forum/m/#!topic/golang-nuts/RSd3B5_rIFE>`__ to read.
 
-Conclusion
-==========
+If you are to keen to learn more:
 
-That's all for now, you can find the source code above `here <https://github.com/amitsaha/golang_gettingstarted>`__.
+- The `How to Write Go Code <https://golang.org/doc/code.html>`__ document covers all I have discussed above and more
+- Others in my `repository <https://github.com/amitsaha/linux_voice_1>`__ for an article I wrote on Go.
+
+That's all for now, you can find the simple source code above `here <https://github.com/amitsaha/golang_gettingstarted>`__.
