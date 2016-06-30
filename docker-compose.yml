@@ -1,0 +1,12 @@
+version: '2'
+services:
+    pelican:
+        build:
+            context: .
+            args:
+                - git_username="${GIT_USERNAME}"
+                - git_useremail="${GIT_USEREMAIL}" 
+                - gid=${GROUPID}
+                - group=${GROUP}
+                - uid=${USERID}
+                - user=${USER}
