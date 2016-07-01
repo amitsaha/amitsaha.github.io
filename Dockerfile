@@ -13,6 +13,5 @@ RUN git config --global user.name $git_username && git config --global user.emai
 RUN pip3 install pelican pelican-youtube
 RUN git clone https://github.com/getpelican/pelican-themes.git /pelican-themes
 WORKDIR /site
-ADD build.sh /build.sh
 USER $user
-ENTRYPOINT ["/build.sh"]
+ENTRYPOINT ["make", "build"]
