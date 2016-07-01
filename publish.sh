@@ -9,5 +9,5 @@ docker build \
     --build-arg user=`id -u -n` \
     -t amitsaha/pelican  .
 
-docker run -v `pwd`:/site -t amitsaha/pelican
+docker run -v `pwd`:/site:Z -t amitsaha/pelican
 make github
