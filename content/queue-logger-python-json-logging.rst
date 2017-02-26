@@ -17,8 +17,8 @@ Solution #1: Modify Python JSON logger
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The first solution is to look for ``exc_text`` which is set by the standard 
-``Formatter`` class as per my [PR](https://github.com/madzak/python-json-logger/pull/38/commits/ac42b205cc275fd0c226843f1dfd226695c09afd) and set that as the value of ``exc_info`` which means at least we get the string representation of the traceback.
-This PR is now merge.
+``Formatter`` class as per my `PR <https://github.com/madzak/python-json-logger/pull/38/commits/ac42b205cc275fd0c226843f1dfd226695c09afd>`__ and set that as the value of ``exc_info`` which means at least we get the string representation of the traceback.
+This PR is now merged.
 
 Solution #2: Subclass QueueHandler
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
