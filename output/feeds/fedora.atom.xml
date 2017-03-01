@@ -1,0 +1,1003 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Programming and Writing about it - Fedora</title><link href="/" rel="alternate"></link><link href="/feeds/fedora.atom.xml" rel="self"></link><id>/</id><updated>2017-02-27T18:00:00+10:00</updated><entry><title>Setup Golang 1.8 and gb on Fedora (and other Linux distributions)</title><link href="/setup-golang-18-and-gb-on-fedora-and-other-linux-distributions.html" rel="alternate"></link><published>2017-02-27T18:00:00+10:00</published><updated>2017-02-27T18:00:00+10:00</updated><author><name>Amit Saha</name></author><id>tag:None,2017-02-27:/setup-golang-18-and-gb-on-fedora-and-other-linux-distributions.html</id><summary type="html">&lt;p&gt;This guide will be how I usually setup and get started with Go development environment on Linux. By the end of this document, we will have seen how to:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;Install the Go 1.8 compiler and other tools (&lt;tt class="docutils literal"&gt;gofmt&lt;/tt&gt;, for eaxmple), collectively referred to as go tools&lt;/li&gt;
+&lt;li&gt;Install &lt;a class="reference external" href="http://getgb.io"&gt;gb&lt;/a&gt; and …&lt;/li&gt;&lt;/ul&gt;</summary><content type="html">&lt;p&gt;This guide will be how I usually setup and get started with Go development environment on Linux. By the end of this document, we will have seen how to:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;Install the Go 1.8 compiler and other tools (&lt;tt class="docutils literal"&gt;gofmt&lt;/tt&gt;, for eaxmple), collectively referred to as go tools&lt;/li&gt;
+&lt;li&gt;Install &lt;a class="reference external" href="http://getgb.io"&gt;gb&lt;/a&gt; and the &lt;tt class="docutils literal"&gt;vendor&lt;/tt&gt; plugin&lt;/li&gt;
+&lt;li&gt;Vendoring third party packages&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="section" id="installing-go-tools"&gt;
+&lt;h2&gt;Installing Go tools&lt;/h2&gt;
+&lt;p&gt;We can follow the official &lt;a class="reference external" href="https://golang.org/doc/install"&gt;install guide&lt;/a&gt; to get the latest stable version of the Go tools:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;Download the Linux binary tarball from the &lt;a class="reference external" href="https://golang.org/dl/"&gt;Downloads page&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;sudo tar &lt;span class="pre"&gt;-C&lt;/span&gt; /usr/local &lt;span class="pre"&gt;-xzf&lt;/span&gt; &lt;span class="pre"&gt;&amp;lt;filename-from-above&amp;gt;&lt;/span&gt;&lt;/tt&gt;&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;export &lt;span class="pre"&gt;PATH=$PATH:/usr/local/go/bin&lt;/span&gt;&lt;/tt&gt; in your &lt;tt class="docutils literal"&gt;.bashrc&lt;/tt&gt; or similar file.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;When we now open a new terminal session, we should be able to type in &lt;cite&gt;go version&lt;/cite&gt; and get the version we installed:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ go version
+go version go1.8 linux/amd64
+&lt;/pre&gt;
+&lt;p&gt;If we see this, we are all set to go to the next stage.&lt;/p&gt;
+&lt;p&gt;Golang expects us to structure our source code in a certain way. You can read all about it
+in this &lt;a class="reference external" href="https://golang.org/doc/code.html"&gt;document&lt;/a&gt;. The summarized version is that:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;All our go code (including those of packages we use) in a single directory&lt;/li&gt;
+&lt;li&gt;The environment variable &lt;tt class="docutils literal"&gt;GOPATH&lt;/tt&gt; points to this single directory&lt;/li&gt;
+&lt;li&gt;This single directory has three sub-directories: &lt;tt class="docutils literal"&gt;src&lt;/tt&gt;, &lt;tt class="docutils literal"&gt;bin&lt;/tt&gt;, &lt;tt class="docutils literal"&gt;pkg&lt;/tt&gt;&lt;/li&gt;
+&lt;li&gt;It is in the &lt;tt class="docutils literal"&gt;src&lt;/tt&gt; sub-directory where all our Go code will live&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Prior to version 1.8, we needed to setup a Go workspace and set the &lt;tt class="docutils literal"&gt;GOPATH&lt;/tt&gt; environment variable before we could
+start working with golang. Golang 1.8 will automatically use &lt;tt class="docutils literal"&gt;$HOME/go&lt;/tt&gt; as the GOPATH if one is not set:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ go env GOPATH
+/home/user/go
+&lt;/pre&gt;
+&lt;p&gt;If you are happy with the selection, you can skip the next step. You can learn more about
+GOPATH &lt;a class="reference external" href="https://golang.org/cmd/go/#hdr-GOPATH_environment_variable"&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="setting-up-the-go-workspace"&gt;
+&lt;h2&gt;Setting up the Go workspace&lt;/h2&gt;
+&lt;p&gt;Let's say you want to set the &lt;tt class="docutils literal"&gt;GOPATH&lt;/tt&gt; to &lt;tt class="docutils literal"&gt;$HOME/work/golang&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ mkdir -p $HOME/work/golang
+$ mkdir -p $HOME/work/golang/src $HOME/work/golang/bin $HOME/work/golang/pkg
+&lt;/pre&gt;
+&lt;p&gt;At this stage, our $GOPATH directory tree looks like this:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ tree -L 1 work/golang/
+work/golang/
+├── bin
+├── pkg
+└── src
+&lt;/pre&gt;
+&lt;p&gt;Next, we will add the line &lt;tt class="docutils literal"&gt;export &lt;span class="pre"&gt;GOPATH=$HOME/work/golang&lt;/span&gt;&lt;/tt&gt; in the &lt;tt class="docutils literal"&gt;.bashrc&lt;/tt&gt; (or another similar file). If we now start a new terminal session, we should see that &lt;tt class="docutils literal"&gt;GOPATH&lt;/tt&gt; is now setup to this path.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="writing-our-first-program"&gt;
+&lt;h2&gt;Writing our first program&lt;/h2&gt;
+&lt;pre class="code literal-block"&gt;
+$ go env GOPATH
+/home/asaha/work/golang
+&lt;/pre&gt;
+&lt;p&gt;There are two types of Golang programs we can write - one is an application program (output is an executable program) and the other is a package which is meant to be used in other programs. We will first write a program which will be compiled to an executable.&lt;/p&gt;
+&lt;p&gt;First, create a directory tree in &lt;tt class="docutils literal"&gt;$GOPATH/src&lt;/tt&gt; for our package:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ mkdir -p $GOPATH/src/github.com/amitsaha/golang_gettingstarted
+&lt;/pre&gt;
+&lt;p&gt;Our package name for the above directory tree becomes &lt;tt class="docutils literal"&gt;github.com/amitsaha/golang_gettingstarted&lt;/tt&gt;. Then, type in the following in &lt;tt class="docutils literal"&gt;$GOPATH/src/github.com/amitsaha/golang_gettingstarted/main.go&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+package main
+
+import (
+         &amp;quot;fmt&amp;quot;
+)
+
+func main() {
+         fmt.Printf(&amp;quot;Hello World\n&amp;quot;)
+}
+&lt;/pre&gt;
+&lt;p&gt;Next, build and run the program as follows:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ go run $GOPATH/src/github.com/amitsaha/golang_gettingstarted/main.go
+Hello World
+&lt;/pre&gt;
+&lt;p&gt;Great! Our program compiled and ran successfully. Our workspace at this stage only has a single file - the one we created above:&lt;/p&gt;
+&lt;p&gt;... code:&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+$ tree
+.
+├── bin
+├── pkg
+└── src
+         └── github.com
+                 └── amitsaha
+                         └── golang_gettingstarted
+                             └── main.go
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class="section" id="installing-go-applications"&gt;
+&lt;h2&gt;Installing Go applications&lt;/h2&gt;
+&lt;p&gt;Now, let's say that the program above was actually a utility we wrote and we want to use it regularly. Where as we could execute &lt;tt class="docutils literal"&gt;go run&lt;/tt&gt; as above, but the more convenient approach is to install the program. &lt;tt class="docutils literal"&gt;go install&lt;/tt&gt; command is used to build and install Go packages. Let's try it on our package:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ go install github.com/amitsaha/golang_gettingstarted/
+&lt;/pre&gt;
+&lt;p&gt;You can execute this command from anywhere on your filesystem. Go will figure out the path to the package from GOPATH we set above. Now, you will see that there is a &lt;tt class="docutils literal"&gt;golang_gettingstarted&lt;/tt&gt; executable file in the &lt;tt class="docutils literal"&gt;$GOPATH/bin&lt;/tt&gt; directory:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ tree work/golang/
+work/golang/
+├── bin
+│&amp;nbsp;&amp;nbsp; └── golang_gettingstarted
+├── pkg
+└── src
+     └── github.com
+         └── amitsaha
+                └── golang_gettingstarted
+                         └── main.go
+&lt;/pre&gt;
+&lt;p&gt;We can try executing the command:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ ./work/golang/bin/golang_gettingstarted
+Hello World
+&lt;/pre&gt;
+&lt;p&gt;As a shortcut, we can just execute &lt;tt class="docutils literal"&gt;$GOPATH/bin/golang_gettingstarted&lt;/tt&gt;. But, you wouldn't need to even do that if &lt;tt class="docutils literal"&gt;$GOPATH/bin&lt;/tt&gt; is in your &lt;tt class="docutils literal"&gt;$PATH&lt;/tt&gt;. So, if you want, you can do that and then you could just specify &lt;tt class="docutils literal"&gt;golang_gettingstarted&lt;/tt&gt; and the program would be executed.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="working-with-third-party-packages"&gt;
+&lt;h2&gt;Working with third-party packages&lt;/h2&gt;
+&lt;p&gt;Let's now replace the &lt;tt class="docutils literal"&gt;main.go&lt;/tt&gt; file above by the example code from the package &lt;a class="reference external" href="https://github.com/cheggaaa/pb"&gt;pb&lt;/a&gt; which lets us create nice progress bars:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+package main
+
+import (
+    &amp;quot;gopkg.in/cheggaaa/pb.v1&amp;quot;
+    &amp;quot;time&amp;quot;
+)
+
+func main() {
+    count := 100000
+    bar := pb.StartNew(count)
+    for i := 0; i &amp;lt; count; i++ {
+        bar.Increment()
+        time.Sleep(time.Millisecond)
+    }
+    bar.FinishPrint(&amp;quot;The End!&amp;quot;)
+}
+&lt;/pre&gt;
+&lt;p&gt;Let's try and install this package:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ go install github.com/amitsaha/golang_gettingstarted
+golang/src/github.com/amitsaha/golang_gettingstarted/main.go:6:5: cannot find package &amp;quot;gopkg.in/cheggaaa/pb.v1&amp;quot; in any of:
+     /usr/lib/golang/src/gopkg.in/cheggaaa/pb.v1 (from $GOROOT)
+     /home/asaha/work/golang/src/gopkg.in/cheggaaa/pb.v1 (from $GOPATH)
+&lt;/pre&gt;
+&lt;p&gt;Basically, this tells us that Go compiler is not able to find the package &lt;tt class="docutils literal"&gt;gopkg.in/cheggaaa/pb.v1&lt;/tt&gt;. So, let's get it:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ go get  gopkg.in/cheggaaa/pb.v1
+&lt;/pre&gt;
+&lt;p&gt;This will download the package and place it in &lt;tt class="docutils literal"&gt;$GOPATH/src&lt;/tt&gt;:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;pre class="code literal-block"&gt;
+$ tree -L 3 $GOPATH/src/
+ /home/asaha/work/golang/src/
+ ├── github.com
+         │&amp;nbsp;&amp;nbsp; └── amitsaha
+         │&amp;nbsp;&amp;nbsp;     └── golang_gettingstarted
+ └── gopkg.in
+         └── cheggaaa
+                └── pb.v1
+&lt;/pre&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;If we now install our package again, it will build correctly and an executable &lt;tt class="docutils literal"&gt;golang_gettingstarted&lt;/tt&gt;
+will be placed in &lt;tt class="docutils literal"&gt;$GOPATH/bin&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ go install github.com/amitsaha/golang_gettingstarted
+$ $GOPATH/bin/golang_gettingstarted
+ 100000 / 100000 [======================================================================================================]100.00% 1m49s
+ The End!
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class="section" id="golang-package-objects"&gt;
+&lt;h2&gt;Golang package objects&lt;/h2&gt;
+&lt;p&gt;If we now display the directory contents of &lt;tt class="docutils literal"&gt;$GOPATH&lt;/tt&gt;, we will see:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ tree -L 2 golang/
+golang/
+    ├── bin
+    │&amp;nbsp;&amp;nbsp;  └── golang_gettingstarted
+    ├── pkg
+    │&amp;nbsp;&amp;nbsp; └── linux_amd64
+    └── src
+        ├── github.com
+        └── gopkg.in
+&lt;/pre&gt;
+&lt;p&gt;The contents in &lt;tt class="docutils literal"&gt;pkg&lt;/tt&gt; sub-directory are referred to as &lt;cite&gt;package objects&lt;/cite&gt; - basically built Golang packages. This is the difference from application programs (programs having &lt;tt class="docutils literal"&gt;package main&lt;/tt&gt;). This question from a while back on the golang-nuts group may be &lt;a class="reference external" href="https://groups.google.com/forum/m/#!topic/golang-nuts/RSd3B5_rIFE"&gt;interesting&lt;/a&gt; to read.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="using-gb-to-manage-projects"&gt;
+&lt;h2&gt;Using gb to manage projects&lt;/h2&gt;
+&lt;p&gt;&lt;a class="reference external" href="https://getgb.io"&gt;gb&lt;/a&gt; is Go build tool which works with the idea of projects. For me it has two features
+for which I use it:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;It doesn't require my project to be in &lt;tt class="docutils literal"&gt;$GOPATH/src&lt;/tt&gt;&lt;/li&gt;
+&lt;li&gt;It allows me to vendor and manage thrird party packages easily&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The disadvantage of using &lt;tt class="docutils literal"&gt;gb&lt;/tt&gt; to manage your project is that your project is not &amp;quot;go gettable&amp;quot;. But, let's ignore
+it for now.&lt;/p&gt;
+&lt;div class="section" id="installing-gb"&gt;
+&lt;h3&gt;Installing gb&lt;/h3&gt;
+&lt;p&gt;The following will fetch and install &lt;tt class="docutils literal"&gt;gb&lt;/tt&gt; in &lt;tt class="docutils literal"&gt;$GOPATH/bin&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ go get github.com/constabulary/gb/...
+&lt;/pre&gt;
+&lt;p&gt;If not already done, please add &lt;tt class="docutils literal"&gt;$GOPATH/bin&lt;/tt&gt; to your &lt;tt class="docutils literal"&gt;$PATH&lt;/tt&gt; environment variable and start
+a new shell session and type in &lt;tt class="docutils literal"&gt;gb&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ gb
+gb, a project based build tool for the Go programming language.
+
+Usage:
+
+     gb command [arguments]
+..
+&lt;/pre&gt;
+&lt;p&gt;We will next install the &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;gb-vendor&lt;/span&gt;&lt;/tt&gt; &lt;a class="reference external" href="https://godoc.org/github.com/constabulary/gb/cmd/gb-vendor"&gt;plugin&lt;/a&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ go get github.com/constabulary/gb/cmd/gb-vendor
+&lt;/pre&gt;
+&lt;p&gt;Let's now setup the above project, but now as a &lt;tt class="docutils literal"&gt;gb&lt;/tt&gt; project. Create a directory &lt;tt class="docutils literal"&gt;pb_demo&lt;/tt&gt; anywhere
+in your &lt;tt class="docutils literal"&gt;$HOME&lt;/tt&gt; and create a sub-directory &lt;tt class="docutils literal"&gt;src&lt;/tt&gt; under it. Inside &lt;tt class="docutils literal"&gt;src&lt;/tt&gt;, we will create another
+subirectory &lt;tt class="docutils literal"&gt;demo&lt;/tt&gt; inside it - &lt;tt class="docutils literal"&gt;demo&lt;/tt&gt; is our project name, and place &lt;tt class="docutils literal"&gt;main.go&lt;/tt&gt; above in it.&lt;/p&gt;
+&lt;p&gt;The resulting directory structure will look like this:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ tree pb-demo/
+pb-demo/
+`-- src
+    `-- demo
+        `-- main.go
+&lt;/pre&gt;
+&lt;p&gt;The &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;pb-demo&lt;/span&gt;&lt;/tt&gt; directory is now a valid &lt;tt class="docutils literal"&gt;gb&lt;/tt&gt; project. Let's fetch the dependency:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ cd pb-demo
+$ gb vendor fetch gopkg.in/cheggaaa/pb.v1
+fetching recursive dependency github.com/mattn/go-runewidth
+&lt;/pre&gt;
+&lt;p&gt;You will now see a new sub-directory &lt;tt class="docutils literal"&gt;vendor&lt;/tt&gt; inside &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;pb-demo&lt;/span&gt;&lt;/tt&gt;. We can now go ahead and build our project:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ cd pb-demo/
+$ gb build
+github.com/mattn/go-runewidth
+gopkg.in/cheggaaa/pb.v1
+demo
+&lt;/pre&gt;
+&lt;p&gt;And finally run it:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ ./bin/main
+..
+&lt;/pre&gt;
+&lt;p&gt;Couple of points to summarize here:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;The third party package(s) are now in the &lt;tt class="docutils literal"&gt;vendor&lt;/tt&gt; sub-directory along with your package's source&lt;/li&gt;
+&lt;li&gt;The &lt;tt class="docutils literal"&gt;vendor/manifest&lt;/tt&gt; file allows you to make sure that your dependencies are pinned to a certain version&lt;/li&gt;
+&lt;li&gt;You don't need to worry about having your project in &lt;tt class="docutils literal"&gt;$GOPATH&lt;/tt&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;If you are to keen to learn more:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;The &lt;a class="reference external" href="https://golang.org/doc/code.html"&gt;How to Write Go Code&lt;/a&gt; document covers all I have discussed above and more&lt;/li&gt;
+&lt;li&gt;Others in my &lt;a class="reference external" href="https://github.com/amitsaha/linux_voice_1"&gt;repository&lt;/a&gt; for an article I wrote on Go.&lt;/li&gt;
+&lt;li&gt;Learn about &lt;a class="reference external" href="https://getgb.io/docs/project/"&gt;gb&lt;/a&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;That's all for now, you can find the simple source code above &lt;a class="reference external" href="https://github.com/amitsaha/golang_gettingstarted"&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+</content></entry><entry><title>Setup Golang on Fedora 24 (and other Linux distributions)</title><link href="/setup-golang-on-fedora-24-and-other-linux-distributions.html" rel="alternate"></link><published>2016-06-23T18:00:00+10:00</published><updated>2016-06-23T18:00:00+10:00</updated><author><name>Amit Saha</name></author><id>tag:None,2016-06-23:/setup-golang-on-fedora-24-and-other-linux-distributions.html</id><summary type="html">&lt;p&gt;This guide will be how I usually setup and get started with Go development environment on Linux. By the end of this document, we will have seen how to:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;Install the Go compiler and other tools (&lt;tt class="docutils literal"&gt;gofmt&lt;/tt&gt;, for eaxmple), collectively referred to as go tools&lt;/li&gt;
+&lt;li&gt;Setup Go workspace&lt;/li&gt;
+&lt;li&gt;Working with …&lt;/li&gt;&lt;/ul&gt;</summary><content type="html">&lt;p&gt;This guide will be how I usually setup and get started with Go development environment on Linux. By the end of this document, we will have seen how to:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;Install the Go compiler and other tools (&lt;tt class="docutils literal"&gt;gofmt&lt;/tt&gt;, for eaxmple), collectively referred to as go tools&lt;/li&gt;
+&lt;li&gt;Setup Go workspace&lt;/li&gt;
+&lt;li&gt;Working with Go programs using third-party packages&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="section" id="installing-go-tools"&gt;
+&lt;h2&gt;Installing Go tools&lt;/h2&gt;
+&lt;p&gt;The first option to install the Go compiler and other tools from your distro's package manager. On Fedora 24, you can do &lt;tt class="docutils literal"&gt;sudo dnf &lt;span class="pre"&gt;-y&lt;/span&gt; install golang&lt;/tt&gt; for example. This will install 1.6 version of the Go tools. However, if your distro's packaged version is behind the upstream release we can follow the official &lt;a class="reference external" href="https://golang.org/doc/install"&gt;install guide&lt;/a&gt; to get the latest stable version of the Go tools:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;Download the Linux binary tarball from the &lt;a class="reference external" href="https://golang.org/dl/"&gt;Downloads page&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;sudo tar &lt;span class="pre"&gt;-C&lt;/span&gt; /usr/local &lt;span class="pre"&gt;-xzf&lt;/span&gt; &lt;span class="pre"&gt;&amp;lt;filename-from-above&amp;gt;&lt;/span&gt;&lt;/tt&gt;&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;export &lt;span class="pre"&gt;PATH=$PATH:/usr/local/go/bin&lt;/span&gt;&lt;/tt&gt; in your &lt;tt class="docutils literal"&gt;.bashrc&lt;/tt&gt; or similar file.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;When we now open a new terminal session, we should be able to type in &lt;cite&gt;go version&lt;/cite&gt; and get the version we installed:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ go version
+go version go1.6.2 linux/amd64
+&lt;/pre&gt;
+&lt;p&gt;If we see this, we are all set to go to the next stage&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="setting-up-the-go-workspace"&gt;
+&lt;h2&gt;Setting up the Go workspace&lt;/h2&gt;
+&lt;p&gt;Golang expects us to structure our source code in a certain way. You can read all about it in this &lt;a class="reference external" href="https://golang.org/doc/code.html"&gt;document&lt;/a&gt;. The summarized version is that:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;All our go code (including those of packages we use) in a single directory&lt;/li&gt;
+&lt;li&gt;The environment variable &lt;tt class="docutils literal"&gt;GOPATH&lt;/tt&gt; points to this single directory&lt;/li&gt;
+&lt;li&gt;This single directory has three sub-directories: &lt;tt class="docutils literal"&gt;src&lt;/tt&gt;, &lt;tt class="docutils literal"&gt;bin&lt;/tt&gt;, &lt;tt class="docutils literal"&gt;pkg&lt;/tt&gt;&lt;/li&gt;
+&lt;li&gt;It is in the &lt;tt class="docutils literal"&gt;src&lt;/tt&gt; sub-directory where all our Go code will live&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;For this guide I will assume that the &lt;tt class="docutils literal"&gt;GOPATH&lt;/tt&gt; is set to &lt;tt class="docutils literal"&gt;$HOME/work/golang&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ mkdir -p $HOME/work/golang
+$ mkdir -p $HOME/work/golang/src $HOME/work/golang/bin $HOME/work/golang/pkg
+&lt;/pre&gt;
+&lt;p&gt;At this stage, our $GOPATH directory tree looks like this:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ tree -L 1 work/golang/
+work/golang/
+├── bin
+├── pkg
+└── src
+&lt;/pre&gt;
+&lt;p&gt;Next, we will add the line &lt;tt class="docutils literal"&gt;export &lt;span class="pre"&gt;GOPATH=$HOME/work/golang&lt;/span&gt;&lt;/tt&gt; in the &lt;tt class="docutils literal"&gt;.bashrc&lt;/tt&gt; (or another similar file). If we now start a new terminal session, we should see that &lt;tt class="docutils literal"&gt;GOPATH&lt;/tt&gt; is now setup correctly:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ go env GOPATH
+/home/asaha/work/golang
+&lt;/pre&gt;
+&lt;p&gt;You can learn more about GOPATH &lt;a class="reference external" href="https://golang.org/cmd/go/#hdr-GOPATH_environment_variable"&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="writing-our-first-program"&gt;
+&lt;h2&gt;Writing our first program&lt;/h2&gt;
+&lt;p&gt;There are two types of Golang programs we can write - one is an application program (output is an executable program) and the other is a package which is meant to be used in other programs. We will first write a program which will be compiled to an executable.&lt;/p&gt;
+&lt;p&gt;First, create a directory tree in &lt;tt class="docutils literal"&gt;src&lt;/tt&gt; for our package:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ mkdir -p work/golang/src/github.com/amitsaha/golang_gettingstarted
+&lt;/pre&gt;
+&lt;p&gt;Our package name for the above directory tree becomes &lt;tt class="docutils literal"&gt;github.com/amitsaha/golang_gettingstarted&lt;/tt&gt;. Then, type in the following in &lt;tt class="docutils literal"&gt;work/golang/src/github.com/amitsaha/golang_gettingstarted/main.go&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+package main
+
+import (
+         &amp;quot;fmt&amp;quot;
+)
+
+func main() {
+         fmt.Printf(&amp;quot;Hello World\n&amp;quot;)
+}
+&lt;/pre&gt;
+&lt;p&gt;Next, build and run the program as follows:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ go run work/golang/src/github.com/amitsaha/golang_gettingstarted/main.go
+Hello World
+&lt;/pre&gt;
+&lt;p&gt;Great! Our program compiled and ran successfully. Our workspace at this stage only has a single file - the one we created above:&lt;/p&gt;
+&lt;p&gt;... code:&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+$ tree
+.
+├── bin
+├── pkg
+└── src
+         └── github.com
+                 └── amitsaha
+                         └── golang_gettingstarted
+                             └── main.go
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class="section" id="installing-go-applications"&gt;
+&lt;h2&gt;Installing Go applications&lt;/h2&gt;
+&lt;p&gt;Now, let's say that the program above was actually a utility we wrote and we want to use it regularly. Where as we could execute &lt;tt class="docutils literal"&gt;go run&lt;/tt&gt; as above, but the more convenient approach is to install the program. &lt;tt class="docutils literal"&gt;go install&lt;/tt&gt; command is used to build and install Go packages. Let's try it on our package:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ go install github.com/amitsaha/golang_gettingstarted/
+&lt;/pre&gt;
+&lt;p&gt;You can execute this command from anywhere on your filesystem. Go will figure out the path to the package from GOPATH we set above. Now, you will see that there is a &lt;tt class="docutils literal"&gt;golang_gettingstarted&lt;/tt&gt; executable file in the &lt;tt class="docutils literal"&gt;$GOPATH/bin&lt;/tt&gt; directory:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ tree work/golang/
+work/golang/
+├── bin
+│&amp;nbsp;&amp;nbsp; └── golang_gettingstarted
+├── pkg
+└── src
+     └── github.com
+         └── amitsaha
+                └── golang_gettingstarted
+                         └── main.go
+&lt;/pre&gt;
+&lt;p&gt;We can try executing the command:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ ./work/golang/bin/golang_gettingstarted
+Hello World
+&lt;/pre&gt;
+&lt;p&gt;As a shortcut, we can just execute &lt;tt class="docutils literal"&gt;$GOPATH/bin/golang_gettingstarted&lt;/tt&gt;. But, you wouldn't need to even do that if &lt;tt class="docutils literal"&gt;$GOPATH/bin&lt;/tt&gt; is in your &lt;tt class="docutils literal"&gt;$PATH&lt;/tt&gt;. So, if you want, you can do that and then you could just specify &lt;tt class="docutils literal"&gt;golang_gettingstarted&lt;/tt&gt; and the program would be executed.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="working-with-third-party-packages"&gt;
+&lt;h2&gt;Working with third-party packages&lt;/h2&gt;
+&lt;p&gt;Let's now replace the &lt;tt class="docutils literal"&gt;main.go&lt;/tt&gt; file above by the example code from the package &lt;a class="reference external" href="https://github.com/cheggaaa/pb"&gt;pb&lt;/a&gt; which lets us create nice progress bars:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+package main
+
+import (
+     &amp;quot;gopkg.in/cheggaaa/pb.v1&amp;quot;
+    &amp;quot;time&amp;quot;
+)
+
+func main() {
+    count := 100000
+    bar := pb.StartNew(count)
+    for i := 0; i &amp;lt; count; i++ {
+        bar.Increment()
+        time.Sleep(time.Millisecond)
+    }
+    bar.FinishPrint(&amp;quot;The End!&amp;quot;)
+}
+&lt;/pre&gt;
+&lt;p&gt;Let's try and install this package:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ go install github.com/amitsaha/golang_gettingstarted
+golang/src/github.com/amitsaha/golang_gettingstarted/main.go:6:5: cannot find package &amp;quot;gopkg.in/cheggaaa/pb.v1&amp;quot; in any of:
+     /usr/lib/golang/src/gopkg.in/cheggaaa/pb.v1 (from $GOROOT)
+     /home/asaha/work/golang/src/gopkg.in/cheggaaa/pb.v1 (from $GOPATH)
+&lt;/pre&gt;
+&lt;p&gt;Basically, this tells us that Go compiler is not able to find the package &lt;tt class="docutils literal"&gt;gopkg.in/cheggaaa/pb.v1&lt;/tt&gt;. So, let's get it:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+  $ go get  gopkg.in/cheggaaa/pb.v1
+
+This will download the package and place it in ``$GOPATH/src``:
+
+.. code::
+
+   $ tree -L 3 $GOPATH/src/
+    /home/asaha/work/golang/src/
+    ├── github.com
+            │&amp;nbsp;&amp;nbsp; └── amitsaha
+            │&amp;nbsp;&amp;nbsp;     └── golang_gettingstarted
+    └── gopkg.in
+            └── cheggaaa
+                   └── pb.v1
+&lt;/pre&gt;
+&lt;p&gt;If we now install our package again, it will build correclty and an executable &lt;tt class="docutils literal"&gt;golang_gettingstarted&lt;/tt&gt; will be placed in &lt;tt class="docutils literal"&gt;$GOPATH/bin&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ go install github.com/amitsaha/golang_gettingstarted
+$ $GOPATH/bin/golang_gettingstarted
+ 100000 / 100000 [======================================================================================================]100.00% 1m49s
+ The End!
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class="section" id="golang-package-objects"&gt;
+&lt;h2&gt;Golang package objects&lt;/h2&gt;
+&lt;p&gt;If we now display the directory contents of &lt;tt class="docutils literal"&gt;$GOPATH&lt;/tt&gt;, we will see:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ tree -L 2 golang/
+golang/
+    ├── bin
+    │&amp;nbsp;&amp;nbsp;  └── golang_gettingstarted
+    ├── pkg
+    │&amp;nbsp;&amp;nbsp; └── linux_amd64
+    └── src
+        ├── github.com
+        └── gopkg.in
+&lt;/pre&gt;
+&lt;p&gt;The contents in &lt;tt class="docutils literal"&gt;pkg&lt;/tt&gt; sub-directory are referred to as &lt;cite&gt;package objects&lt;/cite&gt; - basically built Golang packages. This is the difference from application programs (programs having &lt;tt class="docutils literal"&gt;package main&lt;/tt&gt;). This question from a while back on the golang-nuts group may be &lt;a class="reference external" href="https://groups.google.com/forum/m/#!topic/golang-nuts/RSd3B5_rIFE"&gt;interesting&lt;/a&gt; to read.&lt;/p&gt;
+&lt;p&gt;If you are to keen to learn more:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;The &lt;a class="reference external" href="https://golang.org/doc/code.html"&gt;How to Write Go Code&lt;/a&gt; document covers all I have discussed above and more&lt;/li&gt;
+&lt;li&gt;Others in my &lt;a class="reference external" href="https://github.com/amitsaha/linux_voice_1"&gt;repository&lt;/a&gt; for an article I wrote on Go.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;That's all for now, you can find the simple source code above &lt;a class="reference external" href="https://github.com/amitsaha/golang_gettingstarted"&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+</content></entry><entry><title>runC and libcontainer on Fedora 23/24</title><link href="/runc-and-libcontainer-on-fedora-2324.html" rel="alternate"></link><published>2016-04-27T17:00:00+10:00</published><updated>2016-04-27T17:00:00+10:00</updated><author><name>Amit Saha</name></author><id>tag:None,2016-04-27:/runc-and-libcontainer-on-fedora-2324.html</id><summary type="html">&lt;p&gt;In this post, I will post my notes on how I got &lt;a class="reference external" href="https://github.com/opencontainers/runc/"&gt;runC&lt;/a&gt; and then using
+&lt;cite&gt;libcontainer&lt;/cite&gt; on Fedora. The first step is to install &lt;tt class="docutils literal"&gt;golang&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ sudo dnf -y install golang
+$ go version
+go version go1.6 linux/amd64
+&lt;/pre&gt;
+&lt;p&gt;We will set GOPATH=~/golang/ and then do the following:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ mkdir …&lt;/pre&gt;</summary><content type="html">&lt;p&gt;In this post, I will post my notes on how I got &lt;a class="reference external" href="https://github.com/opencontainers/runc/"&gt;runC&lt;/a&gt; and then using
+&lt;cite&gt;libcontainer&lt;/cite&gt; on Fedora. The first step is to install &lt;tt class="docutils literal"&gt;golang&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ sudo dnf -y install golang
+$ go version
+go version go1.6 linux/amd64
+&lt;/pre&gt;
+&lt;p&gt;We will set GOPATH=~/golang/ and then do the following:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ mkdir -p ~/golang/github.com/opencontainers
+$ cd ~/golang/github.com/opencontainers
+$ git clone https://github.com/opencontainers/runc.git
+$ cd runc
+
+$ sudo dnf -y install libseccomp-devel
+$ make
+$ sudo make install
+&lt;/pre&gt;
+&lt;p&gt;At this stage, &lt;tt class="docutils literal"&gt;runc&lt;/tt&gt; should be installed and ready to use:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ runc --version
+runc version 0.0.9
+commit: 89ab7f2ccc1e45ddf6485eaa802c35dcf321dfc8
+spec: 0.5.0-dev
+&lt;/pre&gt;
+&lt;p&gt;Now we need a rootfs that we will use for our container, we will use
+the &amp;quot;busybox&amp;quot; docker image - pull it and export a tar archive:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ sudo dnf -y install docker
+$ sudo systemctl start docker
+$ docker pull busybox
+$ sudo docker export $(sudo docker create busybox) &amp;gt; busybox.tar
+$ mkdir ~/rootfs
+$ tar -C ~/rootfs -xf busybox.tar
+&lt;/pre&gt;
+&lt;p&gt;Now that we have a rootfs, we have one final step - generate the spec
+for our container:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ runc spec
+&lt;/pre&gt;
+&lt;p&gt;This will generate a &lt;tt class="docutils literal"&gt;config.json&lt;/tt&gt; (&lt;a class="reference external" href="https://github.com/opencontainers/runtime-spec/blob/master/config.md"&gt;config&lt;/a&gt;)
+file and then we can start a container using the rootfs above:
+(runC expects to find &lt;tt class="docutils literal"&gt;config.json&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;rootfs&lt;/tt&gt; in the same
+directory as you are going to start the container from)&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+# for some reason, i have to pass the absolute path to runc when using sudo
+# UPDATE: (Thanks to Dharmit for pointingme to: http://unix.stackexchange.com/questions/91541/why-is-path-reset-in-a-sudo-command/91556#91556)
+$ sudo /usr/local/bin/runc start test #  test is the &amp;quot;container-id&amp;quot;
+/ # ps
+     PID   USER     TIME   COMMAND
+ 1 root       0:00 sh
+ 8 root       0:00 ps
+/# exit
+&lt;/pre&gt;
+&lt;div class="section" id="getting-started-with-libcontainer"&gt;
+&lt;h2&gt;Getting started with libcontainer&lt;/h2&gt;
+&lt;p&gt;&lt;tt class="docutils literal"&gt;runC&lt;/tt&gt; is built upon &lt;a class="reference external" href="https://github.com/opencontainers/runc/tree/master/libcontainer"&gt;libcontainer&lt;/a&gt;. This
+means that wcan write our own Golang programs which will start a
+container and do stuff in it. An example program is available &lt;a class="reference external" href="https://github.com/amitsaha/libcontainer_examples/blob/master/example1.go"&gt;here&lt;/a&gt;
+(thanks to the fine folks on #opencontainers on Freenode for helpful
+pointers). It starts a container using the above rootfs, runs &lt;tt class="docutils literal"&gt;ps&lt;/tt&gt;
+in it and exits.&lt;/p&gt;
+&lt;p&gt;Once you have saved it somewhere on your go path, we will first
+need to get all the dependent packages:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ # My program is in the below directory
+$ cd ~/golang/src/github.com/amitsaha/libcontainer_examples
+$ go get
+$ sudo GOPATH=/home/asaha/golang go run example1.go /home/asaha/rootfs/
+ [sudo] password for asaha:
+ PID   USER     TIME   COMMAND
+ 1 root       0:00 ps
+&lt;/pre&gt;
+&lt;p&gt;(Thanks Dharmit for all the suggestions)&lt;/p&gt;
+&lt;/div&gt;
+</content></entry><entry><title>Did your Fedora live cd build fail?</title><link href="/did-your-fedora-live-cd-build-fail.html" rel="alternate"></link><published>2016-02-17T11:00:00+10:00</published><updated>2016-02-17T11:00:00+10:00</updated><author><name>Amit Saha</name></author><id>tag:None,2016-02-17:/did-your-fedora-live-cd-build-fail.html</id><summary type="html">&lt;p&gt;&lt;em&gt;Update: Changed the Koji URL to reflect the change to livemedia&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;As the &lt;a class="reference external" href="http://fedora-scientific.readthedocs.org/en/latest/"&gt;Fedora Scientific&lt;/a&gt; maintainer, I
+have to make sure I look into whether the nightly build is failing so
+that I can look into the why. So far I have been doing that by going to the koji …&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;em&gt;Update: Changed the Koji URL to reflect the change to livemedia&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;As the &lt;a class="reference external" href="http://fedora-scientific.readthedocs.org/en/latest/"&gt;Fedora Scientific&lt;/a&gt; maintainer, I
+have to make sure I look into whether the nightly build is failing so
+that I can look into the why. So far I have been doing that by going to the koji &lt;a class="reference external" href="http://koji.fedoraproject.org/koji/tasks?state=all&amp;amp;view=tree&amp;amp;method=livemedia"&gt;url&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;But I think there is a better way - make a program do it
+regularly. First, the program (a Python script):&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+from lxml import html
+import requests
+
+def main():
+   page = requests.get('http://koji.fedoraproject.org/koji/tasks?state=all&amp;amp;view=tree&amp;amp;method=livemedia')
+   tree = html.fromstring(page.content)
+
+   a_class_failed = tree.xpath('//a[&amp;#64;class=&amp;quot;taskfailed&amp;quot;]')
+   for image in  a_class_failed:
+   print image.text
+
+if __name__ == '__main__':
+   main()
+&lt;/pre&gt;
+&lt;p&gt;This incidentally happens to be my first scraping program and I got
+the help I needed &lt;a class="reference external" href="http://docs.python-guide.org/en/latest/scenarios/scrape/"&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;If you install the &lt;tt class="docutils literal"&gt;requests&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;lxml&lt;/tt&gt; packages and run the
+script, it will print the list of failing builds.&lt;/p&gt;
+&lt;p&gt;Next step: I want to set this up regularly and send me an email. The
+script is &lt;a class="reference external" href="https://github.com/amitsaha/fedora_livecd_build_failed/blob/master/failing_images.py"&gt;here&lt;/a&gt;.
+As you can see, I have used &lt;a class="reference external" href="https://sendgrid.com/"&gt;sendgrid&lt;/a&gt; to
+send myself the email using their  &lt;a class="reference external" href="https://github.com/sendgrid/sendgrid-python"&gt;Python library&lt;/a&gt;. So you will need to
+get an API key to use this program. Before you can use the script,
+please install the dependencies using &lt;tt class="docutils literal"&gt;pip install &lt;span class="pre"&gt;-r&lt;/span&gt;
+requirements.txt&lt;/tt&gt; preferably in it's own &lt;a class="reference external" href="http://python-packaging-user-guide.readthedocs.org/en/develop/using-a-virtualenv/"&gt;virtualenv&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;I set this up in a cron job as follows:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+0 8 * * * /home/asaha/.local/share/virtualenvs/koji_scraper/bin/python /home/asaha/work/koji_livecd_scraper/python/failing_images.py
+&lt;/pre&gt;
+&lt;p&gt;You will of course have to setup the path correctly for your setup. The script will send me an email every morning at 8 as follows:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+livecd (rawhide, Fedora-Live-Workstation-x86_64-rawhide, fedora-live-workstation-db37b44.ks)
+
+createLiveCD (rawhide, Fedora-Live-Workstation-x86_64-rawhide-20160216, fedora-live-workstation-db37b44.ks, x86_64)
+
+livecd (rawhide, Fedora-Live-Workstation-i686-rawhide, fedora-live-workstation-db37b44.ks)
+
+createLiveCD (rawhide, Fedora-Live-Workstation-i686-rawhide-20160216, fedora-live-workstation-db37b44.ks, i386)
+
+livecd (rawhide, Fedora-Live-Scientific_KDE-x86_64-rawhide, fedora-live-scientific_kde-db37b44.ks)
+
+createLiveCD (rawhide, Fedora-Live-Scientific_KDE-x86_64-rawhide-20160216, fedora-live-scientific_kde-db37b44.ks, x86_64)
+
+livecd (rawhide, Fedora-Live-Scientific_KDE-i686-rawhide, fedora-live-scientific_kde-db37b44.ks)
+
+createLiveCD (rawhide, Fedora-Live-Scientific_KDE-i686-rawhide-20160216, fedora-live-scientific_kde-db37b44.ks, i386)
+&lt;/pre&gt;
+&lt;p&gt;The GitHub repository for the code is available &lt;a class="reference external" href="https://github.com/amitsaha/fedora_livecd_build_failed"&gt;here&lt;/a&gt;.&lt;/p&gt;
+</content></entry><entry><title>Data only Docker containers</title><link href="/data-only-docker-containers.html" rel="alternate"></link><published>2015-12-13T11:00:00+10:00</published><updated>2015-12-13T11:00:00+10:00</updated><author><name>Amit Saha</name></author><id>tag:None,2015-12-13:/data-only-docker-containers.html</id><summary type="html">&lt;p&gt;In this post, we shall take a look at the idea of data only
+containers - containers whose sole purpose is to exist on the &lt;em&gt;docker
+host&lt;/em&gt; so that other containers can have portable access to a
+persistent data volume.&lt;/p&gt;
+&lt;div class="section" id="why-do-we-need-a-persistent-data-volume"&gt;
+&lt;h2&gt;Why do we need a persistent data volume?&lt;/h2&gt;
+&lt;p&gt;We will experiment …&lt;/p&gt;&lt;/div&gt;</summary><content type="html">&lt;p&gt;In this post, we shall take a look at the idea of data only
+containers - containers whose sole purpose is to exist on the &lt;em&gt;docker
+host&lt;/em&gt; so that other containers can have portable access to a
+persistent data volume.&lt;/p&gt;
+&lt;div class="section" id="why-do-we-need-a-persistent-data-volume"&gt;
+&lt;h2&gt;Why do we need a persistent data volume?&lt;/h2&gt;
+&lt;p&gt;We will experiment with the &lt;tt class="docutils literal"&gt;jenkins&lt;/tt&gt; image from the &lt;a class="reference external" href="https://hub.docker.com/_/jenkins/"&gt;docker
+hub&lt;/a&gt;. Let's run a jenkins
+container using &lt;cite&gt;$ sudo docker run -p 8080:8080 jenkins&lt;/cite&gt;. Now, if we
+visit the URL &lt;cite&gt;http://docker-host-ip:8080&lt;/cite&gt;, we will see the familiar
+Jenkins home page.&lt;/p&gt;
+&lt;p&gt;By default, a Jenkins installation doesn't come with any
+authentication configured. Hence, we will first setup a simple
+authentication setup using Jenkins' own user password database. To do
+so, we will visit the URL:
+&lt;cite&gt;http://docker-host-ip:8080/configureSecurity/&lt;/cite&gt; and check the &lt;tt class="docutils literal"&gt;Enable
+security&lt;/tt&gt; checkbox and then select the &lt;tt class="docutils literal"&gt;Jenkins&lt;/tt&gt; own user database`
+option, and check the &lt;tt class="docutils literal"&gt;Allow users to sign up&lt;/tt&gt; check box under
+&lt;tt class="docutils literal"&gt;Security Realm&lt;/tt&gt;, select the &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;Logged-in&lt;/span&gt; users can do anything&lt;/tt&gt;
+option and finally click on &lt;tt class="docutils literal"&gt;Save&lt;/tt&gt;. This will bring us to the login
+page from where we can create a new account since we don't have one
+yet. Now, we will exit out of the container - we can use &lt;tt class="docutils literal"&gt;Ctrl + c&lt;/tt&gt;
+combination for that. Now, if we restart the container using the
+previous command, you will see that none of the configuration changes
+above has been saved.&lt;/p&gt;
+&lt;p&gt;The reason for that is because none of the changes we make during a
+container's lifetime in it's own file system is preserved. So, we need
+&lt;em&gt;data volumes&lt;/em&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="persistent-data-with-a-volume-mount"&gt;
+&lt;h2&gt;Persistent data with a volume mount&lt;/h2&gt;
+&lt;p&gt;If you look at the
+&lt;a class="reference external" href="https://github.com/jenkinsci/docker/blob/master/Dockerfile"&gt;Dockerfile&lt;/a&gt;
+you will see the command &lt;tt class="docutils literal"&gt;VOLUME /var/jenkins_home&lt;/tt&gt;. This
+essentially means that the mount point &lt;tt class="docutils literal"&gt;/var/jenkins_home&lt;/tt&gt; points to
+a location on the docker host. Hence, the changes made in that
+directory will be available from the host even after you have exited
+the container. However, the catch here is that every time you run a
+new container, the host location it mounts to will change and hence as
+we saw above, the data we wrote (via the configuration changes) were
+not visible the next time we started a container from the same
+image. To achieve that, we have to do things slightly differently. We
+will start the container and give a name to it:&lt;/p&gt;
+&lt;p&gt;&lt;tt class="docutils literal"&gt;`
+$ sudo docker run &lt;span class="pre"&gt;-p&lt;/span&gt; 8080:8080 &lt;span class="pre"&gt;--name&lt;/span&gt; jenkins jenkins
+`&lt;/tt&gt;&lt;/p&gt;
+&lt;p&gt;We will perform the same configuration changes above and exit the
+container using Ctrl + C. Next, we will &lt;tt class="docutils literal"&gt;start&lt;/tt&gt; the container using
+&lt;tt class="docutils literal"&gt;sudo docker start jenkins&lt;/tt&gt;. You will see all your changes have been
+preserved.&lt;/p&gt;
+&lt;p&gt;So, now we have a setup of jenkins where our changes are preserved, so
+long as we make sure we start/stop the containers and not run a new
+container from the &lt;tt class="docutils literal"&gt;jenkins&lt;/tt&gt; image. The key point to take away from
+here is that for a specific container, the host directory the volume
+maps to is always the same. This leads to the use of what is commonly
+referred to as &lt;tt class="docutils literal"&gt;data containers&lt;/tt&gt; for persistent data storage in
+containers.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="using-data-containers-for-persistent-storage"&gt;
+&lt;h2&gt;Using data containers for persistent storage&lt;/h2&gt;
+&lt;p&gt;The idea here is that you use the same base image from which your
+actual container will run to only create a container (using &lt;tt class="docutils literal"&gt;docker
+create&lt;/tt&gt;), not run it:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ sudo docker create --name jenkins-data jenkins
+&lt;/pre&gt;
+&lt;p&gt;We gave the name &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;jenkins-data&lt;/span&gt;&lt;/tt&gt; to this container and it's only
+purpose is to be there on our filesystem to serve as a source of
+persistent &lt;tt class="docutils literal"&gt;/var/jenkins_home&lt;/tt&gt; for other jenkins containers. Let's
+run a jenkins container now:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ sudo docker run --volumes-from jenkins-data -p 8080:8080 jenkins
+&lt;/pre&gt;
+&lt;p&gt;As earlier, we can now go to the Jenkins home page at
+&lt;cite&gt;http://docker-host-ip:8080/configureSecurity/&lt;/cite&gt; and make the above
+configuration changes. You can now exit the container and use the
+above command to run another jenkins container. The changes will still
+be visible. We are no more restricted to starting and stopping the
+same container since our &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;jenkins-data&lt;/span&gt;&lt;/tt&gt; container will have all our
+changes stored in its &lt;tt class="docutils literal"&gt;/var/jenkins_home&lt;/tt&gt;. You can have other
+containers (perhaps a container for
+&lt;a class="reference external" href="https://github.com/discordianfish/docker-lloyd"&gt;backing up&lt;/a&gt; your
+&lt;tt class="docutils literal"&gt;/var/jenkins_home&lt;/tt&gt;) being able to access the same data by using the
+same &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;volumes-from&lt;/span&gt;&lt;/tt&gt; option.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="comparison-to-volume-mounting-a-host-directory"&gt;
+&lt;h2&gt;Comparison to volume mounting a host directory&lt;/h2&gt;
+&lt;p&gt;The alternative to using data containers is to mount a directory from
+the host as &lt;tt class="docutils literal"&gt;/var/jenkins_home&lt;/tt&gt; in the container. This approach will
+solve our end-goal, but there are two additional steps that one would
+need to do:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;Decide which host location to use, perhaps creating it&lt;/li&gt;
+&lt;li&gt;Making sure the container will have appropriate read-write permissions (including &lt;a class="reference external" href="www.projectatomic.io/blog/2015/06/using-volumes-with-docker-can-cause-problems-with-selinux/"&gt;SELinux
+labels&lt;/a&gt;).&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;We don't need to do either of these when using data containers. As
+long as the image we plan to use has the appropriate &lt;tt class="docutils literal"&gt;VOLUME&lt;/tt&gt;
+command in it's Dockerfile, we can adopt the same approach we did
+here to make sure the data we care about is persisted. For images,
+which don't, we can easily enough create our own image and add the
+appropriate &lt;tt class="docutils literal"&gt;VOLUME&lt;/tt&gt; commands. And hence, this is a &lt;strong&gt;portable&lt;/strong&gt;
+approach to data persistence - it is not reliant on the host
+setup.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="conclusion"&gt;
+&lt;h2&gt;Conclusion&lt;/h2&gt;
+&lt;p&gt;In conclusion, these are the main reasons why data containers are a
+good approach to have persistent storage for your containers:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;No requirement to setup host&lt;/li&gt;
+&lt;li&gt;The permissions are automatically taken care of since we are using the same base image&lt;/li&gt;
+&lt;li&gt;Multiple containers can easily have access to the same data&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The following links may be helpful to learn more:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;a class="reference external" href="https://docs.docker.com/userguide/dockervolumes/"&gt;Managing data in Containers&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference external" href="https://medium.com/&amp;#64;ramangupta/why-docker-data-containers-are-good-589b3c6c749e"&gt;Why Docker Data Containers are Good&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+</content></entry><entry><title>Mounting a docker volume on SELinux enabled host</title><link href="/mounting-a-docker-volume-on-selinux-enabled-host.html" rel="alternate"></link><published>2015-10-05T11:00:00+10:00</published><updated>2015-10-05T11:00:00+10:00</updated><author><name>Amit Saha</name></author><id>tag:None,2015-10-05:/mounting-a-docker-volume-on-selinux-enabled-host.html</id><summary type="html">&lt;p&gt;My workflow with docker usually involves volume mounting a host
+directory so that I can read and write to the host directory from my
+container as a &lt;em&gt;non-root&lt;/em&gt; user. On a Fedora 23 host with SELinux
+enabled, this is what I have to do differently:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+Use: -v /var/dir1:var …&lt;/pre&gt;</summary><content type="html">&lt;p&gt;My workflow with docker usually involves volume mounting a host
+directory so that I can read and write to the host directory from my
+container as a &lt;em&gt;non-root&lt;/em&gt; user. On a Fedora 23 host with SELinux
+enabled, this is what I have to do differently:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+Use: -v /var/dir1:var/dir1:Z
+&lt;/pre&gt;
+&lt;p&gt;Note the extra Z above? You can learn more about it this
+&lt;a class="reference external" href="http://www.projectatomic.io/blog/2015/06/using-volumes-with-docker-can-cause-problems-with-selinux/"&gt;Project Atomic blog post&lt;/a&gt;&lt;/p&gt;
+</content></entry><entry><title>Standalone open source puppet setup on Fedora</title><link href="/standalone-open-source-puppet-setup-on-fedora.html" rel="alternate"></link><published>2015-10-01T14:54:00+10:00</published><updated>2015-10-01T14:54:00+10:00</updated><author><name>Amit Saha</name></author><id>tag:None,2015-10-01:/standalone-open-source-puppet-setup-on-fedora.html</id><summary type="html">&lt;p&gt;My goal in this post is to show how to setup puppet in standalone mode on a Fedora 23 system. This setup will allow writing puppet modules and then you can apply them on your local system and check manually and via serverspec tests that they are doing what you …&lt;/p&gt;</summary><content type="html">&lt;p&gt;My goal in this post is to show how to setup puppet in standalone mode on a Fedora 23 system. This setup will allow writing puppet modules and then you can apply them on your local system and check manually and via serverspec tests that they are doing what you intend them to be doing. Obviously, a VM would be the best test environment for this, or even a container. Let's get started.&lt;/p&gt;
+&lt;div class="section" id="setup"&gt;
+&lt;h2&gt;Setup&lt;/h2&gt;
+&lt;p&gt;Install &lt;tt class="docutils literal"&gt;puppet&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+# dnf -y install puppet
+&lt;/pre&gt;
+&lt;p&gt;Setup the host name:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+# cat /etc/hostname
+fedora-23.node
+&lt;/pre&gt;
+&lt;p&gt;Reboot, verify:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+# facter | grep node
+domain =&amp;gt; node
+fqdn =&amp;gt; fedora-23.node
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class="section" id="our-first-manifest"&gt;
+&lt;h2&gt;Our First manifest&lt;/h2&gt;
+&lt;p&gt;Let's write our first manifest. We will place it in &lt;tt class="docutils literal"&gt;/etc/puppet/manifests&lt;/tt&gt;.&lt;/p&gt;
+&lt;p&gt;Upon installation, &lt;tt class="docutils literal"&gt;/etc/puppet&lt;/tt&gt; looks like:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+# tree /etc/puppet/
+/etc/puppet/
+ ├── auth.conf
+ ├── modules
+ └── puppet.conf
+&lt;/pre&gt;
+&lt;p&gt;We will create a &lt;tt class="docutils literal"&gt;manifests&lt;/tt&gt; sub-directory:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+# mkdir /etc/puppet/manifests
+&lt;/pre&gt;
+&lt;p&gt;Now, we will create our first manifest &lt;tt class="docutils literal"&gt;/etc/puppet/manifests/nginx.pp&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+node &amp;quot;fedora-23.node&amp;quot; {
+   package { &amp;quot;nginx&amp;quot;:
+     ensure =&amp;gt; installed
+   }
+}
+&lt;/pre&gt;
+&lt;p&gt;Apply with &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;--noop&lt;/span&gt;&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+# puppet apply nginx.pp --noop
+Notice: Compiled catalog for fedora-23.node in environment production in 0.66 seconds
+Notice: /Stage[main]/Main/Node[fedora-23.node]/Package[nginx]/ensure: current_value purged, should be present (noop)
+Notice: Node[fedora-23.node]: Would have triggered 'refresh' from 1 events
+Notice: Class[Main]: Would have triggered 'refresh' from 1 events
+Notice: Stage[main]: Would have triggered 'refresh' from 1 events
+Notice: Applied catalog in 0.26 seconds
+&lt;/pre&gt;
+&lt;p&gt;Really apply:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+# puppet apply nginx.pp
+Notice: Compiled catalog for fedora-23.node in environment production in 0.60 seconds
+Notice: /Stage[main]/Main/Node[fedora-23.node]/Package[nginx]/ensure: created
+Notice: Applied catalog in 5.67 seconds
+&lt;/pre&gt;
+&lt;pre class="code literal-block"&gt;
+# rpm -q nginx
+nginx-1.8.0-13.fc23.x86_64
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class="section" id="writing-serverspec-tests"&gt;
+&lt;h2&gt;Writing serverspec tests&lt;/h2&gt;
+&lt;p&gt;We will first install &lt;tt class="docutils literal"&gt;bundler&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+dnf -y install rubygem-bundler
+&lt;/pre&gt;
+&lt;p&gt;We will put our serverspec test in &lt;tt class="docutils literal"&gt;/etc/puppet/manifests/tests&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+# mkdir /etc/puppet/manifests/tests
+# cd /etc/puppet/manifests/tests
+&lt;/pre&gt;
+&lt;p&gt;Create a &lt;tt class="docutils literal"&gt;Gemfile&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+# cat Gemfile
+source 'https://rubygems.org'
+
+gem 'serverspec'
+gem 'rake'
+&lt;/pre&gt;
+&lt;p&gt;Install the gems:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+# bundle  install --path ./gems/
+Installing rake 10.4.2
+Installing diff-lcs 1.2.5
+Installing multi_json 1.11.2
+Installing net-ssh 2.9.2
+Installing net-scp 1.2.1
+Installing net-telnet 0.1.1
+Installing rspec-support 3.3.0
+Installing rspec-core 3.3.2
+Installing rspec-expectations 3.3.1
+Installing rspec-mocks 3.3.2
+Installing rspec 3.3.0
+Installing rspec-its 1.2.0
+Installing sfl 2.2
+Installing specinfra 2.43.10
+Installing serverspec 2.24.1
+Using bundler 1.7.8
+Your bundle is complete!
+It was installed into ./gems
+&lt;/pre&gt;
+&lt;p&gt;Initialize the serverspec directory tree:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+# bundle exec serverspec-init
+
+Select OS type:
+
+1) UN*X
+2) Windows
+
+Select number: 1
+
+Select a backend type:
+
+1) SSH
+2) Exec (local)
+
+Select number: 2
+
++ spec/
++ spec/localhost/
++ spec/localhost/sample_spec.rb
++ spec/spec_helper.rb
++ Rakefile
++ .rspec
+&lt;/pre&gt;
+&lt;p&gt;Time to write our test in &lt;tt class="docutils literal"&gt;spec/localhost/nginx_spec.rb&lt;/tt&gt;:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;pre class="code literal-block"&gt;
+require 'spec_helper'
+describe package('nginx') do
+    it { should be_installed }
+end
+&lt;/pre&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Let's run our test:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+# bundle exec rake spec
+/usr/bin/ruby -I/etc/puppet/manifests/tests/gems/ruby/gems/rspec-core-3.3.2/lib:/etc/puppet/manifests/tests/gems   /ruby/gems/rspec-support-3.3.0/lib /etc/puppet/manifests/tests/gems/ruby/gems/rspec-core-3.3.2/exe/rspec --pattern spec/localhost/\*_spec.rb
+
+Package &amp;quot;nginx&amp;quot;
+should be installed
+
+Finished in 0.03447 seconds (files took 0.17465 seconds to load)
+1 example, 0 failures
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class="section" id="our-first-module"&gt;
+&lt;h2&gt;Our first module&lt;/h2&gt;
+&lt;p&gt;We will now write our first puppet module, we will name it &lt;tt class="docutils literal"&gt;nginx&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+# tree modules/nginx/
+modules/nginx/
+└── manifests
+   ├── config
+   │&amp;nbsp;&amp;nbsp; ├── config1.pp
+   │&amp;nbsp;&amp;nbsp; └── config.pp
+   └── init.pp
+&lt;/pre&gt;
+&lt;p&gt;Create &lt;tt class="docutils literal"&gt;modules/nginx/manifests/init.pp&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+# modules/nginx/manifests/init.pp
+
+class nginx {
+   package { &amp;quot;nginx&amp;quot;:
+      ensure =&amp;gt; installed
+   }
+
+   include nginx::config::config
+}
+&lt;/pre&gt;
+&lt;p&gt;Create &lt;tt class="docutils literal"&gt;modules/nginx/manifests/config/config.pp&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+# modules/nginx/manifests/config/config.pp
+class nginx::config::config{
+
+file { '/etc/nginx/nginx.conf':
+    ensure  =&amp;gt; present,
+ }
+ include nginx::config::config1
+}
+&lt;/pre&gt;
+&lt;p&gt;Create &lt;tt class="docutils literal"&gt;modules/nginx/manifests/config/config1.pp&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+# modules/nginx/manifests/config/config1.pp
+class nginx::config::config1{
+  file { '/etc/nginx/conf.d':
+     ensure  =&amp;gt; directory,
+  }
+}
+&lt;/pre&gt;
+&lt;p&gt;Let's write a manifest to include this module:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+# cat manifests/use-nginx-module.pp
+include nginx
+&lt;/pre&gt;
+&lt;p&gt;Remove &lt;tt class="docutils literal"&gt;nginx&lt;/tt&gt; and appy the manifest above:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+ # dnf remove nginx
+
+ # puppet apply manifests/use-nginx-module.pp --noop
+Notice: Compiled catalog for fedora-23.node in environment production in 0.61 seconds
+Notice: /Stage[main]/Nginx/Package[nginx]/ensure: current_value purged, should be present (noop)
+Notice: Class[Nginx]: Would have triggered 'refresh' from 1 events
+Notice: /Stage[main]/Nginx::Config::Config/File[/etc/nginx/nginx.conf]/ensure: current_value absent, should be   present (noop)
+Notice: Class[Nginx::Config::Config]: Would have triggered 'refresh' from 1 events
+Notice: /Stage[main]/Nginx::Config::Config1/File[/etc/nginx/conf.d]/ensure: current_value absent, should be directory (noop)
+Notice: Class[Nginx::Config::Config1]: Would have triggered 'refresh' from 1 events
+Notice: Stage[main]: Would have triggered 'refresh' from 3 events
+Notice: Applied catalog in 0.24 seconds
+&lt;/pre&gt;
+&lt;p&gt;And we are done.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="miscellaneous"&gt;
+&lt;h2&gt;Miscellaneous&lt;/h2&gt;
+&lt;p&gt;Use &lt;tt class="docutils literal"&gt;puppet parser&lt;/tt&gt; to validate your manifest:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ puppet parser validate nginx.pp
+&lt;/pre&gt;
+&lt;p&gt;Print current module path:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ puppet config print modulepath
+/etc/puppet/modules
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class="section" id="resources"&gt;
+&lt;h2&gt;Resources&lt;/h2&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;a class="reference external" href="https://docs.puppetlabs.com/references/latest/type.html#package"&gt;https://docs.puppetlabs.com/references/latest/type.html#package&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference external" href="https://www.digitalocean.com/community/tutorials/how-to-install-puppet-in-standalone-mode-on-centos-7"&gt;https://www.digitalocean.com/community/tutorials/how-to-install-puppet-in-standalone-mode-on-centos-7&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference external" href="http://serverspec.org/tutorial.html"&gt;http://serverspec.org/tutorial.html&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference external" href="https://www.debian-administration.org/article/703/A_brief_introduction_to_server-testing_with_serverspec"&gt;https://www.debian-administration.org/article/703/A_brief_introduction_to_server-testing_with_serverspec&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Advanced serverspec tips: &lt;a class="reference external" href="http://serverspec.org/advanced_tips.html"&gt;http://serverspec.org/advanced_tips.html&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+</content></entry><entry><title>Fedora 22 Scientific</title><link href="/fedora-22-scientific.html" rel="alternate"></link><published>2015-06-11T10:20:00+10:00</published><updated>2015-06-11T10:20:00+10:00</updated><author><name>Amit Saha</name></author><id>tag:None,2015-06-11:/fedora-22-scientific.html</id><summary type="html">&lt;p&gt;Fedora 22 was &lt;a class="reference external" href="http://fedoramagazine.org/fedora-22-released/"&gt;released recently&lt;/a&gt; which also means we
+have a new Fedora Scientific release. &lt;a class="reference external" href="https://labs.fedoraproject.org/en/scientific/"&gt;Fedora Scientific&lt;/a&gt;
+is now part of &lt;a class="reference external" href="http://fedoramagazine.org/new-websites-fedora-22/"&gt;Fedora labs&lt;/a&gt;.&lt;/p&gt;
+&lt;a class="reference external image-reference" href="https://labs.fedoraproject.org/en/scientific/"&gt;&lt;img alt="Featured Applications Image" class="align-center" src="/images/scientific-featured-applications.png" style="width: 650.0px; height: 550.0px;" /&gt;&lt;/a&gt;
+&lt;p&gt;As you can see, the new home for Fedora Scientific looks
+amazing. The &amp;quot;Featured Applications&amp;quot; section features the most
+important and useful tools in Fedora Scientific. I …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Fedora 22 was &lt;a class="reference external" href="http://fedoramagazine.org/fedora-22-released/"&gt;released recently&lt;/a&gt; which also means we
+have a new Fedora Scientific release. &lt;a class="reference external" href="https://labs.fedoraproject.org/en/scientific/"&gt;Fedora Scientific&lt;/a&gt;
+is now part of &lt;a class="reference external" href="http://fedoramagazine.org/new-websites-fedora-22/"&gt;Fedora labs&lt;/a&gt;.&lt;/p&gt;
+&lt;a class="reference external image-reference" href="https://labs.fedoraproject.org/en/scientific/"&gt;&lt;img alt="Featured Applications Image" class="align-center" src="/images/scientific-featured-applications.png" style="width: 650.0px; height: 550.0px;" /&gt;&lt;/a&gt;
+&lt;p&gt;As you can see, the new home for Fedora Scientific looks
+amazing. The &amp;quot;Featured Applications&amp;quot; section features the most
+important and useful tools in Fedora Scientific. I think that is a
+great idea. Everyone associated with it, thank you very much.&lt;/p&gt;
+&lt;p&gt;I have also updated the &lt;a class="reference external" href="http://fedora-scientific.readthedocs.org/"&gt;Fedora Scientific Guide&lt;/a&gt; to reflect the
+changes.&lt;/p&gt;
+</content></entry></feed>

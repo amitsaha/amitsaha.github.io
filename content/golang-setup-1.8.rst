@@ -38,6 +38,7 @@ Prior to version 1.8, we needed to setup a Go workspace and set the ``GOPATH`` e
 start working with golang. Golang 1.8 will automatically use ``$HOME/go`` as the GOPATH if one is not set:
 
 .. code::
+
    $ go env GOPATH
    /home/user/go
 
@@ -58,7 +59,6 @@ Let's say you want to set the ``GOPATH`` to ``$HOME/work/golang``:
 At this stage, our $GOPATH directory tree looks like this:
 
 .. code::
-
 
    $ tree -L 1 work/golang/
    work/golang/
