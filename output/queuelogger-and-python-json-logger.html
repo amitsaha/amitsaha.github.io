@@ -1,42 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-          <title>Programming and Writing about it</title>
         <meta charset="utf-8" />
-        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Programming and Writing about it Full Atom Feed" />
-        <link href="/feeds/python.atom.xml" type="application/atom+xml" rel="alternate" title="Programming and Writing about it Categories Atom Feed" />
+        <title>QueueLogger and Python JSON Logger</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Programming and Writing about it Atom Feed" />
 
-
-
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
 </head>
 
 <body id="index" class="home">
         <header id="banner" class="body">
-                <h1><a href="/">Programming and Writing about it <strong></strong></a></h1>
+                <h1><a href="/">Programming and Writing about it </a></h1>
+                <nav><ul>
+                    <li><a href="/pages/about.html">About</a></li>
+                    <li><a href="/pages/articles.html">Articles</a></li>
+                    <li><a href="/pages/books.html">Books</a></li>
+                    <li><a href="/pages/personal-projects.html">Personal Projects</a></li>
+                </ul></nav>
         </header><!-- /#banner -->
-        <nav id="menu"><ul>
-            <li><a href="/pages/about.html">About</a></li>
-            <li><a href="/pages/articles.html">Articles</a></li>
-            <li><a href="/pages/books.html">Books</a></li>
-            <li><a href="/pages/personal-projects.html">Personal Projects</a></li>
-        </ul></nav><!-- /#menu -->
 <section id="content" class="body">
-  <header>
-    <h2 class="entry-title">
-      <a href="/queuelogger-and-python-json-logger.html" rel="bookmark"
-         title="Permalink to QueueLogger and Python JSON Logger">QueueLogger and Python JSON Logger</a></h2>
- 
-  </header>
-  <footer class="post-info">
-    <time class="published" datetime="2017-03-01T18:00:00+10:00">
-      Wed 01 March 2017
-    </time>
-    <address class="vcard author">
-      By           <a class="url fn" href="/author/amit-saha.html">Amit Saha</a>
-    </address>
-  </footer><!-- /.post-info -->
-  <div class="entry-content">
-    <div class="section" id="using-queuelogger-with-python-json-logger">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/queuelogger-and-python-json-logger.html" rel="bookmark"
+           title="Permalink to QueueLogger and Python JSON Logger">QueueLogger and Python JSON Logger</a></h1>
+<a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="echorand">Tweet</a><script type="text/javascript" src="https://platform.twitter.com/widgets.js"></script>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-03-01T18:00:00+10:00">
+                Published: Wed 01 March 2017
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/amit-saha.html">Amit Saha</a>
+        </address>
+<p>In <a href="/category/python.html">Python</a>.</p>
+
+</footer><!-- /.post-info -->      <div class="section" id="using-queuelogger-with-python-json-logger">
 <h2>Using QueueLogger with Python JSON Logger</h2>
 <p>When logging from multiple processes (via <tt class="docutils literal">multiprocessing</tt> module),  using <a class="reference external" href="https://pythonhosted.org/logutils/queue.html#logutils.queue.QueueHandler">QueueHandler</a> is one  approach with Python 2.</p>
 <p><tt class="docutils literal">QueueHandler</tt> however sets <tt class="docutils literal">exc_info</tt> attribute of a <a class="reference external" href="https://docs.python.org/2/library/logging.html#logging.LogRecord">LogRecord</a>
@@ -80,13 +85,27 @@ above (<a class="reference external" href="https://github.com/amitsaha/python-js
 </div>
 </div>
 
-  </div><!-- /.entry-content -->
+    </div><!-- /.entry-content -->
+
+  </article>
 </section>
+        <section id="extras" class="body">
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+                            <li><a href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
         <footer id="contentinfo" class="body">
                 <address id="about" class="vcard body">
-                Proudly powered by <a href="http://getpelican.com/">Pelican</a>,
-                which takes great advantage of <a href="http://python.org">Python</a>.
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
                 </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
         </footer><!-- /#contentinfo -->
+
 </body>
 </html>
