@@ -88,13 +88,13 @@ work/golang/
 └── src
 </pre>
 <p>Next, we will add the line <tt class="docutils literal">export <span class="pre">GOPATH=$HOME/work/golang</span></tt> in the <tt class="docutils literal">.bashrc</tt> (or another similar file). If we now start a new terminal session, we should see that <tt class="docutils literal">GOPATH</tt> is now setup to this path.</p>
-</div>
-<div class="section" id="writing-our-first-program">
-<h2>Writing our first program</h2>
 <pre class="code literal-block">
 $ go env GOPATH
 /home/asaha/work/golang
 </pre>
+</div>
+<div class="section" id="writing-our-first-program">
+<h2>Writing our first program</h2>
 <p>There are two types of Golang programs we can write - one is an application program (output is an executable program) and the other is a package which is meant to be used in other programs. We will first write a program which will be compiled to an executable.</p>
 <p>First, create a directory tree in <tt class="docutils literal">$GOPATH/src</tt> for our package:</p>
 <pre class="code literal-block">

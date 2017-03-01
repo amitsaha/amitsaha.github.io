@@ -69,15 +69,14 @@ At this stage, our $GOPATH directory tree looks like this:
 
 Next, we will add the line ``export GOPATH=$HOME/work/golang`` in the ``.bashrc`` (or another similar file). If we now start a new terminal session, we should see that ``GOPATH`` is now setup to this path.
 
-
-Writing our first program
-=========================
-
-
 .. code::
    
    $ go env GOPATH
    /home/asaha/work/golang
+
+
+Writing our first program
+=========================
 
 
 There are two types of Golang programs we can write - one is an application program (output is an executable program) and the other is a package which is meant to be used in other programs. We will first write a program which will be compiled to an executable. 
