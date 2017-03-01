@@ -22,11 +22,12 @@ When we now open a new terminal session, we should be able to type in `go versio
 .. code::
    
    $ go version
-   go version go1.8.2 linux/amd64
+   go version go1.8 linux/amd64
 
-If we see this, we are all set to go to the next stage
+If we see this, we are all set to go to the next stage.
 
-Golang expects us to structure our source code in a certain way. You can read all about it in this `document <https://golang.org/doc/code.html>`__. The summarized version is that:
+Golang expects us to structure our source code in a certain way. You can read all about it 
+in this `document <https://golang.org/doc/code.html>`__. The summarized version is that:
 
 - All our go code (including those of packages we use) in a single directory
 - The environment variable ``GOPATH`` points to this single directory
@@ -34,14 +35,20 @@ Golang expects us to structure our source code in a certain way. You can read al
 - It is in the ``src`` sub-directory where all our Go code will live
 
 Prior to version 1.8, we needed to setup a Go workspace and set the ``GOPATH`` environment variable before we could
-start working with golang. Golang 1.8 will automatically use ``$HOME/go`` as the GOPATH if one is not set. If you are
-happy with the selection, you can skip the next step.
+start working with golang. Golang 1.8 will automatically use ``$HOME/go`` as the GOPATH if one is not set:
+
+.. code::
+   $ go env GOPATH
+   /home/user/go
+
+If you are happy with the selection, you can skip the next step. You can learn more about 
+GOPATH `here <https://golang.org/cmd/go/#hdr-GOPATH_environment_variable>`__.
 
 
 Setting up the Go workspace
 ===========================
 
-For this guide I will assume that the ``GOPATH`` is set to ``$HOME/work/golang``:
+Let's say you want to set the ``GOPATH`` to ``$HOME/work/golang``:
 
 .. code::
 
@@ -60,10 +67,8 @@ At this stage, our $GOPATH directory tree looks like this:
    └── src
 
 
-Next, we will add the line ``export GOPATH=$HOME/work/golang`` in the ``.bashrc`` (or another similar file). If we now start a new terminal session, we should see that ``GOPATH`` is now setup correctly
+Next, we will add the line ``export GOPATH=$HOME/work/golang`` in the ``.bashrc`` (or another similar file). If we now start a new terminal session, we should see that ``GOPATH`` is now setup to this path.
 
-
-You can learn more about GOPATH `here <https://golang.org/cmd/go/#hdr-GOPATH_environment_variable>`__.
 
 Writing our first program
 =========================
@@ -77,13 +82,13 @@ Writing our first program
 
 There are two types of Golang programs we can write - one is an application program (output is an executable program) and the other is a package which is meant to be used in other programs. We will first write a program which will be compiled to an executable. 
 
-First, create a directory tree in ``src`` for our package:
+First, create a directory tree in ``$GOPATH/src`` for our package:
 
 .. code::
 
-   $ mkdir -p work/golang/src/github.com/amitsaha/golang_gettingstarted
+   $ mkdir -p $GOPATH/src/github.com/amitsaha/golang_gettingstarted
    
-Our package name for the above directory tree becomes ``github.com/amitsaha/golang_gettingstarted``. Then, type in the following in ``work/golang/src/github.com/amitsaha/golang_gettingstarted/main.go``:
+Our package name for the above directory tree becomes ``github.com/amitsaha/golang_gettingstarted``. Then, type in the following in ``$GOPATH/src/github.com/amitsaha/golang_gettingstarted/main.go``:
 
 .. code::
 
@@ -102,7 +107,7 @@ Next, build and run the program as follows:
 
 .. code::
 
-   $ go run work/golang/src/github.com/amitsaha/golang_gettingstarted/main.go 
+   $ go run $GOPATH/src/github.com/amitsaha/golang_gettingstarted/main.go 
    Hello World
 
 Great! Our program compiled and ran successfully. Our workspace at this stage only has a single file - the one we created above:
@@ -164,7 +169,7 @@ Let's now replace the ``main.go`` file above by the example code from the packag
     package main
 
     import (
-         "gopkg.in/cheggaaa/pb.v1"
+        "gopkg.in/cheggaaa/pb.v1"
         "time"
     )
 
@@ -193,7 +198,7 @@ Basically, this tells us that Go compiler is not able to find the package ``gopk
  
    $ go get  gopkg.in/cheggaaa/pb.v1
   
- This will download the package and place it in ``$GOPATH/src``:
+This will download the package and place it in ``$GOPATH/src``:
  
  .. code::
  
@@ -207,7 +212,8 @@ Basically, this tells us that Go compiler is not able to find the package ``gopk
                     └── pb.v1
 
  
-If we now install our package again, it will build correclty and an executable ``golang_gettingstarted`` will be placed in ``$GOPATH/bin``:
+If we now install our package again, it will build correctly and an executable ``golang_gettingstarted`` 
+will be placed in ``$GOPATH/bin``:
 
 .. code::
 
@@ -236,9 +242,100 @@ If we now display the directory contents of ``$GOPATH``, we will see:
 
 The contents in ``pkg`` sub-directory are referred to as `package objects` - basically built Golang packages. This is the difference from application programs (programs having ``package main``). This question from a while back on the golang-nuts group may be `interesting <https://groups.google.com/forum/m/#!topic/golang-nuts/RSd3B5_rIFE>`__ to read.
 
+Using gb to manage projects
+===========================
+
+`gb <https://getgb.io>`__ is Go build tool which works with the idea of projects. For me it has two features
+for which I use it:
+
+- It doesn't require my project to be in ``$GOPATH/src``
+- It allows me to vendor and manage thrird party packages easily
+
+The disadvantage of using ``gb`` to manage your project is that your project is not "go gettable". But, let's ignore
+it for now.
+
+Installing gb
+~~~~~~~~~~~~~
+
+The following will fetch and install ``gb`` in ``$GOPATH/bin``:
+
+.. code::
+
+   $ go get github.com/constabulary/gb/...
+
+If not already done, please add ``$GOPATH/bin`` to your ``$PATH`` environment variable and start
+a new shell session and type in ``gb``:
+
+.. code::
+
+   $ gb
+   gb, a project based build tool for the Go programming language.
+
+   Usage:
+
+        gb command [arguments]
+   ..
+
+We will next install the ``gb-vendor`` `plugin <https://godoc.org/github.com/constabulary/gb/cmd/gb-vendor>`__:
+
+.. code::
+
+   $ go get github.com/constabulary/gb/cmd/gb-vendor
+
+
+Let's now setup the above project, but now as a ``gb`` project. Create a directory ``pb_demo`` anywhere
+in your ``$HOME`` and create a sub-directory ``src`` under it. Inside ``src``, we will create another 
+subirectory ``demo`` inside it - ``demo`` is our project name, and place ``main.go`` above in it.
+
+The resulting directory structure will look like this:
+
+.. code::
+
+   $ tree pb-demo/
+   pb-demo/
+   `-- src
+       `-- demo
+           `-- main.go
+
+The ``pb-demo`` directory is now a valid ``gb`` project. Let's fetch the dependency:
+
+.. code::
+
+   $ cd pb-demo
+   $ gb vendor fetch gopkg.in/cheggaaa/pb.v1
+   fetching recursive dependency github.com/mattn/go-runewidth
+
+You will now see a new sub-directory ``vendor`` inside ``pb-demo``. We can now go ahead and build our project:
+
+.. code::
+
+   $ cd pb-demo/
+   $ gb build
+   github.com/mattn/go-runewidth
+   gopkg.in/cheggaaa/pb.v1
+   demo
+
+
+And finally run it:
+
+.. code::
+   
+   $ ./bin/main
+   ..
+
+Couple of points to summarize here:
+
+- The third party package(s) are now in the ``vendor`` sub-directory along with your package's source
+- The ``vendor/manifest`` file allows you to make sure that your dependencies are pinned to a certain version
+- You don't need to worry about having your project in ``$GOPATH``
+
+
+
+
 If you are to keen to learn more:
 
 - The `How to Write Go Code <https://golang.org/doc/code.html>`__ document covers all I have discussed above and more
 - Others in my `repository <https://github.com/amitsaha/linux_voice_1>`__ for an article I wrote on Go.
+- Learn about `gb <https://getgb.io/docs/project/>`__. 
 
 That's all for now, you can find the simple source code above `here <https://github.com/amitsaha/golang_gettingstarted>`__.
