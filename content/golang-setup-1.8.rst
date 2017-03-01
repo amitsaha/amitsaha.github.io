@@ -1,5 +1,5 @@
 :Title: Setup Golang 1.8 and gb on Fedora (and other Linux distributions)
-:Date: 2017-02-27 18:00
+:Date: 2017-03-01 18:00
 :Category: Fedora
 
 This guide will be how I usually setup and get started with Go development environment on Linux. By the end of this document, we will have seen how to:

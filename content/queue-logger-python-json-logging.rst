@@ -1,5 +1,5 @@
 :Title: QueueLogger and Python JSON Logger
-:Date: 2017-02-27 15:00
+:Date: 2017-03-01 18:00
 :Category: Python
 
 Using QueueLogger with Python JSON Logger
