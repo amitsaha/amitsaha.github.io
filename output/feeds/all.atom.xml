@@ -1,52 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Programming and Writing about it</title><link href="/" rel="alternate"></link><link href="/feeds/all.atom.xml" rel="self"></link><id>/</id><updated>2017-02-27T15:00:00+10:00</updated><entry><title>QueueLogger and Python JSON Logger</title><link href="/queuelogger-and-python-json-logger.html" rel="alternate"></link><published>2017-02-27T15:00:00+10:00</published><updated>2017-02-27T15:00:00+10:00</updated><author><name>Amit Saha</name></author><id>tag:None,2017-02-27:/queuelogger-and-python-json-logger.html</id><summary type="html">&lt;div class="section" id="using-queuelogger-with-python-json-logger"&gt;
-&lt;h2&gt;Using QueueLogger with Python JSON Logger&lt;/h2&gt;
-&lt;p&gt;When logging from multiple processes (via &lt;tt class="docutils literal"&gt;multiprocessing&lt;/tt&gt; module),  using &lt;a class="reference external" href="https://pythonhosted.org/logutils/queue.html#logutils.queue.QueueHandler"&gt;QueueHandler&lt;/a&gt; is one  approach with Python 2.&lt;/p&gt;
-&lt;p&gt;&lt;tt class="docutils literal"&gt;QueueHandler&lt;/tt&gt; however sets &lt;tt class="docutils literal"&gt;exc_info&lt;/tt&gt; attribute of a &lt;a class="reference external" href="https://docs.python.org/2/library/logging.html#logging.LogRecord"&gt;LogRecord&lt;/a&gt;
-to &lt;tt class="docutils literal"&gt;None&lt;/tt&gt; since it is not &amp;quot;pickleable&amp;quot; (more on this later). This becomes a problem when you use &lt;a class="reference external" href="https://github.com/madzak/python-json-logger/"&gt;python-json-logger&lt;/a&gt; to …&lt;/p&gt;&lt;/div&gt;</summary><content type="html">&lt;div class="section" id="using-queuelogger-with-python-json-logger"&gt;
-&lt;h2&gt;Using QueueLogger with Python JSON Logger&lt;/h2&gt;
-&lt;p&gt;When logging from multiple processes (via &lt;tt class="docutils literal"&gt;multiprocessing&lt;/tt&gt; module),  using &lt;a class="reference external" href="https://pythonhosted.org/logutils/queue.html#logutils.queue.QueueHandler"&gt;QueueHandler&lt;/a&gt; is one  approach with Python 2.&lt;/p&gt;
-&lt;p&gt;&lt;tt class="docutils literal"&gt;QueueHandler&lt;/tt&gt; however sets &lt;tt class="docutils literal"&gt;exc_info&lt;/tt&gt; attribute of a &lt;a class="reference external" href="https://docs.python.org/2/library/logging.html#logging.LogRecord"&gt;LogRecord&lt;/a&gt;
-to &lt;tt class="docutils literal"&gt;None&lt;/tt&gt; since it is not &amp;quot;pickleable&amp;quot; (more on this later). This becomes a problem when you use &lt;a class="reference external" href="https://github.com/madzak/python-json-logger/"&gt;python-json-logger&lt;/a&gt; to format your logs as JSON since it relies on &lt;tt class="docutils literal"&gt;exc_info&lt;/tt&gt; being
-&lt;a class="reference external" href="https://github.com/madzak/python-json-logger/blob/master/src/pythonjsonlogger/jsonlogger.py#L125"&gt;set&lt;/a&gt;.
-The result is you don't get &lt;tt class="docutils literal"&gt;exc_info&lt;/tt&gt; in your logs. This is no however no longer true since this PR was merged.
-&lt;a class="reference external" href="https://github.com/amitsaha/python-json-logging/blob/master/multi_processes_queue_logger/multi_process_json_logging.py"&gt;Sample Code&lt;/a&gt;.&lt;/p&gt;
-&lt;div class="section" id="solution-1-modify-python-json-logger"&gt;
-&lt;h3&gt;Solution #1: Modify Python JSON logger&lt;/h3&gt;
-&lt;p&gt;The first solution is to look for &lt;tt class="docutils literal"&gt;exc_text&lt;/tt&gt; which is set by the standard
-&lt;tt class="docutils literal"&gt;Formatter&lt;/tt&gt; class as per my &lt;a class="reference external" href="https://github.com/madzak/python-json-logger/pull/38/commits/ac42b205cc275fd0c226843f1dfd226695c09afd"&gt;PR&lt;/a&gt; and set that as the value of &lt;tt class="docutils literal"&gt;exc_info&lt;/tt&gt; which means at least we get the string representation of the traceback.
-This PR is now merged.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class="section" id="solution-2-subclass-queuehandler"&gt;
-&lt;h3&gt;Solution #2: Subclass QueueHandler&lt;/h3&gt;
-&lt;p&gt;The second solution is it to subclass &lt;tt class="docutils literal"&gt;logutils.queue.QueueHandler&lt;/tt&gt; as follows
-and add pickling support for &lt;tt class="docutils literal"&gt;exc_info&lt;/tt&gt; via &lt;a class="reference external" href="https://github.com/ionelmc/python-tblib"&gt;tblib&lt;/a&gt;:&lt;/p&gt;
-&lt;pre class="code python literal-block"&gt;
-&lt;span class="c1"&gt;# Bring in support for serializing/deserializing tracebacks&lt;/span&gt;
-&lt;span class="c1"&gt;# needed by QueueHandler&lt;/span&gt;
-&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;tblib&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;pickling_support&lt;/span&gt;
-&lt;span class="n"&gt;pickling_support&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;install&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
-
-
-&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;QueueHandlerWithTraceback&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;logutils&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;queue&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;QueueHandler&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
-    &lt;span class="sd"&gt;&amp;quot;&amp;quot;&amp;quot; QueueHandler with support for pickling/unpickling
-        Tracebacks via tblib. We only override the prepare()
-        method to *not* set `exc_info=None`
-    &amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;
-    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="fm"&gt;__init__&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;args&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;**&lt;/span&gt;&lt;span class="n"&gt;kwargs&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
-        &lt;span class="n"&gt;logutils&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;queue&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;QueueHandler&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="fm"&gt;__init__&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;args&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;**&lt;/span&gt;&lt;span class="n"&gt;kwargs&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-
-    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;prepare&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;record&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
-        &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;record&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-        &lt;span class="n"&gt;record&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;msg&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;record&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;message&lt;/span&gt;
-        &lt;span class="n"&gt;record&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;args&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="bp"&gt;None&lt;/span&gt;
-        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;record&lt;/span&gt;
-&lt;/pre&gt;
-&lt;p&gt;Instead of &lt;tt class="docutils literal"&gt;logutils.queue.QueueHandler&lt;/tt&gt;, we will then use &lt;tt class="docutils literal"&gt;QueueHandlerWithTraceback&lt;/tt&gt; instead
-above (&lt;a class="reference external" href="https://github.com/amitsaha/python-json-logging/blob/master/multi_processes_queue_logger/multi_process_json_logging_tblib.py"&gt;Sample Code&lt;/a&gt;).&lt;/p&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-</content></entry><entry><title>Setup Golang on Fedora 24 (and other Linux distributions)</title><link href="/setup-golang-on-fedora-24-and-other-linux-distributions.html" rel="alternate"></link><published>2016-06-23T18:00:00+10:00</published><updated>2016-06-23T18:00:00+10:00</updated><author><name>Amit Saha</name></author><id>tag:None,2016-06-23:/setup-golang-on-fedora-24-and-other-linux-distributions.html</id><summary type="html">&lt;p&gt;This guide will be how I usually setup and get started with Go development environment on Linux. By the end of this document, we will have seen how to:&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Programming and Writing about it</title><link href="/" rel="alternate"></link><link href="/feeds/all.atom.xml" rel="self"></link><id>/</id><updated>2016-06-23T18:00:00+10:00</updated><entry><title>Setup Golang on Fedora 24 (and other Linux distributions)</title><link href="/setup-golang-on-fedora-24-and-other-linux-distributions.html" rel="alternate"></link><published>2016-06-23T18:00:00+10:00</published><updated>2016-06-23T18:00:00+10:00</updated><author><name>Amit Saha</name></author><id>tag:None,2016-06-23:/setup-golang-on-fedora-24-and-other-linux-distributions.html</id><summary type="html">&lt;p&gt;This guide will be how I usually setup and get started with Go development environment on Linux. By the end of this document, we will have seen how to:&lt;/p&gt;
 &lt;ul class="simple"&gt;
 &lt;li&gt;Install the Go compiler and other tools (&lt;tt class="docutils literal"&gt;gofmt&lt;/tt&gt;, for eaxmple), collectively referred to as go tools&lt;/li&gt;
 &lt;li&gt;Setup Go workspace&lt;/li&gt;
