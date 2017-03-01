@@ -112,7 +112,7 @@ Next, build and run the program as follows:
 
 Great! Our program compiled and ran successfully. Our workspace at this stage only has a single file - the one we created above:
 
-... code::
+.. code::
 
    $ tree
    .
@@ -274,7 +274,6 @@ a new shell session and type in ``gb``:
    Usage:
 
         gb command [arguments]
-   ..
 
 We will next install the ``gb-vendor`` `plugin <https://godoc.org/github.com/constabulary/gb/cmd/gb-vendor>`__:
 

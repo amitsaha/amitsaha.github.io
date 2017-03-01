@@ -85,8 +85,7 @@ $ go run $GOPATH/src/github.com/amitsaha/golang_gettingstarted/main.go
 Hello World
 &lt;/pre&gt;
 &lt;p&gt;Great! Our program compiled and ran successfully. Our workspace at this stage only has a single file - the one we created above:&lt;/p&gt;
-&lt;p&gt;... code:&lt;/p&gt;
-&lt;pre class="literal-block"&gt;
+&lt;pre class="code literal-block"&gt;
 $ tree
 .
 ├── bin
@@ -219,7 +218,6 @@ gb, a project based build tool for the Go programming language.
 Usage:
 
      gb command [arguments]
-..
 &lt;/pre&gt;
 &lt;p&gt;We will next install the &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;gb-vendor&lt;/span&gt;&lt;/tt&gt; &lt;a class="reference external" href="https://godoc.org/github.com/constabulary/gb/cmd/gb-vendor"&gt;plugin&lt;/a&gt;:&lt;/p&gt;
 &lt;pre class="code literal-block"&gt;
