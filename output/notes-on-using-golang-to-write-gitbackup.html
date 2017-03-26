@@ -1,47 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+          <title>Programming and Writing about it</title>
         <meta charset="utf-8" />
-        <title>Notes on using Golang to write gitbackup</title>
-        <link rel="stylesheet" href="/theme/css/main.css" />
-        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Programming and Writing about it Atom Feed" />
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Programming and Writing about it Full Atom Feed" />
+        <link href="/feeds/golang.atom.xml" type="application/atom+xml" rel="alternate" title="Programming and Writing about it Categories Atom Feed" />
 
-        <!--[if IE]>
-            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-        <![endif]-->
+
+
+
 </head>
 
 <body id="index" class="home">
         <header id="banner" class="body">
-                <h1><a href="/">Programming and Writing about it </a></h1>
-                <nav><ul>
-                    <li><a href="/pages/about.html">About</a></li>
-                    <li><a href="/pages/articles.html">Articles</a></li>
-                    <li><a href="/pages/books.html">Books</a></li>
-                    <li><a href="/pages/personal-projects.html">Personal Projects</a></li>
-                </ul></nav>
+                <h1><a href="/">Programming and Writing about it <strong></strong></a></h1>
         </header><!-- /#banner -->
+        <nav id="menu"><ul>
+            <li><a href="/pages/about.html">About</a></li>
+            <li><a href="/pages/articles.html">Articles</a></li>
+            <li><a href="/pages/books.html">Books</a></li>
+            <li><a href="/pages/personal-projects.html">Personal Projects</a></li>
+        </ul></nav><!-- /#menu -->
 <section id="content" class="body">
-  <article>
-    <header>
-      <h1 class="entry-title">
-        <a href="/notes-on-using-golang-to-write-gitbackup.html" rel="bookmark"
-           title="Permalink to Notes on using Golang to write gitbackup">Notes on using Golang to write gitbackup</a></h1>
-<a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="echorand">Tweet</a><script type="text/javascript" src="https://platform.twitter.com/widgets.js"></script>
-    </header>
-
-    <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2017-03-26T10:00:00+10:00">
-                Published: Sun 26 March 2017
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/amit-saha.html">Amit Saha</a>
-        </address>
-<p>In <a href="/category/golang.html">golang</a>.</p>
-
-</footer><!-- /.post-info -->      <p><a class="reference external" href="https://github.com/amitsaha/gitbackup">gitbackup</a> is a tool to backup your git repositories from GitHub and GitLab. I wrote the <a class="reference external" href="https://github.com/amitsaha/gitbackup/releases/tag/lj-0.1">initial version</a> as a project for a golang article which is in review for publication in a Linux magazine. It supports GitHub enterprise installations and custom GitLab installations in addition to repositories on github.com and gitlab.com. It's written in Golang, and built upon <a class="reference external" href="https://github.com/google/go-github">go-github</a> and <a class="reference external" href="https://github.com/xanzy/go-gitlab">go-gitlab</a> and other third party golang packages.</p>
+  <header>
+    <h2 class="entry-title">
+      <a href="/notes-on-using-golang-to-write-gitbackup.html" rel="bookmark"
+         title="Permalink to Notes on using Golang to write gitbackup">Notes on using Golang to write gitbackup</a></h2>
+ 
+  </header>
+  <footer class="post-info">
+    <abbr class="published" title="2017-03-26T10:00:00+10:00">
+      Sun 26 March 2017
+    </abbr>
+    <address class="vcard author">
+      By           <a class="url fn" href="/author/amit-saha.html">Amit Saha</a>
+    </address>
+  </footer><!-- /.post-info -->
+  <div class="entry-content">
+    <p><a class="reference external" href="https://github.com/amitsaha/gitbackup">gitbackup</a> is a tool to backup your git repositories from GitHub and GitLab. I wrote the <a class="reference external" href="https://github.com/amitsaha/gitbackup/releases/tag/lj-0.1">initial version</a> as a project for a golang article which is in review for publication in a Linux magazine. It supports GitHub enterprise installations and custom GitLab installations in addition to repositories on github.com and gitlab.com. It's written in Golang, and built upon <a class="reference external" href="https://github.com/google/go-github">go-github</a> and <a class="reference external" href="https://github.com/xanzy/go-gitlab">go-gitlab</a> and other third party golang packages.</p>
 <p>Since the initial version, the project's code has seen number of changes which has been a learning experience for me since I am still fairly new to Golang. In the rest of this post, I describe these and some personal notes about the experience.</p>
 <div class="section" id="using-afero-for-filesystem-operations">
 <h2>Using afero for filesystem operations</h2>
@@ -229,27 +225,13 @@ test_script:
 <p>If you get a chance, please <a class="reference external" href="https://github.com/amitsaha/gitbackup#gitbackup---backup-your-github-and-gitlab-repositories">try it out</a> and I welcome any feedback and contributions!</p>
 </div>
 
-    </div><!-- /.entry-content -->
-
-  </article>
+  </div><!-- /.entry-content -->
 </section>
-        <section id="extras" class="body">
-                <div class="social">
-                        <h2>social</h2>
-                        <ul>
-                            <li><a href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
-
-                        </ul>
-                </div><!-- /.social -->
-        </section><!-- /#extras -->
-
         <footer id="contentinfo" class="body">
                 <address id="about" class="vcard body">
-                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>,
+                which takes great advantage of <a href="http://python.org">Python</a>.
                 </address><!-- /#about -->
-
-                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
         </footer><!-- /#contentinfo -->
-
 </body>
 </html>
