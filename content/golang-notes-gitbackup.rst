@@ -153,6 +153,7 @@ Setting up continious testing for Linux, OS X and Windows
 
 I also setup Travis CI for running the tests on Linux and OS X:
 
+.. code::
 
   language: go
   os:
