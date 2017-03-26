@@ -1,47 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+        <title>Programming and Writing about it - Articles by Amit Saha</title>
         <meta charset="utf-8" />
-        <title>Programming and Writing about it - Amit Saha</title>
-        <link rel="stylesheet" href="/theme/css/main.css" />
-        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Programming and Writing about it Atom Feed" />
-
-        <!--[if IE]>
-            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-        <![endif]-->
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Programming and Writing about it Full Atom Feed" />
 </head>
 
 <body id="index" class="home">
         <header id="banner" class="body">
-                <h1><a href="/">Programming and Writing about it </a></h1>
-                <nav><ul>
-                    <li><a href="/pages/about.html">About</a></li>
-                    <li><a href="/pages/articles.html">Articles</a></li>
-                    <li><a href="/pages/books.html">Books</a></li>
-                    <li><a href="/pages/personal-projects.html">Personal Projects</a></li>
-                </ul></nav>
+                <h1><a href="/">Programming and Writing about it <strong></strong></a></h1>
         </header><!-- /#banner -->
+        <nav id="menu"><ul>
+            <li><a href="/pages/about.html">About</a></li>
+            <li><a href="/pages/articles.html">Articles</a></li>
+            <li><a href="/pages/books.html">Books</a></li>
+            <li><a href="/pages/personal-projects.html">Personal Projects</a></li>
+        </ul></nav><!-- /#menu -->
+<section id="content">
+<h2>Articles by Amit Saha</h2>
 
-                <section id="content" class="body">
-                    <ol id="posts-list" class="hfeed" start="9">
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="/replacing-boto-s3-mocks-using-moto-in-python.html" rel="bookmark"
-                           title="Permalink to Replacing boto S3 mocks using moto in Python">Replacing boto S3 mocks using moto in Python</a></h1>
-                </header>
-
-                <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2016-01-25T16:00:00+10:00">
-                Published: Mon 25 January 2016
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/amit-saha.html">Amit Saha</a>
-        </address>
-<p>In <a href="/category/python.html">Python</a>.</p>
-
-</footer><!-- /.post-info -->                <p>Let's say you have some Python application code which connects to Amazon S3 which
+<ol id="post-list">
+        <li><article class="hentry">
+                <header> <h2 class="entry-title"><a href="/replacing-boto-s3-mocks-using-moto-in-python.html" rel="bookmark" title="Permalink to Replacing boto S3 mocks using moto in Python">Replacing boto S3 mocks using moto in Python</a></h2> </header>
+                <footer class="post-info">
+                    <abbr class="published" title="2016-01-25T16:00:00+10:00"> Mon 25 January 2016 </abbr>
+                    <address class="vcard author">By
+                        <a class="url fn" href="/author/amit-saha.html">Amit Saha</a>
+                    </address>
+                </footer><!-- /.post-info -->
+                <div class="entry-content"> <p>Let's say you have some Python application code which connects to Amazon S3 which
 retrieves the keys in a bucket. Very likely, the application would be
 using <a class="reference external" href="http://boto.cloudhackers.com/en/latest/s3_tut.html">boto</a>
 and the code would like this:</p>
@@ -53,55 +40,31 @@ def get_s3_conn():
 
 def list_keys():
     s3_conn = get_s3_conn()
-    b = s3_conn ...</pre>
-                <a class="readmore" href="/replacing-boto-s3-mocks-using-moto-in-python.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
-
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="/tempfilenamedtemporaryfile-in-python.html" rel="bookmark"
-                           title="Permalink to tempfile.NamedTemporaryFile() in Python">tempfile.NamedTemporaryFile() in Python</a></h1>
-                </header>
-
-                <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2016-01-20T11:00:00+10:00">
-                Published: Wed 20 January 2016
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/amit-saha.html">Amit Saha</a>
-        </address>
-<p>In <a href="/category/python.html">Python</a>.</p>
-
-</footer><!-- /.post-info -->                <p>In Python, when you need to create a temporary file with a filename
+    b = s3_conn ...</pre> </div><!-- /.entry-content -->
+        </article></li>
+        <li><article class="hentry">
+                <header> <h2 class="entry-title"><a href="/tempfilenamedtemporaryfile-in-python.html" rel="bookmark" title="Permalink to tempfile.NamedTemporaryFile() in Python">tempfile.NamedTemporaryFile() in Python</a></h2> </header>
+                <footer class="post-info">
+                    <abbr class="published" title="2016-01-20T11:00:00+10:00"> Wed 20 January 2016 </abbr>
+                    <address class="vcard author">By
+                        <a class="url fn" href="/author/amit-saha.html">Amit Saha</a>
+                    </address>
+                </footer><!-- /.post-info -->
+                <div class="entry-content"> <p>In Python, when you need to create a temporary file with a filename
 associated to it on disk, <a class="reference external" href="https://docs.python.org/2/library/tempfile.html#tempfile.TemporaryFile">NamedTemporaryFile</a>
 function in the <tt class="docutils literal">tempfile</tt> module is the goto function. Here are some use
 cases that I think one might use it for.</p>
-<p><em>Case #1: You simply need a named empty temporary ...</em></p>
-                <a class="readmore" href="/tempfilenamedtemporaryfile-in-python.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
-
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="/mock-objects-and-non-existent-attributesmethods-in-python.html" rel="bookmark"
-                           title="Permalink to Mock objects and non-existent attributes/methods in Python">Mock objects and non-existent attributes/methods in Python</a></h1>
-                </header>
-
-                <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2016-01-11T14:00:00+10:00">
-                Published: Mon 11 January 2016
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/amit-saha.html">Amit Saha</a>
-        </address>
-<p>In <a href="/category/python.html">Python</a>.</p>
-
-</footer><!-- /.post-info -->                <p><em>Updated</em>: Fixed typo in the last paragraph.</p>
+<p><em>Case #1: You simply need a named empty temporary ...</em></p> </div><!-- /.entry-content -->
+        </article></li>
+        <li><article class="hentry">
+                <header> <h2 class="entry-title"><a href="/mock-objects-and-non-existent-attributesmethods-in-python.html" rel="bookmark" title="Permalink to Mock objects and non-existent attributes/methods in Python">Mock objects and non-existent attributes/methods in Python</a></h2> </header>
+                <footer class="post-info">
+                    <abbr class="published" title="2016-01-11T14:00:00+10:00"> Mon 11 January 2016 </abbr>
+                    <address class="vcard author">By
+                        <a class="url fn" href="/author/amit-saha.html">Amit Saha</a>
+                    </address>
+                </footer><!-- /.post-info -->
+                <div class="entry-content"> <p><em>Updated</em>: Fixed typo in the last paragraph.</p>
 <p>Today, I was curious to see this behavior of <tt class="docutils literal">Mock()</tt> objects when using <a class="reference external" href="https://github.com/testing-cabal/mock">mock</a>:</p>
 <pre class="code literal-block">
 &gt;&gt;&gt; from mock import Mock
@@ -111,211 +74,113 @@ cases that I think one might use it for.</p>
 &gt;&gt;&gt; m.i_dont_exist()
 &lt;Mock name='mock.i_dont_exist()' id='139841609106896'&gt;
 </pre>
-<p>The above is expected, since I have ...</p>
-                <a class="readmore" href="/mock-objects-and-non-existent-attributesmethods-in-python.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
-
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="/data-only-docker-containers.html" rel="bookmark"
-                           title="Permalink to Data only Docker containers">Data only Docker containers</a></h1>
-                </header>
-
-                <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2015-12-13T11:00:00+10:00">
-                Published: Sun 13 December 2015
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/amit-saha.html">Amit Saha</a>
-        </address>
-<p>In <a href="/category/fedora.html">Fedora</a>.</p>
-
-</footer><!-- /.post-info -->                <p>In this post, we shall take a look at the idea of data only
+<p>The above is expected, since I have ...</p> </div><!-- /.entry-content -->
+        </article></li>
+        <li><article class="hentry">
+                <header> <h2 class="entry-title"><a href="/data-only-docker-containers.html" rel="bookmark" title="Permalink to Data only Docker containers">Data only Docker containers</a></h2> </header>
+                <footer class="post-info">
+                    <abbr class="published" title="2015-12-13T11:00:00+10:00"> Sun 13 December 2015 </abbr>
+                    <address class="vcard author">By
+                        <a class="url fn" href="/author/amit-saha.html">Amit Saha</a>
+                    </address>
+                </footer><!-- /.post-info -->
+                <div class="entry-content"> <p>In this post, we shall take a look at the idea of data only
 containers - containers whose sole purpose is to exist on the <em>docker
 host</em> so that other containers can have portable access to a
 persistent data volume.</p>
 <div class="section" id="why-do-we-need-a-persistent-data-volume">
 <h2>Why do we need a persistent data volume?</h2>
-<p>We will experiment ...</p></div>
-                <a class="readmore" href="/data-only-docker-containers.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
-
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="/a-virtualenv-first-approach-to-python-projects.html" rel="bookmark"
-                           title="Permalink to A virtualenv first approach to Python projects">A virtualenv first approach to Python projects</a></h1>
-                </header>
-
-                <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2015-11-30T12:00:00+10:00">
-                Published: Mon 30 November 2015
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/amit-saha.html">Amit Saha</a>
-        </address>
-<p>In <a href="/category/python.html">Python</a>.</p>
-
-</footer><!-- /.post-info -->                <p>I have until the last few months (of my ~4 years of working with
+<p>We will experiment ...</p></div> </div><!-- /.entry-content -->
+        </article></li>
+        <li><article class="hentry">
+                <header> <h2 class="entry-title"><a href="/a-virtualenv-first-approach-to-python-projects.html" rel="bookmark" title="Permalink to A virtualenv first approach to Python projects">A virtualenv first approach to Python projects</a></h2> </header>
+                <footer class="post-info">
+                    <abbr class="published" title="2015-11-30T12:00:00+10:00"> Mon 30 November 2015 </abbr>
+                    <address class="vcard author">By
+                        <a class="url fn" href="/author/amit-saha.html">Amit Saha</a>
+                    </address>
+                </footer><!-- /.post-info -->
+                <div class="entry-content"> <p>I have until the last few months (of my ~4 years of working with
 Python) always worked without virtualenv for all my Python
 projects. Why? I think I found the whole idea of having to do the
 following two steps before I work on something cumbersome:</p>
 <ul class="simple">
-<li>Remember the exact virtualenv ...</li></ul>
-                <a class="readmore" href="/a-virtualenv-first-approach-to-python-projects.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
-
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="/pythonhashseed-and-your-tests.html" rel="bookmark"
-                           title="Permalink to PYTHONHASHSEED and your tests">PYTHONHASHSEED and your tests</a></h1>
-                </header>
-
-                <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2015-11-19T11:00:00+10:00">
-                Published: Thu 19 November 2015
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/amit-saha.html">Amit Saha</a>
-        </address>
-<p>In <a href="/category/python.html">Python</a>.</p>
-
-</footer><!-- /.post-info -->                <p>Recently at work, I wanted to test a string which was being created by the <tt class="docutils literal">urllib.urlencode()</tt> function. My first attempt was simple - test my expected string with that being created by the function above using unittest's <tt class="docutils literal">assertEquals()</tt> function. It passed all the times I ran the tests before ...</p>
-                <a class="readmore" href="/pythonhashseed-and-your-tests.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
-
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="/mounting-a-docker-volume-on-selinux-enabled-host.html" rel="bookmark"
-                           title="Permalink to Mounting a docker volume on SELinux enabled host">Mounting a docker volume on SELinux enabled host</a></h1>
-                </header>
-
-                <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2015-10-05T11:00:00+10:00">
-                Published: Mon 05 October 2015
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/amit-saha.html">Amit Saha</a>
-        </address>
-<p>In <a href="/category/fedora.html">Fedora</a>.</p>
-
-</footer><!-- /.post-info -->                <p>My workflow with docker usually involves volume mounting a host
+<li>Remember the exact virtualenv ...</li></ul> </div><!-- /.entry-content -->
+        </article></li>
+        <li><article class="hentry">
+                <header> <h2 class="entry-title"><a href="/pythonhashseed-and-your-tests.html" rel="bookmark" title="Permalink to PYTHONHASHSEED and your tests">PYTHONHASHSEED and your tests</a></h2> </header>
+                <footer class="post-info">
+                    <abbr class="published" title="2015-11-19T11:00:00+10:00"> Thu 19 November 2015 </abbr>
+                    <address class="vcard author">By
+                        <a class="url fn" href="/author/amit-saha.html">Amit Saha</a>
+                    </address>
+                </footer><!-- /.post-info -->
+                <div class="entry-content"> <p>Recently at work, I wanted to test a string which was being created by the <tt class="docutils literal">urllib.urlencode()</tt> function. My first attempt was simple - test my expected string with that being created by the function above using unittest's <tt class="docutils literal">assertEquals()</tt> function. It passed all the times I ran the tests before ...</p> </div><!-- /.entry-content -->
+        </article></li>
+        <li><article class="hentry">
+                <header> <h2 class="entry-title"><a href="/mounting-a-docker-volume-on-selinux-enabled-host.html" rel="bookmark" title="Permalink to Mounting a docker volume on SELinux enabled host">Mounting a docker volume on SELinux enabled host</a></h2> </header>
+                <footer class="post-info">
+                    <abbr class="published" title="2015-10-05T11:00:00+10:00"> Mon 05 October 2015 </abbr>
+                    <address class="vcard author">By
+                        <a class="url fn" href="/author/amit-saha.html">Amit Saha</a>
+                    </address>
+                </footer><!-- /.post-info -->
+                <div class="entry-content"> <p>My workflow with docker usually involves volume mounting a host
 directory so that I can read and write to the host directory from my
 container as a <em>non-root</em> user. On a Fedora 23 host with SELinux
 enabled, this is what I have to do differently:</p>
 <pre class="code literal-block">
-Use: -v /var/dir1:var ...</pre>
-                <a class="readmore" href="/mounting-a-docker-volume-on-selinux-enabled-host.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
-
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="/standalone-open-source-puppet-setup-on-fedora.html" rel="bookmark"
-                           title="Permalink to Standalone open source puppet setup on Fedora">Standalone open source puppet setup on Fedora</a></h1>
-                </header>
-
-                <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2015-10-01T14:54:00+10:00">
-                Published: Thu 01 October 2015
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/amit-saha.html">Amit Saha</a>
-        </address>
-<p>In <a href="/category/fedora.html">Fedora</a>.</p>
-
-</footer><!-- /.post-info -->                <p>My goal in this post is to show how to setup puppet in standalone mode on a Fedora 23 system. This setup will allow writing puppet modules and then you can apply them on your local system and check manually and via serverspec tests that they are doing what you ...</p>
-                <a class="readmore" href="/standalone-open-source-puppet-setup-on-fedora.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
-
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="/fedora-22-scientific.html" rel="bookmark"
-                           title="Permalink to Fedora 22 Scientific">Fedora 22 Scientific</a></h1>
-                </header>
-
-                <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2015-06-11T10:20:00+10:00">
-                Published: Thu 11 June 2015
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/amit-saha.html">Amit Saha</a>
-        </address>
-<p>In <a href="/category/fedora.html">Fedora</a>.</p>
-
-</footer><!-- /.post-info -->                <p>Fedora 22 was <a class="reference external" href="http://fedoramagazine.org/fedora-22-released/">released recently</a> which also means we
+Use: -v /var/dir1:var ...</pre> </div><!-- /.entry-content -->
+        </article></li>
+        <li><article class="hentry">
+                <header> <h2 class="entry-title"><a href="/standalone-open-source-puppet-setup-on-fedora.html" rel="bookmark" title="Permalink to Standalone open source puppet setup on Fedora">Standalone open source puppet setup on Fedora</a></h2> </header>
+                <footer class="post-info">
+                    <abbr class="published" title="2015-10-01T14:54:00+10:00"> Thu 01 October 2015 </abbr>
+                    <address class="vcard author">By
+                        <a class="url fn" href="/author/amit-saha.html">Amit Saha</a>
+                    </address>
+                </footer><!-- /.post-info -->
+                <div class="entry-content"> <p>My goal in this post is to show how to setup puppet in standalone mode on a Fedora 23 system. This setup will allow writing puppet modules and then you can apply them on your local system and check manually and via serverspec tests that they are doing what you ...</p> </div><!-- /.entry-content -->
+        </article></li>
+        <li><article class="hentry">
+                <header> <h2 class="entry-title"><a href="/fedora-22-scientific.html" rel="bookmark" title="Permalink to Fedora 22 Scientific">Fedora 22 Scientific</a></h2> </header>
+                <footer class="post-info">
+                    <abbr class="published" title="2015-06-11T10:20:00+10:00"> Thu 11 June 2015 </abbr>
+                    <address class="vcard author">By
+                        <a class="url fn" href="/author/amit-saha.html">Amit Saha</a>
+                    </address>
+                </footer><!-- /.post-info -->
+                <div class="entry-content"> <p>Fedora 22 was <a class="reference external" href="http://fedoramagazine.org/fedora-22-released/">released recently</a> which also means we
 have a new Fedora Scientific release. <a class="reference external" href="https://labs.fedoraproject.org/en/scientific/">Fedora Scientific</a>
 is now part of <a class="reference external" href="http://fedoramagazine.org/new-websites-fedora-22/">Fedora labs</a>.</p>
 <a class="reference external image-reference" href="https://labs.fedoraproject.org/en/scientific/"><img alt="Featured Applications Image" class="align-center" src="/images/scientific-featured-applications.png" style="width: 650.0px; height: 550.0px;" /></a>
 <p>As you can see, the new home for Fedora Scientific looks
 amazing. The &quot;Featured Applications&quot; section features the most
-important and useful tools in Fedora Scientific. I ...</p>
-                <a class="readmore" href="/fedora-22-scientific.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
-
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="/remapping-httpechorandme.html" rel="bookmark"
-                           title="Permalink to Remapping http://echorand.me">Remapping http://echorand.me</a></h1>
-                </header>
-
-                <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2015-04-30T10:20:00+10:00">
-                Published: Thu 30 April 2015
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/amit-saha.html">Amit Saha</a>
-        </address>
-<p>In <a href="/category/miscellaneous.html">Miscellaneous</a>.</p>
-
-</footer><!-- /.post-info -->                <p>I changed the mapping of my domain to point to my GitHub pages. My old
+important and useful tools in Fedora Scientific. I ...</p> </div><!-- /.entry-content -->
+        </article></li>
+        <li><article class="hentry">
+                <header> <h2 class="entry-title"><a href="/remapping-httpechorandme.html" rel="bookmark" title="Permalink to Remapping http://echorand.me">Remapping http://echorand.me</a></h2> </header>
+                <footer class="post-info">
+                    <abbr class="published" title="2015-04-30T10:20:00+10:00"> Thu 30 April 2015 </abbr>
+                    <address class="vcard author">By
+                        <a class="url fn" href="/author/amit-saha.html">Amit Saha</a>
+                    </address>
+                </footer><!-- /.post-info -->
+                <div class="entry-content"> <p>I changed the mapping of my domain to point to my GitHub pages. My old
 blog content is still available <a class="reference external" href="http://amitksaha.wordpress.com">here</a>.</p>
-
-                <a class="readmore" href="/remapping-httpechorandme.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
-                </ol><!-- /#posts-list -->
+ </div><!-- /.entry-content -->
+        </article></li>
+</ol><!-- /#posts-list -->
 <p class="paginator">
         <a href="/author/amit-saha.html">&laquo;</a>
     Page 2 / 2
 </p>
-                </section><!-- /#content -->
-        <section id="extras" class="body">
-                <div class="social">
-                        <h2>social</h2>
-                        <ul>
-                            <li><a href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
-
-                        </ul>
-                </div><!-- /.social -->
-        </section><!-- /#extras -->
-
+</section><!-- /#content -->
         <footer id="contentinfo" class="body">
                 <address id="about" class="vcard body">
-                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>,
+                which takes great advantage of <a href="http://python.org">Python</a>.
                 </address><!-- /#about -->
-
-                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
         </footer><!-- /#contentinfo -->
-
 </body>
 </html>
