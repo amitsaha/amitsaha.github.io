@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Programming and Writing about it</title><link href="/" rel="alternate"></link><link href="/feeds/golang.atom.xml" rel="self"></link><id>/</id><updated>2017-03-26T10:00:00+10:00</updated><entry><title>Notes on using Golang to write gitbackup</title><link href="/notes-on-using-golang-to-write-gitbackup.html" rel="alternate"></link><published>2017-03-26T10:00:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2017-03-26:notes-on-using-golang-to-write-gitbackup.html</id><summary type="html">&lt;p&gt;&lt;a class="reference external" href="https://github.com/amitsaha/gitbackup"&gt;gitbackup&lt;/a&gt; is a tool to backup your git repositories from GitHub and GitLab. I wrote the &lt;a class="reference external" href="https://github.com/amitsaha/gitbackup/releases/tag/lj-0.1"&gt;initial version&lt;/a&gt; as a project for a golang article which is in review for publication in a Linux magazine. It supports GitHub enterprise installations and custom GitLab installations in addition to repositories on github.com and gitlab.com. It's written in Golang, and built upon &lt;a class="reference external" href="https://github.com/google/go-github"&gt;go-github&lt;/a&gt; and &lt;a class="reference external" href="https://github.com/xanzy/go-gitlab"&gt;go-gitlab&lt;/a&gt; and other third party golang packages.&lt;/p&gt;
+&lt;p&gt;Since the initial version, the project's code has seen number of changes which has been a learning experience for me since I am still fairly new to Golang. In the rest of this post, I describe these and some personal notes about the experience.&lt;/p&gt;
+&lt;div class="section" id="using-afero-for-filesystem-operations"&gt;
+&lt;h2&gt;Using afero for filesystem operations&lt;/h2&gt;
+&lt;p&gt;&lt;tt class="docutils literal"&gt;gitbackup&lt;/tt&gt; needs to do some basic filesystem operations - create directories and check for existence of directories. In the initial version, I was using the &lt;tt class="docutils literal"&gt;os&lt;/tt&gt; package directly which meant any test invoking the code which performed these operations were actually performing those on the underlying filesystem. I could of course
+perform cleanup after these tests so that my filesystem would not remain polluted. However, then I decided to check what &lt;a class="reference external" href="https://github.com/spf13/afero"&gt;afero&lt;/a&gt; had to offer. It had exactly what I needed - a memory backed filesystem (&lt;cite&gt;NewMemMapFs&lt;/cite&gt;).This &lt;a class="reference external" href="https://github.com/spf13/afero#using-afero-for-testing"&gt;section&lt;/a&gt; in the project homepage was all I needed to switch to using &lt;cite&gt;afero&lt;/cite&gt; instead of &lt;cite&gt;os&lt;/cite&gt; package drirectly. And hence I didn't need to worry about cleaning up my filesystem after a test run or worry about starting from a known clean state!&lt;/p&gt;
+&lt;p&gt;To show some code, this is the &lt;cite&gt;git diff&lt;/cite&gt; of introducing &lt;cite&gt;afero&lt;/cite&gt; and switching out direct use of &lt;cite&gt;os&lt;/cite&gt;:&lt;/p&gt;
+&lt;pre class="code diff literal-block"&gt;
+&lt;span class="gh"&gt;diff --git a/src/gitbackup/main.go b/src/gitbackup/main.go
+index 500d9a2..6e71beb 100644
+&lt;/span&gt;&lt;span class="gd"&gt;--- a/src/gitbackup/main.go
+&lt;/span&gt;&lt;span class="gi"&gt;+++ b/src/gitbackup/main.go
+&lt;/span&gt;&lt;span class="gu"&gt;&amp;#64;&amp;#64; -3,6 +3,7 &amp;#64;&amp;#64; package main
+&lt;/span&gt; import (
+        &amp;quot;flag&amp;quot;
+        &amp;quot;github.com/mitchellh/go-homedir&amp;quot;
+&lt;span class="gi"&gt;+       &amp;quot;github.com/spf13/afero&amp;quot;
+&lt;/span&gt;        &amp;quot;log&amp;quot;
+        &amp;quot;os&amp;quot;
+        &amp;quot;os/exec&amp;quot;
+&lt;span class="gu"&gt;&amp;#64;&amp;#64; -14,6 +15,7 &amp;#64;&amp;#64; import (
+&lt;/span&gt; var MAX_CONCURRENT_CLONES int = 20
+
+ var execCommand = exec.Command
+&lt;span class="gi"&gt;+var appFS = afero.NewOsFs()
+&lt;/span&gt; var gitCommand = &amp;quot;git&amp;quot;
+
+ // Check if we have a copy of the repo already, if
+&lt;span class="gu"&gt;&amp;#64;&amp;#64; -22,7 +24,7 &amp;#64;&amp;#64; func backUp(backupDir string, repo *Repository, wg *sync.WaitGroup) ([]byte, err
+&lt;/span&gt;        defer wg.Done()
+
+        repoDir := path.Join(backupDir, repo.Name)
+&lt;span class="gd"&gt;-       _, err := os.Stat(repoDir)
+&lt;/span&gt;&lt;span class="gi"&gt;+       _, err := appFS.Stat(repoDir)
+&lt;/span&gt;
+        var stdoutStderr []byte
+        if err == nil {
+&lt;span class="gu"&gt;&amp;#64;&amp;#64; -83,7 +85,7 &amp;#64;&amp;#64; func main() {
+&lt;/span&gt;        } else {
+                *backupDir = path.Join(*backupDir, *service)
+        }
+&lt;span class="gd"&gt;-       _, err := os.Stat(*backupDir)
+&lt;/span&gt;&lt;span class="gi"&gt;+       _, err := appFS.Stat(*backupDir)
+&lt;/span&gt;        if err != nil {
+                log.Printf(&amp;quot;%s doesn't exist, creating it\n&amp;quot;, *backupDir)
+                err := os.MkdirAll(*backupDir, 0771)
+&lt;/pre&gt;
+&lt;p&gt;When we declare &lt;cite&gt;appFS&lt;/cite&gt; above outside all functions, it becomes a package level
+variable and we set it to &lt;cite&gt;NewOsFs()&lt;/cite&gt; and replace function calls such as &lt;cite&gt;os.Stat&lt;/cite&gt; by &lt;cite&gt;appFS.Stat()&lt;/cite&gt;. Since the variable name starts with a small letter, this variable is not visible outside the package.&lt;/p&gt;
+&lt;p&gt;Then, in the test, I will do:&lt;/p&gt;
+&lt;pre class="code go literal-block"&gt;
+&lt;span class="nx"&gt;appFS&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;afero&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;NewMemMapFs&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;Hence, all operations will happen in the memory based filesystem rather than the &amp;quot;real&amp;quot; underlying filesystem.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="testing-shell-commands"&gt;
+&lt;h2&gt;Testing shell commands&lt;/h2&gt;
+&lt;p&gt;One of the first roadblocks to writing tests I faced was how to test functions which were invoking external programs (&lt;tt class="docutils literal"&gt;git&lt;/tt&gt; in this case). This post here titled &lt;a class="reference external" href="https://npf.io/2015/06/testing-exec-command/"&gt;Testing os/exec.Command&lt;/a&gt; had my answer. However, it took me a while to correctly apply it. And that post is still the reference if you want to understand what's going on.&lt;/p&gt;
+&lt;p&gt;Here's basically what I did:&lt;/p&gt;
+&lt;pre class="code go literal-block"&gt;
+&lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;execCommand&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;exec&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Command&lt;/span&gt;
+&lt;span class="p"&gt;..&lt;/span&gt;
+
+&lt;span class="kd"&gt;func&lt;/span&gt; &lt;span class="nx"&gt;backUp&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;backupDir&lt;/span&gt; &lt;span class="kt"&gt;string&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;repo&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="nx"&gt;Repository&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;wg&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="nx"&gt;sync&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;WaitGroup&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;([]&lt;/span&gt;&lt;span class="kt"&gt;byte&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;error&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="o"&gt;...&lt;/span&gt;
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="nx"&gt;err&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="kc"&gt;nil&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="p"&gt;..&lt;/span&gt;
+        &lt;span class="nx"&gt;cmd&lt;/span&gt; &lt;span class="o"&gt;:=&lt;/span&gt; &lt;span class="nx"&gt;execCommand&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;gitCommand&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;-C&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;repoDir&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;pull&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="p"&gt;..&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="k"&gt;else&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="p"&gt;..&lt;/span&gt;
+        &lt;span class="nx"&gt;cmd&lt;/span&gt; &lt;span class="o"&gt;:=&lt;/span&gt; &lt;span class="nx"&gt;execCommand&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;gitCommand&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;clone&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;repo&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;GitURL&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;repoDir&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="p"&gt;..&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+    &lt;span class="o"&gt;...&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;We declare a package variable, &lt;tt class="docutils literal"&gt;execCommand&lt;/tt&gt; which is intialized with &lt;tt class="docutils literal"&gt;exec.Command&lt;/tt&gt; from the &lt;tt class="docutils literal"&gt;os/exec&lt;/tt&gt; package. Then, in the tests, I do the following:&lt;/p&gt;
+&lt;pre class="code go literal-block"&gt;
+&lt;span class="kd"&gt;func&lt;/span&gt; &lt;span class="nx"&gt;TestHelperCloneProcess&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;t&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="nx"&gt;testing&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;T&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="nx"&gt;os&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Getenv&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;GO_WANT_HELPER_PROCESS&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;!=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;1&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+    &lt;span class="c1"&gt;// Check that git command was executed
+&lt;/span&gt;    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="nx"&gt;os&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Args&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;!=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;git&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;||&lt;/span&gt; &lt;span class="nx"&gt;os&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Args&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;!=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;clone&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="nx"&gt;fmt&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Fprintf&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;os&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Stdout&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Expected git clone to be executed. Got %v&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;os&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Args&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="p"&gt;:])&lt;/span&gt;
+        &lt;span class="nx"&gt;os&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Exit&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+    &lt;span class="nx"&gt;os&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Exit&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+
+&lt;span class="kd"&gt;func&lt;/span&gt; &lt;span class="nx"&gt;fakeCloneCommand&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;command&lt;/span&gt; &lt;span class="kt"&gt;string&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;args&lt;/span&gt; &lt;span class="o"&gt;...&lt;/span&gt;&lt;span class="kt"&gt;string&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;cmd&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="nx"&gt;exec&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Cmd&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="nx"&gt;cs&lt;/span&gt; &lt;span class="o"&gt;:=&lt;/span&gt; &lt;span class="p"&gt;[]&lt;/span&gt;&lt;span class="kt"&gt;string&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;-test.run=TestHelperCloneProcess&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;--&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;command&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+    &lt;span class="nx"&gt;cs&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;append&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;cs&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;args&lt;/span&gt;&lt;span class="o"&gt;...&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="nx"&gt;cmd&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;exec&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Command&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;os&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Args&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt; &lt;span class="nx"&gt;cs&lt;/span&gt;&lt;span class="o"&gt;...&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="nx"&gt;cmd&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Env&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[]&lt;/span&gt;&lt;span class="kt"&gt;string&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;GO_WANT_HELPER_PROCESS=1&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nx"&gt;cmd&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="nx"&gt;execCommand&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;fakeCloneCommand&lt;/span&gt;
+&lt;span class="nx"&gt;stdoutStderr&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;err&lt;/span&gt; &lt;span class="o"&gt;:=&lt;/span&gt; &lt;span class="nx"&gt;backUp&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;backupDir&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="nx"&gt;repo&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="nx"&gt;wg&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;The above is a test for the case where a repository is being backed up for the first
+time via &lt;tt class="docutils literal"&gt;git clone&lt;/tt&gt;. In the test, before I call the &lt;tt class="docutils literal"&gt;backUp()&lt;/tt&gt; function which actually executes the command, I set &lt;tt class="docutils literal"&gt;execCommand = fakeCloneCommand&lt;/tt&gt; so to that &lt;tt class="docutils literal"&gt;execCommand&lt;/tt&gt; doesn't point to &lt;tt class="docutils literal"&gt;os.execCommand&lt;/tt&gt; any more. &lt;tt class="docutils literal"&gt;fakeCloneCommand&lt;/tt&gt;, instead of executing &lt;tt class="docutils literal"&gt;git clone&lt;/tt&gt; executes &lt;tt class="docutils literal"&gt;TestHelperCloneProcess&lt;/tt&gt;, where we also check if the command being attempted to execute was &lt;tt class="docutils literal"&gt;git clone&lt;/tt&gt;.&lt;/p&gt;
+&lt;p&gt;We similarly test the operation of a repository's backup being updated via &lt;tt class="docutils literal"&gt;git pull&lt;/tt&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="switching-from-gb-to-standard-go-tooling"&gt;
+&lt;h2&gt;Switching from &lt;tt class="docutils literal"&gt;gb&lt;/tt&gt; to standard go tooling&lt;/h2&gt;
+&lt;p&gt;When I was started to write &lt;tt class="docutils literal"&gt;gitbackup&lt;/tt&gt;, I was still in two minds about whether I like the idea of the standard &lt;tt class="docutils literal"&gt;go&lt;/tt&gt; tools' requirements of having every Golang project in &lt;tt class="docutils literal"&gt;$GOPATH&lt;/tt&gt;. Hence, I decided to go with &lt;a class="reference external" href="https://getgb.io"&gt;gb&lt;/a&gt; because it removed that requirement, as well as allowed me to have a easy way to vendor the third party dependencies and manage them.&lt;/p&gt;
+&lt;p&gt;However, as I worked on &lt;tt class="docutils literal"&gt;gitbackup&lt;/tt&gt; and was finally close to having release binaries, I decided to move away from using &lt;tt class="docutils literal"&gt;gb&lt;/tt&gt; and also try out &lt;a class="reference external" href="https://github.com/golang/dep"&gt;go dep&lt;/a&gt; for dependency management.&lt;/p&gt;
+&lt;p&gt;This involved two steps. The first was moving all the source from &lt;tt class="docutils literal"&gt;src/gitbackup&lt;/tt&gt; to the top level directory (&lt;a class="reference external" href="https://github.com/amitsaha/gitbackup/commit/e1932c41eac249a0d3dd8b9e6d6b026cdb663cce"&gt;commit&lt;/a&gt;). Then, I removed the &lt;tt class="docutils literal"&gt;vendor&lt;/tt&gt; directory created by &lt;tt class="docutils literal"&gt;gb&lt;/tt&gt; (&lt;a class="reference external" href="https://github.com/amitsaha/gitbackup/commit/654f52f0cf1cec7bb1fd994bbc75fd8839a2d43c"&gt;commit&lt;/a&gt;), and used &lt;tt class="docutils literal"&gt;dep init&lt;/tt&gt; to create a new &lt;tt class="docutils literal"&gt;vendor&lt;/tt&gt; directory, the &lt;tt class="docutils literal"&gt;lock.json&lt;/tt&gt; file and &lt;tt class="docutils literal"&gt;manifest.json&lt;/tt&gt; file. And that's all!&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="creating-release-binaries"&gt;
+&lt;h2&gt;Creating release binaries&lt;/h2&gt;
+&lt;p&gt;At this stage, &lt;tt class="docutils literal"&gt;gitbackup&lt;/tt&gt; could be installed with &lt;tt class="docutils literal"&gt;go get&lt;/tt&gt;, but I wanted to have binaries made available with the 0.1 release. I looked at a few alternatives, but finally I decided upon a bash script (copied from the fish script of &lt;a class="reference external" href="https://github.com/oklog/oklog/blob/master/release.fish"&gt;oklog&lt;/a&gt;).&lt;/p&gt;
+&lt;p&gt;The following script snippet builds binaries for multiple OS and architectures:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+for pair in linux/386 linux/amd64 linux/arm linux/arm64 darwin/amd64 dragonfly/amd64 freebsd/amd64 netbsd/amd64 openbsd/amd64 windows/amd64; do
+        GOOS=`echo $pair | cut -d'/' -f1`
+        GOARCH=`echo $pair | cut -d'/' -f2`
+        OBJECT_FILE=&amp;quot;gitbackup-$VERSION-$GOOS-$GOARCH&amp;quot;
+        GOOS=$GOOS GOARCH=$GOARCH go build -o &amp;quot;$DISTDIR/$OBJECT_FILE&amp;quot;
+..
+done
+&lt;/pre&gt;
+&lt;p&gt;I was very excited about being able to build binaries for different operating systems and architectures via &lt;tt class="docutils literal"&gt;go build&lt;/tt&gt;!&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="setting-up-continious-testing-for-linux-os-x-and-windows"&gt;
+&lt;h2&gt;Setting up continious testing for Linux, OS X and Windows&lt;/h2&gt;
+&lt;p&gt;I also setup Travis CI for running the tests on Linux and OS X:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+language: go
+os:
+  - linux
+  - osx
+go:
+  - 1.7
+  - 1.8
+
+install: true
+script:
+      - cd $GOPATH/src/github.com/amitsaha/gitbackup/
+      - go build
+      - go test -v
+&lt;/pre&gt;
+&lt;p&gt;For running tests on Windows via Appveyor, I have the following &lt;tt class="docutils literal"&gt;appveyor.yml&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+version: &amp;quot;{build}&amp;quot;
+
+# Source Config
+clone_folder: c:\gopath\src\github.com\amitsaha\gitbackup
+
+# Build host
+
+environment:
+  GOPATH: c:\gopath
+  matrix:
+    - environment:
+      GOVERSION: 1.7.5
+    - environment:
+      GOVERSION: 1.8
+
+# Build
+
+install:
+  # Install the specific Go version.
+  - rmdir c:\go /s /q
+  - appveyor DownloadFile https://storage.googleapis.com/golang/go%GOVERSION%.windows-amd64.msi
+  - msiexec /i go%GOVERSION%.windows-amd64.msi /q
+  - set Path=c:\go\bin;c:\gopath\bin;%Path%
+  - go version
+  - go env
+
+build: off
+
+test_script:
+  - cd c:\gopath\src\github.com\amitsaha\gitbackup
+  - go build -o bin\gitbackup.exe
+  - go test -v
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class="section" id="ending-notes"&gt;
+&lt;h2&gt;Ending notes&lt;/h2&gt;
+&lt;p&gt;&lt;tt class="docutils literal"&gt;gitbackup&lt;/tt&gt; is mainly an educational project to build a tool which I and hopefully others find useful. I wanted to have reasonable test coverage for it, release binaries for multiple operating systems and architecture and have continuous testing setup on multiple operatng systems. So far, all of these has been successfully achieved.I am looking forward to using &lt;tt class="docutils literal"&gt;go dep&lt;/tt&gt; more as I get a chance and also happy about making &lt;tt class="docutils literal"&gt;gitbackup&lt;/tt&gt; compatible with standard go tools out of the box.&lt;/p&gt;
+&lt;p&gt;If you get a chance, please &lt;a class="reference external" href="https://github.com/amitsaha/gitbackup#gitbackup---backup-your-github-and-gitlab-repositories"&gt;try it out&lt;/a&gt; and I welcome any feedback and contributions!&lt;/p&gt;
+&lt;/div&gt;
+</summary></entry></feed>

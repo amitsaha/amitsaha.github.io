@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="utf-8" />
+        <title>Presentation slides with Jupyter Notebook</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Programming and Writing about it Atom Feed" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">Programming and Writing about it </a></h1>
+                <nav><ul>
+                    <li><a href="/pages/about.html">About</a></li>
+                    <li><a href="/pages/articles.html">Articles</a></li>
+                    <li><a href="/pages/books.html">Books</a></li>
+                    <li><a href="/pages/personal-projects.html">Personal Projects</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/presentation-slides-with-jupyter-notebook.html" rel="bookmark"
+           title="Permalink to Presentation slides with Jupyter Notebook">Presentation slides with Jupyter Notebook</a></h1>
+<a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="echorand">Tweet</a><script type="text/javascript" src="https://platform.twitter.com/widgets.js"></script>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2016-05-31T22:00:00+10:00">
+                Published: Tue 31 May 2016
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/amit-saha.html">Amit Saha</a>
+        </address>
+<p>In <a href="/category/python.html">Python</a>.</p>
+
+</footer><!-- /.post-info -->      <p>I presented at the PyCon 2016 Education Summit on &quot;Doing Math with Python&quot; day before yesterday and a lightning talk yesterday. This is the first time, I prepared a <a class="reference external" href="doingmathwithpython.github.io/pycon-us-2016">slide deck</a> using Jupyter Notebook + Reveal.js. I was pleased with the content creation process and the end result. So, here is what worked for me.</p>
+<p><em>Please note that I have basically taken quite a bit of liberty with HTML where I didn't want to search for markdown way of doing something</em></p>
+<p>Basically, there are two steps:</p>
+<ul class="simple">
+<li>Create content in a Jupyter Notebook</li>
+<li>Use <tt class="docutils literal"><span class="pre">jupyter-nbconvert</span></tt> to convert the notebook to a HTML/JS based slide deck</li>
+</ul>
+<p>Finally, I hosted the slide deck on GitHub pages.</p>
+<p>Please note that, you will need the latest version of <tt class="docutils literal"><span class="pre">jupyter-notebook</span></tt> (4.2.0).</p>
+<div class="section" id="quick-start-to-publish-your-slides-using-github-pages">
+<h2>Quick start to publish your slides using GitHub pages</h2>
+<p>I have copied my <em>real</em> slides to a repo along with a static copy of &quot;reveal.js&quot; (3.3.0) and a Bash script to automate it all. A good starting point then would  be to <a class="reference external" href="https://github.com/amitsaha/jupyter-notebook-slides#fork-destination-box">fork</a> my GitHub repo:</p>
+<pre class="code literal-block">
+$ git clone git&#64;github.com:&lt;your-user-name&gt;/jupyter-notebook-slides.git
+$ cd jupyter-notebook-slides
+$ # Start notebook server
+$ # Edit your slides
+
+$ ./publish.sh
+</pre>
+<p>Your slides should now be live at <a class="reference external" href="http:/">http:/</a>/&lt;user-github-username&gt;.github.io/jupyter-notebook-slides/</p>
+</div>
+<div class="section" id="publish-sh-script">
+<h2>publish.sh script</h2>
+<p>The <tt class="docutils literal">publish.sh</tt> script is as follows:</p>
+<pre class="code literal-block">
+#!/bin/bash
+
+$ jupyter-nbconvert --to slides slides.ipynb --reveal-prefix=reveal.js
+$ mv slides.slides.html  index.html
+$ mkdir -p /tmp/workspace
+$ cp -r * /tmp/workspace/
+$ git add -A .
+$ git commit -m &quot;Update&quot;
+$ git checkout -B gh-pages
+$ cp -r /tmp/workspace/* .
+$ git add -A .
+$ git commit -m &quot;new version&quot;
+$ git push origin master gh-pages
+$ git checkout master
+$ rm -rf /tmp/workspace
+</pre>
+<p>The part of the script above where I update the <cite>gh-pages</cite> branch is of a quality where it does its job.</p>
+</div>
+<div class="section" id="viewing-your-slides-locally">
+<h2>Viewing your slides locally</h2>
+<p>To view your slides locally:</p>
+<pre class="code literal-block">
+$ jupyter-nbconvert --to slides slides.ipynb --reveal-prefix=reveal.js --post serve
+</pre>
+</div>
+<div class="section" id="understanding-what-s-going-on-in-brief">
+<h2>Understanding what's going on in brief</h2>
+<p>The first step to do before you can start creating your slides is activate the &quot;Slideshow&quot; toolbar from the &quot;View &gt; Cell Toolbar menu&quot;. Once you do that, each of your cells will have a drop down box, and you can select what the cell is. The options you will have are:  Slide, Sub-slide, Fragment, Skip and Notes.</p>
+<p>Like any other notebook, your &quot;slides notebook&quot; is also made up of cells. So, if you want a cell to be in your final slide deck, you will have to choose one of &quot;Slide&quot;, &quot;Sub-slide&quot; or &quot;Fragment&quot;. &quot;Skip&quot; will skip the cell from your final slide deck and cells marked with &quot;Notes&quot; will be visible in the &quot;speaker mode&quot; when you present.</p>
+</div>
+<div class="section" id="other-related-posts-you-may-find-useful">
+<h2>Other related posts you may find useful</h2>
+<ul class="simple">
+<li>I think I found the CSS from <a class="reference external" href="http://neuroscience.telenczuk.pl/?p=607">http://neuroscience.telenczuk.pl/?p=607</a></li>
+</ul>
+<p>Thanks for your work, Damián Avila and everyone else!</p>
+</div>
+
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+                            <li><a href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+</body>
+</html>

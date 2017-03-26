@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="utf-8" />
+        <title>Replacing boto S3 mocks using moto in Python</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Programming and Writing about it Atom Feed" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">Programming and Writing about it </a></h1>
+                <nav><ul>
+                    <li><a href="/pages/about.html">About</a></li>
+                    <li><a href="/pages/articles.html">Articles</a></li>
+                    <li><a href="/pages/books.html">Books</a></li>
+                    <li><a href="/pages/personal-projects.html">Personal Projects</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/replacing-boto-s3-mocks-using-moto-in-python.html" rel="bookmark"
+           title="Permalink to Replacing boto S3 mocks using moto in Python">Replacing boto S3 mocks using moto in Python</a></h1>
+<a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="echorand">Tweet</a><script type="text/javascript" src="https://platform.twitter.com/widgets.js"></script>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2016-01-25T16:00:00+10:00">
+                Published: Mon 25 January 2016
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/amit-saha.html">Amit Saha</a>
+        </address>
+<p>In <a href="/category/python.html">Python</a>.</p>
+
+</footer><!-- /.post-info -->      <p>Let's say you have some Python application code which connects to Amazon S3 which
+retrieves the keys in a bucket. Very likely, the application would be
+using <a class="reference external" href="http://boto.cloudhackers.com/en/latest/s3_tut.html">boto</a>
+and the code would like this:</p>
+<pre class="code literal-block">
+import boto
+
+def get_s3_conn():
+    return boto.connect_s3('&lt;aws-access-key', '&lt;aws-secret-key&gt;')
+
+def list_keys():
+    s3_conn = get_s3_conn()
+    b = s3_conn.get_bucket('bucket_name')
+    keys = b.list()
+    return keys
+</pre>
+<p>The corresponding test would presumably use some <a class="reference external" href="mock.readthedocs.org">mocks and patching</a>. Here is one way to write a test for the
+above code:</p>
+<pre class="code literal-block">
+# Assume the code above is in a module list_keys
+# in a function list_keys
+
+from list_keys import list_keys
+
+from mock import patch, Mock
+
+def test_list_keys():
+   mocked_keys = [Mock(key='mykey1'), Mock(key='key2')]
+   mocked_connection = Mock()
+   # Start with patching connect_s3
+   with patch('boto.connect_s3', Mock(return_value=mocked_connection)):
+       mocked_bucket = Mock()
+       # Mock get_bucket() call
+       mocked_connection.get_bucket = Mock(return_value=mocked_bucket)
+       # Mock the list() call to return the keys you want
+       mocked_bucket.list = Mock(return_value=mocked_keys)
+       keys = list_keys()
+
+       assert keys == mocked_keys
+</pre>
+<p>I thought I really had no other way to get around mocks and patches if
+I wanted to test this part of my application. But, I discovered <a class="reference external" href="https://github.com/spulec/moto">moto</a>. Then life became easier.</p>
+<p>Using moto's S3 support, I don't need to worry about the mocking and
+patching the boto calls any more. Here is the same test above, but
+using moto:</p>
+<pre class="code literal-block">
+from list_keys import get_s3_conn, list_keys
+from moto import mock_s3
+
+def test_list_keys():
+
+    expected_keys = ['key1', 'key2']
+
+    moto = mock_s3()
+    # We enter &quot;moto&quot; mode using this
+    moto.start()
+
+    # Get the connection object
+    conn = get_s3_conn()
+
+    # Set up S3 as we expect it to be
+    conn.create_bucket('bucket_name')
+    for name in expected_keys:
+        k = conn.get_bucket('bucket_name').new_key(name)
+        k.set_contents_from_string('abcdedsd')
+
+    # Now call the actual function
+    keys = list_keys()
+    assert expected_keys == [k.name for k in keys]
+
+    # get out of moto mode
+    moto.stop()
+</pre>
+<p>Unless it is obvious, here are two major differences from the previous
+test:</p>
+<p><em>We don't mock or patch anything</em></p>
+<p>The point #1 above is the direct reason I would consider using moto
+for testing S3 interactions rather than setting up mocks. This helps us in
+the scenario in which this section of the code lies in another
+package, not the one you are writing tests for currently. You can
+actually call this section of the code and let the interaction with S3
+happen as if it were interacting directly with Amazon S3. I think this
+allows deeper penetration of your tests and as a result your code's
+interactions with others.</p>
+<p><em>The test code has to explicitly first setup the expected state</em></p>
+<p>This may seem like more work, but I think it still outweighs the
+benefits as mentioned previously.</p>
+<p>Please checkout <a class="reference external" href="https://github.com/spulec/moto">moto</a> here.</p>
+<p>If you like this post, please follow <a class="reference external" href="https://twitter.com/PythonTestTips">PythonTestTips</a> on Twitter.</p>
+
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+                            <li><a href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+</body>
+</html>
