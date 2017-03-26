@@ -1,6 +1,6 @@
 :Title: runC and libcontainer on Fedora 23/24
 :Date: 2016-04-27 17:00
-:Category: Fedora
+:Category: golang
 
 In this post, I will post my notes on how I got `runC
 <https://github.com/opencontainers/runc/>`__ and then using 

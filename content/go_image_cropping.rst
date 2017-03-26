@@ -1,6 +1,6 @@
 :Title: New article: Write an Image Cropping program with Go
 :Date: 2016-04-17 10:00
-:Category: Go
+:Category: golang 
 
 My article "Write an Image Cropping with Go" is out in `Linux Voice <https://linuxvoice.com>`__ (Issue 26). It is my first article to be published in Linux Voice and I am very excited about it.
 
