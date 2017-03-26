@@ -60,7 +60,7 @@ variable and we set it to `NewOsFs()` and replace function calls such as `os.Sta
 
 Then, in the test, I will do:
 
-.. code::
+.. code:: go
 
     appFS = afero.NewMemMapFs()
 
@@ -73,7 +73,7 @@ One of the first roadblocks to writing tests I faced was how to test functions w
 
 Here's basically what I did:
 
-.. code:: golang
+.. code:: go
 
     var execCommand = exec.Command
     ..
@@ -94,7 +94,7 @@ Here's basically what I did:
 
 We declare a package variable, ``execCommand`` which is intialized with ``exec.Command`` from the ``os/exec`` package. Then, in the tests, I do the following:
 
-.. code:: golang
+.. code:: go
 
     func TestHelperCloneProcess(t *testing.T) {
         if os.Getenv("GO_WANT_HELPER_PROCESS") != "1" {
