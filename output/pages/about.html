@@ -1,24 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-        <title>About</title>
         <meta charset="utf-8" />
-        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Programming and Writing about it Full Atom Feed" />
+        <title>About</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Programming and Writing about it Atom Feed" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
 </head>
 
 <body id="index" class="home">
         <header id="banner" class="body">
-                <h1><a href="/">Programming and Writing about it <strong></strong></a></h1>
+                <h1><a href="/">Programming and Writing about it </a></h1>
+                <nav><ul>
+                    <li class="active"><a href="/pages/about.html">About</a></li>
+                    <li><a href="/pages/articles.html">Articles</a></li>
+                    <li><a href="/pages/books.html">Books</a></li>
+                    <li><a href="/pages/personal-projects.html">Personal Projects</a></li>
+                </ul></nav>
         </header><!-- /#banner -->
-        <nav id="menu"><ul>
-            <li class="active"><a href="/pages/about.html">About</a></li>
-            <li><a href="/pages/articles.html">Articles</a></li>
-            <li><a href="/pages/books.html">Books</a></li>
-            <li><a href="/pages/personal-projects.html">Personal Projects</a></li>
-        </ul></nav><!-- /#menu -->
-    <h1>About</h1>
+<section id="content" class="body">
+    <h1 class="entry-title">About</h1>
     
-
     <p>My name is Amit, I am a Software Engineer and Author (most recently of
 <a class="reference external" href="https://doingmathwithpython.github.io">Doing Math with Python</a>),
 currently living in Sydney, Australia. Besides my books, I write
@@ -39,12 +44,24 @@ I am on <a class="reference external" href="http://twitter.com/echorand">Twitter
 </ul>
 </div>
 
+</section>
+        <section id="extras" class="body">
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+                            <li><a href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
 
         <footer id="contentinfo" class="body">
                 <address id="about" class="vcard body">
-                Proudly powered by <a href="http://getpelican.com/">Pelican</a>,
-                which takes great advantage of <a href="http://python.org">Python</a>.
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
                 </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
         </footer><!-- /#contentinfo -->
+
 </body>
 </html>
