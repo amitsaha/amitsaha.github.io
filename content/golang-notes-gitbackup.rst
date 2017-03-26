@@ -2,9 +2,9 @@
 :Date: 2017-03-26 10:00
 :Category: golang
 
-`gitbackup <https://github.com/amitsaha/gitbackup>`__ is a tool to backup your git repositories from GitHub and GitLab. I wrote the `initial version <https://github.com/amitsaha/gitbackup/releases/tag/lj-0.1>`__ as a project for a golang article which is in review for publication in a Linux magazine.
+`gitbackup <https://github.com/amitsaha/gitbackup>`__ is a tool to backup your git repositories from GitHub and GitLab. I wrote the `initial version <https://github.com/amitsaha/gitbackup/releases/tag/lj-0.1>`__ as a project for a golang article which is in review for publication in a Linux magazine. It supports GitHub enterprise installations and custom GitLab installations in addition to repositories on github.com and gitlab.com. It's written in Golang, and built upon `go-github <https://github.com/google/go-github>`__ and `go-gitlab <https://github.com/xanzy/go-gitlab>`__ and other third party golang packages.
 
-Since the initial version, the project's code ha seen number of changes which has been a learning experience for me since I am still fairly new to Golang. In the rest of this post, I describe these and some personal notes about the experience.
+Since the initial version, the project's code has seen number of changes which has been a learning experience for me since I am still fairly new to Golang. In the rest of this post, I describe these and some personal notes about the experience.
 
 Using afero for filesystem operations
 =====================================
@@ -209,5 +209,8 @@ For running tests on Windows via Appveyor, I have the following ``appveyor.yml``
 Ending notes
 ============
 
-``gitbackup`` is mainly an educational project to build a tool which I and hopefully others find useful. I wanted to have reasonable test coverage for it, release binaries for multiple operating systems and architecture and have continuous testing setup on multiple operatng systems. So far, all of these has been successfully achieved. If you get a chance, please try it out and I welcome any feedback and contributions!
+``gitbackup`` is mainly an educational project to build a tool which I and hopefully others find useful. I wanted to have reasonable test coverage for it, release binaries for multiple operating systems and architecture and have continuous testing setup on multiple operatng systems. So far, all of these has been successfully achieved.I am looking forward to using ``go dep`` more as I get a chance and also happy about making ``gitbackup`` compatible with standard go tools out of the box.
+
+If you get a chance, please `try it out <https://github.com/amitsaha/gitbackup#gitbackup---backup-your-github-and-gitlab-repositories>`__ and I welcome any feedback and contributions!
+
 
