@@ -123,7 +123,90 @@ We declare a package variable, ``execCommand`` which is intialized with ``exec.C
 Switching from ``gb`` to standard go tooling
 ============================================
 
+When I was started to write ``gitbackup``, I was still in two minds about whether I like the idea of the standard ``go`` tools' requirements of having every Golang project in ``$GOPATH``. Hence, I decided to go with `gb <https://getgb.io>`__ because it removed that requirement, as well as allowed me to have a easy way to vendor the third party dependencies and manage them.
+
+However, as I worked on ``gitbackup`` and was finally close to having release binaries, I decided to move away from using ``gb`` and also try out `go dep <https://github.com/golang/dep>`__ for dependency management.
+
+This involved two steps. The first was moving all the source from ``src/gitbackup`` to the top level directory (`commit <https://github.com/amitsaha/gitbackup/commit/e1932c41eac249a0d3dd8b9e6d6b026cdb663cce>`__). Then, I removed the ``vendor`` directory created by ``gb`` (`commit <https://github.com/amitsaha/gitbackup/commit/654f52f0cf1cec7bb1fd994bbc75fd8839a2d43c>`__), and used ``dep init`` to create a new ``vendor`` directory, the ``lock.json`` file and ``manifest.json`` file. And that's all!
+
+Creating release binaries
+=========================
+
+At this stage, ``gitbackup`` could be installed with ``go get``, but I wanted to have binaries made available with the 0.1 release. I looked at a few alternatives, but finally I decided upon a bash script (copied from the fish script of `oklog <https://github.com/oklog/oklog/blob/master/release.fish>`__).
+
+The following script snippet builds binaries for multiple OS and architectures:
+
+.. code::
+
+	for pair in linux/386 linux/amd64 linux/arm linux/arm64 darwin/amd64 dragonfly/amd64 freebsd/amd64 netbsd/amd64 openbsd/amd64 windows/amd64; do
+		GOOS=`echo $pair | cut -d'/' -f1`
+		GOARCH=`echo $pair | cut -d'/' -f2` 
+		OBJECT_FILE="gitbackup-$VERSION-$GOOS-$GOARCH"
+		GOOS=$GOOS GOARCH=$GOARCH go build -o "$DISTDIR/$OBJECT_FILE" 
+	..
+	done
+
+I was very excited about being able to build binaries for different operating systems and architectures via ``go build``!
+
+Setting up continious testing for Linux, OS X and Windows
+=========================================================
+
+I also setup Travis CI for running the tests on Linux and OS X:
 
 
+  language: go
+  os:
+    - linux
+    - osx
+  go: 
+    - 1.7
+    - 1.8
 
+  install: true
+  script:
+	- cd $GOPATH/src/github.com/amitsaha/gitbackup/
+	- go build
+	- go test -v
+
+For running tests on Windows via Appveyor, I have the following ``appveyor.yml``:
+
+.. code::
+
+    version: "{build}"
+
+    # Source Config
+    clone_folder: c:\gopath\src\github.com\amitsaha\gitbackup
+
+    # Build host
+
+    environment:
+      GOPATH: c:\gopath
+      matrix:
+        - environment:
+          GOVERSION: 1.7.5
+        - environment:
+          GOVERSION: 1.8
+
+    # Build
+
+    install:
+      # Install the specific Go version.
+      - rmdir c:\go /s /q
+      - appveyor DownloadFile https://storage.googleapis.com/golang/go%GOVERSION%.windows-amd64.msi
+      - msiexec /i go%GOVERSION%.windows-amd64.msi /q
+      - set Path=c:\go\bin;c:\gopath\bin;%Path%
+      - go version
+      - go env
+
+    build: off
+
+    test_script:
+      - cd c:\gopath\src\github.com\amitsaha\gitbackup
+      - go build -o bin\gitbackup.exe 
+      - go test -v
+
+Ending notes
+============
+
+``gitbackup`` is mainly an educational project to build a tool which I and hopefully others find useful. I wanted to have reasonable test coverage for it, release binaries for multiple operating systems and architecture and have continuous testing setup on multiple operatng systems. So far, all of these has been successfully achieved. If you get a chance, please try it out and I welcome any feedback and contributions!
 
