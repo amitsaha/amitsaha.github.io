@@ -120,6 +120,11 @@ We declare a package variable, ``execCommand`` which is intialized with ``exec.C
     execCommand = fakeCloneCommand
     stdoutStderr, err := backUp(backupDir, &repo, &wg)
 
+The above is a test for the case where a repository is being backed up for the first
+time via ``git clone``. In the test, before I call the ``backUp()`` function which actually executes the command, I set ``execCommand = fakeCloneCommand`` so to that ``execCommand`` doesn't point to ``os.execCommand`` any more. ``fakeCloneCommand``, instead of executing ``git clone`` executes ``TestHelperCloneProcess``, where we also check if the command being attempted to execute was ``git clone``.
+
+We similarly test the operation of a repository's backup being updated via ``git pull``.
+
 Switching from ``gb`` to standard go tooling
 ============================================
 
