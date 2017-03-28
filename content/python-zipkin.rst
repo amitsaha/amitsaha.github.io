@@ -38,7 +38,7 @@ Zipkin
 
 First, we will start ``zipkin`` with ``elasticsearch`` as the backend as ``docker containers``. So, you need to have ``docker`` installed. To get the data in ``elasticsearch`` persisted, we will first create a `data container <http://echorand.me/data-only-docker-containers.html>`__ as follows:
 
-.. code:
+.. code::
 
     $ docker create --name esdata openzipkin/zipkin-elasticsearch
     
@@ -50,6 +50,18 @@ Then, download my code from `here <https://github.com/amitsaha/python-web-app-re
     $ unzip ..
     $ cd tracing/http_collector
     $ ./start_zipkin.sh
+    ..
+    ..
+    zipkin          | 2017-03-28 03:48:00.936  INFO 9 --- [           main] zipkin.server.ZipkinServer               :           Started ZipkinServer in 7.36 seconds (JVM running for 8.595)
+    
+If you now go to ``http://localhost:9411/`` in your browser, you will see the Zipkin Web UI.
+
+Creating traces
+===============
+
+
+    
+    
 
 
  
