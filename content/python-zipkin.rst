@@ -81,7 +81,7 @@ Then, the "internal" service 1:
     * Debugger pin code: 961-605-579
     
   
- Now, let's make couple of requests to the ``demo`` service using ``$ curl localhost:5000`` twice. If we go back to the Zipkin Web UI and click on "Find Traces", we will see something like this:
+Now, let's make couple of requests to the ``demo`` service using ``$ curl localhost:5000`` twice. If we go back to the Zipkin Web UI and click on "Find Traces", we will see something like this:
  
 .. image:: {filename}/images/zipkin-traces.png
    :align: center
@@ -99,23 +99,73 @@ If we click on one of the traces, we will see something like this:
  
 As we can see four spans were created (two spans in each service) with the 2nd, 3rd and 4th spans nested inside the first span. The time reported to be spent in each span will become clear next.
 
+Application code
+================
+
+Let's look at the ``demo.py`` file first:
+
+.. code::
+
+    @zipkin_span(service_name='webapp', span_name='do_stuff')
+    def do_stuff():
+        time.sleep(5)
+        headers = create_http_headers_for_new_span()
+        requests.get('http://localhost:6000/service1/', headers=headers)
+        return 'OK'
+
+    @app.route('/')
+    def index():
+        with zipkin_span(
+            service_name='webapp',
+            span_name='index',
+            transport_handler=http_transport,
+            port=5000,
+            sample_rate=100, #0.05, # Value between 0.0 and 100.0
+        ):
+            do_stuff()
+            time.sleep(10)
+        return 'OK', 200
 
 
-  
+We create the first span inside the ``/`` handler function ``index()`` via the ``zipkin_span()`` context manager.
+We specify the ``sample_rate=100`` meaning it will trace every request (only for demo). The ``transport_handler``
+specifies "how" the emitted traces are transported to the Zipkin "collector". Here we use the ``http_transport``
+provided as example by the ``py_zipkin`` project.
 
+This handler function calls the ``do_stuff()`` function where we create another span, but since it is in the same
+service, we specify the same ``service_name`` and decorate it with the ``zipkin_span`` decorator. We have an artificial
+time delay of 5s before we make a HTTP call to the ``service1`` service. Since we want to continue the current span, we 
+pass in the span data as HTTP headers. These headers are created via the helper function, ``create_http_headers_for_new_span()`` provided via ``py_zipkin``.
 
-    
-    
+Let's look at the ``service1.py`` file next:
 
+.. code::
 
- 
- 
- 
-    
-    
+    @zipkin_span(service_name='service1', span_name='service1_do_stuff')
+    def do_stuff():
+        time.sleep(5)
+        return 'OK'
 
+    @app.route('/service1/')
+    def index():
+        with zipkin_span(
+            service_name='service1',
+            zipkin_attrs=ZipkinAttrs(
+                trace_id=request.headers['X-B3-TraceID'],
+                span_id=request.headers['X-B3-SpanID'],
+                parent_span_id=request.headers['X-B3-ParentSpanID'],
+                flags=request.headers['X-B3-Flags'],
+                is_sampled=request.headers['X-B3-Sampled'],
+            ),
+            span_name='index_service1',
+            transport_handler=http_transport,
+            port=6000,
+            sample_rate=100, #0.05, # Value between 0.0 and 100.0
+        ):
+            do_stuff()
+        return 'OK', 200
 
-
-
-
-
+This is almost the same as our ``demo`` service above, but note how we set the ``zipkin_attrs`` by making using of the
+headers we were passed from the ``demo`` service aboev. This makes sure that the span of ``service1`` is nested within
+the span of ``demo``. Note once again, how we introduce artificial delays here once again to make the trace show
+the time spent in each service more clearly.
