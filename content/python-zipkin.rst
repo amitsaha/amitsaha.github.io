@@ -13,7 +13,7 @@ Distributed Tracing concepts
 
 Roughly, a call to an "external service" starts a `span`. We can have a `span` nested within another span in a tree like fashion. All the spans in the context of a single request would form a `trace`. Something like the following would perhaps explain it better:
 
-..code::
+.. code::
 
                                                       Trace                                                      
                                      Start Root Span                        Start a nested span      
