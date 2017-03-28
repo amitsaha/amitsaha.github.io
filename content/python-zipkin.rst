@@ -59,6 +59,50 @@ If you now go to ``http://localhost:9411/`` in your browser, you will see the Zi
 Creating traces
 ===============
 
+Let's now start our two services, firs the "external" facing demo service:
+
+.. code::
+    $ python demo.py
+   
+   
+    * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+    * Restarting with stat
+    * Debugger is active!
+    * Debugger pin code: 961-605-579
+
+Then, the "internal" service 1:
+
+.. code::
+
+    $ python service1.py 
+    * Running on http://127.0.0.1:6000/ (Press CTRL+C to quit)
+    * Restarting with stat
+    * Debugger is active!
+    * Debugger pin code: 961-605-579
+    
+  
+ Now, let's make couple of requests to the ``demo`` service using ``$ curl localhost:5000`` twice. If we go back to the Zipkin Web UI and click on "Find Traces", we will see something like this:
+ 
+.. image:: {filename}/images/zipkin-traces.png
+   :align: center
+   :height: 1100px
+   :width: 1300px
+   :scale: 50 %
+   
+If we click on one of the traces, we will see something like this:
+ 
+.. image:: {filename}/images/zipkin-trace1.png
+   :align: center
+   :height: 1100px
+   :width: 1300px
+   :scale: 50 %
+ 
+As we can see four spans were created (two spans in each service) with the 2nd, 3rd and 4th spans nested inside the first span. The time reported to be spent in each span will become clear next.
+
+
+
+  
+
 
     
     
