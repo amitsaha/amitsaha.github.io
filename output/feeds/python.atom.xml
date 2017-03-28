@@ -131,6 +131,15 @@ headers we were passed from the &lt;tt class="docutils literal"&gt;demo&lt;/tt&g
 the span of &lt;tt class="docutils literal"&gt;demo&lt;/tt&gt;. Note once again, how we introduce artificial delays here once again to make the trace show
 the time spent in each service more clearly.&lt;/p&gt;
 &lt;/div&gt;
+&lt;div class="section" id="ending-notes"&gt;
+&lt;h2&gt;Ending Notes&lt;/h2&gt;
+&lt;p&gt;Hopefully this post has given you a starting point of how you may go about implement distributed tracing. The following links
+has more about distributed tracing:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;a class="reference external" href="zipkin.io"&gt;zipkin&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference external" href="http://opentracing.io/"&gt;opentracing&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
 </content></entry><entry><title>QueueLogger and Python JSON Logger</title><link href="/queuelogger-and-python-json-logger.html" rel="alternate"></link><published>2017-03-01T18:00:00+10:00</published><updated>2017-03-01T18:00:00+10:00</updated><author><name>Amit Saha</name></author><id>tag:None,2017-03-01:/queuelogger-and-python-json-logger.html</id><summary type="html">&lt;div class="section" id="using-queuelogger-with-python-json-logger"&gt;
 &lt;h2&gt;Using QueueLogger with Python JSON Logger&lt;/h2&gt;
 &lt;p&gt;When logging from multiple processes (via &lt;tt class="docutils literal"&gt;multiprocessing&lt;/tt&gt; module),  using &lt;a class="reference external" href="https://pythonhosted.org/logutils/queue.html#logutils.queue.QueueHandler"&gt;QueueHandler&lt;/a&gt; is one  approach with Python 2.&lt;/p&gt;

@@ -167,3 +167,12 @@ This is almost the same as our ``demo`` service above, but note how we set the `
 headers we were passed from the ``demo`` service aboev. This makes sure that the span of ``service1`` is nested within
 the span of ``demo``. Note once again, how we introduce artificial delays here once again to make the trace show
 the time spent in each service more clearly.
+
+Ending Notes
+============
+
+Hopefully this post has given you a starting point of how you may go about implement distributed tracing. The following links
+has more about distributed tracing:
+
+- `zipkin <zipkin.io>`__
+- `opentracing <http://opentracing.io/>`__
