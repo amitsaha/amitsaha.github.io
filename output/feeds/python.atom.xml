@@ -9,7 +9,8 @@ We have a service &lt;tt class="docutils literal"&gt;demo&lt;/tt&gt; which is a 
 &lt;p&gt;Roughly, a call to an &amp;quot;external service&amp;quot; starts a &lt;cite&gt;span&lt;/cite&gt;. We can have a &lt;cite&gt;span&lt;/cite&gt; nested within another span in a tree like fashion. All the spans in the context of a single request would form a &lt;cite&gt;trace&lt;/cite&gt;.&lt;/p&gt;
 &lt;p&gt;Something like the following would perhaps explain it better in the context of our &lt;tt class="docutils literal"&gt;demo&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;service&lt;/tt&gt; network application stack:&lt;/p&gt;
 &lt;pre class="code literal-block"&gt;
-                &amp;lt;--------------------          Trace       ------------------------------------ &amp;gt;                                                               Start Root Span                        Start a nested span
+                &amp;lt;--------------------          Trace       ------------------------------------ &amp;gt;
+                                    Start Root Span                        Start a nested span
 External Request -&amp;gt; Demo HTTP app       ---&amp;gt;          Service 1 HTTP app        ---&amp;gt;          Process
 &lt;/pre&gt;
 &lt;p&gt;The span that is started from the &lt;tt class="docutils literal"&gt;service1&lt;/tt&gt; is designated as a child of the &lt;tt class="docutils literal"&gt;root span&lt;/tt&gt; which was started from the &lt;tt class="docutils literal"&gt;demo&lt;/tt&gt; application. In the context of Python, we can think of a span as a context manager and one context manager living within another context manager. And all these &amp;quot;contexts&amp;quot; together forming a trace.&lt;/p&gt;
@@ -36,7 +37,8 @@ $ cd tracing/http_collector
 $ ./start_zipkin.sh
 ..
 ..
-zipkin          | 2017-03-28 03:48:00.936  INFO 9 --- [           main] zipkin.server.ZipkinServer               :           Started ZipkinServer in 7.36 seconds (JVM running for 8.595)
+zipkin          | 2017-03-28 03:48:00.936  INFO 9 --- [           main] zipkin.server.ZipkinServer
+Started ZipkinServer in 7.36 seconds (JVM running for 8.595)
 &lt;/pre&gt;
 &lt;p&gt;If you now go to &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;http://localhost:9411/&lt;/span&gt;&lt;/tt&gt; in your browser, you will see the Zipkin Web UI.&lt;/p&gt;
 &lt;/div&gt;
@@ -61,9 +63,9 @@ $ python service1.py
 * Debugger pin code: 961-605-579
 &lt;/pre&gt;
 &lt;p&gt;Now, let's make couple of requests to the &lt;tt class="docutils literal"&gt;demo&lt;/tt&gt; service using &lt;tt class="docutils literal"&gt;$ curl localhost:5000&lt;/tt&gt; twice. If we go back to the Zipkin Web UI and click on &amp;quot;Find Traces&amp;quot;, we will see something like this:&lt;/p&gt;
-&lt;img alt="" class="align-center" src="/images/zipkin-traces.png" style="width: 650.0px; height: 550.0px;" /&gt;
+&lt;img alt="" class="align-center" src="/images/zipkin-traces.png" /&gt;
 &lt;p&gt;If we click on one of the traces, we will see something like this:&lt;/p&gt;
-&lt;img alt="" class="align-center" src="/images/zipkin-trace1.png" style="width: 650.0px; height: 550.0px;" /&gt;
+&lt;img alt="" class="align-center" src="/images/zipkin-trace1.png" /&gt;
 &lt;p&gt;As we can see four spans were created (two spans in each service) with the 2nd, 3rd and 4th spans nested inside the first span. The time reported to be spent in each span will become clear next.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="application-code"&gt;

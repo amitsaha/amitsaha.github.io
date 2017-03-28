@@ -17,7 +17,8 @@ Something like the following would perhaps explain it better in the context of o
 
 .. code::
 
-                   <--------------------          Trace       ------------------------------------ >                                                               Start Root Span                        Start a nested span      
+                   <--------------------          Trace       ------------------------------------ >  
+                                       Start Root Span                        Start a nested span  
    External Request -> Demo HTTP app       --->          Service 1 HTTP app        --->          Process
    
 
@@ -52,7 +53,8 @@ Then, download my code from `here <https://github.com/amitsaha/python-web-app-re
     $ ./start_zipkin.sh
     ..
     ..
-    zipkin          | 2017-03-28 03:48:00.936  INFO 9 --- [           main] zipkin.server.ZipkinServer               :           Started ZipkinServer in 7.36 seconds (JVM running for 8.595)
+    zipkin          | 2017-03-28 03:48:00.936  INFO 9 --- [           main] zipkin.server.ZipkinServer
+    Started ZipkinServer in 7.36 seconds (JVM running for 8.595)
     
 If you now go to ``http://localhost:9411/`` in your browser, you will see the Zipkin Web UI.
 
@@ -87,17 +89,11 @@ Now, let's make couple of requests to the ``demo`` service using ``$ curl localh
  
 .. image:: {filename}/images/zipkin-traces.png
    :align: center
-   :height: 1100px
-   :width: 1300px
-   :scale: 50 %
    
 If we click on one of the traces, we will see something like this:
  
 .. image:: {filename}/images/zipkin-trace1.png
    :align: center
-   :height: 1100px
-   :width: 1300px
-   :scale: 50 %
  
 As we can see four spans were created (two spans in each service) with the 2nd, 3rd and 4th spans nested inside the first span. The time reported to be spent in each span will become clear next.
 

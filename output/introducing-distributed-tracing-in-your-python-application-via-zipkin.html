@@ -50,7 +50,8 @@ We have a service <tt class="docutils literal">demo</tt> which is a Flask applic
 <p>Roughly, a call to an &quot;external service&quot; starts a <cite>span</cite>. We can have a <cite>span</cite> nested within another span in a tree like fashion. All the spans in the context of a single request would form a <cite>trace</cite>.</p>
 <p>Something like the following would perhaps explain it better in the context of our <tt class="docutils literal">demo</tt> and <tt class="docutils literal">service</tt> network application stack:</p>
 <pre class="code literal-block">
-                &lt;--------------------          Trace       ------------------------------------ &gt;                                                               Start Root Span                        Start a nested span
+                &lt;--------------------          Trace       ------------------------------------ &gt;
+                                    Start Root Span                        Start a nested span
 External Request -&gt; Demo HTTP app       ---&gt;          Service 1 HTTP app        ---&gt;          Process
 </pre>
 <p>The span that is started from the <tt class="docutils literal">service1</tt> is designated as a child of the <tt class="docutils literal">root span</tt> which was started from the <tt class="docutils literal">demo</tt> application. In the context of Python, we can think of a span as a context manager and one context manager living within another context manager. And all these &quot;contexts&quot; together forming a trace.</p>
@@ -77,7 +78,8 @@ $ cd tracing/http_collector
 $ ./start_zipkin.sh
 ..
 ..
-zipkin          | 2017-03-28 03:48:00.936  INFO 9 --- [           main] zipkin.server.ZipkinServer               :           Started ZipkinServer in 7.36 seconds (JVM running for 8.595)
+zipkin          | 2017-03-28 03:48:00.936  INFO 9 --- [           main] zipkin.server.ZipkinServer
+Started ZipkinServer in 7.36 seconds (JVM running for 8.595)
 </pre>
 <p>If you now go to <tt class="docutils literal"><span class="pre">http://localhost:9411/</span></tt> in your browser, you will see the Zipkin Web UI.</p>
 </div>
@@ -102,9 +104,9 @@ $ python service1.py
 * Debugger pin code: 961-605-579
 </pre>
 <p>Now, let's make couple of requests to the <tt class="docutils literal">demo</tt> service using <tt class="docutils literal">$ curl localhost:5000</tt> twice. If we go back to the Zipkin Web UI and click on &quot;Find Traces&quot;, we will see something like this:</p>
-<img alt="" class="align-center" src="/images/zipkin-traces.png" style="width: 650.0px; height: 550.0px;" />
+<img alt="" class="align-center" src="/images/zipkin-traces.png" />
 <p>If we click on one of the traces, we will see something like this:</p>
-<img alt="" class="align-center" src="/images/zipkin-trace1.png" style="width: 650.0px; height: 550.0px;" />
+<img alt="" class="align-center" src="/images/zipkin-trace1.png" />
 <p>As we can see four spans were created (two spans in each service) with the 2nd, 3rd and 4th spans nested inside the first span. The time reported to be spent in each span will become clear next.</p>
 </div>
 <div class="section" id="application-code">
