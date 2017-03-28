@@ -1,0 +1,752 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Programming and Writing about it - golang</title><link href="/" rel="alternate"></link><link href="/feeds/golang.atom.xml" rel="self"></link><id>/</id><updated>2017-03-26T10:00:00+10:00</updated><entry><title>Notes on using Golang to write gitbackup</title><link href="/notes-on-using-golang-to-write-gitbackup.html" rel="alternate"></link><published>2017-03-26T10:00:00+10:00</published><updated>2017-03-26T10:00:00+10:00</updated><author><name>Amit Saha</name></author><id>tag:None,2017-03-26:/notes-on-using-golang-to-write-gitbackup.html</id><summary type="html">&lt;p&gt;&lt;a class="reference external" href="https://github.com/amitsaha/gitbackup"&gt;gitbackup&lt;/a&gt; is a tool to backup your git repositories from GitHub and GitLab. I wrote the &lt;a class="reference external" href="https://github.com/amitsaha/gitbackup/releases/tag/lj-0.1"&gt;initial version&lt;/a&gt; as a project for a golang article which is in review for publication in a Linux magazine. It supports GitHub enterprise installations and custom GitLab installations in addition to repositories on github …&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a class="reference external" href="https://github.com/amitsaha/gitbackup"&gt;gitbackup&lt;/a&gt; is a tool to backup your git repositories from GitHub and GitLab. I wrote the &lt;a class="reference external" href="https://github.com/amitsaha/gitbackup/releases/tag/lj-0.1"&gt;initial version&lt;/a&gt; as a project for a golang article which is in review for publication in a Linux magazine. It supports GitHub enterprise installations and custom GitLab installations in addition to repositories on github.com and gitlab.com. It's written in Golang, and built upon &lt;a class="reference external" href="https://github.com/google/go-github"&gt;go-github&lt;/a&gt; and &lt;a class="reference external" href="https://github.com/xanzy/go-gitlab"&gt;go-gitlab&lt;/a&gt; and other third party golang packages.&lt;/p&gt;
+&lt;p&gt;Since the initial version, the project's code has seen number of changes which has been a learning experience for me since I am still fairly new to Golang. In the rest of this post, I describe these and some personal notes about the experience.&lt;/p&gt;
+&lt;div class="section" id="using-afero-for-filesystem-operations"&gt;
+&lt;h2&gt;Using afero for filesystem operations&lt;/h2&gt;
+&lt;p&gt;&lt;tt class="docutils literal"&gt;gitbackup&lt;/tt&gt; needs to do some basic filesystem operations - create directories and check for existence of directories. In the initial version, I was using the &lt;tt class="docutils literal"&gt;os&lt;/tt&gt; package directly which meant any test invoking the code which performed these operations were actually performing those on the underlying filesystem. I could of course
+perform cleanup after these tests so that my filesystem would not remain polluted. However, then I decided to check what &lt;a class="reference external" href="https://github.com/spf13/afero"&gt;afero&lt;/a&gt; had to offer. It had exactly what I needed - a memory backed filesystem (&lt;cite&gt;NewMemMapFs&lt;/cite&gt;).This &lt;a class="reference external" href="https://github.com/spf13/afero#using-afero-for-testing"&gt;section&lt;/a&gt; in the project homepage was all I needed to switch to using &lt;cite&gt;afero&lt;/cite&gt; instead of &lt;cite&gt;os&lt;/cite&gt; package drirectly. And hence I didn't need to worry about cleaning up my filesystem after a test run or worry about starting from a known clean state!&lt;/p&gt;
+&lt;p&gt;To show some code, this is the &lt;cite&gt;git diff&lt;/cite&gt; of introducing &lt;cite&gt;afero&lt;/cite&gt; and switching out direct use of &lt;cite&gt;os&lt;/cite&gt;:&lt;/p&gt;
+&lt;pre class="code diff literal-block"&gt;
+&lt;span class="gh"&gt;diff --git a/src/gitbackup/main.go b/src/gitbackup/main.go
+index 500d9a2..6e71beb 100644
+&lt;/span&gt;&lt;span class="gd"&gt;--- a/src/gitbackup/main.go
+&lt;/span&gt;&lt;span class="gi"&gt;+++ b/src/gitbackup/main.go
+&lt;/span&gt;&lt;span class="gu"&gt;&amp;#64;&amp;#64; -3,6 +3,7 &amp;#64;&amp;#64; package main
+&lt;/span&gt; import (
+        &amp;quot;flag&amp;quot;
+        &amp;quot;github.com/mitchellh/go-homedir&amp;quot;
+&lt;span class="gi"&gt;+       &amp;quot;github.com/spf13/afero&amp;quot;
+&lt;/span&gt;        &amp;quot;log&amp;quot;
+        &amp;quot;os&amp;quot;
+        &amp;quot;os/exec&amp;quot;
+&lt;span class="gu"&gt;&amp;#64;&amp;#64; -14,6 +15,7 &amp;#64;&amp;#64; import (
+&lt;/span&gt; var MAX_CONCURRENT_CLONES int = 20
+
+ var execCommand = exec.Command
+&lt;span class="gi"&gt;+var appFS = afero.NewOsFs()
+&lt;/span&gt; var gitCommand = &amp;quot;git&amp;quot;
+
+ // Check if we have a copy of the repo already, if
+&lt;span class="gu"&gt;&amp;#64;&amp;#64; -22,7 +24,7 &amp;#64;&amp;#64; func backUp(backupDir string, repo *Repository, wg *sync.WaitGroup) ([]byte, err
+&lt;/span&gt;        defer wg.Done()
+
+        repoDir := path.Join(backupDir, repo.Name)
+&lt;span class="gd"&gt;-       _, err := os.Stat(repoDir)
+&lt;/span&gt;&lt;span class="gi"&gt;+       _, err := appFS.Stat(repoDir)
+&lt;/span&gt;
+        var stdoutStderr []byte
+        if err == nil {
+&lt;span class="gu"&gt;&amp;#64;&amp;#64; -83,7 +85,7 &amp;#64;&amp;#64; func main() {
+&lt;/span&gt;        } else {
+                *backupDir = path.Join(*backupDir, *service)
+        }
+&lt;span class="gd"&gt;-       _, err := os.Stat(*backupDir)
+&lt;/span&gt;&lt;span class="gi"&gt;+       _, err := appFS.Stat(*backupDir)
+&lt;/span&gt;        if err != nil {
+                log.Printf(&amp;quot;%s doesn't exist, creating it\n&amp;quot;, *backupDir)
+                err := os.MkdirAll(*backupDir, 0771)
+&lt;/pre&gt;
+&lt;p&gt;When we declare &lt;cite&gt;appFS&lt;/cite&gt; above outside all functions, it becomes a package level
+variable and we set it to &lt;cite&gt;NewOsFs()&lt;/cite&gt; and replace function calls such as &lt;cite&gt;os.Stat&lt;/cite&gt; by &lt;cite&gt;appFS.Stat()&lt;/cite&gt;. Since the variable name starts with a small letter, this variable is not visible outside the package.&lt;/p&gt;
+&lt;p&gt;Then, in the test, I will do:&lt;/p&gt;
+&lt;pre class="code go literal-block"&gt;
+&lt;span class="nx"&gt;appFS&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;afero&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;NewMemMapFs&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;Hence, all operations will happen in the memory based filesystem rather than the &amp;quot;real&amp;quot; underlying filesystem.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="testing-shell-commands"&gt;
+&lt;h2&gt;Testing shell commands&lt;/h2&gt;
+&lt;p&gt;One of the first roadblocks to writing tests I faced was how to test functions which were invoking external programs (&lt;tt class="docutils literal"&gt;git&lt;/tt&gt; in this case). This post here titled &lt;a class="reference external" href="https://npf.io/2015/06/testing-exec-command/"&gt;Testing os/exec.Command&lt;/a&gt; had my answer. However, it took me a while to correctly apply it. And that post is still the reference if you want to understand what's going on.&lt;/p&gt;
+&lt;p&gt;Here's basically what I did:&lt;/p&gt;
+&lt;pre class="code go literal-block"&gt;
+&lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;execCommand&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;exec&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Command&lt;/span&gt;
+&lt;span class="p"&gt;..&lt;/span&gt;
+
+&lt;span class="kd"&gt;func&lt;/span&gt; &lt;span class="nx"&gt;backUp&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;backupDir&lt;/span&gt; &lt;span class="kt"&gt;string&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;repo&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="nx"&gt;Repository&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;wg&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="nx"&gt;sync&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;WaitGroup&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;([]&lt;/span&gt;&lt;span class="kt"&gt;byte&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;error&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="o"&gt;...&lt;/span&gt;
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="nx"&gt;err&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="kc"&gt;nil&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="p"&gt;..&lt;/span&gt;
+        &lt;span class="nx"&gt;cmd&lt;/span&gt; &lt;span class="o"&gt;:=&lt;/span&gt; &lt;span class="nx"&gt;execCommand&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;gitCommand&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;-C&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;repoDir&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;pull&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="p"&gt;..&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="k"&gt;else&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="p"&gt;..&lt;/span&gt;
+        &lt;span class="nx"&gt;cmd&lt;/span&gt; &lt;span class="o"&gt;:=&lt;/span&gt; &lt;span class="nx"&gt;execCommand&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;gitCommand&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;clone&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;repo&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;GitURL&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;repoDir&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="p"&gt;..&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+    &lt;span class="o"&gt;...&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;We declare a package variable, &lt;tt class="docutils literal"&gt;execCommand&lt;/tt&gt; which is intialized with &lt;tt class="docutils literal"&gt;exec.Command&lt;/tt&gt; from the &lt;tt class="docutils literal"&gt;os/exec&lt;/tt&gt; package. Then, in the tests, I do the following:&lt;/p&gt;
+&lt;pre class="code go literal-block"&gt;
+&lt;span class="kd"&gt;func&lt;/span&gt; &lt;span class="nx"&gt;TestHelperCloneProcess&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;t&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="nx"&gt;testing&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;T&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="nx"&gt;os&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Getenv&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;GO_WANT_HELPER_PROCESS&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;!=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;1&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+    &lt;span class="c1"&gt;// Check that git command was executed
+&lt;/span&gt;    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="nx"&gt;os&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Args&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;!=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;git&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;||&lt;/span&gt; &lt;span class="nx"&gt;os&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Args&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;!=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;clone&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="nx"&gt;fmt&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Fprintf&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;os&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Stdout&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Expected git clone to be executed. Got %v&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;os&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Args&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="p"&gt;:])&lt;/span&gt;
+        &lt;span class="nx"&gt;os&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Exit&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+    &lt;span class="nx"&gt;os&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Exit&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+
+&lt;span class="kd"&gt;func&lt;/span&gt; &lt;span class="nx"&gt;fakeCloneCommand&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;command&lt;/span&gt; &lt;span class="kt"&gt;string&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;args&lt;/span&gt; &lt;span class="o"&gt;...&lt;/span&gt;&lt;span class="kt"&gt;string&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;cmd&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="nx"&gt;exec&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Cmd&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="nx"&gt;cs&lt;/span&gt; &lt;span class="o"&gt;:=&lt;/span&gt; &lt;span class="p"&gt;[]&lt;/span&gt;&lt;span class="kt"&gt;string&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;-test.run=TestHelperCloneProcess&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;--&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;command&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+    &lt;span class="nx"&gt;cs&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;append&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;cs&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;args&lt;/span&gt;&lt;span class="o"&gt;...&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="nx"&gt;cmd&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;exec&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Command&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;os&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Args&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt; &lt;span class="nx"&gt;cs&lt;/span&gt;&lt;span class="o"&gt;...&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="nx"&gt;cmd&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Env&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[]&lt;/span&gt;&lt;span class="kt"&gt;string&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;GO_WANT_HELPER_PROCESS=1&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nx"&gt;cmd&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="nx"&gt;execCommand&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;fakeCloneCommand&lt;/span&gt;
+&lt;span class="nx"&gt;stdoutStderr&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;err&lt;/span&gt; &lt;span class="o"&gt;:=&lt;/span&gt; &lt;span class="nx"&gt;backUp&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;backupDir&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="nx"&gt;repo&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="nx"&gt;wg&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;
+&lt;p&gt;The above is a test for the case where a repository is being backed up for the first
+time via &lt;tt class="docutils literal"&gt;git clone&lt;/tt&gt;. In the test, before I call the &lt;tt class="docutils literal"&gt;backUp()&lt;/tt&gt; function which actually executes the command, I set &lt;tt class="docutils literal"&gt;execCommand = fakeCloneCommand&lt;/tt&gt; so to that &lt;tt class="docutils literal"&gt;execCommand&lt;/tt&gt; doesn't point to &lt;tt class="docutils literal"&gt;os.execCommand&lt;/tt&gt; any more. &lt;tt class="docutils literal"&gt;fakeCloneCommand&lt;/tt&gt;, instead of executing &lt;tt class="docutils literal"&gt;git clone&lt;/tt&gt; executes &lt;tt class="docutils literal"&gt;TestHelperCloneProcess&lt;/tt&gt;, where we also check if the command being attempted to execute was &lt;tt class="docutils literal"&gt;git clone&lt;/tt&gt;.&lt;/p&gt;
+&lt;p&gt;We similarly test the operation of a repository's backup being updated via &lt;tt class="docutils literal"&gt;git pull&lt;/tt&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="switching-from-gb-to-standard-go-tooling"&gt;
+&lt;h2&gt;Switching from &lt;tt class="docutils literal"&gt;gb&lt;/tt&gt; to standard go tooling&lt;/h2&gt;
+&lt;p&gt;When I was started to write &lt;tt class="docutils literal"&gt;gitbackup&lt;/tt&gt;, I was still in two minds about whether I like the idea of the standard &lt;tt class="docutils literal"&gt;go&lt;/tt&gt; tools' requirements of having every Golang project in &lt;tt class="docutils literal"&gt;$GOPATH&lt;/tt&gt;. Hence, I decided to go with &lt;a class="reference external" href="https://getgb.io"&gt;gb&lt;/a&gt; because it removed that requirement, as well as allowed me to have a easy way to vendor the third party dependencies and manage them.&lt;/p&gt;
+&lt;p&gt;However, as I worked on &lt;tt class="docutils literal"&gt;gitbackup&lt;/tt&gt; and was finally close to having release binaries, I decided to move away from using &lt;tt class="docutils literal"&gt;gb&lt;/tt&gt; and also try out &lt;a class="reference external" href="https://github.com/golang/dep"&gt;go dep&lt;/a&gt; for dependency management.&lt;/p&gt;
+&lt;p&gt;This involved two steps. The first was moving all the source from &lt;tt class="docutils literal"&gt;src/gitbackup&lt;/tt&gt; to the top level directory (&lt;a class="reference external" href="https://github.com/amitsaha/gitbackup/commit/e1932c41eac249a0d3dd8b9e6d6b026cdb663cce"&gt;commit&lt;/a&gt;). Then, I removed the &lt;tt class="docutils literal"&gt;vendor&lt;/tt&gt; directory created by &lt;tt class="docutils literal"&gt;gb&lt;/tt&gt; (&lt;a class="reference external" href="https://github.com/amitsaha/gitbackup/commit/654f52f0cf1cec7bb1fd994bbc75fd8839a2d43c"&gt;commit&lt;/a&gt;), and used &lt;tt class="docutils literal"&gt;dep init&lt;/tt&gt; to create a new &lt;tt class="docutils literal"&gt;vendor&lt;/tt&gt; directory, the &lt;tt class="docutils literal"&gt;lock.json&lt;/tt&gt; file and &lt;tt class="docutils literal"&gt;manifest.json&lt;/tt&gt; file. And that's all!&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="creating-release-binaries"&gt;
+&lt;h2&gt;Creating release binaries&lt;/h2&gt;
+&lt;p&gt;At this stage, &lt;tt class="docutils literal"&gt;gitbackup&lt;/tt&gt; could be installed with &lt;tt class="docutils literal"&gt;go get&lt;/tt&gt;, but I wanted to have binaries made available with the 0.1 release. I looked at a few alternatives, but finally I decided upon a bash script (copied from the fish script of &lt;a class="reference external" href="https://github.com/oklog/oklog/blob/master/release.fish"&gt;oklog&lt;/a&gt;).&lt;/p&gt;
+&lt;p&gt;The following script snippet builds binaries for multiple OS and architectures:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+for pair in linux/386 linux/amd64 linux/arm linux/arm64 darwin/amd64 dragonfly/amd64 freebsd/amd64 netbsd/amd64 openbsd/amd64 windows/amd64; do
+        GOOS=`echo $pair | cut -d'/' -f1`
+        GOARCH=`echo $pair | cut -d'/' -f2`
+        OBJECT_FILE=&amp;quot;gitbackup-$VERSION-$GOOS-$GOARCH&amp;quot;
+        GOOS=$GOOS GOARCH=$GOARCH go build -o &amp;quot;$DISTDIR/$OBJECT_FILE&amp;quot;
+..
+done
+&lt;/pre&gt;
+&lt;p&gt;I was very excited about being able to build binaries for different operating systems and architectures via &lt;tt class="docutils literal"&gt;go build&lt;/tt&gt;!&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="setting-up-continious-testing-for-linux-os-x-and-windows"&gt;
+&lt;h2&gt;Setting up continious testing for Linux, OS X and Windows&lt;/h2&gt;
+&lt;p&gt;I also setup Travis CI for running the tests on Linux and OS X:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+language: go
+os:
+  - linux
+  - osx
+go:
+  - 1.7
+  - 1.8
+
+install: true
+script:
+      - cd $GOPATH/src/github.com/amitsaha/gitbackup/
+      - go build
+      - go test -v
+&lt;/pre&gt;
+&lt;p&gt;For running tests on Windows via Appveyor, I have the following &lt;tt class="docutils literal"&gt;appveyor.yml&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+version: &amp;quot;{build}&amp;quot;
+
+# Source Config
+clone_folder: c:\gopath\src\github.com\amitsaha\gitbackup
+
+# Build host
+
+environment:
+  GOPATH: c:\gopath
+  matrix:
+    - environment:
+      GOVERSION: 1.7.5
+    - environment:
+      GOVERSION: 1.8
+
+# Build
+
+install:
+  # Install the specific Go version.
+  - rmdir c:\go /s /q
+  - appveyor DownloadFile https://storage.googleapis.com/golang/go%GOVERSION%.windows-amd64.msi
+  - msiexec /i go%GOVERSION%.windows-amd64.msi /q
+  - set Path=c:\go\bin;c:\gopath\bin;%Path%
+  - go version
+  - go env
+
+build: off
+
+test_script:
+  - cd c:\gopath\src\github.com\amitsaha\gitbackup
+  - go build -o bin\gitbackup.exe
+  - go test -v
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class="section" id="ending-notes"&gt;
+&lt;h2&gt;Ending notes&lt;/h2&gt;
+&lt;p&gt;&lt;tt class="docutils literal"&gt;gitbackup&lt;/tt&gt; is mainly an educational project to build a tool which I and hopefully others find useful. I wanted to have reasonable test coverage for it, release binaries for multiple operating systems and architecture and have continuous testing setup on multiple operatng systems. So far, all of these has been successfully achieved.I am looking forward to using &lt;tt class="docutils literal"&gt;go dep&lt;/tt&gt; more as I get a chance and also happy about making &lt;tt class="docutils literal"&gt;gitbackup&lt;/tt&gt; compatible with standard go tools out of the box.&lt;/p&gt;
+&lt;p&gt;If you get a chance, please &lt;a class="reference external" href="https://github.com/amitsaha/gitbackup#gitbackup---backup-your-github-and-gitlab-repositories"&gt;try it out&lt;/a&gt; and I welcome any feedback and contributions!&lt;/p&gt;
+&lt;/div&gt;
+</content></entry><entry><title>Setup Golang 1.8 and gb on Fedora (and other Linux distributions)</title><link href="/setup-golang-18-and-gb-on-fedora-and-other-linux-distributions.html" rel="alternate"></link><published>2017-03-01T18:00:00+10:00</published><updated>2017-03-01T18:00:00+10:00</updated><author><name>Amit Saha</name></author><id>tag:None,2017-03-01:/setup-golang-18-and-gb-on-fedora-and-other-linux-distributions.html</id><summary type="html">&lt;p&gt;This guide will be how I usually setup and get started with Go development environment on Linux. By the end of this document, we will have seen how to:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;Install the Go 1.8 compiler and other tools (&lt;tt class="docutils literal"&gt;gofmt&lt;/tt&gt;, for eaxmple), collectively referred to as go tools&lt;/li&gt;
+&lt;li&gt;Install &lt;a class="reference external" href="http://getgb.io"&gt;gb&lt;/a&gt; and …&lt;/li&gt;&lt;/ul&gt;</summary><content type="html">&lt;p&gt;This guide will be how I usually setup and get started with Go development environment on Linux. By the end of this document, we will have seen how to:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;Install the Go 1.8 compiler and other tools (&lt;tt class="docutils literal"&gt;gofmt&lt;/tt&gt;, for eaxmple), collectively referred to as go tools&lt;/li&gt;
+&lt;li&gt;Install &lt;a class="reference external" href="http://getgb.io"&gt;gb&lt;/a&gt; and the &lt;tt class="docutils literal"&gt;vendor&lt;/tt&gt; plugin&lt;/li&gt;
+&lt;li&gt;Vendoring third party packages&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="section" id="installing-go-tools"&gt;
+&lt;h2&gt;Installing Go tools&lt;/h2&gt;
+&lt;p&gt;We can follow the official &lt;a class="reference external" href="https://golang.org/doc/install"&gt;install guide&lt;/a&gt; to get the latest stable version of the Go tools:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;Download the Linux binary tarball from the &lt;a class="reference external" href="https://golang.org/dl/"&gt;Downloads page&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;sudo tar &lt;span class="pre"&gt;-C&lt;/span&gt; /usr/local &lt;span class="pre"&gt;-xzf&lt;/span&gt; &lt;span class="pre"&gt;&amp;lt;filename-from-above&amp;gt;&lt;/span&gt;&lt;/tt&gt;&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;export &lt;span class="pre"&gt;PATH=$PATH:/usr/local/go/bin&lt;/span&gt;&lt;/tt&gt; in your &lt;tt class="docutils literal"&gt;.bashrc&lt;/tt&gt; or similar file.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;When we now open a new terminal session, we should be able to type in &lt;cite&gt;go version&lt;/cite&gt; and get the version we installed:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ go version
+go version go1.8 linux/amd64
+&lt;/pre&gt;
+&lt;p&gt;If we see this, we are all set to go to the next stage.&lt;/p&gt;
+&lt;p&gt;Golang expects us to structure our source code in a certain way. You can read all about it
+in this &lt;a class="reference external" href="https://golang.org/doc/code.html"&gt;document&lt;/a&gt;. The summarized version is that:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;All our go code (including those of packages we use) in a single directory&lt;/li&gt;
+&lt;li&gt;The environment variable &lt;tt class="docutils literal"&gt;GOPATH&lt;/tt&gt; points to this single directory&lt;/li&gt;
+&lt;li&gt;This single directory has three sub-directories: &lt;tt class="docutils literal"&gt;src&lt;/tt&gt;, &lt;tt class="docutils literal"&gt;bin&lt;/tt&gt;, &lt;tt class="docutils literal"&gt;pkg&lt;/tt&gt;&lt;/li&gt;
+&lt;li&gt;It is in the &lt;tt class="docutils literal"&gt;src&lt;/tt&gt; sub-directory where all our Go code will live&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Prior to version 1.8, we needed to setup a Go workspace and set the &lt;tt class="docutils literal"&gt;GOPATH&lt;/tt&gt; environment variable before we could
+start working with golang. Golang 1.8 will automatically use &lt;tt class="docutils literal"&gt;$HOME/go&lt;/tt&gt; as the GOPATH if one is not set:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ go env GOPATH
+/home/user/go
+&lt;/pre&gt;
+&lt;p&gt;If you are happy with the selection, you can skip the next step. You can learn more about
+GOPATH &lt;a class="reference external" href="https://golang.org/cmd/go/#hdr-GOPATH_environment_variable"&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="setting-up-the-go-workspace"&gt;
+&lt;h2&gt;Setting up the Go workspace&lt;/h2&gt;
+&lt;p&gt;Let's say you want to set the &lt;tt class="docutils literal"&gt;GOPATH&lt;/tt&gt; to &lt;tt class="docutils literal"&gt;$HOME/work/golang&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ mkdir -p $HOME/work/golang
+$ mkdir -p $HOME/work/golang/src $HOME/work/golang/bin $HOME/work/golang/pkg
+&lt;/pre&gt;
+&lt;p&gt;At this stage, our $GOPATH directory tree looks like this:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ tree -L 1 work/golang/
+work/golang/
+├── bin
+├── pkg
+└── src
+&lt;/pre&gt;
+&lt;p&gt;Next, we will add the line &lt;tt class="docutils literal"&gt;export &lt;span class="pre"&gt;GOPATH=$HOME/work/golang&lt;/span&gt;&lt;/tt&gt; in the &lt;tt class="docutils literal"&gt;.bashrc&lt;/tt&gt; (or another similar file). If we now start a new terminal session, we should see that &lt;tt class="docutils literal"&gt;GOPATH&lt;/tt&gt; is now setup to this path.&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ go env GOPATH
+/home/asaha/work/golang
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class="section" id="writing-our-first-program"&gt;
+&lt;h2&gt;Writing our first program&lt;/h2&gt;
+&lt;p&gt;There are two types of Golang programs we can write - one is an application program (output is an executable program) and the other is a package which is meant to be used in other programs. We will first write a program which will be compiled to an executable.&lt;/p&gt;
+&lt;p&gt;First, create a directory tree in &lt;tt class="docutils literal"&gt;$GOPATH/src&lt;/tt&gt; for our package:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ mkdir -p $GOPATH/src/github.com/amitsaha/golang_gettingstarted
+&lt;/pre&gt;
+&lt;p&gt;Our package name for the above directory tree becomes &lt;tt class="docutils literal"&gt;github.com/amitsaha/golang_gettingstarted&lt;/tt&gt;. Then, type in the following in &lt;tt class="docutils literal"&gt;$GOPATH/src/github.com/amitsaha/golang_gettingstarted/main.go&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+package main
+
+import (
+         &amp;quot;fmt&amp;quot;
+)
+
+func main() {
+         fmt.Printf(&amp;quot;Hello World\n&amp;quot;)
+}
+&lt;/pre&gt;
+&lt;p&gt;Next, build and run the program as follows:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ go run $GOPATH/src/github.com/amitsaha/golang_gettingstarted/main.go
+Hello World
+&lt;/pre&gt;
+&lt;p&gt;Great! Our program compiled and ran successfully. Our workspace at this stage only has a single file - the one we created above:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ tree
+.
+├── bin
+├── pkg
+└── src
+         └── github.com
+                 └── amitsaha
+                         └── golang_gettingstarted
+                             └── main.go
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class="section" id="installing-go-applications"&gt;
+&lt;h2&gt;Installing Go applications&lt;/h2&gt;
+&lt;p&gt;Now, let's say that the program above was actually a utility we wrote and we want to use it regularly. Where as we could execute &lt;tt class="docutils literal"&gt;go run&lt;/tt&gt; as above, but the more convenient approach is to install the program. &lt;tt class="docutils literal"&gt;go install&lt;/tt&gt; command is used to build and install Go packages. Let's try it on our package:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ go install github.com/amitsaha/golang_gettingstarted/
+&lt;/pre&gt;
+&lt;p&gt;You can execute this command from anywhere on your filesystem. Go will figure out the path to the package from GOPATH we set above. Now, you will see that there is a &lt;tt class="docutils literal"&gt;golang_gettingstarted&lt;/tt&gt; executable file in the &lt;tt class="docutils literal"&gt;$GOPATH/bin&lt;/tt&gt; directory:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ tree work/golang/
+work/golang/
+├── bin
+│&amp;nbsp;&amp;nbsp; └── golang_gettingstarted
+├── pkg
+└── src
+     └── github.com
+         └── amitsaha
+                └── golang_gettingstarted
+                         └── main.go
+&lt;/pre&gt;
+&lt;p&gt;We can try executing the command:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ ./work/golang/bin/golang_gettingstarted
+Hello World
+&lt;/pre&gt;
+&lt;p&gt;As a shortcut, we can just execute &lt;tt class="docutils literal"&gt;$GOPATH/bin/golang_gettingstarted&lt;/tt&gt;. But, you wouldn't need to even do that if &lt;tt class="docutils literal"&gt;$GOPATH/bin&lt;/tt&gt; is in your &lt;tt class="docutils literal"&gt;$PATH&lt;/tt&gt;. So, if you want, you can do that and then you could just specify &lt;tt class="docutils literal"&gt;golang_gettingstarted&lt;/tt&gt; and the program would be executed.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="working-with-third-party-packages"&gt;
+&lt;h2&gt;Working with third-party packages&lt;/h2&gt;
+&lt;p&gt;Let's now replace the &lt;tt class="docutils literal"&gt;main.go&lt;/tt&gt; file above by the example code from the package &lt;a class="reference external" href="https://github.com/cheggaaa/pb"&gt;pb&lt;/a&gt; which lets us create nice progress bars:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+package main
+
+import (
+    &amp;quot;gopkg.in/cheggaaa/pb.v1&amp;quot;
+    &amp;quot;time&amp;quot;
+)
+
+func main() {
+    count := 100000
+    bar := pb.StartNew(count)
+    for i := 0; i &amp;lt; count; i++ {
+        bar.Increment()
+        time.Sleep(time.Millisecond)
+    }
+    bar.FinishPrint(&amp;quot;The End!&amp;quot;)
+}
+&lt;/pre&gt;
+&lt;p&gt;Let's try and install this package:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ go install github.com/amitsaha/golang_gettingstarted
+golang/src/github.com/amitsaha/golang_gettingstarted/main.go:6:5: cannot find package &amp;quot;gopkg.in/cheggaaa/pb.v1&amp;quot; in any of:
+     /usr/lib/golang/src/gopkg.in/cheggaaa/pb.v1 (from $GOROOT)
+     /home/asaha/work/golang/src/gopkg.in/cheggaaa/pb.v1 (from $GOPATH)
+&lt;/pre&gt;
+&lt;p&gt;Basically, this tells us that Go compiler is not able to find the package &lt;tt class="docutils literal"&gt;gopkg.in/cheggaaa/pb.v1&lt;/tt&gt;. So, let's get it:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ go get  gopkg.in/cheggaaa/pb.v1
+&lt;/pre&gt;
+&lt;p&gt;This will download the package and place it in &lt;tt class="docutils literal"&gt;$GOPATH/src&lt;/tt&gt;:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;pre class="code literal-block"&gt;
+$ tree -L 3 $GOPATH/src/
+ /home/asaha/work/golang/src/
+ ├── github.com
+         │&amp;nbsp;&amp;nbsp; └── amitsaha
+         │&amp;nbsp;&amp;nbsp;     └── golang_gettingstarted
+ └── gopkg.in
+         └── cheggaaa
+                └── pb.v1
+&lt;/pre&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;If we now install our package again, it will build correctly and an executable &lt;tt class="docutils literal"&gt;golang_gettingstarted&lt;/tt&gt;
+will be placed in &lt;tt class="docutils literal"&gt;$GOPATH/bin&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ go install github.com/amitsaha/golang_gettingstarted
+$ $GOPATH/bin/golang_gettingstarted
+ 100000 / 100000 [======================================================================================================]100.00% 1m49s
+ The End!
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class="section" id="golang-package-objects"&gt;
+&lt;h2&gt;Golang package objects&lt;/h2&gt;
+&lt;p&gt;If we now display the directory contents of &lt;tt class="docutils literal"&gt;$GOPATH&lt;/tt&gt;, we will see:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ tree -L 2 golang/
+golang/
+    ├── bin
+    │&amp;nbsp;&amp;nbsp;  └── golang_gettingstarted
+    ├── pkg
+    │&amp;nbsp;&amp;nbsp; └── linux_amd64
+    └── src
+        ├── github.com
+        └── gopkg.in
+&lt;/pre&gt;
+&lt;p&gt;The contents in &lt;tt class="docutils literal"&gt;pkg&lt;/tt&gt; sub-directory are referred to as &lt;cite&gt;package objects&lt;/cite&gt; - basically built Golang packages. This is the difference from application programs (programs having &lt;tt class="docutils literal"&gt;package main&lt;/tt&gt;). This question from a while back on the golang-nuts group may be &lt;a class="reference external" href="https://groups.google.com/forum/m/#!topic/golang-nuts/RSd3B5_rIFE"&gt;interesting&lt;/a&gt; to read.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="using-gb-to-manage-projects"&gt;
+&lt;h2&gt;Using gb to manage projects&lt;/h2&gt;
+&lt;p&gt;&lt;a class="reference external" href="https://getgb.io"&gt;gb&lt;/a&gt; is Go build tool which works with the idea of projects. For me it has two features
+for which I use it:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;It doesn't require my project to be in &lt;tt class="docutils literal"&gt;$GOPATH/src&lt;/tt&gt;&lt;/li&gt;
+&lt;li&gt;It allows me to vendor and manage thrird party packages easily&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The disadvantage of using &lt;tt class="docutils literal"&gt;gb&lt;/tt&gt; to manage your project is that your project is not &amp;quot;go gettable&amp;quot;. But, let's ignore
+it for now.&lt;/p&gt;
+&lt;div class="section" id="installing-gb"&gt;
+&lt;h3&gt;Installing gb&lt;/h3&gt;
+&lt;p&gt;The following will fetch and install &lt;tt class="docutils literal"&gt;gb&lt;/tt&gt; in &lt;tt class="docutils literal"&gt;$GOPATH/bin&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ go get github.com/constabulary/gb/...
+&lt;/pre&gt;
+&lt;p&gt;If not already done, please add &lt;tt class="docutils literal"&gt;$GOPATH/bin&lt;/tt&gt; to your &lt;tt class="docutils literal"&gt;$PATH&lt;/tt&gt; environment variable and start
+a new shell session and type in &lt;tt class="docutils literal"&gt;gb&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ gb
+gb, a project based build tool for the Go programming language.
+
+Usage:
+
+     gb command [arguments]
+&lt;/pre&gt;
+&lt;p&gt;We will next install the &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;gb-vendor&lt;/span&gt;&lt;/tt&gt; &lt;a class="reference external" href="https://godoc.org/github.com/constabulary/gb/cmd/gb-vendor"&gt;plugin&lt;/a&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ go get github.com/constabulary/gb/cmd/gb-vendor
+&lt;/pre&gt;
+&lt;p&gt;Let's now setup the above project, but now as a &lt;tt class="docutils literal"&gt;gb&lt;/tt&gt; project. Create a directory &lt;tt class="docutils literal"&gt;pb_demo&lt;/tt&gt; anywhere
+in your &lt;tt class="docutils literal"&gt;$HOME&lt;/tt&gt; and create a sub-directory &lt;tt class="docutils literal"&gt;src&lt;/tt&gt; under it. Inside &lt;tt class="docutils literal"&gt;src&lt;/tt&gt;, we will create another
+subirectory &lt;tt class="docutils literal"&gt;demo&lt;/tt&gt; inside it - &lt;tt class="docutils literal"&gt;demo&lt;/tt&gt; is our project name, and place &lt;tt class="docutils literal"&gt;main.go&lt;/tt&gt; above in it.&lt;/p&gt;
+&lt;p&gt;The resulting directory structure will look like this:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ tree pb-demo/
+pb-demo/
+`-- src
+    `-- demo
+        `-- main.go
+&lt;/pre&gt;
+&lt;p&gt;The &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;pb-demo&lt;/span&gt;&lt;/tt&gt; directory is now a valid &lt;tt class="docutils literal"&gt;gb&lt;/tt&gt; project. Let's fetch the dependency:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ cd pb-demo
+$ gb vendor fetch gopkg.in/cheggaaa/pb.v1
+fetching recursive dependency github.com/mattn/go-runewidth
+&lt;/pre&gt;
+&lt;p&gt;You will now see a new sub-directory &lt;tt class="docutils literal"&gt;vendor&lt;/tt&gt; inside &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;pb-demo&lt;/span&gt;&lt;/tt&gt;. We can now go ahead and build our project:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ cd pb-demo/
+$ gb build
+github.com/mattn/go-runewidth
+gopkg.in/cheggaaa/pb.v1
+demo
+&lt;/pre&gt;
+&lt;p&gt;And finally run it:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ ./bin/main
+..
+&lt;/pre&gt;
+&lt;p&gt;Couple of points to summarize here:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;The third party package(s) are now in the &lt;tt class="docutils literal"&gt;vendor&lt;/tt&gt; sub-directory along with your package's source&lt;/li&gt;
+&lt;li&gt;The &lt;tt class="docutils literal"&gt;vendor/manifest&lt;/tt&gt; file allows you to make sure that your dependencies are pinned to a certain version&lt;/li&gt;
+&lt;li&gt;You don't need to worry about having your project in &lt;tt class="docutils literal"&gt;$GOPATH&lt;/tt&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;If you are to keen to learn more:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;The &lt;a class="reference external" href="https://golang.org/doc/code.html"&gt;How to Write Go Code&lt;/a&gt; document covers all I have discussed above and more&lt;/li&gt;
+&lt;li&gt;Others in my &lt;a class="reference external" href="https://github.com/amitsaha/linux_voice_1"&gt;repository&lt;/a&gt; for an article I wrote on Go.&lt;/li&gt;
+&lt;li&gt;Learn about &lt;a class="reference external" href="https://getgb.io/docs/project/"&gt;gb&lt;/a&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;That's all for now, you can find the simple source code above &lt;a class="reference external" href="https://github.com/amitsaha/golang_gettingstarted"&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+</content></entry><entry><title>Setup Golang on Fedora 24 (and other Linux distributions)</title><link href="/setup-golang-on-fedora-24-and-other-linux-distributions.html" rel="alternate"></link><published>2016-06-23T18:00:00+10:00</published><updated>2016-06-23T18:00:00+10:00</updated><author><name>Amit Saha</name></author><id>tag:None,2016-06-23:/setup-golang-on-fedora-24-and-other-linux-distributions.html</id><summary type="html">&lt;p&gt;This guide will be how I usually setup and get started with Go development environment on Linux. By the end of this document, we will have seen how to:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;Install the Go compiler and other tools (&lt;tt class="docutils literal"&gt;gofmt&lt;/tt&gt;, for eaxmple), collectively referred to as go tools&lt;/li&gt;
+&lt;li&gt;Setup Go workspace&lt;/li&gt;
+&lt;li&gt;Working with …&lt;/li&gt;&lt;/ul&gt;</summary><content type="html">&lt;p&gt;This guide will be how I usually setup and get started with Go development environment on Linux. By the end of this document, we will have seen how to:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;Install the Go compiler and other tools (&lt;tt class="docutils literal"&gt;gofmt&lt;/tt&gt;, for eaxmple), collectively referred to as go tools&lt;/li&gt;
+&lt;li&gt;Setup Go workspace&lt;/li&gt;
+&lt;li&gt;Working with Go programs using third-party packages&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="section" id="installing-go-tools"&gt;
+&lt;h2&gt;Installing Go tools&lt;/h2&gt;
+&lt;p&gt;The first option to install the Go compiler and other tools from your distro's package manager. On Fedora 24, you can do &lt;tt class="docutils literal"&gt;sudo dnf &lt;span class="pre"&gt;-y&lt;/span&gt; install golang&lt;/tt&gt; for example. This will install 1.6 version of the Go tools. However, if your distro's packaged version is behind the upstream release we can follow the official &lt;a class="reference external" href="https://golang.org/doc/install"&gt;install guide&lt;/a&gt; to get the latest stable version of the Go tools:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;Download the Linux binary tarball from the &lt;a class="reference external" href="https://golang.org/dl/"&gt;Downloads page&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;sudo tar &lt;span class="pre"&gt;-C&lt;/span&gt; /usr/local &lt;span class="pre"&gt;-xzf&lt;/span&gt; &lt;span class="pre"&gt;&amp;lt;filename-from-above&amp;gt;&lt;/span&gt;&lt;/tt&gt;&lt;/li&gt;
+&lt;li&gt;&lt;tt class="docutils literal"&gt;export &lt;span class="pre"&gt;PATH=$PATH:/usr/local/go/bin&lt;/span&gt;&lt;/tt&gt; in your &lt;tt class="docutils literal"&gt;.bashrc&lt;/tt&gt; or similar file.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;When we now open a new terminal session, we should be able to type in &lt;cite&gt;go version&lt;/cite&gt; and get the version we installed:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ go version
+go version go1.6.2 linux/amd64
+&lt;/pre&gt;
+&lt;p&gt;If we see this, we are all set to go to the next stage&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="setting-up-the-go-workspace"&gt;
+&lt;h2&gt;Setting up the Go workspace&lt;/h2&gt;
+&lt;p&gt;Golang expects us to structure our source code in a certain way. You can read all about it in this &lt;a class="reference external" href="https://golang.org/doc/code.html"&gt;document&lt;/a&gt;. The summarized version is that:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;All our go code (including those of packages we use) in a single directory&lt;/li&gt;
+&lt;li&gt;The environment variable &lt;tt class="docutils literal"&gt;GOPATH&lt;/tt&gt; points to this single directory&lt;/li&gt;
+&lt;li&gt;This single directory has three sub-directories: &lt;tt class="docutils literal"&gt;src&lt;/tt&gt;, &lt;tt class="docutils literal"&gt;bin&lt;/tt&gt;, &lt;tt class="docutils literal"&gt;pkg&lt;/tt&gt;&lt;/li&gt;
+&lt;li&gt;It is in the &lt;tt class="docutils literal"&gt;src&lt;/tt&gt; sub-directory where all our Go code will live&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;For this guide I will assume that the &lt;tt class="docutils literal"&gt;GOPATH&lt;/tt&gt; is set to &lt;tt class="docutils literal"&gt;$HOME/work/golang&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ mkdir -p $HOME/work/golang
+$ mkdir -p $HOME/work/golang/src $HOME/work/golang/bin $HOME/work/golang/pkg
+&lt;/pre&gt;
+&lt;p&gt;At this stage, our $GOPATH directory tree looks like this:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ tree -L 1 work/golang/
+work/golang/
+├── bin
+├── pkg
+└── src
+&lt;/pre&gt;
+&lt;p&gt;Next, we will add the line &lt;tt class="docutils literal"&gt;export &lt;span class="pre"&gt;GOPATH=$HOME/work/golang&lt;/span&gt;&lt;/tt&gt; in the &lt;tt class="docutils literal"&gt;.bashrc&lt;/tt&gt; (or another similar file). If we now start a new terminal session, we should see that &lt;tt class="docutils literal"&gt;GOPATH&lt;/tt&gt; is now setup correctly:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ go env GOPATH
+/home/asaha/work/golang
+&lt;/pre&gt;
+&lt;p&gt;You can learn more about GOPATH &lt;a class="reference external" href="https://golang.org/cmd/go/#hdr-GOPATH_environment_variable"&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="writing-our-first-program"&gt;
+&lt;h2&gt;Writing our first program&lt;/h2&gt;
+&lt;p&gt;There are two types of Golang programs we can write - one is an application program (output is an executable program) and the other is a package which is meant to be used in other programs. We will first write a program which will be compiled to an executable.&lt;/p&gt;
+&lt;p&gt;First, create a directory tree in &lt;tt class="docutils literal"&gt;src&lt;/tt&gt; for our package:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ mkdir -p work/golang/src/github.com/amitsaha/golang_gettingstarted
+&lt;/pre&gt;
+&lt;p&gt;Our package name for the above directory tree becomes &lt;tt class="docutils literal"&gt;github.com/amitsaha/golang_gettingstarted&lt;/tt&gt;. Then, type in the following in &lt;tt class="docutils literal"&gt;work/golang/src/github.com/amitsaha/golang_gettingstarted/main.go&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+package main
+
+import (
+         &amp;quot;fmt&amp;quot;
+)
+
+func main() {
+         fmt.Printf(&amp;quot;Hello World\n&amp;quot;)
+}
+&lt;/pre&gt;
+&lt;p&gt;Next, build and run the program as follows:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ go run work/golang/src/github.com/amitsaha/golang_gettingstarted/main.go
+Hello World
+&lt;/pre&gt;
+&lt;p&gt;Great! Our program compiled and ran successfully. Our workspace at this stage only has a single file - the one we created above:&lt;/p&gt;
+&lt;p&gt;... code:&lt;/p&gt;
+&lt;pre class="literal-block"&gt;
+$ tree
+.
+├── bin
+├── pkg
+└── src
+         └── github.com
+                 └── amitsaha
+                         └── golang_gettingstarted
+                             └── main.go
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class="section" id="installing-go-applications"&gt;
+&lt;h2&gt;Installing Go applications&lt;/h2&gt;
+&lt;p&gt;Now, let's say that the program above was actually a utility we wrote and we want to use it regularly. Where as we could execute &lt;tt class="docutils literal"&gt;go run&lt;/tt&gt; as above, but the more convenient approach is to install the program. &lt;tt class="docutils literal"&gt;go install&lt;/tt&gt; command is used to build and install Go packages. Let's try it on our package:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ go install github.com/amitsaha/golang_gettingstarted/
+&lt;/pre&gt;
+&lt;p&gt;You can execute this command from anywhere on your filesystem. Go will figure out the path to the package from GOPATH we set above. Now, you will see that there is a &lt;tt class="docutils literal"&gt;golang_gettingstarted&lt;/tt&gt; executable file in the &lt;tt class="docutils literal"&gt;$GOPATH/bin&lt;/tt&gt; directory:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ tree work/golang/
+work/golang/
+├── bin
+│&amp;nbsp;&amp;nbsp; └── golang_gettingstarted
+├── pkg
+└── src
+     └── github.com
+         └── amitsaha
+                └── golang_gettingstarted
+                         └── main.go
+&lt;/pre&gt;
+&lt;p&gt;We can try executing the command:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ ./work/golang/bin/golang_gettingstarted
+Hello World
+&lt;/pre&gt;
+&lt;p&gt;As a shortcut, we can just execute &lt;tt class="docutils literal"&gt;$GOPATH/bin/golang_gettingstarted&lt;/tt&gt;. But, you wouldn't need to even do that if &lt;tt class="docutils literal"&gt;$GOPATH/bin&lt;/tt&gt; is in your &lt;tt class="docutils literal"&gt;$PATH&lt;/tt&gt;. So, if you want, you can do that and then you could just specify &lt;tt class="docutils literal"&gt;golang_gettingstarted&lt;/tt&gt; and the program would be executed.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="working-with-third-party-packages"&gt;
+&lt;h2&gt;Working with third-party packages&lt;/h2&gt;
+&lt;p&gt;Let's now replace the &lt;tt class="docutils literal"&gt;main.go&lt;/tt&gt; file above by the example code from the package &lt;a class="reference external" href="https://github.com/cheggaaa/pb"&gt;pb&lt;/a&gt; which lets us create nice progress bars:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+package main
+
+import (
+     &amp;quot;gopkg.in/cheggaaa/pb.v1&amp;quot;
+    &amp;quot;time&amp;quot;
+)
+
+func main() {
+    count := 100000
+    bar := pb.StartNew(count)
+    for i := 0; i &amp;lt; count; i++ {
+        bar.Increment()
+        time.Sleep(time.Millisecond)
+    }
+    bar.FinishPrint(&amp;quot;The End!&amp;quot;)
+}
+&lt;/pre&gt;
+&lt;p&gt;Let's try and install this package:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ go install github.com/amitsaha/golang_gettingstarted
+golang/src/github.com/amitsaha/golang_gettingstarted/main.go:6:5: cannot find package &amp;quot;gopkg.in/cheggaaa/pb.v1&amp;quot; in any of:
+     /usr/lib/golang/src/gopkg.in/cheggaaa/pb.v1 (from $GOROOT)
+     /home/asaha/work/golang/src/gopkg.in/cheggaaa/pb.v1 (from $GOPATH)
+&lt;/pre&gt;
+&lt;p&gt;Basically, this tells us that Go compiler is not able to find the package &lt;tt class="docutils literal"&gt;gopkg.in/cheggaaa/pb.v1&lt;/tt&gt;. So, let's get it:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+  $ go get  gopkg.in/cheggaaa/pb.v1
+
+This will download the package and place it in ``$GOPATH/src``:
+
+.. code::
+
+   $ tree -L 3 $GOPATH/src/
+    /home/asaha/work/golang/src/
+    ├── github.com
+            │&amp;nbsp;&amp;nbsp; └── amitsaha
+            │&amp;nbsp;&amp;nbsp;     └── golang_gettingstarted
+    └── gopkg.in
+            └── cheggaaa
+                   └── pb.v1
+&lt;/pre&gt;
+&lt;p&gt;If we now install our package again, it will build correclty and an executable &lt;tt class="docutils literal"&gt;golang_gettingstarted&lt;/tt&gt; will be placed in &lt;tt class="docutils literal"&gt;$GOPATH/bin&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ go install github.com/amitsaha/golang_gettingstarted
+$ $GOPATH/bin/golang_gettingstarted
+ 100000 / 100000 [======================================================================================================]100.00% 1m49s
+ The End!
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class="section" id="golang-package-objects"&gt;
+&lt;h2&gt;Golang package objects&lt;/h2&gt;
+&lt;p&gt;If we now display the directory contents of &lt;tt class="docutils literal"&gt;$GOPATH&lt;/tt&gt;, we will see:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ tree -L 2 golang/
+golang/
+    ├── bin
+    │&amp;nbsp;&amp;nbsp;  └── golang_gettingstarted
+    ├── pkg
+    │&amp;nbsp;&amp;nbsp; └── linux_amd64
+    └── src
+        ├── github.com
+        └── gopkg.in
+&lt;/pre&gt;
+&lt;p&gt;The contents in &lt;tt class="docutils literal"&gt;pkg&lt;/tt&gt; sub-directory are referred to as &lt;cite&gt;package objects&lt;/cite&gt; - basically built Golang packages. This is the difference from application programs (programs having &lt;tt class="docutils literal"&gt;package main&lt;/tt&gt;). This question from a while back on the golang-nuts group may be &lt;a class="reference external" href="https://groups.google.com/forum/m/#!topic/golang-nuts/RSd3B5_rIFE"&gt;interesting&lt;/a&gt; to read.&lt;/p&gt;
+&lt;p&gt;If you are to keen to learn more:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;The &lt;a class="reference external" href="https://golang.org/doc/code.html"&gt;How to Write Go Code&lt;/a&gt; document covers all I have discussed above and more&lt;/li&gt;
+&lt;li&gt;Others in my &lt;a class="reference external" href="https://github.com/amitsaha/linux_voice_1"&gt;repository&lt;/a&gt; for an article I wrote on Go.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;That's all for now, you can find the simple source code above &lt;a class="reference external" href="https://github.com/amitsaha/golang_gettingstarted"&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+</content></entry><entry><title>runC and libcontainer on Fedora 23/24</title><link href="/runc-and-libcontainer-on-fedora-2324.html" rel="alternate"></link><published>2016-04-27T17:00:00+10:00</published><updated>2016-04-27T17:00:00+10:00</updated><author><name>Amit Saha</name></author><id>tag:None,2016-04-27:/runc-and-libcontainer-on-fedora-2324.html</id><summary type="html">&lt;p&gt;In this post, I will post my notes on how I got &lt;a class="reference external" href="https://github.com/opencontainers/runc/"&gt;runC&lt;/a&gt; and then using
+&lt;cite&gt;libcontainer&lt;/cite&gt; on Fedora. The first step is to install &lt;tt class="docutils literal"&gt;golang&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ sudo dnf -y install golang
+$ go version
+go version go1.6 linux/amd64
+&lt;/pre&gt;
+&lt;p&gt;We will set GOPATH=~/golang/ and then do the following:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ mkdir …&lt;/pre&gt;</summary><content type="html">&lt;p&gt;In this post, I will post my notes on how I got &lt;a class="reference external" href="https://github.com/opencontainers/runc/"&gt;runC&lt;/a&gt; and then using
+&lt;cite&gt;libcontainer&lt;/cite&gt; on Fedora. The first step is to install &lt;tt class="docutils literal"&gt;golang&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ sudo dnf -y install golang
+$ go version
+go version go1.6 linux/amd64
+&lt;/pre&gt;
+&lt;p&gt;We will set GOPATH=~/golang/ and then do the following:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ mkdir -p ~/golang/github.com/opencontainers
+$ cd ~/golang/github.com/opencontainers
+$ git clone https://github.com/opencontainers/runc.git
+$ cd runc
+
+$ sudo dnf -y install libseccomp-devel
+$ make
+$ sudo make install
+&lt;/pre&gt;
+&lt;p&gt;At this stage, &lt;tt class="docutils literal"&gt;runc&lt;/tt&gt; should be installed and ready to use:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ runc --version
+runc version 0.0.9
+commit: 89ab7f2ccc1e45ddf6485eaa802c35dcf321dfc8
+spec: 0.5.0-dev
+&lt;/pre&gt;
+&lt;p&gt;Now we need a rootfs that we will use for our container, we will use
+the &amp;quot;busybox&amp;quot; docker image - pull it and export a tar archive:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ sudo dnf -y install docker
+$ sudo systemctl start docker
+$ docker pull busybox
+$ sudo docker export $(sudo docker create busybox) &amp;gt; busybox.tar
+$ mkdir ~/rootfs
+$ tar -C ~/rootfs -xf busybox.tar
+&lt;/pre&gt;
+&lt;p&gt;Now that we have a rootfs, we have one final step - generate the spec
+for our container:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ runc spec
+&lt;/pre&gt;
+&lt;p&gt;This will generate a &lt;tt class="docutils literal"&gt;config.json&lt;/tt&gt; (&lt;a class="reference external" href="https://github.com/opencontainers/runtime-spec/blob/master/config.md"&gt;config&lt;/a&gt;)
+file and then we can start a container using the rootfs above:
+(runC expects to find &lt;tt class="docutils literal"&gt;config.json&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;rootfs&lt;/tt&gt; in the same
+directory as you are going to start the container from)&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+# for some reason, i have to pass the absolute path to runc when using sudo
+# UPDATE: (Thanks to Dharmit for pointingme to: http://unix.stackexchange.com/questions/91541/why-is-path-reset-in-a-sudo-command/91556#91556)
+$ sudo /usr/local/bin/runc start test #  test is the &amp;quot;container-id&amp;quot;
+/ # ps
+     PID   USER     TIME   COMMAND
+ 1 root       0:00 sh
+ 8 root       0:00 ps
+/# exit
+&lt;/pre&gt;
+&lt;div class="section" id="getting-started-with-libcontainer"&gt;
+&lt;h2&gt;Getting started with libcontainer&lt;/h2&gt;
+&lt;p&gt;&lt;tt class="docutils literal"&gt;runC&lt;/tt&gt; is built upon &lt;a class="reference external" href="https://github.com/opencontainers/runc/tree/master/libcontainer"&gt;libcontainer&lt;/a&gt;. This
+means that wcan write our own Golang programs which will start a
+container and do stuff in it. An example program is available &lt;a class="reference external" href="https://github.com/amitsaha/libcontainer_examples/blob/master/example1.go"&gt;here&lt;/a&gt;
+(thanks to the fine folks on #opencontainers on Freenode for helpful
+pointers). It starts a container using the above rootfs, runs &lt;tt class="docutils literal"&gt;ps&lt;/tt&gt;
+in it and exits.&lt;/p&gt;
+&lt;p&gt;Once you have saved it somewhere on your go path, we will first
+need to get all the dependent packages:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ # My program is in the below directory
+$ cd ~/golang/src/github.com/amitsaha/libcontainer_examples
+$ go get
+$ sudo GOPATH=/home/asaha/golang go run example1.go /home/asaha/rootfs/
+ [sudo] password for asaha:
+ PID   USER     TIME   COMMAND
+ 1 root       0:00 ps
+&lt;/pre&gt;
+&lt;p&gt;(Thanks Dharmit for all the suggestions)&lt;/p&gt;
+&lt;/div&gt;
+</content></entry><entry><title>New article: Write an Image Cropping program with Go</title><link href="/new-article-write-an-image-cropping-program-with-go.html" rel="alternate"></link><published>2016-04-17T10:00:00+10:00</published><updated>2016-04-17T10:00:00+10:00</updated><author><name>Amit Saha</name></author><id>tag:None,2016-04-17:/new-article-write-an-image-cropping-program-with-go.html</id><summary type="html">&lt;p&gt;My article &amp;quot;Write an Image Cropping with Go&amp;quot; is out in &lt;a class="reference external" href="https://linuxvoice.com"&gt;Linux Voice&lt;/a&gt; (Issue 26). It is my first article to be published in Linux Voice and I am very excited about it.&lt;/p&gt;
+&lt;p&gt;It is challenging to write an introductory article without being able to explain everything the reader needs …&lt;/p&gt;</summary><content type="html">&lt;p&gt;My article &amp;quot;Write an Image Cropping with Go&amp;quot; is out in &lt;a class="reference external" href="https://linuxvoice.com"&gt;Linux Voice&lt;/a&gt; (Issue 26). It is my first article to be published in Linux Voice and I am very excited about it.&lt;/p&gt;
+&lt;p&gt;It is challenging to write an introductory article without being able to explain everything the reader needs to know so as to follow the article, while keeping the article concise. Therefore I have updated the &lt;a class="reference external" href="https://github.com/amitsaha/linux_voice_1"&gt;GitHub repo&lt;/a&gt; of the final code with a README which points you to various resources and tips I found useful while I was learning myself.&lt;/p&gt;
+&lt;p&gt;Go is one of the two &amp;quot;new&amp;quot; languages I have been exploring (the other being Rust). What do I like about it?&lt;/p&gt;
+&lt;div class="section" id="what-i-like-about-go"&gt;
+&lt;h2&gt;What I like about Go?&lt;/h2&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;It is statically typed, but with type inference&lt;/li&gt;
+&lt;li&gt;Rich standard library&lt;/li&gt;
+&lt;li&gt;I like how it enforces code organization via &lt;a class="reference external" href="https://golang.org/doc/code.html#Workspaces"&gt;workspaces&lt;/a&gt;, no unused imports and &lt;a class="reference external" href="https://blog.golang.org/go-fmt-your-code"&gt;gofmt&lt;/a&gt; being the one and only way of formatting your code correctly.&lt;/li&gt;
+&lt;li&gt;I didn't discuss &amp;quot;goroutines&amp;quot; and &amp;quot;channels&amp;quot; in the article. But finally, a programming language feature that have allowed me to write concurrent programs without having to look up the documentation&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference external" href="https://www.godoc.org"&gt;GoDoc&lt;/a&gt; is awesome&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference external" href="https://blog.golang.org/examples"&gt;Testable examples in Go&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;I hope you enjoy reading the article, and please feel free to get in touch if you have any suggestions/comments/queries. I am &lt;cite&gt;&amp;#64;echorand&lt;/cite&gt; on Twitter, or you can email me at &lt;cite&gt;amitsaha.in AT gmail.com&lt;/cite&gt;.&lt;/p&gt;
+&lt;p&gt;In the next issue of Linux Voice, I have an article coming up on Rust.&lt;/p&gt;
+&lt;/div&gt;
+</content></entry></feed>

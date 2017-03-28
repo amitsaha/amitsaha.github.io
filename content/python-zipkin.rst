@@ -64,8 +64,8 @@ Now, let's install the two libraries we need from the ``requirements.txt`` via `
 Let's now start our two services, first the "external" facing demo service:
 
 .. code::
+
     $ python demo.py
-   
    
     * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
     * Restarting with stat
