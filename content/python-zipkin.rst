@@ -41,6 +41,17 @@ First, we will start ``zipkin`` with ``elasticsearch`` as the backend as ``docke
 .. code:
 
     $ docker create --name esdata openzipkin/zipkin-elasticsearch
+    
+Then, download my code from `here <https://github.com/amitsaha/python-web-app-recipes/archive/zipkin_python_demo.zip>`__ and:
+
+.. code::
+
+    $ wget ..
+    $ unzip ..
+    $ cd tracing/http_collector
+    $ ./start_zipkin.sh
+
+
  
  
  
