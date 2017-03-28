@@ -1,5 +1,5 @@
 :Title: Introducing distributed tracing in your Python application via Zipkin
-:Date: 2017-03-27 11:00
+:Date: 2017-03-28 17:00
 :Category: Python
 
 Distributed tracing is the idea of tracing a network request as it travels through your services, as it would be in a microservices based architecture. The primary reason you may want to do is to troubleshoot or monitor the latency of a request
