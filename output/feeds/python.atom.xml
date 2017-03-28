@@ -134,7 +134,7 @@ the time spent in each service more clearly.&lt;/p&gt;
 &lt;div class="section" id="ending-notes"&gt;
 &lt;h2&gt;Ending Notes&lt;/h2&gt;
 &lt;p&gt;Hopefully this post has given you a starting point of how you may go about implement distributed tracing. The following links
-has more about distributed tracing:&lt;/p&gt;
+has more:&lt;/p&gt;
 &lt;ul class="simple"&gt;
 &lt;li&gt;&lt;a class="reference external" href="zipkin.io"&gt;zipkin&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a class="reference external" href="http://opentracing.io/"&gt;opentracing&lt;/a&gt;&lt;/li&gt;

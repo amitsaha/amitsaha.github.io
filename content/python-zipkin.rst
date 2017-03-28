@@ -172,7 +172,7 @@ Ending Notes
 ============
 
 Hopefully this post has given you a starting point of how you may go about implement distributed tracing. The following links
-has more about distributed tracing:
+has more:
 
 - `zipkin <zipkin.io>`__
 - `opentracing <http://opentracing.io/>`__
