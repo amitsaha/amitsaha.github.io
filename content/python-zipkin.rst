@@ -59,7 +59,9 @@ If you now go to ``http://localhost:9411/`` in your browser, you will see the Zi
 Creating traces
 ===============
 
-Let's now start our two services, firs the "external" facing demo service:
+Now, let's install the two libraries we need from the ``requirements.txt`` via ``pip install -r requirements.txt``. 
+
+Let's now start our two services, first the "external" facing demo service:
 
 .. code::
     $ python demo.py
