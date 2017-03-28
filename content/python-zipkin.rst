@@ -11,7 +11,9 @@ We have a service ``demo`` which is a Flask application, which listens on ``/``.
 Distributed Tracing concepts
 ============================
 
-Roughly, a call to an "external service" starts a `span`. We can have a `span` nested within another span in a tree like fashion. All the spans in the context of a single request would form a `trace`. Something like the following would perhaps explain it better:
+Roughly, a call to an "external service" starts a `span`. We can have a `span` nested within another span in a tree like fashion. All the spans in the context of a single request would form a `trace`. 
+
+Something like the following would perhaps explain it better in the context of our ``demo`` and ``service`` network application stack:
 
 .. code::
 
@@ -19,6 +21,8 @@ Roughly, a call to an "external service" starts a `span`. We can have a `span` n
                                      Start Root Span                        Start a nested span      
    External Request -> Demo HTTP app       --->          Service 1 HTTP app        --->          Process
    
+
+The span that is started from the ``service1`` is designated as a child of the ``root span`` which was started from the ``demo`` application. In the context of Python, we can think of a span as a context manager and one context manager living within another context manager.
 
    
 
