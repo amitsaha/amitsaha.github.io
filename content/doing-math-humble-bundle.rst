@@ -11,7 +11,7 @@ Your purchases will help support the Python Software Foundation and I am excited
 .. figure:: {filename}/images/humble-bundle.png
    :align: center
    :alt: Humble Bundle
-   :scale: 70%
+   :scale: 50%
 
 
 For 1+ USD you can get three books including "Doing Math with Python"! For 15+ USD you get nine excellent Python books!
