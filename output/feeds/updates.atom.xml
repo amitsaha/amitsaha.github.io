@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom"><title>Programming and Writing about it - updates</title><link href="/" rel="alternate"></link><link href="/feeds/updates.atom.xml" rel="self"></link><id>/</id><updated>2017-04-06T08:20:00+10:00</updated><entry><title>Doing Math with Python Humble Bundle</title><link href="/humble-bundle.html" rel="alternate"></link><published>2017-04-06T08:20:00+10:00</published><updated>2017-04-06T08:20:00+10:00</updated><author><name>Amit Saha</name></author><id>tag:None,2017-04-06:/humble-bundle.html</id><summary type="html">&lt;p class="first last"&gt;Humble bundle&lt;/p&gt;
-</summary><content type="html">&lt;p&gt;No Starch Press has launched a &amp;quot;Pay what you want&amp;quot; Python Humble Bundle running from April 5th - April 19th!
+</summary><content type="html">&lt;p&gt;No Starch Press has launched a &amp;quot;Pay what you want&amp;quot; &lt;a class="reference external" href="https://www.humblebundle.com/books/python-book-bundle"&gt;Python Humble Bundle&lt;/a&gt; running from April 5th - April 19th!
 Your purchases will help support the Python Software Foundation and I am excited to announce that Doing Math with Python is part of it.&lt;/p&gt;
 &lt;div class="figure align-center"&gt;
 &lt;img alt="Humble Bundle" src="/images/humble-bundle.png" /&gt;
 &lt;/div&gt;
 &lt;p&gt;For 1+ USD you can get three books including &amp;quot;Doing Math with Python&amp;quot;! For 15+ USD you get nine excellent Python books!&lt;/p&gt;
+&lt;p&gt;Get the bundle &lt;a class="reference external" href="https://www.humblebundle.com/books/python-book-bundle"&gt;here&lt;/a&gt;!&lt;/p&gt;
 </content></entry></feed>
