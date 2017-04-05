@@ -1,7 +1,7 @@
 Doing Math with Python Humble Bundle
 ====================================
 :date: 2017-04-06 08:20
-:category: updates
+:category: python
 :slug: humble-bundle
 :summary: Humble bundle
 
@@ -11,6 +11,7 @@ Your purchases will help support the Python Software Foundation and I am excited
 .. figure:: {filename}/images/humble-bundle.png
    :align: center
    :alt: Humble Bundle
+   :scale: 70%
 
 
 For 1+ USD you can get three books including "Doing Math with Python"! For 15+ USD you get nine excellent Python books!
