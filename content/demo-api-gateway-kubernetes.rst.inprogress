@@ -1,0 +1,77 @@
+Setting up Kubernetes
+=====================
+
+https://github.com/kubernetes/minikube
+https://coreos.com/kubernetes/docs/latest/configure-kubectl.html
+
+Mac OS X + VirtualBox
+
+.. code::
+
+   $ minikube start
+   Starting local Kubernetes cluster...
+   Starting VM...
+   Downloading Minikube ISO
+   89.51 MB / 89.51 MB [==============================================] 100.00% 0s
+   SSH-ing files into VM...
+   Setting up certs...
+   Starting cluster components...
+   Connecting to cluster...
+   Setting up kubeconfig...
+   Kubectl is now configured to use the cluster.
+   
+Sanity checking
+
+.. code::
+
+  $ kubectl version
+  Client Version: version.Info{Major:"1", Minor:"6", GitVersion:"v1.6.1", GitCommit:"b0b7a323cc5a4a2019b2e9520c21c7830b7f708e", GitTreeState:"clean", BuildDate:"2017-04-03T20:44:38Z", GoVersion:"go1.7.5", Compiler:"gc", Platform:"darwin/amd64"}
+  Server Version: version.Info{Major:"1", Minor:"6", GitVersion:"v1.6.0", GitCommit:"fff5156092b56e6bd60fff75aad4dc9de6b6ef37", GitTreeState:"dirty", BuildDate:"2017-04-07T20:46:46Z", GoVersion:"go1.7.3", Compiler:"gc", Platform:"linux/amd64"}
+  
+  $ kubectl cluster-info
+  Kubernetes master is running at https://192.168.99.100:8443
+  KubeDNS is running at https://192.168.99.100:8443/api/v1/proxy/namespaces/kube-system/services/kube-dns
+  kubernetes-dashboard is running at https://192.168.99.100:8443/api/v1/proxy/namespaces/kube-system/services/kubernetes-dashboard
+  
+  $ kubectl get services
+  NAME         CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE
+  kubernetes   10.0.0.1     <none>        443/TCP   14m
+  
+  $ kubectl get nodes
+  NAME       STATUS    AGE       VERSION
+  minikube   Ready     14m       v1.6.0
+  
+  $ kubectl get pods
+  No resources found.
+
+The last output is interesting. Applications/services live inside a pod in Kubernetes and we currently don't have any running,
+hence no pods are shown. Similarly, `kubectl get services` runs only the `kubernetes` service running on port 443. I will get
+back to this later on.
+
+At this stage, we have a Kubernetes cluster up and running. 
+
+Now a bit about what we are going to deploy in it? We are going to
+deploy an "API gateway" and two other services. The API gateway forwards requests it get to one of these services - one via HTTP,
+the other via gRPC. What are the features we want to have?
+
+- We will be running 3 instances of the API gateway service and 3 instances each of the other services
+- API gateway should not have any hard coded IP address for any service it talks to. If an instance of a service goes up or down, the API gateway
+  shouldn't have to know about it
+- API gateway should load balance between the services
+- External requests should be load balanced between the multiple API gateway instances
+- We should have circuit breaking between API gateway and any of the other services
+- We should have rate limitting across the API gateway
+- We should have metrics on each service
+- We should have correlated logging
+- We should have distributed tracing
+- We should be able to scale up or down automatically based on incoming requests
+
+That's a huge list of desirable features. So, let's get to work.
+
+Service #1: Deploying the HTTP service
+======================================
+
+
+
+What's running on port 443 kubernetes?
+======================================
