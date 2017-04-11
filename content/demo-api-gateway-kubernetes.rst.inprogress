@@ -65,13 +65,197 @@ the other via gRPC. What are the features we want to have?
 - We should have correlated logging
 - We should have distributed tracing
 - We should be able to scale up or down automatically based on incoming requests
+- Upgrades and downgrades without downtime
+- Only healthy instances should get traffic
 
 That's a huge list of desirable features. So, let's get to work.
 
 Service #1: Deploying the HTTP service
 ======================================
 
+$ cd webapp-1
+$ ...export..
+
+$ docker build -t amitsaha/webapp-1 .
+
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: webapp1-deployment
+spec:
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: webapp1
+    spec:
+      containers:
+      - name: webapp1
+        image: amitsaha/webapp1
+        ports:
+        - containerPort: 5000
+        
+$ kubectl create -f deployment.yaml
+deployment "webapp1-deployment" created
+$ kubectl describe deployment webapp1-deployment
+Name:			webapp1-deployment
+Namespace:		default
+CreationTimestamp:	Tue, 11 Apr 2017 11:58:46 +1000
+Labels:			app=webapp1
+Annotations:		deployment.kubernetes.io/revision=1
+Selector:		app=webapp1
+Replicas:		3 desired | 3 updated | 3 total | 0 available | 3 unavailable
+StrategyType:		RollingUpdate
+MinReadySeconds:	0
+RollingUpdateStrategy:	25% max unavailable, 25% max surge
+Pod Template:
+  Labels:	app=webapp1
+  Containers:
+   webapp1:
+    Image:		amitsaha/webapp1
+    Port:		5000/TCP
+    Environment:	<none>
+    Mounts:		<none>
+  Volumes:		<none>
+Conditions:
+  Type		Status	Reason
+  ----		------	------
+  Available 	False	MinimumReplicasUnavailable
+  Progressing 	True	ReplicaSetUpdated
+OldReplicaSets:	<none>
+NewReplicaSet:	webapp1-deployment-2199260651 (3/3 replicas created)
+Events:
+  FirstSeen	LastSeen	Count	From			SubObjectPath	Type	Reason			Message
+  ---------	--------	-----	----			-------------	--------------			-------
+  4m		4m		1	deployment-controller			Normal	ScalingReplicaSet	Scaled up replica set webapp1-deployment-2199260651 to 3
+
+
+
+Fix the image name:
+
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: webapp1-deployment
+spec:
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: webapp1
+    spec:
+      containers:
+      - name: webapp1
+        image: amitsaha/webapp-1
+        ports:
+        - containerPort: 5000
+        
+        
+
+kubectl apply -f deployment.yaml
+
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: webapp1-deployment
+spec:
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: webapp1
+    spec:
+      containers:
+      - name: webapp1
+        image: amitsaha/webapp-1:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 5000
+
+kubectl get pods -l app=webapp1
+NAME                                 READY     STATUS    RESTARTS   AGE
+webapp1-deployment-536678510-dtmjb   1/1       Running   0          4m
+webapp1-deployment-536678510-kt1zs   1/1       Running   0          4m
+webapp1-deployment-536678510-wkmkq   1/1       Running   0          4m
+➜  webapp-1 git:(kubernetes) ✗
+
+
+$ cat service.yaml
+kind: Service
+apiVersion: v1
+metadata:
+  name: webapp-1
+spec:
+  selector:
+    app: webapp-1
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 5000
+
+$ kubectl create -f service.yaml
+service "webapp-1" created
+      
+kubectl describe svc webapp1
+Name:			webapp1
+Namespace:		default
+Labels:			<none>
+Annotations:		<none>
+Selector:		app=webapp1
+Type:			ClusterIP
+IP:			10.0.0.91
+Port:			<unset>	80/TCP
+Endpoints:		172.17.0.5:5000,172.17.0.8:5000,172.17.0.9:5000
+Session Affinity:	None
+Events:			<none>
+
+
+**How to update service config changes**
+
+$ minikube ssh
+..
+$ curl 10.0.0.91/create
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<title>405 Method Not Allowed</title>
+<h1>Method Not Allowed</h1>
+<p>The method is not allowed for the requested URL.</p>
+
+$ kubectl get services kube-dns --namespace=kube-system
+NAME       CLUSTER-IP   EXTERNAL-IP   PORT(S)         AGE
+kube-dns   10.0.0.10    <none>        53/UDP,53/TCP   4h
+
+At this stage, we will be able to talk to our webapp1 service using "webapp1". 
+
+kubectl run curl --image=radial/busyboxplus:curl -i --tty
+If you don't see a command prompt, try pressing enter.
+[ root@curl-57077659-gkqk0:/ ]$ curl webapp1
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<title>404 Not Found</title>
+<h1>Not Found</h1>
+<p>The requested URL was not found on the server.  If you entered the URL manually please check your spelling and try again.</p>
+[ root@curl-57077659-gkqk0:/ ]$ curl webapp1/create
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<title>405 Method Not Allowed</title>
+<h1>Method Not Allowed</h1>
+<p>The method is not allowed for the requested URL.</p>
+[ root@curl-57077659-gkqk0:/ ]$ nslookup webapp1
+Server:    10.0.0.10
+Address 1: 10.0.0.10 kube-dns.kube-system.svc.cluster.local
+
+Name:      webapp1
+Address 1: 10.0.0.91 webapp1.default.svc.cluster.local
+
+
+
 
 
 What's running on port 443 kubernetes?
 ======================================
+
+
+References
+==========
+
+- https://kubernetes.io/docs/concepts/services-networking/connect-applications-service/
+- https://medium.com/google-cloud/running-workloads-in-kubernetes-86194d133593
+- https://kubernetes.io/docs/concepts/services-networking/service/#defining-a-service
