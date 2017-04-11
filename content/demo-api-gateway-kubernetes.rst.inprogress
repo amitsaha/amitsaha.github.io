@@ -246,6 +246,39 @@ Name:      webapp1
 Address 1: 10.0.0.91 webapp1.default.svc.cluster.local
 
 
+$ curl 10.0.0.91/_status/healthcheck/
+OK
+
+
+$ kubectl logs -f webapp1-deployment-2794365971-mz4mj
+
+Adding healthcheck to a deployment
+==================================
+
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: webapp1-deployment
+spec:
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: webapp1
+    spec:
+      containers:
+      - name: webapp1
+        image: amitsaha/webapp1:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 5000
+        livenessProbe:
+          httpGet:
+            path: /_status/healthcheck/
+            port: 80
+          initialDelaySeconds: 30
+          timeoutSeconds: 1
+
 
 
 
