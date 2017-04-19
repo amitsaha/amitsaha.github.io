@@ -1,5 +1,8 @@
 The `http.ListenAndServe(..) <https://golang.org/pkg/net/http/#ListenAndServe>`__ function is the 
 
+
+
+
 // The HandlerFunc type is an adapter to allow the use of
 // ordinary functions as HTTP handlers.  If f is a function
 // with the appropriate signature, HandlerFunc(f) is a
@@ -197,6 +200,48 @@ func main() {
 	http.Handle("/", t)
 	http.ListenAndServe(":8080", t)
 }
+
+
+Anything that has a ServeHTTP() method can be used as a handler.
+
+// HTTP server with middleware
+package main
+
+import (
+	"fmt"
+	"net/http"
+)
+
+func rootHandler(w http.ResponseWriter, r *http.Request) {
+	// Send a response
+	fmt.Fprintf(w, "Hi there! %s", r.URL.Path[1:])
+	// Send another response
+	fmt.Fprintf(w, "Hi again!")
+}
+
+// This handles /ping requests, but is wrapped by the "makeHandler"
+// function below
+func pingHandler(w http.ResponseWriter, r *http.Request, s string) {
+	fmt.Fprintf(w, "Pong! %s", s)
+}
+
+// This is a function which returns a http.HandlerFunc, useful to implement common logic
+// across Handlers
+// It accepts a function as argument which takes in http.ResponseWriter, *http.Request
+// and a string
+func makeHandler(fn func(http.ResponseWriter, *http.Request, string)) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		fn(w, r, "testing")
+	}
+}
+
+func main() {
+	http.HandleFunc("/", rootHandler)
+	http.HandleFunc("/ping", makeHandler(pingHandler))
+	// nil argument here specifies using the DefaultServeMux
+	http.ListenAndServe(":8080", makeHandler(pingHandler))
+}
+
 
 
 
