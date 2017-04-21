@@ -1,5 +1,34 @@
-The `http.ListenAndServe(..) <https://golang.org/pkg/net/http/#ListenAndServe>`__ function is the 
+:Title: Dissecting golang's HandlerFunc, Handle and DefaultServerMux
+:Date: 2016-04-17 10:00
+:Category: golang 
 
+The `http.ListenAndServe(..) <https://golang.org/pkg/net/http/#ListenAndServe>`__ function is the most straightforward approach to start a HTTP 1.1 server. The following code does just that:
+
+.. code::
+
+   package main
+
+   import (
+	"log"
+	"net/http"
+   )
+
+   func main() {
+       log.Fatal(http.ListenAndServe(":8080", nil))
+   }
+
+
+Now, if we try to send a couple of HTTP GET requests, we will see the following:
+
+.. code::
+   
+   $ curl localhost:8080
+   404 page not found
+   
+   $ curl localhost:8080/status/
+   404 page not found
+
+This is because, we haven't specified how our server should handle requests to GET the root ("/") - our first request or requests to GET the "/status" resource - our second request. Before we see how we could fix that, let's understand *how* the error message "404 page not found" is generated.
 
 
 
