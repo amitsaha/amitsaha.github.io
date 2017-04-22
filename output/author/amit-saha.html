@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="utf-8" />
+        <title>Programming and Writing about it - Amit Saha</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Programming and Writing about it Atom Feed" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">Programming and Writing about it </a></h1>
+                <nav><ul>
+                    <li><a href="/pages/about.html">About</a></li>
+                    <li><a href="/pages/articles.html">Articles</a></li>
+                    <li><a href="/pages/books.html">Books</a></li>
+                    <li><a href="/pages/personal-projects.html">Personal Projects</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+
+            <aside id="featured" class="body">
+                <article>
+                    <h1 class="entry-title"><a href="/dissecting-golangs-handlerfunc-handle-and-defaultservemux.html">Dissecting golang's HandlerFunc, Handle and DefaultServeMux</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2017-04-22T10:00:00+10:00">
+                Published: Sat 22 April 2017
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/amit-saha.html">Amit Saha</a>
+        </address>
+<p>In <a href="/category/golang.html">golang</a>.</p>
+
+</footer><!-- /.post-info --><p>The <a class="reference external" href="https://golang.org/pkg/net/http/#ListenAndServe">http.ListenAndServe(..)</a> function is the most straightforward
+approach to start a HTTP 1.1 server. The following code does just that:</p>
+<div class="highlight"><pre><span></span><span class="n">package</span> <span class="n">main</span>
+
+<span class="kn">import</span> <span class="p">(</span>
+        <span class="s2">&quot;log&quot;</span>
+        <span class="s2">&quot;net/http&quot;</span>
+<span class="p">)</span>
+
+<span class="n">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Fatal</span><span class="p">(</span><span class="n">http</span><span class="o">.</span><span class="n">ListenAndServe</span><span class="p">(</span><span class="s2">&quot;:8080&quot;</span><span class="p">,</span> <span class="n">nil</span><span class="p">))</span>
+<span class="p">}</span>
+</pre></div>
+<p><strong>Question 1</strong>: What is the <cite>nil</cite> second argument above? If not specified, it defaults to <cite>DefaultServeMux</cite>. What is it? We will find out soon.</p>
+<p>Now, if we try to send a couple of HTTP GET requests, we will see the following:</p>
+<pre class="code literal-block">
+$ curl localhost:8080
+404 page not found
+
+$ curl localhost:8080/status/
+404 page not found
+</pre>
+<p>This is because, we haven't specified how our server should handle requests to GET the root (&quot;/&quot;) - our first request or requests to GET the &quot;/status&quot; resource - our second request. Before we see how we could fix that, let's understand <em>how</em> the error message &quot;404 page not found&quot; is generated.</p>
+<p>The error message is generated from the function below in <cite>src/net/http/server.go</cite> specifically the <cite>NotFoundHandler()</cite> &quot;handler&quot; function:</p>
+<div class="highlight"><pre><span></span>// handler is the main implementation of Handler.
+// The path is known to be in canonical form, except for CONNECT methods.
+func (mux *ServeMux) handler(host, path string) (h Handler, pattern string) {
+        mux.mu.RLock()
+        defer mux.mu.RUnlock()
+
+        // Host-specific pattern takes precedence over generic ones
+        if mux.hosts {
+                h, pattern = mux.match(host + path)
+        }
+        if h == nil {
+                h, pattern = mux.match(path)
+        }
+        if h == nil {
+                h, pattern = NotFoundHandler(), &quot;&quot;
+        }
+        return
+}
+</pre></div>
+<p>We will discuss handlers shortly. First, let's consider the function signature of the above handler function: <cite>func (mux *ServeMux) handler(host, path string) (h Handler, pattern string)</cite>. This function is a method belonging to the type <cite>ServeMux</cite>:</p>
+<div class="highlight"><pre><span></span>// ServeMux also takes care of sanitizing the URL request path,
+// redirecting any request containing . or .. elements or repeated slashes
+// to an equivalent, cleaner URL.
+type ServeMux struct {
+        mu    sync.RWMutex
+        m     map[string]muxEntry
+        hosts bool // whether any patterns contain hostnames
+}
+
+type muxEntry struct {
+        explicit bool
+        h        Handler
+        pattern  string
+}
+
+// NewServeMux allocates and returns a new ServeMux.
+func NewServeMux() *ServeMux { return new(ServeMux) }
+
+// DefaultServeMux is the default ServeMux used by Serve.
+var DefaultServeMux = &amp;defaultServeMux
+
+var defaultServeMux ServeMux
+</pre></div>
+<p><strong>Answer 1</strong>:  Let's now go back to our question 1 we asked: How does <cite>DefaultServeMux</cite> get set when the second argument is <cite>nil</cite>? The following code snippet has the answer:</p>
+<div class="highlight"><pre><span></span>func (sh serverHandler) ServeHTTP(rw ResponseWriter, req *Request) {
+        handler := sh.srv.Handler
+        if handler == nil {
+                handler = DefaultServeMux
+        }
+        if req.RequestURI == &quot;*&quot; &amp;&amp; req.Method == &quot;OPTIONS&quot; {
+                handler = globalOptionsHandler{}
+        }
+        handler.ServeHTTP(rw, req)
+}
+</pre></div>
+<p>The above call to <cite>ServeHTTP()</cite> calls the following implementation of <cite>ServeHTTP()</cite>:</p>
+<div class="highlight"><pre><span></span>// ServeHTTP dispatches the request to the handler whose
+// pattern most closely matches the request URL.
+func (mux *ServeMux) ServeHTTP(w ResponseWriter, r *Request) {
+        if r.RequestURI == &quot;*&quot; {
+                if r.ProtoAtLeast(1, 1) {
+                        w.Header().Set(&quot;Connection&quot;, &quot;close&quot;)
+                }
+                w.WriteHeader(StatusBadRequest)
+                return
+        }
+        h, _ := mux.Handler(r)
+        h.ServeHTTP(w, r)
+}
+</pre></div>
+<p>The call to <cite>Handler()</cite> function then calls the following implementation of <cite>Handler()</cite>:</p>
+<div class="highlight"><pre><span></span>// If there is no registered handler that applies to the request,
+// Handler returns a ``page not found&#39;&#39; handler and an empty pattern.
+func (mux *ServeMux) Handler(r *Request) (h Handler, pattern string) {
+        if r.Method != &quot;CONNECT&quot; {
+                if p := cleanPath(r.URL.Path); p != r.URL.Path {
+                        _, pattern = mux.handler(r.Host, p)
+                        url := *r.URL
+                        url.Path = p
+                        return RedirectHandler(url.String(), StatusMovedPermanently), pattern
+                }
+        }
+
+        return mux.handler(r.Host, r.URL.Path)
+}
+
+// handler is the main implementation of Handler.
+// The path is known to be in canonical form, except for CONNECT methods.
+func (mux *ServeMux) handler(host, path string) (h Handler, pattern string) {
+        mux.mu.RLock()
+        defer mux.mu.RUnlock()
+
+        // Host-specific pattern takes precedence over generic ones
+        if mux.hosts {
+                h, pattern = mux.match(host + path)
+        }
+        if h == nil {
+                h, pattern = mux.match(path)
+        }
+        if h == nil {
+                h, pattern = NotFoundHandler(), &quot;&quot;
+        }
+        return
+}
+</pre></div>
+<p>Now, when we make a request to &quot;/&quot; or &quot;/status/&quot;, no match is found by the <cite>mux.match()</cite> call above and hence the handler returned is the <cite>NotFoundHandler</cite> whose <cite>ServeHTTP()</cite> function is then called to return the &quot;404 page not found&quot; error message:</p>
+<div class="highlight"><pre><span></span>// NotFound replies to the request with an HTTP 404 not found error.
+func NotFound(w ResponseWriter, r *Request) { Error(w, &quot;404 page not found&quot;, StatusNotFound) }
+
+// NotFoundHandler returns a simple request handler
+// that replies to each request with a ``404 page not found&#39;&#39; reply.
+func NotFoundHandler() Handler { return HandlerFunc(NotFound) }
+</pre></div>
+                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/humble-bundle.html" rel="bookmark"
+                           title="Permalink to Doing Math with Python Humble Bundle">Doing Math with Python Humble Bundle</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-04-06T08:20:00+10:00">
+                Published: Thu 06 April 2017
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/amit-saha.html">Amit Saha</a>
+        </address>
+<p>In <a href="/category/python.html">python</a>.</p>
+
+</footer><!-- /.post-info -->                <p class="first last">Humble bundle</p>
+
+                <a class="readmore" href="/humble-bundle.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/introducing-distributed-tracing-in-your-python-application-via-zipkin.html" rel="bookmark"
+                           title="Permalink to Introducing distributed tracing in your Python application via Zipkin">Introducing distributed tracing in your Python application via Zipkin</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-03-28T17:00:00+10:00">
+                Published: Tue 28 March 2017
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/amit-saha.html">Amit Saha</a>
+        </address>
+<p>In <a href="/category/python.html">Python</a>.</p>
+
+</footer><!-- /.post-info -->                <p>Distributed tracing is the idea of tracing a network request as it travels through your services, as it would be in a microservices based architecture. The primary reason you may want to do is to troubleshoot or monitor the latency of a request
+as it travels through the different services ...</p>
+                <a class="readmore" href="/introducing-distributed-tracing-in-your-python-application-via-zipkin.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/notes-on-using-golang-to-write-gitbackup.html" rel="bookmark"
+                           title="Permalink to Notes on using Golang to write gitbackup">Notes on using Golang to write gitbackup</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-03-26T10:00:00+10:00">
+                Published: Sun 26 March 2017
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/amit-saha.html">Amit Saha</a>
+        </address>
+<p>In <a href="/category/golang.html">golang</a>.</p>
+
+</footer><!-- /.post-info -->                <p><a class="reference external" href="https://github.com/amitsaha/gitbackup">gitbackup</a> is a tool to backup your git repositories from GitHub and GitLab. I wrote the <a class="reference external" href="https://github.com/amitsaha/gitbackup/releases/tag/lj-0.1">initial version</a> as a project for a golang article which is in review for publication in a Linux magazine. It supports GitHub enterprise installations and custom GitLab installations in addition to repositories on github ...</p>
+                <a class="readmore" href="/notes-on-using-golang-to-write-gitbackup.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/queuelogger-and-python-json-logger.html" rel="bookmark"
+                           title="Permalink to QueueLogger and Python JSON Logger">QueueLogger and Python JSON Logger</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-03-01T18:00:00+10:00">
+                Published: Wed 01 March 2017
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/amit-saha.html">Amit Saha</a>
+        </address>
+<p>In <a href="/category/python.html">Python</a>.</p>
+
+</footer><!-- /.post-info -->                <div class="section" id="using-queuelogger-with-python-json-logger">
+<h2>Using QueueLogger with Python JSON Logger</h2>
+<p>When logging from multiple processes (via <tt class="docutils literal">multiprocessing</tt> module),  using <a class="reference external" href="https://pythonhosted.org/logutils/queue.html#logutils.queue.QueueHandler">QueueHandler</a> is one  approach with Python 2.</p>
+<p><tt class="docutils literal">QueueHandler</tt> however sets <tt class="docutils literal">exc_info</tt> attribute of a <a class="reference external" href="https://docs.python.org/2/library/logging.html#logging.LogRecord">LogRecord</a>
+to <tt class="docutils literal">None</tt> since it is not &quot;pickleable&quot; (more on this later). This becomes a problem when you use <a class="reference external" href="https://github.com/madzak/python-json-logger/">python-json-logger</a> to ...</p></div>
+                <a class="readmore" href="/queuelogger-and-python-json-logger.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/setup-golang-18-and-gb-on-fedora-and-other-linux-distributions.html" rel="bookmark"
+                           title="Permalink to Setup Golang 1.8 and gb on Fedora (and other Linux distributions)">Setup Golang 1.8 and gb on Fedora (and other Linux distributions)</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-03-01T18:00:00+10:00">
+                Published: Wed 01 March 2017
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/amit-saha.html">Amit Saha</a>
+        </address>
+<p>In <a href="/category/golang.html">golang</a>.</p>
+
+</footer><!-- /.post-info -->                <p>This guide will be how I usually setup and get started with Go development environment on Linux. By the end of this document, we will have seen how to:</p>
+<ul class="simple">
+<li>Install the Go 1.8 compiler and other tools (<tt class="docutils literal">gofmt</tt>, for eaxmple), collectively referred to as go tools</li>
+<li>Install <a class="reference external" href="http://getgb.io">gb</a> and ...</li></ul>
+                <a class="readmore" href="/setup-golang-18-and-gb-on-fedora-and-other-linux-distributions.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/setup-golang-on-fedora-24-and-other-linux-distributions.html" rel="bookmark"
+                           title="Permalink to Setup Golang on Fedora 24 (and other Linux distributions)">Setup Golang on Fedora 24 (and other Linux distributions)</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2016-06-23T18:00:00+10:00">
+                Published: Thu 23 June 2016
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/amit-saha.html">Amit Saha</a>
+        </address>
+<p>In <a href="/category/golang.html">golang</a>.</p>
+
+</footer><!-- /.post-info -->                <p>This guide will be how I usually setup and get started with Go development environment on Linux. By the end of this document, we will have seen how to:</p>
+<ul class="simple">
+<li>Install the Go compiler and other tools (<tt class="docutils literal">gofmt</tt>, for eaxmple), collectively referred to as go tools</li>
+<li>Setup Go workspace</li>
+<li>Working with ...</li></ul>
+                <a class="readmore" href="/setup-golang-on-fedora-24-and-other-linux-distributions.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/presentation-slides-with-jupyter-notebook.html" rel="bookmark"
+                           title="Permalink to Presentation slides with Jupyter Notebook">Presentation slides with Jupyter Notebook</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2016-05-31T22:00:00+10:00">
+                Published: Tue 31 May 2016
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/amit-saha.html">Amit Saha</a>
+        </address>
+<p>In <a href="/category/python.html">Python</a>.</p>
+
+</footer><!-- /.post-info -->                <p>I presented at the PyCon 2016 Education Summit on &quot;Doing Math with Python&quot; day before yesterday and a lightning talk yesterday. This is the first time, I prepared a <a class="reference external" href="doingmathwithpython.github.io/pycon-us-2016">slide deck</a> using Jupyter Notebook + Reveal.js. I was pleased with the content creation process and the end result. So, here ...</p>
+                <a class="readmore" href="/presentation-slides-with-jupyter-notebook.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/new-article-write-a-program-to-tee-output-using-rust.html" rel="bookmark"
+                           title="Permalink to New article: Write a program to tee output using Rust">New article: Write a program to tee output using Rust</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2016-05-04T14:00:00+10:00">
+                Published: Wed 04 May 2016
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/amit-saha.html">Amit Saha</a>
+        </address>
+<p>In <a href="/category/rust.html">Rust</a>.</p>
+
+</footer><!-- /.post-info -->                <p>My article &quot;Write a program to tee output using Rust&quot; is out in <a class="reference external" href="https://linuxvoice.com">Linux
+Voice</a> (Issue 27).</p>
+<p>When I first set out to learning Rust, I really liked how the Rust programming language book
+took the approach of introducing the language via <a class="reference external" href="https://doc.rust-lang.org/stable/book/guessing-game.html">small projects</a>. In a recent &quot;New Rustacean&quot; <a class="reference external" href="http://www.newrustacean.com/show_notes/bonus/_4/index.html">bonus ...</a></p>
+                <a class="readmore" href="/new-article-write-a-program-to-tee-output-using-rust.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/runc-and-libcontainer-on-fedora-2324.html" rel="bookmark"
+                           title="Permalink to runC and libcontainer on Fedora 23/24">runC and libcontainer on Fedora 23/24</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2016-04-27T17:00:00+10:00">
+                Published: Wed 27 April 2016
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/amit-saha.html">Amit Saha</a>
+        </address>
+<p>In <a href="/category/golang.html">golang</a>.</p>
+
+</footer><!-- /.post-info -->                <p>In this post, I will post my notes on how I got <a class="reference external" href="https://github.com/opencontainers/runc/">runC</a> and then using
+<cite>libcontainer</cite> on Fedora. The first step is to install <tt class="docutils literal">golang</tt>:</p>
+<pre class="code literal-block">
+$ sudo dnf -y install golang
+$ go version
+go version go1.6 linux/amd64
+</pre>
+<p>We will set GOPATH=~/golang/ and then do the following:</p>
+<pre class="code literal-block">
+$ mkdir ...</pre>
+                <a class="readmore" href="/runc-and-libcontainer-on-fedora-2324.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+                </ol><!-- /#posts-list -->
+<p class="paginator">
+    Page 1 / 3
+        <a href="/author/amit-saha2.html">&raquo;</a>
+</p>
+                </section><!-- /#content -->
+        <section id="extras" class="body">
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+                            <li><a href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+</body>
+</html>

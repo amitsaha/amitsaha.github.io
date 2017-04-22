@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="utf-8" />
+        <title>Notes on using Golang to write gitbackup</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Programming and Writing about it Atom Feed" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">Programming and Writing about it </a></h1>
+                <nav><ul>
+                    <li><a href="/pages/about.html">About</a></li>
+                    <li><a href="/pages/articles.html">Articles</a></li>
+                    <li><a href="/pages/books.html">Books</a></li>
+                    <li><a href="/pages/personal-projects.html">Personal Projects</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/notes-on-using-golang-to-write-gitbackup.html" rel="bookmark"
+           title="Permalink to Notes on using Golang to write gitbackup">Notes on using Golang to write gitbackup</a></h1>
+<a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="echorand">Tweet</a><script type="text/javascript" src="https://platform.twitter.com/widgets.js"></script>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2017-03-26T10:00:00+10:00">
+                Published: Sun 26 March 2017
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/amit-saha.html">Amit Saha</a>
+        </address>
+<p>In <a href="/category/golang.html">golang</a>.</p>
+
+</footer><!-- /.post-info -->      <p><a class="reference external" href="https://github.com/amitsaha/gitbackup">gitbackup</a> is a tool to backup your git repositories from GitHub and GitLab. I wrote the <a class="reference external" href="https://github.com/amitsaha/gitbackup/releases/tag/lj-0.1">initial version</a> as a project for a golang article which is in review for publication in a Linux magazine. It supports GitHub enterprise installations and custom GitLab installations in addition to repositories on github.com and gitlab.com. It's written in Golang, and built upon <a class="reference external" href="https://github.com/google/go-github">go-github</a> and <a class="reference external" href="https://github.com/xanzy/go-gitlab">go-gitlab</a> and other third party golang packages.</p>
+<p>Since the initial version, the project's code has seen number of changes which has been a learning experience for me since I am still fairly new to Golang. In the rest of this post, I describe these and some personal notes about the experience.</p>
+<div class="section" id="using-afero-for-filesystem-operations">
+<h2>Using afero for filesystem operations</h2>
+<p><tt class="docutils literal">gitbackup</tt> needs to do some basic filesystem operations - create directories and check for existence of directories. In the initial version, I was using the <tt class="docutils literal">os</tt> package directly which meant any test invoking the code which performed these operations were actually performing those on the underlying filesystem. I could of course
+perform cleanup after these tests so that my filesystem would not remain polluted. However, then I decided to check what <a class="reference external" href="https://github.com/spf13/afero">afero</a> had to offer. It had exactly what I needed - a memory backed filesystem (<cite>NewMemMapFs</cite>).This <a class="reference external" href="https://github.com/spf13/afero#using-afero-for-testing">section</a> in the project homepage was all I needed to switch to using <cite>afero</cite> instead of <cite>os</cite> package drirectly. And hence I didn't need to worry about cleaning up my filesystem after a test run or worry about starting from a known clean state!</p>
+<p>To show some code, this is the <cite>git diff</cite> of introducing <cite>afero</cite> and switching out direct use of <cite>os</cite>:</p>
+<pre class="code diff literal-block">
+<span class="gh">diff --git a/src/gitbackup/main.go b/src/gitbackup/main.go
+index 500d9a2..6e71beb 100644
+</span><span class="gd">--- a/src/gitbackup/main.go
+</span><span class="gi">+++ b/src/gitbackup/main.go
+</span><span class="gu">&#64;&#64; -3,6 +3,7 &#64;&#64; package main
+</span> import (
+        &quot;flag&quot;
+        &quot;github.com/mitchellh/go-homedir&quot;
+<span class="gi">+       &quot;github.com/spf13/afero&quot;
+</span>        &quot;log&quot;
+        &quot;os&quot;
+        &quot;os/exec&quot;
+<span class="gu">&#64;&#64; -14,6 +15,7 &#64;&#64; import (
+</span> var MAX_CONCURRENT_CLONES int = 20
+
+ var execCommand = exec.Command
+<span class="gi">+var appFS = afero.NewOsFs()
+</span> var gitCommand = &quot;git&quot;
+
+ // Check if we have a copy of the repo already, if
+<span class="gu">&#64;&#64; -22,7 +24,7 &#64;&#64; func backUp(backupDir string, repo *Repository, wg *sync.WaitGroup) ([]byte, err
+</span>        defer wg.Done()
+
+        repoDir := path.Join(backupDir, repo.Name)
+<span class="gd">-       _, err := os.Stat(repoDir)
+</span><span class="gi">+       _, err := appFS.Stat(repoDir)
+</span>
+        var stdoutStderr []byte
+        if err == nil {
+<span class="gu">&#64;&#64; -83,7 +85,7 &#64;&#64; func main() {
+</span>        } else {
+                *backupDir = path.Join(*backupDir, *service)
+        }
+<span class="gd">-       _, err := os.Stat(*backupDir)
+</span><span class="gi">+       _, err := appFS.Stat(*backupDir)
+</span>        if err != nil {
+                log.Printf(&quot;%s doesn't exist, creating it\n&quot;, *backupDir)
+                err := os.MkdirAll(*backupDir, 0771)
+</pre>
+<p>When we declare <cite>appFS</cite> above outside all functions, it becomes a package level
+variable and we set it to <cite>NewOsFs()</cite> and replace function calls such as <cite>os.Stat</cite> by <cite>appFS.Stat()</cite>. Since the variable name starts with a small letter, this variable is not visible outside the package.</p>
+<p>Then, in the test, I will do:</p>
+<pre class="code go literal-block">
+<span class="nx">appFS</span> <span class="p">=</span> <span class="nx">afero</span><span class="p">.</span><span class="nx">NewMemMapFs</span><span class="p">()</span>
+</pre>
+<p>Hence, all operations will happen in the memory based filesystem rather than the &quot;real&quot; underlying filesystem.</p>
+</div>
+<div class="section" id="testing-shell-commands">
+<h2>Testing shell commands</h2>
+<p>One of the first roadblocks to writing tests I faced was how to test functions which were invoking external programs (<tt class="docutils literal">git</tt> in this case). This post here titled <a class="reference external" href="https://npf.io/2015/06/testing-exec-command/">Testing os/exec.Command</a> had my answer. However, it took me a while to correctly apply it. And that post is still the reference if you want to understand what's going on.</p>
+<p>Here's basically what I did:</p>
+<pre class="code go literal-block">
+<span class="kd">var</span> <span class="nx">execCommand</span> <span class="p">=</span> <span class="nx">exec</span><span class="p">.</span><span class="nx">Command</span>
+<span class="p">..</span>
+
+<span class="kd">func</span> <span class="nx">backUp</span><span class="p">(</span><span class="nx">backupDir</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">repo</span> <span class="o">*</span><span class="nx">Repository</span><span class="p">,</span> <span class="nx">wg</span> <span class="o">*</span><span class="nx">sync</span><span class="p">.</span><span class="nx">WaitGroup</span><span class="p">)</span> <span class="p">([]</span><span class="kt">byte</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+    <span class="o">...</span>
+    <span class="k">if</span> <span class="nx">err</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+        <span class="p">..</span>
+        <span class="nx">cmd</span> <span class="o">:=</span> <span class="nx">execCommand</span><span class="p">(</span><span class="nx">gitCommand</span><span class="p">,</span> <span class="s">&quot;-C&quot;</span><span class="p">,</span> <span class="nx">repoDir</span><span class="p">,</span> <span class="s">&quot;pull&quot;</span><span class="p">)</span>
+        <span class="p">..</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="p">..</span>
+        <span class="nx">cmd</span> <span class="o">:=</span> <span class="nx">execCommand</span><span class="p">(</span><span class="nx">gitCommand</span><span class="p">,</span> <span class="s">&quot;clone&quot;</span><span class="p">,</span> <span class="nx">repo</span><span class="p">.</span><span class="nx">GitURL</span><span class="p">,</span> <span class="nx">repoDir</span><span class="p">)</span>
+        <span class="p">..</span>
+    <span class="p">}</span>
+    <span class="o">...</span>
+<span class="p">}</span>
+</pre>
+<p>We declare a package variable, <tt class="docutils literal">execCommand</tt> which is intialized with <tt class="docutils literal">exec.Command</tt> from the <tt class="docutils literal">os/exec</tt> package. Then, in the tests, I do the following:</p>
+<pre class="code go literal-block">
+<span class="kd">func</span> <span class="nx">TestHelperCloneProcess</span><span class="p">(</span><span class="nx">t</span> <span class="o">*</span><span class="nx">testing</span><span class="p">.</span><span class="nx">T</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="nx">os</span><span class="p">.</span><span class="nx">Getenv</span><span class="p">(</span><span class="s">&quot;GO_WANT_HELPER_PROCESS&quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="s">&quot;1&quot;</span> <span class="p">{</span>
+        <span class="k">return</span>
+    <span class="p">}</span>
+    <span class="c1">// Check that git command was executed
+</span>    <span class="k">if</span> <span class="nx">os</span><span class="p">.</span><span class="nx">Args</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">!=</span> <span class="s">&quot;git&quot;</span> <span class="o">||</span> <span class="nx">os</span><span class="p">.</span><span class="nx">Args</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">!=</span> <span class="s">&quot;clone&quot;</span> <span class="p">{</span>
+        <span class="nx">fmt</span><span class="p">.</span><span class="nx">Fprintf</span><span class="p">(</span><span class="nx">os</span><span class="p">.</span><span class="nx">Stdout</span><span class="p">,</span> <span class="s">&quot;Expected git clone to be executed. Got %v&quot;</span><span class="p">,</span> <span class="nx">os</span><span class="p">.</span><span class="nx">Args</span><span class="p">[</span><span class="mi">3</span><span class="p">:])</span>
+        <span class="nx">os</span><span class="p">.</span><span class="nx">Exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="nx">os</span><span class="p">.</span><span class="nx">Exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="p">}</span>
+
+
+<span class="kd">func</span> <span class="nx">fakeCloneCommand</span><span class="p">(</span><span class="nx">command</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">args</span> <span class="o">...</span><span class="kt">string</span><span class="p">)</span> <span class="p">(</span><span class="nx">cmd</span> <span class="o">*</span><span class="nx">exec</span><span class="p">.</span><span class="nx">Cmd</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">cs</span> <span class="o">:=</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">&quot;-test.run=TestHelperCloneProcess&quot;</span><span class="p">,</span> <span class="s">&quot;--&quot;</span><span class="p">,</span> <span class="nx">command</span><span class="p">}</span>
+    <span class="nx">cs</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">cs</span><span class="p">,</span> <span class="nx">args</span><span class="o">...</span><span class="p">)</span>
+    <span class="nx">cmd</span> <span class="p">=</span> <span class="nx">exec</span><span class="p">.</span><span class="nx">Command</span><span class="p">(</span><span class="nx">os</span><span class="p">.</span><span class="nx">Args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nx">cs</span><span class="o">...</span><span class="p">)</span>
+    <span class="nx">cmd</span><span class="p">.</span><span class="nx">Env</span> <span class="p">=</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">&quot;GO_WANT_HELPER_PROCESS=1&quot;</span><span class="p">}</span>
+    <span class="k">return</span> <span class="nx">cmd</span>
+<span class="p">}</span>
+
+<span class="nx">execCommand</span> <span class="p">=</span> <span class="nx">fakeCloneCommand</span>
+<span class="nx">stdoutStderr</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">backUp</span><span class="p">(</span><span class="nx">backupDir</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">repo</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">wg</span><span class="p">)</span>
+</pre>
+<p>The above is a test for the case where a repository is being backed up for the first
+time via <tt class="docutils literal">git clone</tt>. In the test, before I call the <tt class="docutils literal">backUp()</tt> function which actually executes the command, I set <tt class="docutils literal">execCommand = fakeCloneCommand</tt> so to that <tt class="docutils literal">execCommand</tt> doesn't point to <tt class="docutils literal">os.execCommand</tt> any more. <tt class="docutils literal">fakeCloneCommand</tt>, instead of executing <tt class="docutils literal">git clone</tt> executes <tt class="docutils literal">TestHelperCloneProcess</tt>, where we also check if the command being attempted to execute was <tt class="docutils literal">git clone</tt>.</p>
+<p>We similarly test the operation of a repository's backup being updated via <tt class="docutils literal">git pull</tt>.</p>
+</div>
+<div class="section" id="switching-from-gb-to-standard-go-tooling">
+<h2>Switching from <tt class="docutils literal">gb</tt> to standard go tooling</h2>
+<p>When I was started to write <tt class="docutils literal">gitbackup</tt>, I was still in two minds about whether I like the idea of the standard <tt class="docutils literal">go</tt> tools' requirements of having every Golang project in <tt class="docutils literal">$GOPATH</tt>. Hence, I decided to go with <a class="reference external" href="https://getgb.io">gb</a> because it removed that requirement, as well as allowed me to have a easy way to vendor the third party dependencies and manage them.</p>
+<p>However, as I worked on <tt class="docutils literal">gitbackup</tt> and was finally close to having release binaries, I decided to move away from using <tt class="docutils literal">gb</tt> and also try out <a class="reference external" href="https://github.com/golang/dep">go dep</a> for dependency management.</p>
+<p>This involved two steps. The first was moving all the source from <tt class="docutils literal">src/gitbackup</tt> to the top level directory (<a class="reference external" href="https://github.com/amitsaha/gitbackup/commit/e1932c41eac249a0d3dd8b9e6d6b026cdb663cce">commit</a>). Then, I removed the <tt class="docutils literal">vendor</tt> directory created by <tt class="docutils literal">gb</tt> (<a class="reference external" href="https://github.com/amitsaha/gitbackup/commit/654f52f0cf1cec7bb1fd994bbc75fd8839a2d43c">commit</a>), and used <tt class="docutils literal">dep init</tt> to create a new <tt class="docutils literal">vendor</tt> directory, the <tt class="docutils literal">lock.json</tt> file and <tt class="docutils literal">manifest.json</tt> file. And that's all!</p>
+</div>
+<div class="section" id="creating-release-binaries">
+<h2>Creating release binaries</h2>
+<p>At this stage, <tt class="docutils literal">gitbackup</tt> could be installed with <tt class="docutils literal">go get</tt>, but I wanted to have binaries made available with the 0.1 release. I looked at a few alternatives, but finally I decided upon a bash script (copied from the fish script of <a class="reference external" href="https://github.com/oklog/oklog/blob/master/release.fish">oklog</a>).</p>
+<p>The following script snippet builds binaries for multiple OS and architectures:</p>
+<pre class="code literal-block">
+for pair in linux/386 linux/amd64 linux/arm linux/arm64 darwin/amd64 dragonfly/amd64 freebsd/amd64 netbsd/amd64 openbsd/amd64 windows/amd64; do
+        GOOS=`echo $pair | cut -d'/' -f1`
+        GOARCH=`echo $pair | cut -d'/' -f2`
+        OBJECT_FILE=&quot;gitbackup-$VERSION-$GOOS-$GOARCH&quot;
+        GOOS=$GOOS GOARCH=$GOARCH go build -o &quot;$DISTDIR/$OBJECT_FILE&quot;
+..
+done
+</pre>
+<p>I was very excited about being able to build binaries for different operating systems and architectures via <tt class="docutils literal">go build</tt>!</p>
+</div>
+<div class="section" id="setting-up-continious-testing-for-linux-os-x-and-windows">
+<h2>Setting up continious testing for Linux, OS X and Windows</h2>
+<p>I also setup Travis CI for running the tests on Linux and OS X:</p>
+<pre class="code literal-block">
+language: go
+os:
+  - linux
+  - osx
+go:
+  - 1.7
+  - 1.8
+
+install: true
+script:
+      - cd $GOPATH/src/github.com/amitsaha/gitbackup/
+      - go build
+      - go test -v
+</pre>
+<p>For running tests on Windows via Appveyor, I have the following <tt class="docutils literal">appveyor.yml</tt>:</p>
+<pre class="code literal-block">
+version: &quot;{build}&quot;
+
+# Source Config
+clone_folder: c:\gopath\src\github.com\amitsaha\gitbackup
+
+# Build host
+
+environment:
+  GOPATH: c:\gopath
+  matrix:
+    - environment:
+      GOVERSION: 1.7.5
+    - environment:
+      GOVERSION: 1.8
+
+# Build
+
+install:
+  # Install the specific Go version.
+  - rmdir c:\go /s /q
+  - appveyor DownloadFile https://storage.googleapis.com/golang/go%GOVERSION%.windows-amd64.msi
+  - msiexec /i go%GOVERSION%.windows-amd64.msi /q
+  - set Path=c:\go\bin;c:\gopath\bin;%Path%
+  - go version
+  - go env
+
+build: off
+
+test_script:
+  - cd c:\gopath\src\github.com\amitsaha\gitbackup
+  - go build -o bin\gitbackup.exe
+  - go test -v
+</pre>
+</div>
+<div class="section" id="ending-notes">
+<h2>Ending notes</h2>
+<p><tt class="docutils literal">gitbackup</tt> is mainly an educational project to build a tool which I and hopefully others find useful. I wanted to have reasonable test coverage for it, release binaries for multiple operating systems and architecture and have continuous testing setup on multiple operatng systems. So far, all of these has been successfully achieved.I am looking forward to using <tt class="docutils literal">go dep</tt> more as I get a chance and also happy about making <tt class="docutils literal">gitbackup</tt> compatible with standard go tools out of the box.</p>
+<p>If you get a chance, please <a class="reference external" href="https://github.com/amitsaha/gitbackup#gitbackup---backup-your-github-and-gitlab-repositories">try it out</a> and I welcome any feedback and contributions!</p>
+</div>
+
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+                            <li><a href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+</body>
+</html>

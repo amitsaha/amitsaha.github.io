@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="utf-8" />
+        <title>Programming and Writing about it - Fedora</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Programming and Writing about it Atom Feed" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">Programming and Writing about it </a></h1>
+                <nav><ul>
+                    <li><a href="/pages/about.html">About</a></li>
+                    <li><a href="/pages/articles.html">Articles</a></li>
+                    <li><a href="/pages/books.html">Books</a></li>
+                    <li><a href="/pages/personal-projects.html">Personal Projects</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+
+            <aside id="featured" class="body">
+                <article>
+                    <h1 class="entry-title"><a href="/did-your-fedora-live-cd-build-fail.html">Did your Fedora live cd build fail?</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2016-02-17T11:00:00+10:00">
+                Published: Wed 17 February 2016
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/amit-saha.html">Amit Saha</a>
+        </address>
+<p>In <a href="/category/fedora.html">Fedora</a>.</p>
+
+</footer><!-- /.post-info --><p><em>Update: Changed the Koji URL to reflect the change to livemedia</em></p>
+<p>As the <a class="reference external" href="http://fedora-scientific.readthedocs.org/en/latest/">Fedora Scientific</a> maintainer, I
+have to make sure I look into whether the nightly build is failing so
+that I can look into the why. So far I have been doing that by going to the koji <a class="reference external" href="http://koji.fedoraproject.org/koji/tasks?state=all&amp;view=tree&amp;method=livemedia">url</a>.</p>
+<p>But I think there is a better way - make a program do it
+regularly. First, the program (a Python script):</p>
+<pre class="code literal-block">
+from lxml import html
+import requests
+
+def main():
+   page = requests.get('http://koji.fedoraproject.org/koji/tasks?state=all&amp;view=tree&amp;method=livemedia')
+   tree = html.fromstring(page.content)
+
+   a_class_failed = tree.xpath('//a[&#64;class=&quot;taskfailed&quot;]')
+   for image in  a_class_failed:
+   print image.text
+
+if __name__ == '__main__':
+   main()
+</pre>
+<p>This incidentally happens to be my first scraping program and I got
+the help I needed <a class="reference external" href="http://docs.python-guide.org/en/latest/scenarios/scrape/">here</a>.</p>
+<p>If you install the <tt class="docutils literal">requests</tt> and <tt class="docutils literal">lxml</tt> packages and run the
+script, it will print the list of failing builds.</p>
+<p>Next step: I want to set this up regularly and send me an email. The
+script is <a class="reference external" href="https://github.com/amitsaha/fedora_livecd_build_failed/blob/master/failing_images.py">here</a>.
+As you can see, I have used <a class="reference external" href="https://sendgrid.com/">sendgrid</a> to
+send myself the email using their  <a class="reference external" href="https://github.com/sendgrid/sendgrid-python">Python library</a>. So you will need to
+get an API key to use this program. Before you can use the script,
+please install the dependencies using <tt class="docutils literal">pip install <span class="pre">-r</span>
+requirements.txt</tt> preferably in it's own <a class="reference external" href="http://python-packaging-user-guide.readthedocs.org/en/develop/using-a-virtualenv/">virtualenv</a>.</p>
+<p>I set this up in a cron job as follows:</p>
+<pre class="code literal-block">
+0 8 * * * /home/asaha/.local/share/virtualenvs/koji_scraper/bin/python /home/asaha/work/koji_livecd_scraper/python/failing_images.py
+</pre>
+<p>You will of course have to setup the path correctly for your setup. The script will send me an email every morning at 8 as follows:</p>
+<pre class="code literal-block">
+livecd (rawhide, Fedora-Live-Workstation-x86_64-rawhide, fedora-live-workstation-db37b44.ks)
+
+createLiveCD (rawhide, Fedora-Live-Workstation-x86_64-rawhide-20160216, fedora-live-workstation-db37b44.ks, x86_64)
+
+livecd (rawhide, Fedora-Live-Workstation-i686-rawhide, fedora-live-workstation-db37b44.ks)
+
+createLiveCD (rawhide, Fedora-Live-Workstation-i686-rawhide-20160216, fedora-live-workstation-db37b44.ks, i386)
+
+livecd (rawhide, Fedora-Live-Scientific_KDE-x86_64-rawhide, fedora-live-scientific_kde-db37b44.ks)
+
+createLiveCD (rawhide, Fedora-Live-Scientific_KDE-x86_64-rawhide-20160216, fedora-live-scientific_kde-db37b44.ks, x86_64)
+
+livecd (rawhide, Fedora-Live-Scientific_KDE-i686-rawhide, fedora-live-scientific_kde-db37b44.ks)
+
+createLiveCD (rawhide, Fedora-Live-Scientific_KDE-i686-rawhide-20160216, fedora-live-scientific_kde-db37b44.ks, i386)
+</pre>
+<p>The GitHub repository for the code is available <a class="reference external" href="https://github.com/amitsaha/fedora_livecd_build_failed">here</a>.</p>
+                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/data-only-docker-containers.html" rel="bookmark"
+                           title="Permalink to Data only Docker containers">Data only Docker containers</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2015-12-13T11:00:00+10:00">
+                Published: Sun 13 December 2015
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/amit-saha.html">Amit Saha</a>
+        </address>
+<p>In <a href="/category/fedora.html">Fedora</a>.</p>
+
+</footer><!-- /.post-info -->                <p>In this post, we shall take a look at the idea of data only
+containers - containers whose sole purpose is to exist on the <em>docker
+host</em> so that other containers can have portable access to a
+persistent data volume.</p>
+<div class="section" id="why-do-we-need-a-persistent-data-volume">
+<h2>Why do we need a persistent data volume?</h2>
+<p>We will experiment ...</p></div>
+                <a class="readmore" href="/data-only-docker-containers.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/mounting-a-docker-volume-on-selinux-enabled-host.html" rel="bookmark"
+                           title="Permalink to Mounting a docker volume on SELinux enabled host">Mounting a docker volume on SELinux enabled host</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2015-10-05T11:00:00+10:00">
+                Published: Mon 05 October 2015
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/amit-saha.html">Amit Saha</a>
+        </address>
+<p>In <a href="/category/fedora.html">Fedora</a>.</p>
+
+</footer><!-- /.post-info -->                <p>My workflow with docker usually involves volume mounting a host
+directory so that I can read and write to the host directory from my
+container as a <em>non-root</em> user. On a Fedora 23 host with SELinux
+enabled, this is what I have to do differently:</p>
+<pre class="code literal-block">
+Use: -v /var/dir1:var ...</pre>
+                <a class="readmore" href="/mounting-a-docker-volume-on-selinux-enabled-host.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/standalone-open-source-puppet-setup-on-fedora.html" rel="bookmark"
+                           title="Permalink to Standalone open source puppet setup on Fedora">Standalone open source puppet setup on Fedora</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2015-10-01T14:54:00+10:00">
+                Published: Thu 01 October 2015
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/amit-saha.html">Amit Saha</a>
+        </address>
+<p>In <a href="/category/fedora.html">Fedora</a>.</p>
+
+</footer><!-- /.post-info -->                <p>My goal in this post is to show how to setup puppet in standalone mode on a Fedora 23 system. This setup will allow writing puppet modules and then you can apply them on your local system and check manually and via serverspec tests that they are doing what you ...</p>
+                <a class="readmore" href="/standalone-open-source-puppet-setup-on-fedora.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/fedora-22-scientific.html" rel="bookmark"
+                           title="Permalink to Fedora 22 Scientific">Fedora 22 Scientific</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2015-06-11T10:20:00+10:00">
+                Published: Thu 11 June 2015
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/amit-saha.html">Amit Saha</a>
+        </address>
+<p>In <a href="/category/fedora.html">Fedora</a>.</p>
+
+</footer><!-- /.post-info -->                <p>Fedora 22 was <a class="reference external" href="http://fedoramagazine.org/fedora-22-released/">released recently</a> which also means we
+have a new Fedora Scientific release. <a class="reference external" href="https://labs.fedoraproject.org/en/scientific/">Fedora Scientific</a>
+is now part of <a class="reference external" href="http://fedoramagazine.org/new-websites-fedora-22/">Fedora labs</a>.</p>
+<a class="reference external image-reference" href="https://labs.fedoraproject.org/en/scientific/"><img alt="Featured Applications Image" class="align-center" src="/images/scientific-featured-applications.png" style="width: 650.0px; height: 550.0px;" /></a>
+<p>As you can see, the new home for Fedora Scientific looks
+amazing. The &quot;Featured Applications&quot; section features the most
+important and useful tools in Fedora Scientific. I ...</p>
+                <a class="readmore" href="/fedora-22-scientific.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+                </ol><!-- /#posts-list -->
+                </section><!-- /#content -->
+        <section id="extras" class="body">
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+                            <li><a href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+</body>
+</html>
