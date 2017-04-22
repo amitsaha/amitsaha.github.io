@@ -1,22 +1,14 @@
-:Title: Dissecting golang's HandlerFunc, Handle and DefaultServerMux
+:Title: Dissecting golang's HandlerFunc, Handle and DefaultServeMux
 :Date: 2016-04-17 10:00
 :Category: golang 
 
-The `http.ListenAndServe(..) <https://golang.org/pkg/net/http/#ListenAndServe>`__ function is the most straightforward approach to start a HTTP 1.1 server. The following code does just that:
+The `http.ListenAndServe(..) <https://golang.org/pkg/net/http/#ListenAndServe>`__ function is the most straightforward 
+approach to start a HTTP 1.1 server. The following code does just that:
 
-.. code::
+.. code-include: files/golang_http_server/server1.py
+    :lexer: python
 
-   package main
-
-   import (
-	"log"
-	"net/http"
-   )
-
-   func main() {
-       log.Fatal(http.ListenAndServe(":8080", nil))
-   }
-
+**Question 1**: What is the `nil` second argument above? If not specified, it defaults to `DefaultServeMux`. What is it? We will find out soon.
 
 Now, if we try to send a couple of HTTP GET requests, we will see the following:
 
@@ -29,6 +21,46 @@ Now, if we try to send a couple of HTTP GET requests, we will see the following:
    404 page not found
 
 This is because, we haven't specified how our server should handle requests to GET the root ("/") - our first request or requests to GET the "/status" resource - our second request. Before we see how we could fix that, let's understand *how* the error message "404 page not found" is generated.
+
+The error message is generated from the function below in `src/net/http/server.go` specifically the `NotFoundHandler()` "handler" function:
+
+.. code-inclide: files/golang_http_server/snippet1.go
+    :lexer: golang
+
+
+We will discuss handlers shortly. First, let's consider the function signature of the above handler function: `func (mux *ServeMux) handler(host, path string) (h Handler, pattern string)`. This function is a method belonging to the type `ServeMux`:
+
+.. code-inclide: files/golang_http_server/snippet2.go
+    :lexer: golang
+
+
+**Answer 1**:  Let's now go back to our question 1 we asked: How does `DefaultServeMux` get set when the second argument is `nil`? The following code snippet has the answer:
+
+.. code-inclide: files/golang_http_server/snippet3.go
+    :lexer: golang
+
+
+The above call to `ServeHTTP()` calls the following implementation of `ServeHTTP()`:
+
+.. code-inclide: files/golang_http_server/snippet4.go
+    :lexer: golang
+
+The call to `Handler()` function then calls the following implementation of `Handler()`:
+
+.. code-inclide: files/golang_http_server/snippet5.go
+    :lexer: golang
+
+
+Now, when we make a request to "/" or "/status/", no match is found by the `mux.match()` call above and hence the handler returned is the `NotFoundHandler` whose `ServeHTTP()` function is then called to return the "404 page not found" error message:
+
+.. code-inclide: files/golang_http_server/snippet6.go
+    :lexer: golang
+
+
+
+
+
+
 
 
 
@@ -105,64 +137,6 @@ func (mux *ServeMux) match(path string) (h Handler, pattern string) {
 
 
 
-
-// Handler returns the handler to use for the given request,
-// consulting r.Method, r.Host, and r.URL.Path. It always returns
-// a non-nil handler. If the path is not in its canonical form, the
-// handler will be an internally-generated handler that redirects
-// to the canonical path.
-//
-// Handler also returns the registered pattern that matches the
-// request or, in the case of internally-generated redirects,
-// the pattern that will match after following the redirect.
-//
-// If there is no registered handler that applies to the request,
-// Handler returns a ``page not found'' handler and an empty pattern.
-func (mux *ServeMux) Handler(r *Request) (h Handler, pattern string) {
-	if r.Method != "CONNECT" {
-		if p := cleanPath(r.URL.Path); p != r.URL.Path {
-			_, pattern = mux.handler(r.Host, p)
-			url := *r.URL
-			url.Path = p
-			return RedirectHandler(url.String(), StatusMovedPermanently), pattern
-		}
-	}
-
-	return mux.handler(r.Host, r.URL.Path)
-}
-
-// handler is the main implementation of Handler.
-// The path is known to be in canonical form, except for CONNECT methods.
-func (mux *ServeMux) handler(host, path string) (h Handler, pattern string) {
-	mux.mu.RLock()
-	defer mux.mu.RUnlock()
-
-	// Host-specific pattern takes precedence over generic ones
-	if mux.hosts {
-		h, pattern = mux.match(host + path)
-	}
-	if h == nil {
-		h, pattern = mux.match(path)
-	}
-	if h == nil {
-		h, pattern = NotFoundHandler(), ""
-	}
-	return
-}
-
-// ServeHTTP dispatches the request to the handler whose
-// pattern most closely matches the request URL.
-func (mux *ServeMux) ServeHTTP(w ResponseWriter, r *Request) {
-	if r.RequestURI == "*" {
-		if r.ProtoAtLeast(1, 1) {
-			w.Header().Set("Connection", "close")
-		}
-		w.WriteHeader(StatusBadRequest)
-		return
-	}
-	h, _ := mux.Handler(r)
-	h.ServeHTTP(w, r)
-}
 
 
 // Serve a new connection.
