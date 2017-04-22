@@ -8,9 +8,14 @@ approach to start a HTTP 1.1 server. The following code does just that:
 .. code-include:: files/golang_http_server/server1.go
     :lexer: python
 
-**Question 1**: What is the `nil` second argument above? If not specified, it defaults to `DefaultServeMux`. What is it? We will find out soon.
+What is the `nil` second argument above? The documentation states, that if not specified, 
+it defaults to `DefaultServeMux`.
 
-Now, if we try to send a couple of HTTP GET requests, we will see the following:
+
+What is `DefaultServeMux`?
+==========================
+
+If we run our server above, and send a couple of HTTP GET requests, we will see the following:
 
 .. code::
    
@@ -56,10 +61,10 @@ Now, when we make a request to "/" or "/status/", no match is found by the `mux.
 .. code-include:: files/golang_http_server/snippet6.go
     :lexer: golang
 
+We will discuss how this "magic" happens in the next section.
 
-
-
-
+Registering handlers
+====================
 
 
 
