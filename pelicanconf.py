@@ -31,6 +31,5 @@ ADDTHIS_PROFILE="ra-557910c01cb1eb5c"
 STATIC_PATHS = ['images']
 
 
-PLUGINS = [
-    'pelican_youtube',
-]
+PLUGIN_PATHS = ['/tmp/pelican-plugins']
+PLUGINS = ['code_include', 'pelican_youtube']
