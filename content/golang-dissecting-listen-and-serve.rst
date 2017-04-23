@@ -84,17 +84,6 @@ If we run the server and send the two requests above, we will see the following 
    OK
 
 
-Let's look at what the call to `Handle()` function does:
-
-.. code-include:: files/golang_http_server/snippet7.go
-    :lexer: golang
-
-Now, let's look at what the call to `HandleFunc()` function does:
-
-.. code-include:: files/golang_http_server/snippet8.go
-    :lexer: golang
-
-The call to the ``http.HandleFunc()`` function "converts" the provided function to the ``HandleFunc()`` type and then calls the ``(mux *ServeMux) Handle()`` function similar to what happens when we call the ``Handle()`` function.
 
 Let's now revisit how the right handler function gets called. In a code snippet above, we saw a call to the ``match()`` function which given a path returns the most appropriate registered handler for the path:
 
@@ -102,10 +91,57 @@ Let's now revisit how the right handler function gets called. In a code snippet 
 .. code-include:: files/golang_http_server/snippet9.go
     :lexer: golang
 
-``mux.m`` is a a ``map`` data structure defined in the ``ServeMux`` structure (snippet earlier in the post).
+``mux.m`` is a a ``map`` data structure defined in the ``ServeMux`` structure (snippet earlier in the post) which stores a mapping of a path and the handler we have registered for it.
 
 The HandleFunc() type
 =====================
+
+Let's go back to the idea of "converting" any function with the signature ``func aFunction(w http.ResponseWriter, r *http.Request)`` to the type "HandlerFunc". 
+
+Any type which has a ServeHTTP() method is said to implement the ``Handler`` interface:
+
+.. code::
+
+    type HandlerFunc func(ResponseWriter, *Request)
+
+    // ServeHTTP calls f(w, req).
+    func (f HandlerFunc) ServeHTTP(w ResponseWriter, req *Request) {
+        f(w, req)
+    }
+
+
+Going back to the previous version of our server, we see how we do that:
+
+
+.. code::
+
+    type mytype struct{}
+
+    func (t *mytype) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+        fmt.Fprintf(w, "Hello there from mytype")
+    }
+
+The ``ServeHTTP()`` method of a Handler is invoked when it has been registered as handling a particular path.
+
+Let's look at what the call to `Handle()` function does:
+
+.. code-include:: files/golang_http_server/snippet7.go
+    :lexer: golang
+
+
+It can feel cumbersome to define a type implementing the ``Handler`` interface for every path we want to register a handler for. Hence, a convenience function, ``HandleFunc()`` is provided to register any function which has a specified signature as a Handler function. For example:
+
+.. code::
+
+    http.HandleFunc("/status/", StatusHandler)
+
+Now, let's look at what the call to `HandleFunc()` function does:
+
+.. code-include:: files/golang_http_server/snippet8.go
+    :lexer: golang
+
+The call to the ``http.HandleFunc()`` function "converts" the provided function to the ``HandleFunc()`` type and then calls the ``(mux *ServeMux) Handle()`` function similar to what happens when we call the ``Handle()`` function. The idea of this conversion is explained in the `Effective Go guide <https://golang.org/doc/effective_go.html#interface_methods>`__ and this `blog post <http://jordanorelli.com/post/42369331748/function-types-in-go-golang>`__.
+
 
 
 Using your own Handler with ListenAndServe()

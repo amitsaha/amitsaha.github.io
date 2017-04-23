@@ -178,6 +178,47 @@ Hello there from mytype
 $ curl localhost:8080/status/
 OK
 &lt;/pre&gt;
+&lt;p&gt;Let's now revisit how the right handler function gets called. In a code snippet above, we saw a call to the &lt;tt class="docutils literal"&gt;match()&lt;/tt&gt; function which given a path returns the most appropriate registered handler for the path:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;// Find a handler on a handler map given a path string
+// Most-specific (longest) pattern wins
+func (mux *ServeMux) match(path string) (h Handler, pattern string) {
+        var n = 0
+        for k, v := range mux.m {
+                if !pathMatch(k, path) {
+                        continue
+                }
+                if h == nil || len(k) &amp;gt; n {
+                        n = len(k)
+                        h = v.h
+                        pattern = v.pattern
+                }
+        }
+        return
+}
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;&lt;tt class="docutils literal"&gt;mux.m&lt;/tt&gt; is a a &lt;tt class="docutils literal"&gt;map&lt;/tt&gt; data structure defined in the &lt;tt class="docutils literal"&gt;ServeMux&lt;/tt&gt; structure (snippet earlier in the post) which stores a mapping of a path and the handler we have registered for it.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="the-handlefunc-type"&gt;
+&lt;h2&gt;The HandleFunc() type&lt;/h2&gt;
+&lt;p&gt;Let's go back to the idea of &amp;quot;converting&amp;quot; any function with the signature &lt;tt class="docutils literal"&gt;func aFunction(w http.ResponseWriter, r *http.Request)&lt;/tt&gt; to the type &amp;quot;HandlerFunc&amp;quot;.&lt;/p&gt;
+&lt;p&gt;Any type which has a ServeHTTP() method is said to implement the &lt;tt class="docutils literal"&gt;Handler&lt;/tt&gt; interface:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+type HandlerFunc func(ResponseWriter, *Request)
+
+// ServeHTTP calls f(w, req).
+func (f HandlerFunc) ServeHTTP(w ResponseWriter, req *Request) {
+    f(w, req)
+}
+&lt;/pre&gt;
+&lt;p&gt;Going back to the previous version of our server, we see how we do that:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+type mytype struct{}
+
+func (t *mytype) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+    fmt.Fprintf(w, &amp;quot;Hello there from mytype&amp;quot;)
+}
+&lt;/pre&gt;
+&lt;p&gt;The &lt;tt class="docutils literal"&gt;ServeHTTP()&lt;/tt&gt; method of a Handler is invoked when it has been registered as handling a particular path.&lt;/p&gt;
 &lt;p&gt;Let's look at what the call to &lt;cite&gt;Handle()&lt;/cite&gt; function does:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;// Handle registers the handler for the given pattern
 // in the DefaultServeMux.
@@ -227,6 +268,10 @@ func (mux *ServeMux) Handle(pattern string, handler Handler) {
         }
 }
 &lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;It can feel cumbersome to define a type implementing the &lt;tt class="docutils literal"&gt;Handler&lt;/tt&gt; interface for every path we want to register a handler for. Hence, a convenience function, &lt;tt class="docutils literal"&gt;HandleFunc()&lt;/tt&gt; is provided to register any function which has a specified signature as a Handler function. For example:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+http.HandleFunc(&amp;quot;/status/&amp;quot;, StatusHandler)
+&lt;/pre&gt;
 &lt;p&gt;Now, let's look at what the call to &lt;cite&gt;HandleFunc()&lt;/cite&gt; function does:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;// HandleFunc registers the handler function for the given pattern
 // in the DefaultServeMux.
@@ -252,25 +297,13 @@ func (f HandlerFunc) ServeHTTP(w ResponseWriter, req *Request) {
     f(w, req)
 }
 &lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;The call to the &lt;tt class="docutils literal"&gt;http.HandleFunc()&lt;/tt&gt; function &amp;quot;converts&amp;quot; the provided function to the &lt;tt class="docutils literal"&gt;HandleFunc()&lt;/tt&gt; type and then calls the &lt;tt class="docutils literal"&gt;(mux *ServeMux) Handle()&lt;/tt&gt; function similar to what happens when we call the &lt;tt class="docutils literal"&gt;Handle()&lt;/tt&gt; function.&lt;/p&gt;
-&lt;p&gt;Let's now revisit how the right handler function ges called. In a code snippet above, we saw a call to the &lt;tt class="docutils literal"&gt;match()&lt;/tt&gt; function which given a path returns the most appropriate registered handler for the path:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;// Find a handler on a handler map given a path string
-// Most-specific (longest) pattern wins
-func (mux *ServeMux) match(path string) (h Handler, pattern string) {
-        var n = 0
-        for k, v := range mux.m {
-                if !pathMatch(k, path) {
-                        continue
-                }
-                if h == nil || len(k) &amp;gt; n {
-                        n = len(k)
-                        h = v.h
-                        pattern = v.pattern
-                }
-        }
-        return
-}
-&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;The call to the &lt;tt class="docutils literal"&gt;http.HandleFunc()&lt;/tt&gt; function &amp;quot;converts&amp;quot; the provided function to the &lt;tt class="docutils literal"&gt;HandleFunc()&lt;/tt&gt; type and then calls the &lt;tt class="docutils literal"&gt;(mux *ServeMux) Handle()&lt;/tt&gt; function similar to what happens when we call the &lt;tt class="docutils literal"&gt;Handle()&lt;/tt&gt; function. The idea of this conversion is explained in the &lt;a class="reference external" href="https://golang.org/doc/effective_go.html#interface_methods"&gt;Effective Go guide&lt;/a&gt; and this &lt;a class="reference external" href="http://jordanorelli.com/post/42369331748/function-types-in-go-golang"&gt;blog post&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="using-your-own-handler-with-listenandserve"&gt;
+&lt;h2&gt;Using your own Handler with ListenAndServe()&lt;/h2&gt;
+&lt;/div&gt;
+&lt;div class="section" id="writing-middleware"&gt;
+&lt;h2&gt;Writing Middleware&lt;/h2&gt;
 &lt;/div&gt;
 &lt;div class="section" id="learn-more"&gt;
 &lt;h2&gt;Learn more&lt;/h2&gt;

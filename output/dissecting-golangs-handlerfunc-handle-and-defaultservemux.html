@@ -220,6 +220,47 @@ Hello there from mytype
 $ curl localhost:8080/status/
 OK
 </pre>
+<p>Let's now revisit how the right handler function gets called. In a code snippet above, we saw a call to the <tt class="docutils literal">match()</tt> function which given a path returns the most appropriate registered handler for the path:</p>
+<div class="highlight"><pre><span></span>// Find a handler on a handler map given a path string
+// Most-specific (longest) pattern wins
+func (mux *ServeMux) match(path string) (h Handler, pattern string) {
+        var n = 0
+        for k, v := range mux.m {
+                if !pathMatch(k, path) {
+                        continue
+                }
+                if h == nil || len(k) &gt; n {
+                        n = len(k)
+                        h = v.h
+                        pattern = v.pattern
+                }
+        }
+        return
+}
+</pre></div>
+<p><tt class="docutils literal">mux.m</tt> is a a <tt class="docutils literal">map</tt> data structure defined in the <tt class="docutils literal">ServeMux</tt> structure (snippet earlier in the post) which stores a mapping of a path and the handler we have registered for it.</p>
+</div>
+<div class="section" id="the-handlefunc-type">
+<h2>The HandleFunc() type</h2>
+<p>Let's go back to the idea of &quot;converting&quot; any function with the signature <tt class="docutils literal">func aFunction(w http.ResponseWriter, r *http.Request)</tt> to the type &quot;HandlerFunc&quot;.</p>
+<p>Any type which has a ServeHTTP() method is said to implement the <tt class="docutils literal">Handler</tt> interface:</p>
+<pre class="code literal-block">
+type HandlerFunc func(ResponseWriter, *Request)
+
+// ServeHTTP calls f(w, req).
+func (f HandlerFunc) ServeHTTP(w ResponseWriter, req *Request) {
+    f(w, req)
+}
+</pre>
+<p>Going back to the previous version of our server, we see how we do that:</p>
+<pre class="code literal-block">
+type mytype struct{}
+
+func (t *mytype) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+    fmt.Fprintf(w, &quot;Hello there from mytype&quot;)
+}
+</pre>
+<p>The <tt class="docutils literal">ServeHTTP()</tt> method of a Handler is invoked when it has been registered as handling a particular path.</p>
 <p>Let's look at what the call to <cite>Handle()</cite> function does:</p>
 <div class="highlight"><pre><span></span>// Handle registers the handler for the given pattern
 // in the DefaultServeMux.
@@ -269,6 +310,10 @@ func (mux *ServeMux) Handle(pattern string, handler Handler) {
         }
 }
 </pre></div>
+<p>It can feel cumbersome to define a type implementing the <tt class="docutils literal">Handler</tt> interface for every path we want to register a handler for. Hence, a convenience function, <tt class="docutils literal">HandleFunc()</tt> is provided to register any function which has a specified signature as a Handler function. For example:</p>
+<pre class="code literal-block">
+http.HandleFunc(&quot;/status/&quot;, StatusHandler)
+</pre>
 <p>Now, let's look at what the call to <cite>HandleFunc()</cite> function does:</p>
 <div class="highlight"><pre><span></span>// HandleFunc registers the handler function for the given pattern
 // in the DefaultServeMux.
@@ -294,25 +339,13 @@ func (f HandlerFunc) ServeHTTP(w ResponseWriter, req *Request) {
     f(w, req)
 }
 </pre></div>
-<p>The call to the <tt class="docutils literal">http.HandleFunc()</tt> function &quot;converts&quot; the provided function to the <tt class="docutils literal">HandleFunc()</tt> type and then calls the <tt class="docutils literal">(mux *ServeMux) Handle()</tt> function similar to what happens when we call the <tt class="docutils literal">Handle()</tt> function.</p>
-<p>Let's now revisit how the right handler function ges called. In a code snippet above, we saw a call to the <tt class="docutils literal">match()</tt> function which given a path returns the most appropriate registered handler for the path:</p>
-<div class="highlight"><pre><span></span>// Find a handler on a handler map given a path string
-// Most-specific (longest) pattern wins
-func (mux *ServeMux) match(path string) (h Handler, pattern string) {
-        var n = 0
-        for k, v := range mux.m {
-                if !pathMatch(k, path) {
-                        continue
-                }
-                if h == nil || len(k) &gt; n {
-                        n = len(k)
-                        h = v.h
-                        pattern = v.pattern
-                }
-        }
-        return
-}
-</pre></div>
+<p>The call to the <tt class="docutils literal">http.HandleFunc()</tt> function &quot;converts&quot; the provided function to the <tt class="docutils literal">HandleFunc()</tt> type and then calls the <tt class="docutils literal">(mux *ServeMux) Handle()</tt> function similar to what happens when we call the <tt class="docutils literal">Handle()</tt> function. The idea of this conversion is explained in the <a class="reference external" href="https://golang.org/doc/effective_go.html#interface_methods">Effective Go guide</a> and this <a class="reference external" href="http://jordanorelli.com/post/42369331748/function-types-in-go-golang">blog post</a>.</p>
+</div>
+<div class="section" id="using-your-own-handler-with-listenandserve">
+<h2>Using your own Handler with ListenAndServe()</h2>
+</div>
+<div class="section" id="writing-middleware">
+<h2>Writing Middleware</h2>
 </div>
 <div class="section" id="learn-more">
 <h2>Learn more</h2>
