@@ -164,11 +164,11 @@ Writing Middleware
 .. code-include:: files/golang_http_server/server4.go
     :lexer: go
 
-https://gocodecloud.com/blog/2016/11/15/simple-golang-http-request-context-example/
 
 Learn more
 ==========
 
+- https://gocodecloud.com/blog/2016/11/15/simple-golang-http-request-context-example/
 - http://jordanorelli.com/post/42369331748/function-types-in-go-golang
 - https://golang.org/doc/effective_go.html#interface_methods
 
