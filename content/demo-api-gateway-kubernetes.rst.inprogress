@@ -341,6 +341,14 @@ rpc-app-1    10.0.0.30    <none>        6000/TCP   17s
 webapp-1     10.0.0.46    <none>        80/TCP     8d
 webapp1      10.0.0.91    <none>        80/TCP     8d
 
+API gateway: Deploying the API gateway
+=====================================
+
+$ cd apigatewaydemo/apigateway
+$ docker build -t amitsaha/apigateway .
+..
+
+
 
 What's running on port 443 kubernetes?
 ======================================
