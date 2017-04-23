@@ -67,150 +67,150 @@ $ curl localhost:8080/status/
 </pre>
 <p>This is because, we haven't specified how our server should handle requests to GET the root (&quot;/&quot;) - our first request or requests to GET the &quot;/status&quot; resource - our second request. Before we see how we could fix that, let's understand <em>how</em> the error message &quot;404 page not found&quot; is generated.</p>
 <p>The error message is generated from the function below in <cite>src/net/http/server.go</cite> specifically the <cite>NotFoundHandler()</cite> &quot;handler&quot; function:</p>
-<div class="highlight"><pre><span></span>// handler is the main implementation of Handler.
-// The path is known to be in canonical form, except for CONNECT methods.
-func (mux *ServeMux) handler(host, path string) (h Handler, pattern string) {
-        mux.mu.RLock()
-        defer mux.mu.RUnlock()
+<div class="highlight"><pre><span></span><span class="c1">// handler is the main implementation of Handler.</span>
+<span class="c1">// The path is known to be in canonical form, except for CONNECT methods.</span>
+<span class="kd">func</span> <span class="p">(</span><span class="nx">mux</span> <span class="o">*</span><span class="nx">ServeMux</span><span class="p">)</span> <span class="nx">handler</span><span class="p">(</span><span class="nx">host</span><span class="p">,</span> <span class="nx">path</span> <span class="kt">string</span><span class="p">)</span> <span class="p">(</span><span class="nx">h</span> <span class="nx">Handler</span><span class="p">,</span> <span class="nx">pattern</span> <span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">mux</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nx">RLock</span><span class="p">()</span>
+        <span class="k">defer</span> <span class="nx">mux</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nx">RUnlock</span><span class="p">()</span>
 
-        // Host-specific pattern takes precedence over generic ones
-        if mux.hosts {
-                h, pattern = mux.match(host + path)
-        }
-        if h == nil {
-                h, pattern = mux.match(path)
-        }
-        if h == nil {
-                h, pattern = NotFoundHandler(), &quot;&quot;
-        }
-        return
-}
+        <span class="c1">// Host-specific pattern takes precedence over generic ones</span>
+        <span class="k">if</span> <span class="nx">mux</span><span class="p">.</span><span class="nx">hosts</span> <span class="p">{</span>
+                <span class="nx">h</span><span class="p">,</span> <span class="nx">pattern</span> <span class="p">=</span> <span class="nx">mux</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="nx">host</span> <span class="o">+</span> <span class="nx">path</span><span class="p">)</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="nx">h</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+                <span class="nx">h</span><span class="p">,</span> <span class="nx">pattern</span> <span class="p">=</span> <span class="nx">mux</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="nx">path</span><span class="p">)</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="nx">h</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+                <span class="nx">h</span><span class="p">,</span> <span class="nx">pattern</span> <span class="p">=</span> <span class="nx">NotFoundHandler</span><span class="p">(),</span> <span class="s">&quot;&quot;</span>
+        <span class="p">}</span>
+        <span class="k">return</span>
+<span class="p">}</span>
 </pre></div>
 <p>Now, let's roughly see how our GET request above reaches the above function. Let us consider the function signature of the above handler function: <cite>func (mux *ServeMux) handler(host, path string) (h Handler, pattern string)</cite>.</p>
 <p>This function is a method belonging to the type <cite>ServeMux</cite>:</p>
-<div class="highlight"><pre><span></span>// ServeMux also takes care of sanitizing the URL request path,
-// redirecting any request containing . or .. elements or repeated slashes
-// to an equivalent, cleaner URL.
-type ServeMux struct {
-        mu    sync.RWMutex
-        m     map[string]muxEntry
-        hosts bool // whether any patterns contain hostnames
-}
+<div class="highlight"><pre><span></span><span class="c1">// ServeMux also takes care of sanitizing the URL request path,</span>
+<span class="c1">// redirecting any request containing . or .. elements or repeated slashes</span>
+<span class="c1">// to an equivalent, cleaner URL.</span>
+<span class="kd">type</span> <span class="nx">ServeMux</span> <span class="kd">struct</span> <span class="p">{</span>
+        <span class="nx">mu</span>    <span class="nx">sync</span><span class="p">.</span><span class="nx">RWMutex</span>
+        <span class="nx">m</span>     <span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="nx">muxEntry</span>
+        <span class="nx">hosts</span> <span class="kt">bool</span> <span class="c1">// whether any patterns contain hostnames</span>
+<span class="p">}</span>
 
-type muxEntry struct {
-        explicit bool
-        h        Handler
-        pattern  string
-}
+<span class="kd">type</span> <span class="nx">muxEntry</span> <span class="kd">struct</span> <span class="p">{</span>
+        <span class="nx">explicit</span> <span class="kt">bool</span>
+        <span class="nx">h</span>        <span class="nx">Handler</span>
+        <span class="nx">pattern</span>  <span class="kt">string</span>
+<span class="p">}</span>
 
-// NewServeMux allocates and returns a new ServeMux.
-func NewServeMux() *ServeMux { return new(ServeMux) }
+<span class="c1">// NewServeMux allocates and returns a new ServeMux.</span>
+<span class="kd">func</span> <span class="nx">NewServeMux</span><span class="p">()</span> <span class="o">*</span><span class="nx">ServeMux</span> <span class="p">{</span> <span class="k">return</span> <span class="nb">new</span><span class="p">(</span><span class="nx">ServeMux</span><span class="p">)</span> <span class="p">}</span>
 
-// DefaultServeMux is the default ServeMux used by Serve.
-var DefaultServeMux = &amp;defaultServeMux
+<span class="c1">// DefaultServeMux is the default ServeMux used by Serve.</span>
+<span class="kd">var</span> <span class="nx">DefaultServeMux</span> <span class="p">=</span> <span class="o">&amp;</span><span class="nx">defaultServeMux</span>
 
-var defaultServeMux ServeMux
+<span class="kd">var</span> <span class="nx">defaultServeMux</span> <span class="nx">ServeMux</span>
 </pre></div>
 <p>So, how does <cite>DefaultServeMux</cite> get set when the second argument to <cite>ListenAndServe()</cite> is <cite>nil</cite>? The following code snippet has the answer:</p>
-<div class="highlight"><pre><span></span>func (sh serverHandler) ServeHTTP(rw ResponseWriter, req *Request) {
-        handler := sh.srv.Handler
-        if handler == nil {
-                handler = DefaultServeMux
-        }
-        if req.RequestURI == &quot;*&quot; &amp;&amp; req.Method == &quot;OPTIONS&quot; {
-                handler = globalOptionsHandler{}
-        }
-        handler.ServeHTTP(rw, req)
-}
+<div class="highlight"><pre><span></span><span class="kd">func</span> <span class="p">(</span><span class="nx">sh</span> <span class="nx">serverHandler</span><span class="p">)</span> <span class="nx">ServeHTTP</span><span class="p">(</span><span class="nx">rw</span> <span class="nx">ResponseWriter</span><span class="p">,</span> <span class="nx">req</span> <span class="o">*</span><span class="nx">Request</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">handler</span> <span class="o">:=</span> <span class="nx">sh</span><span class="p">.</span><span class="nx">srv</span><span class="p">.</span><span class="nx">Handler</span>
+        <span class="k">if</span> <span class="nx">handler</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+                <span class="nx">handler</span> <span class="p">=</span> <span class="nx">DefaultServeMux</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="nx">req</span><span class="p">.</span><span class="nx">RequestURI</span> <span class="o">==</span> <span class="s">&quot;*&quot;</span> <span class="o">&amp;&amp;</span> <span class="nx">req</span><span class="p">.</span><span class="nx">Method</span> <span class="o">==</span> <span class="s">&quot;OPTIONS&quot;</span> <span class="p">{</span>
+                <span class="nx">handler</span> <span class="p">=</span> <span class="nx">globalOptionsHandler</span><span class="p">{}</span>
+        <span class="p">}</span>
+        <span class="nx">handler</span><span class="p">.</span><span class="nx">ServeHTTP</span><span class="p">(</span><span class="nx">rw</span><span class="p">,</span> <span class="nx">req</span><span class="p">)</span>
+<span class="p">}</span>
 </pre></div>
 <p>The above call to <cite>ServeHTTP()</cite> calls the following implementation of <cite>ServeHTTP()</cite>:</p>
-<div class="highlight"><pre><span></span>// ServeHTTP dispatches the request to the handler whose
-// pattern most closely matches the request URL.
-func (mux *ServeMux) ServeHTTP(w ResponseWriter, r *Request) {
-        if r.RequestURI == &quot;*&quot; {
-                if r.ProtoAtLeast(1, 1) {
-                        w.Header().Set(&quot;Connection&quot;, &quot;close&quot;)
-                }
-                w.WriteHeader(StatusBadRequest)
-                return
-        }
-        h, _ := mux.Handler(r)
-        h.ServeHTTP(w, r)
-}
+<div class="highlight"><pre><span></span><span class="c1">// ServeHTTP dispatches the request to the handler whose</span>
+<span class="c1">// pattern most closely matches the request URL.</span>
+<span class="kd">func</span> <span class="p">(</span><span class="nx">mux</span> <span class="o">*</span><span class="nx">ServeMux</span><span class="p">)</span> <span class="nx">ServeHTTP</span><span class="p">(</span><span class="nx">w</span> <span class="nx">ResponseWriter</span><span class="p">,</span> <span class="nx">r</span> <span class="o">*</span><span class="nx">Request</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="nx">r</span><span class="p">.</span><span class="nx">RequestURI</span> <span class="o">==</span> <span class="s">&quot;*&quot;</span> <span class="p">{</span>
+                <span class="k">if</span> <span class="nx">r</span><span class="p">.</span><span class="nx">ProtoAtLeast</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+                        <span class="nx">w</span><span class="p">.</span><span class="nx">Header</span><span class="p">().</span><span class="nx">Set</span><span class="p">(</span><span class="s">&quot;Connection&quot;</span><span class="p">,</span> <span class="s">&quot;close&quot;</span><span class="p">)</span>
+                <span class="p">}</span>
+                <span class="nx">w</span><span class="p">.</span><span class="nx">WriteHeader</span><span class="p">(</span><span class="nx">StatusBadRequest</span><span class="p">)</span>
+                <span class="k">return</span>
+        <span class="p">}</span>
+        <span class="nx">h</span><span class="p">,</span> <span class="nx">_</span> <span class="o">:=</span> <span class="nx">mux</span><span class="p">.</span><span class="nx">Handler</span><span class="p">(</span><span class="nx">r</span><span class="p">)</span>
+        <span class="nx">h</span><span class="p">.</span><span class="nx">ServeHTTP</span><span class="p">(</span><span class="nx">w</span><span class="p">,</span> <span class="nx">r</span><span class="p">)</span>
+<span class="p">}</span>
 </pre></div>
 <p>The call to <cite>Handler()</cite> function then calls the following implementation:</p>
-<div class="highlight"><pre><span></span>// If there is no registered handler that applies to the request,
-// Handler returns a ``page not found&#39;&#39; handler and an empty pattern.
-func (mux *ServeMux) Handler(r *Request) (h Handler, pattern string) {
-        if r.Method != &quot;CONNECT&quot; {
-                if p := cleanPath(r.URL.Path); p != r.URL.Path {
-                        _, pattern = mux.handler(r.Host, p)
-                        url := *r.URL
-                        url.Path = p
-                        return RedirectHandler(url.String(), StatusMovedPermanently), pattern
-                }
-        }
+<div class="highlight"><pre><span></span><span class="c1">// If there is no registered handler that applies to the request,</span>
+<span class="c1">// Handler returns a ``page not found&#39;&#39; handler and an empty pattern.</span>
+<span class="kd">func</span> <span class="p">(</span><span class="nx">mux</span> <span class="o">*</span><span class="nx">ServeMux</span><span class="p">)</span> <span class="nx">Handler</span><span class="p">(</span><span class="nx">r</span> <span class="o">*</span><span class="nx">Request</span><span class="p">)</span> <span class="p">(</span><span class="nx">h</span> <span class="nx">Handler</span><span class="p">,</span> <span class="nx">pattern</span> <span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="nx">r</span><span class="p">.</span><span class="nx">Method</span> <span class="o">!=</span> <span class="s">&quot;CONNECT&quot;</span> <span class="p">{</span>
+                <span class="k">if</span> <span class="nx">p</span> <span class="o">:=</span> <span class="nx">cleanPath</span><span class="p">(</span><span class="nx">r</span><span class="p">.</span><span class="nx">URL</span><span class="p">.</span><span class="nx">Path</span><span class="p">);</span> <span class="nx">p</span> <span class="o">!=</span> <span class="nx">r</span><span class="p">.</span><span class="nx">URL</span><span class="p">.</span><span class="nx">Path</span> <span class="p">{</span>
+                        <span class="nx">_</span><span class="p">,</span> <span class="nx">pattern</span> <span class="p">=</span> <span class="nx">mux</span><span class="p">.</span><span class="nx">handler</span><span class="p">(</span><span class="nx">r</span><span class="p">.</span><span class="nx">Host</span><span class="p">,</span> <span class="nx">p</span><span class="p">)</span>
+                        <span class="nx">url</span> <span class="o">:=</span> <span class="o">*</span><span class="nx">r</span><span class="p">.</span><span class="nx">URL</span>
+                        <span class="nx">url</span><span class="p">.</span><span class="nx">Path</span> <span class="p">=</span> <span class="nx">p</span>
+                        <span class="k">return</span> <span class="nx">RedirectHandler</span><span class="p">(</span><span class="nx">url</span><span class="p">.</span><span class="nx">String</span><span class="p">(),</span> <span class="nx">StatusMovedPermanently</span><span class="p">),</span> <span class="nx">pattern</span>
+                <span class="p">}</span>
+        <span class="p">}</span>
 
-        return mux.handler(r.Host, r.URL.Path)
-}
+        <span class="k">return</span> <span class="nx">mux</span><span class="p">.</span><span class="nx">handler</span><span class="p">(</span><span class="nx">r</span><span class="p">.</span><span class="nx">Host</span><span class="p">,</span> <span class="nx">r</span><span class="p">.</span><span class="nx">URL</span><span class="p">.</span><span class="nx">Path</span><span class="p">)</span>
+<span class="p">}</span>
 
-// handler is the main implementation of Handler.
-// The path is known to be in canonical form, except for CONNECT methods.
-func (mux *ServeMux) handler(host, path string) (h Handler, pattern string) {
-        mux.mu.RLock()
-        defer mux.mu.RUnlock()
+<span class="c1">// handler is the main implementation of Handler.</span>
+<span class="c1">// The path is known to be in canonical form, except for CONNECT methods.</span>
+<span class="kd">func</span> <span class="p">(</span><span class="nx">mux</span> <span class="o">*</span><span class="nx">ServeMux</span><span class="p">)</span> <span class="nx">handler</span><span class="p">(</span><span class="nx">host</span><span class="p">,</span> <span class="nx">path</span> <span class="kt">string</span><span class="p">)</span> <span class="p">(</span><span class="nx">h</span> <span class="nx">Handler</span><span class="p">,</span> <span class="nx">pattern</span> <span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">mux</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nx">RLock</span><span class="p">()</span>
+        <span class="k">defer</span> <span class="nx">mux</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nx">RUnlock</span><span class="p">()</span>
 
-        // Host-specific pattern takes precedence over generic ones
-        if mux.hosts {
-                h, pattern = mux.match(host + path)
-        }
-        if h == nil {
-                h, pattern = mux.match(path)
-        }
-        if h == nil {
-                h, pattern = NotFoundHandler(), &quot;&quot;
-        }
-        return
-}
+        <span class="c1">// Host-specific pattern takes precedence over generic ones</span>
+        <span class="k">if</span> <span class="nx">mux</span><span class="p">.</span><span class="nx">hosts</span> <span class="p">{</span>
+                <span class="nx">h</span><span class="p">,</span> <span class="nx">pattern</span> <span class="p">=</span> <span class="nx">mux</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="nx">host</span> <span class="o">+</span> <span class="nx">path</span><span class="p">)</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="nx">h</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+                <span class="nx">h</span><span class="p">,</span> <span class="nx">pattern</span> <span class="p">=</span> <span class="nx">mux</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="nx">path</span><span class="p">)</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="nx">h</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+                <span class="nx">h</span><span class="p">,</span> <span class="nx">pattern</span> <span class="p">=</span> <span class="nx">NotFoundHandler</span><span class="p">(),</span> <span class="s">&quot;&quot;</span>
+        <span class="p">}</span>
+        <span class="k">return</span>
+<span class="p">}</span>
 </pre></div>
 <p>Now, when we make a request to &quot;/&quot; or &quot;/status/&quot;, no match is found by the <cite>mux.match()</cite> call above and hence the handler returned is the <cite>NotFoundHandler</cite> whose <cite>ServeHTTP()</cite> function is then called to return the &quot;404 page not found&quot; error message:</p>
-<div class="highlight"><pre><span></span>// NotFound replies to the request with an HTTP 404 not found error.
-func NotFound(w ResponseWriter, r *Request) { Error(w, &quot;404 page not found&quot;, StatusNotFound) }
+<div class="highlight"><pre><span></span><span class="c1">// NotFound replies to the request with an HTTP 404 not found error.</span>
+<span class="kd">func</span> <span class="nx">NotFound</span><span class="p">(</span><span class="nx">w</span> <span class="nx">ResponseWriter</span><span class="p">,</span> <span class="nx">r</span> <span class="o">*</span><span class="nx">Request</span><span class="p">)</span> <span class="p">{</span> <span class="nx">Error</span><span class="p">(</span><span class="nx">w</span><span class="p">,</span> <span class="s">&quot;404 page not found&quot;</span><span class="p">,</span> <span class="nx">StatusNotFound</span><span class="p">)</span> <span class="p">}</span>
 
-// NotFoundHandler returns a simple request handler
-// that replies to each request with a ``404 page not found&#39;&#39; reply.
-func NotFoundHandler() Handler { return HandlerFunc(NotFound) }
+<span class="c1">// NotFoundHandler returns a simple request handler</span>
+<span class="c1">// that replies to each request with a ``404 page not found&#39;&#39; reply.</span>
+<span class="kd">func</span> <span class="nx">NotFoundHandler</span><span class="p">()</span> <span class="nx">Handler</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">HandlerFunc</span><span class="p">(</span><span class="nx">NotFound</span><span class="p">)</span> <span class="p">}</span>
 </pre></div>
 <p>We will discuss how this &quot;magic&quot; happens in the next section.</p>
 </div>
 <div class="section" id="registering-handlers">
 <h2>Registering handlers</h2>
 <p>Let's now update our server code to handle &quot;/&quot; and &quot;/status/&quot;:</p>
-<div class="highlight"><pre><span></span>package main
+<div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nx">main</span>
 
-import &quot;net/http&quot;
-import &quot;fmt&quot;
+<span class="kn">import</span> <span class="s">&quot;net/http&quot;</span>
+<span class="kn">import</span> <span class="s">&quot;fmt&quot;</span>
 
-type mytype struct{}
+<span class="kd">type</span> <span class="nx">mytype</span> <span class="kd">struct</span><span class="p">{}</span>
 
-func (t *mytype) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-        fmt.Fprintf(w, &quot;Hello there from mytype&quot;)
-}
+<span class="kd">func</span> <span class="p">(</span><span class="nx">t</span> <span class="o">*</span><span class="nx">mytype</span><span class="p">)</span> <span class="nx">ServeHTTP</span><span class="p">(</span><span class="nx">w</span> <span class="nx">http</span><span class="p">.</span><span class="nx">ResponseWriter</span><span class="p">,</span> <span class="nx">r</span> <span class="o">*</span><span class="nx">http</span><span class="p">.</span><span class="nx">Request</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">fmt</span><span class="p">.</span><span class="nx">Fprintf</span><span class="p">(</span><span class="nx">w</span><span class="p">,</span> <span class="s">&quot;Hello there from mytype&quot;</span><span class="p">)</span>
+<span class="p">}</span>
 
 
-func StatusHandler(w http.ResponseWriter, r *http.Request) {
-        fmt.Fprintf(w, &quot;OK&quot;)
-}
+<span class="kd">func</span> <span class="nx">StatusHandler</span><span class="p">(</span><span class="nx">w</span> <span class="nx">http</span><span class="p">.</span><span class="nx">ResponseWriter</span><span class="p">,</span> <span class="nx">r</span> <span class="o">*</span><span class="nx">http</span><span class="p">.</span><span class="nx">Request</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">fmt</span><span class="p">.</span><span class="nx">Fprintf</span><span class="p">(</span><span class="nx">w</span><span class="p">,</span> <span class="s">&quot;OK&quot;</span><span class="p">)</span>
+<span class="p">}</span>
 
-func main() {
+<span class="kd">func</span> <span class="nx">main</span><span class="p">()</span> <span class="p">{</span>
 
-        t := new(mytype)
-        http.Handle(&quot;/&quot;, t)
+        <span class="nx">t</span> <span class="o">:=</span> <span class="nb">new</span><span class="p">(</span><span class="nx">mytype</span><span class="p">)</span>
+        <span class="nx">http</span><span class="p">.</span><span class="nx">Handle</span><span class="p">(</span><span class="s">&quot;/&quot;</span><span class="p">,</span> <span class="nx">t</span><span class="p">)</span>
 
-        http.HandleFunc(&quot;/status/&quot;, StatusHandler)
+        <span class="nx">http</span><span class="p">.</span><span class="nx">HandleFunc</span><span class="p">(</span><span class="s">&quot;/status/&quot;</span><span class="p">,</span> <span class="nx">StatusHandler</span><span class="p">)</span>
 
-        http.ListenAndServe(&quot;:8080&quot;, nil)
-}
+        <span class="nx">http</span><span class="p">.</span><span class="nx">ListenAndServe</span><span class="p">(</span><span class="s">&quot;:8080&quot;</span><span class="p">,</span> <span class="kc">nil</span><span class="p">)</span>
+<span class="p">}</span>
 </pre></div>
 <p>If we run the server and send the two requests above, we will see the following responses:</p>
 <pre class="code literal-block">
@@ -221,22 +221,22 @@ $ curl localhost:8080/status/
 OK
 </pre>
 <p>Let's now revisit how the right handler function gets called. In a code snippet above, we saw a call to the <tt class="docutils literal">match()</tt> function which given a path returns the most appropriate registered handler for the path:</p>
-<div class="highlight"><pre><span></span>// Find a handler on a handler map given a path string
-// Most-specific (longest) pattern wins
-func (mux *ServeMux) match(path string) (h Handler, pattern string) {
-        var n = 0
-        for k, v := range mux.m {
-                if !pathMatch(k, path) {
-                        continue
-                }
-                if h == nil || len(k) &gt; n {
-                        n = len(k)
-                        h = v.h
-                        pattern = v.pattern
-                }
-        }
-        return
-}
+<div class="highlight"><pre><span></span><span class="c1">// Find a handler on a handler map given a path string</span>
+<span class="c1">// Most-specific (longest) pattern wins</span>
+<span class="kd">func</span> <span class="p">(</span><span class="nx">mux</span> <span class="o">*</span><span class="nx">ServeMux</span><span class="p">)</span> <span class="nx">match</span><span class="p">(</span><span class="nx">path</span> <span class="kt">string</span><span class="p">)</span> <span class="p">(</span><span class="nx">h</span> <span class="nx">Handler</span><span class="p">,</span> <span class="nx">pattern</span> <span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">n</span> <span class="p">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="nx">k</span><span class="p">,</span> <span class="nx">v</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">mux</span><span class="p">.</span><span class="nx">m</span> <span class="p">{</span>
+                <span class="k">if</span> <span class="p">!</span><span class="nx">pathMatch</span><span class="p">(</span><span class="nx">k</span><span class="p">,</span> <span class="nx">path</span><span class="p">)</span> <span class="p">{</span>
+                        <span class="k">continue</span>
+                <span class="p">}</span>
+                <span class="k">if</span> <span class="nx">h</span> <span class="o">==</span> <span class="kc">nil</span> <span class="o">||</span> <span class="nb">len</span><span class="p">(</span><span class="nx">k</span><span class="p">)</span> <span class="p">&gt;</span> <span class="nx">n</span> <span class="p">{</span>
+                        <span class="nx">n</span> <span class="p">=</span> <span class="nb">len</span><span class="p">(</span><span class="nx">k</span><span class="p">)</span>
+                        <span class="nx">h</span> <span class="p">=</span> <span class="nx">v</span><span class="p">.</span><span class="nx">h</span>
+                        <span class="nx">pattern</span> <span class="p">=</span> <span class="nx">v</span><span class="p">.</span><span class="nx">pattern</span>
+                <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="k">return</span>
+<span class="p">}</span>
 </pre></div>
 <p><tt class="docutils literal">mux.m</tt> is a a <tt class="docutils literal">map</tt> data structure defined in the <tt class="docutils literal">ServeMux</tt> structure (snippet earlier in the post) which stores a mapping of a path and the handler we have registered for it.</p>
 </div>
@@ -262,90 +262,154 @@ func (t *mytype) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 </pre>
 <p>The <tt class="docutils literal">ServeHTTP()</tt> method of a Handler is invoked when it has been registered as handling a particular path.</p>
 <p>Let's look at what the call to <cite>Handle()</cite> function does:</p>
-<div class="highlight"><pre><span></span>// Handle registers the handler for the given pattern
-// in the DefaultServeMux.
-// The documentation for ServeMux explains how patterns are matched.
-func Handle(pattern string, handler Handler) { DefaultServeMux.Handle(pattern, handler) }
+<div class="highlight"><pre><span></span><span class="c1">// Handle registers the handler for the given pattern</span>
+<span class="c1">// in the DefaultServeMux.</span>
+<span class="c1">// The documentation for ServeMux explains how patterns are matched.</span>
+<span class="kd">func</span> <span class="nx">Handle</span><span class="p">(</span><span class="nx">pattern</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">handler</span> <span class="nx">Handler</span><span class="p">)</span> <span class="p">{</span> <span class="nx">DefaultServeMux</span><span class="p">.</span><span class="nx">Handle</span><span class="p">(</span><span class="nx">pattern</span><span class="p">,</span> <span class="nx">handler</span><span class="p">)</span> <span class="p">}</span>
 
-// Handle registers the handler for the given pattern.
-// If a handler already exists for pattern, Handle panics.
-func (mux *ServeMux) Handle(pattern string, handler Handler) {
-        mux.mu.Lock()
-        defer mux.mu.Unlock()
+<span class="c1">// Handle registers the handler for the given pattern.</span>
+<span class="c1">// If a handler already exists for pattern, Handle panics.</span>
+<span class="kd">func</span> <span class="p">(</span><span class="nx">mux</span> <span class="o">*</span><span class="nx">ServeMux</span><span class="p">)</span> <span class="nx">Handle</span><span class="p">(</span><span class="nx">pattern</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">handler</span> <span class="nx">Handler</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">mux</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nx">Lock</span><span class="p">()</span>
+        <span class="k">defer</span> <span class="nx">mux</span><span class="p">.</span><span class="nx">mu</span><span class="p">.</span><span class="nx">Unlock</span><span class="p">()</span>
 
-        if pattern == &quot;&quot; {
-                panic(&quot;http: invalid pattern &quot; + pattern)
-        }
-        if handler == nil {
-                panic(&quot;http: nil handler&quot;)
-        }
-        if mux.m[pattern].explicit {
-                panic(&quot;http: multiple registrations for &quot; + pattern)
-        }
+        <span class="k">if</span> <span class="nx">pattern</span> <span class="o">==</span> <span class="s">&quot;&quot;</span> <span class="p">{</span>
+                <span class="nb">panic</span><span class="p">(</span><span class="s">&quot;http: invalid pattern &quot;</span> <span class="o">+</span> <span class="nx">pattern</span><span class="p">)</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="nx">handler</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+                <span class="nb">panic</span><span class="p">(</span><span class="s">&quot;http: nil handler&quot;</span><span class="p">)</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="nx">mux</span><span class="p">.</span><span class="nx">m</span><span class="p">[</span><span class="nx">pattern</span><span class="p">].</span><span class="nx">explicit</span> <span class="p">{</span>
+                <span class="nb">panic</span><span class="p">(</span><span class="s">&quot;http: multiple registrations for &quot;</span> <span class="o">+</span> <span class="nx">pattern</span><span class="p">)</span>
+        <span class="p">}</span>
 
-        if mux.m == nil {
-                mux.m = make(map[string]muxEntry)
-        }
-        mux.m[pattern] = muxEntry{explicit: true, h: handler, pattern: pattern}
+        <span class="k">if</span> <span class="nx">mux</span><span class="p">.</span><span class="nx">m</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+                <span class="nx">mux</span><span class="p">.</span><span class="nx">m</span> <span class="p">=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="nx">muxEntry</span><span class="p">)</span>
+        <span class="p">}</span>
+        <span class="nx">mux</span><span class="p">.</span><span class="nx">m</span><span class="p">[</span><span class="nx">pattern</span><span class="p">]</span> <span class="p">=</span> <span class="nx">muxEntry</span><span class="p">{</span><span class="nx">explicit</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span> <span class="nx">h</span><span class="p">:</span> <span class="nx">handler</span><span class="p">,</span> <span class="nx">pattern</span><span class="p">:</span> <span class="nx">pattern</span><span class="p">}</span>
 
-        if pattern[0] != &#39;/&#39; {
-                mux.hosts = true
-        }
+        <span class="k">if</span> <span class="nx">pattern</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="sc">&#39;/&#39;</span> <span class="p">{</span>
+                <span class="nx">mux</span><span class="p">.</span><span class="nx">hosts</span> <span class="p">=</span> <span class="kc">true</span>
+        <span class="p">}</span>
 
-        // Helpful behavior:
-        // If pattern is /tree/, insert an implicit permanent redirect for /tree.
-        // It can be overridden by an explicit registration.
-        n := len(pattern)
-        if n &gt; 0 &amp;&amp; pattern[n-1] == &#39;/&#39; &amp;&amp; !mux.m[pattern[0:n-1]].explicit {
-                // If pattern contains a host name, strip it and use remaining
-                // path for redirect.
-                path := pattern
-                if pattern[0] != &#39;/&#39; {
-                        // In pattern, at least the last character is a &#39;/&#39;, so
-                        // strings.Index can&#39;t be -1.
-                        path = pattern[strings.Index(pattern, &quot;/&quot;):]
-                }
-                url := &amp;url.URL{Path: path}
-                mux.m[pattern[0:n-1]] = muxEntry{h: RedirectHandler(url.String(), StatusMovedPermanently), pattern: pattern}
-        }
-}
+        <span class="c1">// Helpful behavior:</span>
+        <span class="c1">// If pattern is /tree/, insert an implicit permanent redirect for /tree.</span>
+        <span class="c1">// It can be overridden by an explicit registration.</span>
+        <span class="nx">n</span> <span class="o">:=</span> <span class="nb">len</span><span class="p">(</span><span class="nx">pattern</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nx">n</span> <span class="p">&gt;</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="nx">pattern</span><span class="p">[</span><span class="nx">n</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="sc">&#39;/&#39;</span> <span class="o">&amp;&amp;</span> <span class="p">!</span><span class="nx">mux</span><span class="p">.</span><span class="nx">m</span><span class="p">[</span><span class="nx">pattern</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="nx">n</span><span class="o">-</span><span class="mi">1</span><span class="p">]].</span><span class="nx">explicit</span> <span class="p">{</span>
+                <span class="c1">// If pattern contains a host name, strip it and use remaining</span>
+                <span class="c1">// path for redirect.</span>
+                <span class="nx">path</span> <span class="o">:=</span> <span class="nx">pattern</span>
+                <span class="k">if</span> <span class="nx">pattern</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="sc">&#39;/&#39;</span> <span class="p">{</span>
+                        <span class="c1">// In pattern, at least the last character is a &#39;/&#39;, so</span>
+                        <span class="c1">// strings.Index can&#39;t be -1.</span>
+                        <span class="nx">path</span> <span class="p">=</span> <span class="nx">pattern</span><span class="p">[</span><span class="nx">strings</span><span class="p">.</span><span class="nx">Index</span><span class="p">(</span><span class="nx">pattern</span><span class="p">,</span> <span class="s">&quot;/&quot;</span><span class="p">):]</span>
+                <span class="p">}</span>
+                <span class="nx">url</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">url</span><span class="p">.</span><span class="nx">URL</span><span class="p">{</span><span class="nx">Path</span><span class="p">:</span> <span class="nx">path</span><span class="p">}</span>
+                <span class="nx">mux</span><span class="p">.</span><span class="nx">m</span><span class="p">[</span><span class="nx">pattern</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="nx">n</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span> <span class="p">=</span> <span class="nx">muxEntry</span><span class="p">{</span><span class="nx">h</span><span class="p">:</span> <span class="nx">RedirectHandler</span><span class="p">(</span><span class="nx">url</span><span class="p">.</span><span class="nx">String</span><span class="p">(),</span> <span class="nx">StatusMovedPermanently</span><span class="p">),</span> <span class="nx">pattern</span><span class="p">:</span> <span class="nx">pattern</span><span class="p">}</span>
+        <span class="p">}</span>
+<span class="p">}</span>
 </pre></div>
 <p>It can feel cumbersome to define a type implementing the <tt class="docutils literal">Handler</tt> interface for every path we want to register a handler for. Hence, a convenience function, <tt class="docutils literal">HandleFunc()</tt> is provided to register any function which has a specified signature as a Handler function. For example:</p>
 <pre class="code literal-block">
 http.HandleFunc(&quot;/status/&quot;, StatusHandler)
 </pre>
 <p>Now, let's look at what the call to <cite>HandleFunc()</cite> function does:</p>
-<div class="highlight"><pre><span></span>// HandleFunc registers the handler function for the given pattern
-// in the DefaultServeMux.
-// The documentation for ServeMux explains how patterns are matched.
-func HandleFunc(pattern string, handler func(ResponseWriter, *Request)) {
-        DefaultServeMux.HandleFunc(pattern, handler)
-}
+<div class="highlight"><pre><span></span><span class="c1">// HandleFunc registers the handler function for the given pattern</span>
+<span class="c1">// in the DefaultServeMux.</span>
+<span class="c1">// The documentation for ServeMux explains how patterns are matched.</span>
+<span class="kd">func</span> <span class="nx">HandleFunc</span><span class="p">(</span><span class="nx">pattern</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">handler</span> <span class="kd">func</span><span class="p">(</span><span class="nx">ResponseWriter</span><span class="p">,</span> <span class="o">*</span><span class="nx">Request</span><span class="p">))</span> <span class="p">{</span>
+        <span class="nx">DefaultServeMux</span><span class="p">.</span><span class="nx">HandleFunc</span><span class="p">(</span><span class="nx">pattern</span><span class="p">,</span> <span class="nx">handler</span><span class="p">)</span>
+<span class="p">}</span>
 
 
-// HandleFunc registers the handler function for the given pattern.
-func (mux *ServeMux) HandleFunc(pattern string, handler func(ResponseWriter, *Request)) {
-        mux.Handle(pattern, HandlerFunc(handler))
-}
+<span class="c1">// HandleFunc registers the handler function for the given pattern.</span>
+<span class="kd">func</span> <span class="p">(</span><span class="nx">mux</span> <span class="o">*</span><span class="nx">ServeMux</span><span class="p">)</span> <span class="nx">HandleFunc</span><span class="p">(</span><span class="nx">pattern</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">handler</span> <span class="kd">func</span><span class="p">(</span><span class="nx">ResponseWriter</span><span class="p">,</span> <span class="o">*</span><span class="nx">Request</span><span class="p">))</span> <span class="p">{</span>
+        <span class="nx">mux</span><span class="p">.</span><span class="nx">Handle</span><span class="p">(</span><span class="nx">pattern</span><span class="p">,</span> <span class="nx">HandlerFunc</span><span class="p">(</span><span class="nx">handler</span><span class="p">))</span>
+<span class="p">}</span>
 
-// The HandlerFunc type is an adapter to allow the use of
-// ordinary functions as HTTP handlers.  If f is a function
-// with the appropriate signature, HandlerFunc(f) is a
-// Handler object that calls f.
-type HandlerFunc func(ResponseWriter, *Request)
+<span class="c1">// The HandlerFunc type is an adapter to allow the use of</span>
+<span class="c1">// ordinary functions as HTTP handlers.  If f is a function</span>
+<span class="c1">// with the appropriate signature, HandlerFunc(f) is a</span>
+<span class="c1">// Handler object that calls f.</span>
+<span class="kd">type</span> <span class="nx">HandlerFunc</span> <span class="kd">func</span><span class="p">(</span><span class="nx">ResponseWriter</span><span class="p">,</span> <span class="o">*</span><span class="nx">Request</span><span class="p">)</span>
 
-// ServeHTTP calls f(w, req).
-func (f HandlerFunc) ServeHTTP(w ResponseWriter, req *Request) {
-    f(w, req)
-}
+<span class="c1">// ServeHTTP calls f(w, req).</span>
+<span class="kd">func</span> <span class="p">(</span><span class="nx">f</span> <span class="nx">HandlerFunc</span><span class="p">)</span> <span class="nx">ServeHTTP</span><span class="p">(</span><span class="nx">w</span> <span class="nx">ResponseWriter</span><span class="p">,</span> <span class="nx">req</span> <span class="o">*</span><span class="nx">Request</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">f</span><span class="p">(</span><span class="nx">w</span><span class="p">,</span> <span class="nx">req</span><span class="p">)</span>
+<span class="p">}</span>
 </pre></div>
 <p>The call to the <tt class="docutils literal">http.HandleFunc()</tt> function &quot;converts&quot; the provided function to the <tt class="docutils literal">HandleFunc()</tt> type and then calls the <tt class="docutils literal">(mux *ServeMux) Handle()</tt> function similar to what happens when we call the <tt class="docutils literal">Handle()</tt> function. The idea of this conversion is explained in the <a class="reference external" href="https://golang.org/doc/effective_go.html#interface_methods">Effective Go guide</a> and this <a class="reference external" href="http://jordanorelli.com/post/42369331748/function-types-in-go-golang">blog post</a>.</p>
 </div>
 <div class="section" id="using-your-own-handler-with-listenandserve">
 <h2>Using your own Handler with ListenAndServe()</h2>
+<div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nx">main</span>
+
+<span class="kn">import</span> <span class="s">&quot;net/http&quot;</span>
+<span class="kn">import</span> <span class="s">&quot;fmt&quot;</span>
+
+<span class="kd">type</span> <span class="nx">mytype</span> <span class="kd">struct</span><span class="p">{}</span>
+
+<span class="kd">func</span> <span class="p">(</span><span class="nx">t</span> <span class="o">*</span><span class="nx">mytype</span><span class="p">)</span> <span class="nx">ServeHTTP</span><span class="p">(</span><span class="nx">w</span> <span class="nx">http</span><span class="p">.</span><span class="nx">ResponseWriter</span><span class="p">,</span> <span class="nx">r</span> <span class="o">*</span><span class="nx">http</span><span class="p">.</span><span class="nx">Request</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">fmt</span><span class="p">.</span><span class="nx">Fprintf</span><span class="p">(</span><span class="nx">w</span><span class="p">,</span> <span class="s">&quot;Hello there from mytype&quot;</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="nx">StatusHandler</span><span class="p">(</span><span class="nx">w</span> <span class="nx">http</span><span class="p">.</span><span class="nx">ResponseWriter</span><span class="p">,</span> <span class="nx">r</span> <span class="o">*</span><span class="nx">http</span><span class="p">.</span><span class="nx">Request</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">fmt</span><span class="p">.</span><span class="nx">Fprintf</span><span class="p">(</span><span class="nx">w</span><span class="p">,</span> <span class="s">&quot;OK&quot;</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="nx">main</span><span class="p">()</span> <span class="p">{</span>
+
+        <span class="nx">mux</span> <span class="o">:=</span> <span class="nx">http</span><span class="p">.</span><span class="nx">NewServeMux</span><span class="p">()</span>
+
+        <span class="nx">t</span> <span class="o">:=</span> <span class="nb">new</span><span class="p">(</span><span class="nx">mytype</span><span class="p">)</span>
+        <span class="nx">mux</span><span class="p">.</span><span class="nx">Handle</span><span class="p">(</span><span class="s">&quot;/&quot;</span><span class="p">,</span> <span class="nx">t</span><span class="p">)</span>
+        <span class="nx">mux</span><span class="p">.</span><span class="nx">HandleFunc</span><span class="p">(</span><span class="s">&quot;/status/&quot;</span><span class="p">,</span> <span class="nx">StatusHandler</span><span class="p">)</span>
+
+        <span class="nx">http</span><span class="p">.</span><span class="nx">ListenAndServe</span><span class="p">(</span><span class="s">&quot;:8080&quot;</span><span class="p">,</span> <span class="nx">mux</span><span class="p">)</span>
+<span class="p">}</span>
+</pre></div>
 </div>
 <div class="section" id="writing-middleware">
 <h2>Writing Middleware</h2>
+<div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nx">main</span>
+
+<span class="kn">import</span> <span class="s">&quot;net/http&quot;</span>
+<span class="kn">import</span> <span class="s">&quot;fmt&quot;</span>
+<span class="kn">import</span> <span class="s">&quot;log&quot;</span>
+
+<span class="kd">type</span> <span class="nx">mytype</span> <span class="kd">struct</span><span class="p">{}</span>
+
+<span class="kd">func</span> <span class="p">(</span><span class="nx">t</span> <span class="o">*</span><span class="nx">mytype</span><span class="p">)</span> <span class="nx">ServeHTTP</span><span class="p">(</span><span class="nx">w</span> <span class="nx">http</span><span class="p">.</span><span class="nx">ResponseWriter</span><span class="p">,</span> <span class="nx">r</span> <span class="o">*</span><span class="nx">http</span><span class="p">.</span><span class="nx">Request</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">fmt</span><span class="p">.</span><span class="nx">Fprintf</span><span class="p">(</span><span class="nx">w</span><span class="p">,</span> <span class="s">&quot;Hello there from mytype&quot;</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="nx">StatusHandler</span><span class="p">(</span><span class="nx">w</span> <span class="nx">http</span><span class="p">.</span><span class="nx">ResponseWriter</span><span class="p">,</span> <span class="nx">r</span> <span class="o">*</span><span class="nx">http</span><span class="p">.</span><span class="nx">Request</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">fmt</span><span class="p">.</span><span class="nx">Fprintf</span><span class="p">(</span><span class="nx">w</span><span class="p">,</span> <span class="s">&quot;OK&quot;</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="nx">RunSomeCode</span><span class="p">(</span><span class="nx">handler</span> <span class="nx">http</span><span class="p">.</span><span class="nx">Handler</span><span class="p">)</span> <span class="nx">http</span><span class="p">.</span><span class="nx">Handler</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">http</span><span class="p">.</span><span class="nx">HandlerFunc</span><span class="p">(</span><span class="kd">func</span><span class="p">(</span><span class="nx">w</span> <span class="nx">http</span><span class="p">.</span><span class="nx">ResponseWriter</span><span class="p">,</span> <span class="nx">r</span> <span class="o">*</span><span class="nx">http</span><span class="p">.</span><span class="nx">Request</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nx">log</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="s">&quot;Before&quot;</span><span class="p">)</span>
+                <span class="nx">handler</span><span class="p">.</span><span class="nx">ServeHTTP</span><span class="p">(</span><span class="nx">w</span><span class="p">,</span> <span class="nx">r</span><span class="p">)</span>
+                <span class="nx">log</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="s">&quot;After&quot;</span><span class="p">)</span>
+                <span class="p">})</span>
+<span class="p">}</span>
+
+
+<span class="kd">func</span> <span class="nx">main</span><span class="p">()</span> <span class="p">{</span>
+
+        <span class="nx">mux</span> <span class="o">:=</span> <span class="nx">http</span><span class="p">.</span><span class="nx">NewServeMux</span><span class="p">()</span>
+
+        <span class="nx">t</span> <span class="o">:=</span> <span class="nb">new</span><span class="p">(</span><span class="nx">mytype</span><span class="p">)</span>
+        <span class="nx">mux</span><span class="p">.</span><span class="nx">Handle</span><span class="p">(</span><span class="s">&quot;/&quot;</span><span class="p">,</span> <span class="nx">t</span><span class="p">)</span>
+        <span class="nx">mux</span><span class="p">.</span><span class="nx">HandleFunc</span><span class="p">(</span><span class="s">&quot;/status/&quot;</span><span class="p">,</span> <span class="nx">StatusHandler</span><span class="p">)</span>
+
+        <span class="nx">WrappedMux</span> <span class="o">:=</span> <span class="nx">RunSomeCode</span><span class="p">(</span><span class="nx">mux</span><span class="p">)</span>
+        <span class="nx">http</span><span class="p">.</span><span class="nx">ListenAndServe</span><span class="p">(</span><span class="s">&quot;:8080&quot;</span><span class="p">,</span> <span class="nx">WrappedMux</span><span class="p">)</span>
+<span class="p">}</span>
+</pre></div>
+<p><a class="reference external" href="https://gocodecloud.com/blog/2016/11/15/simple-golang-http-request-context-example/">https://gocodecloud.com/blog/2016/11/15/simple-golang-http-request-context-example/</a></p>
 </div>
 <div class="section" id="learn-more">
 <h2>Learn more</h2>

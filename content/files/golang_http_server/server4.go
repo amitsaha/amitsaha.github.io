@@ -2,6 +2,7 @@ package main
 
 import "net/http"
 import "fmt"
+import "log"
 
 type mytype struct{}
 
@@ -13,6 +14,15 @@ func StatusHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "OK")
 }
 
+func RunSomeCode(handler http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.Println("Before")
+		handler.ServeHTTP(w, r)
+		log.Println("After")
+		})
+}
+
+
 func main() {
 
 	mux := http.NewServeMux()
@@ -21,5 +31,6 @@ func main() {
 	mux.Handle("/", t)
 	mux.HandleFunc("/status/", StatusHandler)
 
-	http.ListenAndServe(":8080", mux)
+	WrappedMux := RunSomeCode(mux)
+	http.ListenAndServe(":8080", WrappedMux)
 }
