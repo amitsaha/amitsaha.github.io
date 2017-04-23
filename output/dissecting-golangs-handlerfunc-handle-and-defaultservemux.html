@@ -54,8 +54,10 @@ approach to start a HTTP 1.1 server. The following code does just that:</p>
         <span class="n">log</span><span class="o">.</span><span class="n">Fatal</span><span class="p">(</span><span class="n">http</span><span class="o">.</span><span class="n">ListenAndServe</span><span class="p">(</span><span class="s2">&quot;:8080&quot;</span><span class="p">,</span> <span class="n">nil</span><span class="p">))</span>
 <span class="p">}</span>
 </pre></div>
-<p><strong>Question 1</strong>: What is the <cite>nil</cite> second argument above? If not specified, it defaults to <cite>DefaultServeMux</cite>. What is it? We will find out soon.</p>
-<p>Now, if we try to send a couple of HTTP GET requests, we will see the following:</p>
+<p>What is the <cite>nil</cite> second argument above? The documentation states that the second argument to the function should be a &quot;handler&quot; and if it is specified as <cite>nil</cite>, it defaults to <cite>DefaultServeMux</cite>. By the end of next section and eventually by the end of the post, I will have successfully removed one of my main misconceptions - i.e. <cite>DefaultServeMux</cite> was something else other than a handler.</p>
+<div class="section" id="what-is-defaultservemux">
+<h2>What is <cite>DefaultServeMux</cite>?</h2>
+<p>If we run our server above, and send a couple of HTTP GET requests, we will see the following:</p>
 <pre class="code literal-block">
 $ curl localhost:8080
 404 page not found
@@ -84,7 +86,8 @@ func (mux *ServeMux) handler(host, path string) (h Handler, pattern string) {
         return
 }
 </pre></div>
-<p>We will discuss handlers shortly. First, let's consider the function signature of the above handler function: <cite>func (mux *ServeMux) handler(host, path string) (h Handler, pattern string)</cite>. This function is a method belonging to the type <cite>ServeMux</cite>:</p>
+<p>Now, let's roughly see how our GET request above reaches the above function. Let us consider the function signature of the above handler function: <cite>func (mux *ServeMux) handler(host, path string) (h Handler, pattern string)</cite>.</p>
+<p>This function is a method belonging to the type <cite>ServeMux</cite>:</p>
 <div class="highlight"><pre><span></span>// ServeMux also takes care of sanitizing the URL request path,
 // redirecting any request containing . or .. elements or repeated slashes
 // to an equivalent, cleaner URL.
@@ -108,7 +111,7 @@ var DefaultServeMux = &amp;defaultServeMux
 
 var defaultServeMux ServeMux
 </pre></div>
-<p><strong>Answer 1</strong>:  Let's now go back to our question 1 we asked: How does <cite>DefaultServeMux</cite> get set when the second argument is <cite>nil</cite>? The following code snippet has the answer:</p>
+<p>So, how does <cite>DefaultServeMux</cite> get set when the second argument to <cite>ListenAndServe()</cite> is <cite>nil</cite>? The following code snippet has the answer:</p>
 <div class="highlight"><pre><span></span>func (sh serverHandler) ServeHTTP(rw ResponseWriter, req *Request) {
         handler := sh.srv.Handler
         if handler == nil {
@@ -135,7 +138,7 @@ func (mux *ServeMux) ServeHTTP(w ResponseWriter, r *Request) {
         h.ServeHTTP(w, r)
 }
 </pre></div>
-<p>The call to <cite>Handler()</cite> function then calls the following implementation of <cite>Handler()</cite>:</p>
+<p>The call to <cite>Handler()</cite> function then calls the following implementation:</p>
 <div class="highlight"><pre><span></span>// If there is no registered handler that applies to the request,
 // Handler returns a ``page not found&#39;&#39; handler and an empty pattern.
 func (mux *ServeMux) Handler(r *Request) (h Handler, pattern string) {
@@ -178,6 +181,146 @@ func NotFound(w ResponseWriter, r *Request) { Error(w, &quot;404 page not found&
 // that replies to each request with a ``404 page not found&#39;&#39; reply.
 func NotFoundHandler() Handler { return HandlerFunc(NotFound) }
 </pre></div>
+<p>We will discuss how this &quot;magic&quot; happens in the next section.</p>
+</div>
+<div class="section" id="registering-handlers">
+<h2>Registering handlers</h2>
+<p>Let's now update our server code to handle &quot;/&quot; and &quot;/status/&quot;:</p>
+<div class="highlight"><pre><span></span>package main
+
+import &quot;net/http&quot;
+import &quot;fmt&quot;
+
+type mytype struct{}
+
+func (t *mytype) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+        fmt.Fprintf(w, &quot;Hello there from mytype&quot;)
+}
+
+
+func StatusHandler(w http.ResponseWriter, r *http.Request) {
+        fmt.Fprintf(w, &quot;OK&quot;)
+}
+
+func main() {
+
+        t := new(mytype)
+        http.Handle(&quot;/&quot;, t)
+
+        http.HandleFunc(&quot;/status/&quot;, StatusHandler)
+
+        http.ListenAndServe(&quot;:8080&quot;, nil)
+}
+</pre></div>
+<p>If we run the server and send the two requests above, we will see the following responses:</p>
+<pre class="code literal-block">
+$ curl localhost:8080
+Hello there from mytype
+
+$ curl localhost:8080/status/
+OK
+</pre>
+<p>Let's look at what the call to <cite>Handle()</cite> function does:</p>
+<div class="highlight"><pre><span></span>// Handle registers the handler for the given pattern
+// in the DefaultServeMux.
+// The documentation for ServeMux explains how patterns are matched.
+func Handle(pattern string, handler Handler) { DefaultServeMux.Handle(pattern, handler) }
+
+// Handle registers the handler for the given pattern.
+// If a handler already exists for pattern, Handle panics.
+func (mux *ServeMux) Handle(pattern string, handler Handler) {
+        mux.mu.Lock()
+        defer mux.mu.Unlock()
+
+        if pattern == &quot;&quot; {
+                panic(&quot;http: invalid pattern &quot; + pattern)
+        }
+        if handler == nil {
+                panic(&quot;http: nil handler&quot;)
+        }
+        if mux.m[pattern].explicit {
+                panic(&quot;http: multiple registrations for &quot; + pattern)
+        }
+
+        if mux.m == nil {
+                mux.m = make(map[string]muxEntry)
+        }
+        mux.m[pattern] = muxEntry{explicit: true, h: handler, pattern: pattern}
+
+        if pattern[0] != &#39;/&#39; {
+                mux.hosts = true
+        }
+
+        // Helpful behavior:
+        // If pattern is /tree/, insert an implicit permanent redirect for /tree.
+        // It can be overridden by an explicit registration.
+        n := len(pattern)
+        if n &gt; 0 &amp;&amp; pattern[n-1] == &#39;/&#39; &amp;&amp; !mux.m[pattern[0:n-1]].explicit {
+                // If pattern contains a host name, strip it and use remaining
+                // path for redirect.
+                path := pattern
+                if pattern[0] != &#39;/&#39; {
+                        // In pattern, at least the last character is a &#39;/&#39;, so
+                        // strings.Index can&#39;t be -1.
+                        path = pattern[strings.Index(pattern, &quot;/&quot;):]
+                }
+                url := &amp;url.URL{Path: path}
+                mux.m[pattern[0:n-1]] = muxEntry{h: RedirectHandler(url.String(), StatusMovedPermanently), pattern: pattern}
+        }
+}
+</pre></div>
+<p>Now, let's look at what the call to <cite>HandleFunc()</cite> function does:</p>
+<div class="highlight"><pre><span></span>// HandleFunc registers the handler function for the given pattern
+// in the DefaultServeMux.
+// The documentation for ServeMux explains how patterns are matched.
+func HandleFunc(pattern string, handler func(ResponseWriter, *Request)) {
+        DefaultServeMux.HandleFunc(pattern, handler)
+}
+
+
+// HandleFunc registers the handler function for the given pattern.
+func (mux *ServeMux) HandleFunc(pattern string, handler func(ResponseWriter, *Request)) {
+        mux.Handle(pattern, HandlerFunc(handler))
+}
+
+// The HandlerFunc type is an adapter to allow the use of
+// ordinary functions as HTTP handlers.  If f is a function
+// with the appropriate signature, HandlerFunc(f) is a
+// Handler object that calls f.
+type HandlerFunc func(ResponseWriter, *Request)
+
+// ServeHTTP calls f(w, req).
+func (f HandlerFunc) ServeHTTP(w ResponseWriter, req *Request) {
+    f(w, req)
+}
+</pre></div>
+<p>The call to the <tt class="docutils literal">http.HandleFunc()</tt> function &quot;converts&quot; the provided function to the <tt class="docutils literal">HandleFunc()</tt> type and then calls the <tt class="docutils literal">(mux *ServeMux) Handle()</tt> function similar to what happens when we call the <tt class="docutils literal">Handle()</tt> function.</p>
+<p>Let's now revisit how the right handler function ges called. In a code snippet above, we saw a call to the <tt class="docutils literal">match()</tt> function which given a path returns the most appropriate registered handler for the path:</p>
+<div class="highlight"><pre><span></span>// Find a handler on a handler map given a path string
+// Most-specific (longest) pattern wins
+func (mux *ServeMux) match(path string) (h Handler, pattern string) {
+        var n = 0
+        for k, v := range mux.m {
+                if !pathMatch(k, path) {
+                        continue
+                }
+                if h == nil || len(k) &gt; n {
+                        n = len(k)
+                        h = v.h
+                        pattern = v.pattern
+                }
+        }
+        return
+}
+</pre></div>
+</div>
+<div class="section" id="learn-more">
+<h2>Learn more</h2>
+<ul class="simple">
+<li><a class="reference external" href="http://jordanorelli.com/post/42369331748/function-types-in-go-golang">http://jordanorelli.com/post/42369331748/function-types-in-go-golang</a></li>
+<li><a class="reference external" href="https://golang.org/doc/effective_go.html#interface_methods">https://golang.org/doc/effective_go.html#interface_methods</a></li>
+</ul>
+</div>
 
     </div><!-- /.entry-content -->
 

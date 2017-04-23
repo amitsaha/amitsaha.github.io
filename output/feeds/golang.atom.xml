@@ -12,8 +12,10 @@ approach to start a HTTP 1.1 server. The following code does just that:&lt;/p&gt
         &lt;span class="n"&gt;log&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Fatal&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;http&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;ListenAndServe&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;:8080&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;nil&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
 &lt;span class="p"&gt;}&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;&lt;strong&gt;Question 1&lt;/strong&gt;: What is the &lt;cite&gt;nil&lt;/cite&gt; second argument above? If not specified, it defaults to &lt;cite&gt;DefaultServeMux&lt;/cite&gt;. What is it? We will find out soon.&lt;/p&gt;
-&lt;p&gt;Now, if we try to send a couple of HTTP GET requests, we will see the following:&lt;/p&gt;
+&lt;p&gt;What is the &lt;cite&gt;nil&lt;/cite&gt; second argument above? The documentation states that the second argument to the function should be a &amp;quot;handler&amp;quot; and if it is specified as &lt;cite&gt;nil&lt;/cite&gt;, it defaults to &lt;cite&gt;DefaultServeMux&lt;/cite&gt;. By the end of next section and eventually by the end of the post, I will have successfully removed one of my main misconceptions - i.e. &lt;cite&gt;DefaultServeMux&lt;/cite&gt; was something else other than a handler.&lt;/p&gt;
+&lt;div class="section" id="what-is-defaultservemux"&gt;
+&lt;h2&gt;What is &lt;cite&gt;DefaultServeMux&lt;/cite&gt;?&lt;/h2&gt;
+&lt;p&gt;If we run our server above, and send a couple of HTTP GET requests, we will see the following:&lt;/p&gt;
 &lt;pre class="code literal-block"&gt;
 $ curl localhost:8080
 404 page not found
@@ -42,7 +44,8 @@ func (mux *ServeMux) handler(host, path string) (h Handler, pattern string) {
         return
 }
 &lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;We will discuss handlers shortly. First, let's consider the function signature of the above handler function: &lt;cite&gt;func (mux *ServeMux) handler(host, path string) (h Handler, pattern string)&lt;/cite&gt;. This function is a method belonging to the type &lt;cite&gt;ServeMux&lt;/cite&gt;:&lt;/p&gt;
+&lt;p&gt;Now, let's roughly see how our GET request above reaches the above function. Let us consider the function signature of the above handler function: &lt;cite&gt;func (mux *ServeMux) handler(host, path string) (h Handler, pattern string)&lt;/cite&gt;.&lt;/p&gt;
+&lt;p&gt;This function is a method belonging to the type &lt;cite&gt;ServeMux&lt;/cite&gt;:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;// ServeMux also takes care of sanitizing the URL request path,
 // redirecting any request containing . or .. elements or repeated slashes
 // to an equivalent, cleaner URL.
@@ -66,7 +69,7 @@ var DefaultServeMux = &amp;amp;defaultServeMux
 
 var defaultServeMux ServeMux
 &lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;&lt;strong&gt;Answer 1&lt;/strong&gt;:  Let's now go back to our question 1 we asked: How does &lt;cite&gt;DefaultServeMux&lt;/cite&gt; get set when the second argument is &lt;cite&gt;nil&lt;/cite&gt;? The following code snippet has the answer:&lt;/p&gt;
+&lt;p&gt;So, how does &lt;cite&gt;DefaultServeMux&lt;/cite&gt; get set when the second argument to &lt;cite&gt;ListenAndServe()&lt;/cite&gt; is &lt;cite&gt;nil&lt;/cite&gt;? The following code snippet has the answer:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;func (sh serverHandler) ServeHTTP(rw ResponseWriter, req *Request) {
         handler := sh.srv.Handler
         if handler == nil {
@@ -93,7 +96,7 @@ func (mux *ServeMux) ServeHTTP(w ResponseWriter, r *Request) {
         h.ServeHTTP(w, r)
 }
 &lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;The call to &lt;cite&gt;Handler()&lt;/cite&gt; function then calls the following implementation of &lt;cite&gt;Handler()&lt;/cite&gt;:&lt;/p&gt;
+&lt;p&gt;The call to &lt;cite&gt;Handler()&lt;/cite&gt; function then calls the following implementation:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;// If there is no registered handler that applies to the request,
 // Handler returns a ``page not found&amp;#39;&amp;#39; handler and an empty pattern.
 func (mux *ServeMux) Handler(r *Request) (h Handler, pattern string) {
@@ -136,6 +139,146 @@ func NotFound(w ResponseWriter, r *Request) { Error(w, &amp;quot;404 page not fo
 // that replies to each request with a ``404 page not found&amp;#39;&amp;#39; reply.
 func NotFoundHandler() Handler { return HandlerFunc(NotFound) }
 &lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;We will discuss how this &amp;quot;magic&amp;quot; happens in the next section.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="registering-handlers"&gt;
+&lt;h2&gt;Registering handlers&lt;/h2&gt;
+&lt;p&gt;Let's now update our server code to handle &amp;quot;/&amp;quot; and &amp;quot;/status/&amp;quot;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;package main
+
+import &amp;quot;net/http&amp;quot;
+import &amp;quot;fmt&amp;quot;
+
+type mytype struct{}
+
+func (t *mytype) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+        fmt.Fprintf(w, &amp;quot;Hello there from mytype&amp;quot;)
+}
+
+
+func StatusHandler(w http.ResponseWriter, r *http.Request) {
+        fmt.Fprintf(w, &amp;quot;OK&amp;quot;)
+}
+
+func main() {
+
+        t := new(mytype)
+        http.Handle(&amp;quot;/&amp;quot;, t)
+
+        http.HandleFunc(&amp;quot;/status/&amp;quot;, StatusHandler)
+
+        http.ListenAndServe(&amp;quot;:8080&amp;quot;, nil)
+}
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;If we run the server and send the two requests above, we will see the following responses:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ curl localhost:8080
+Hello there from mytype
+
+$ curl localhost:8080/status/
+OK
+&lt;/pre&gt;
+&lt;p&gt;Let's look at what the call to &lt;cite&gt;Handle()&lt;/cite&gt; function does:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;// Handle registers the handler for the given pattern
+// in the DefaultServeMux.
+// The documentation for ServeMux explains how patterns are matched.
+func Handle(pattern string, handler Handler) { DefaultServeMux.Handle(pattern, handler) }
+
+// Handle registers the handler for the given pattern.
+// If a handler already exists for pattern, Handle panics.
+func (mux *ServeMux) Handle(pattern string, handler Handler) {
+        mux.mu.Lock()
+        defer mux.mu.Unlock()
+
+        if pattern == &amp;quot;&amp;quot; {
+                panic(&amp;quot;http: invalid pattern &amp;quot; + pattern)
+        }
+        if handler == nil {
+                panic(&amp;quot;http: nil handler&amp;quot;)
+        }
+        if mux.m[pattern].explicit {
+                panic(&amp;quot;http: multiple registrations for &amp;quot; + pattern)
+        }
+
+        if mux.m == nil {
+                mux.m = make(map[string]muxEntry)
+        }
+        mux.m[pattern] = muxEntry{explicit: true, h: handler, pattern: pattern}
+
+        if pattern[0] != &amp;#39;/&amp;#39; {
+                mux.hosts = true
+        }
+
+        // Helpful behavior:
+        // If pattern is /tree/, insert an implicit permanent redirect for /tree.
+        // It can be overridden by an explicit registration.
+        n := len(pattern)
+        if n &amp;gt; 0 &amp;amp;&amp;amp; pattern[n-1] == &amp;#39;/&amp;#39; &amp;amp;&amp;amp; !mux.m[pattern[0:n-1]].explicit {
+                // If pattern contains a host name, strip it and use remaining
+                // path for redirect.
+                path := pattern
+                if pattern[0] != &amp;#39;/&amp;#39; {
+                        // In pattern, at least the last character is a &amp;#39;/&amp;#39;, so
+                        // strings.Index can&amp;#39;t be -1.
+                        path = pattern[strings.Index(pattern, &amp;quot;/&amp;quot;):]
+                }
+                url := &amp;amp;url.URL{Path: path}
+                mux.m[pattern[0:n-1]] = muxEntry{h: RedirectHandler(url.String(), StatusMovedPermanently), pattern: pattern}
+        }
+}
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Now, let's look at what the call to &lt;cite&gt;HandleFunc()&lt;/cite&gt; function does:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;// HandleFunc registers the handler function for the given pattern
+// in the DefaultServeMux.
+// The documentation for ServeMux explains how patterns are matched.
+func HandleFunc(pattern string, handler func(ResponseWriter, *Request)) {
+        DefaultServeMux.HandleFunc(pattern, handler)
+}
+
+
+// HandleFunc registers the handler function for the given pattern.
+func (mux *ServeMux) HandleFunc(pattern string, handler func(ResponseWriter, *Request)) {
+        mux.Handle(pattern, HandlerFunc(handler))
+}
+
+// The HandlerFunc type is an adapter to allow the use of
+// ordinary functions as HTTP handlers.  If f is a function
+// with the appropriate signature, HandlerFunc(f) is a
+// Handler object that calls f.
+type HandlerFunc func(ResponseWriter, *Request)
+
+// ServeHTTP calls f(w, req).
+func (f HandlerFunc) ServeHTTP(w ResponseWriter, req *Request) {
+    f(w, req)
+}
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;The call to the &lt;tt class="docutils literal"&gt;http.HandleFunc()&lt;/tt&gt; function &amp;quot;converts&amp;quot; the provided function to the &lt;tt class="docutils literal"&gt;HandleFunc()&lt;/tt&gt; type and then calls the &lt;tt class="docutils literal"&gt;(mux *ServeMux) Handle()&lt;/tt&gt; function similar to what happens when we call the &lt;tt class="docutils literal"&gt;Handle()&lt;/tt&gt; function.&lt;/p&gt;
+&lt;p&gt;Let's now revisit how the right handler function ges called. In a code snippet above, we saw a call to the &lt;tt class="docutils literal"&gt;match()&lt;/tt&gt; function which given a path returns the most appropriate registered handler for the path:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;// Find a handler on a handler map given a path string
+// Most-specific (longest) pattern wins
+func (mux *ServeMux) match(path string) (h Handler, pattern string) {
+        var n = 0
+        for k, v := range mux.m {
+                if !pathMatch(k, path) {
+                        continue
+                }
+                if h == nil || len(k) &amp;gt; n {
+                        n = len(k)
+                        h = v.h
+                        pattern = v.pattern
+                }
+        }
+        return
+}
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="learn-more"&gt;
+&lt;h2&gt;Learn more&lt;/h2&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;a class="reference external" href="http://jordanorelli.com/post/42369331748/function-types-in-go-golang"&gt;http://jordanorelli.com/post/42369331748/function-types-in-go-golang&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference external" href="https://golang.org/doc/effective_go.html#interface_methods"&gt;https://golang.org/doc/effective_go.html#interface_methods&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
 </summary></entry><entry><title>Notes on using Golang to write gitbackup</title><link href="/notes-on-using-golang-to-write-gitbackup.html" rel="alternate"></link><published>2017-03-26T10:00:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2017-03-26:notes-on-using-golang-to-write-gitbackup.html</id><summary type="html">&lt;p&gt;&lt;a class="reference external" href="https://github.com/amitsaha/gitbackup"&gt;gitbackup&lt;/a&gt; is a tool to backup your git repositories from GitHub and GitLab. I wrote the &lt;a class="reference external" href="https://github.com/amitsaha/gitbackup/releases/tag/lj-0.1"&gt;initial version&lt;/a&gt; as a project for a golang article which is in review for publication in a Linux magazine. It supports GitHub enterprise installations and custom GitLab installations in addition to repositories on github.com and gitlab.com. It's written in Golang, and built upon &lt;a class="reference external" href="https://github.com/google/go-github"&gt;go-github&lt;/a&gt; and &lt;a class="reference external" href="https://github.com/xanzy/go-gitlab"&gt;go-gitlab&lt;/a&gt; and other third party golang packages.&lt;/p&gt;
 &lt;p&gt;Since the initial version, the project's code has seen number of changes which has been a learning experience for me since I am still fairly new to Golang. In the rest of this post, I describe these and some personal notes about the experience.&lt;/p&gt;
 &lt;div class="section" id="using-afero-for-filesystem-operations"&gt;
