@@ -147,9 +147,15 @@ The call to the ``http.HandleFunc()`` function "converts" the provided function 
 Using your own Handler with ListenAndServe()
 ============================================
 
+Earlier in this post, we saw how passsing ``nil`` to ``ListenAndServe()`` function sets the handler to ``DefaultServeMux``. The handlers
+we register via ``Handle()`` and ``HandleFunc()`` are then added to this object. Hence, we could without changing any functionality rewrite our server as follows:
+
 .. code-include:: files/golang_http_server/server3.go
     :lexer: go
 
+We create an object of type ``ServeMux`` via ``mux := http.NewServeMux()``, register our handlers calling the same two functions, but those that are defined for the ``ServeMux`` object we created.
+
+The reason we may want to use our own Handler with ``ListenAndServe()`` is demonstrated in the next section.
 
 
 Writing Middleware
