@@ -170,7 +170,7 @@ The reason we may want to use our own Handler with ``ListenAndServe()`` is demon
 Writing Middleware
 ==================
 
-In our latest version of the server, we have specified our own handler to ``ListenAndServe()``. One reason for doing so is when you want to execute some code for every request. That is:
+In our latest version of the server, we have specified our own handler to ``ListenAndServe()``. One reason for doing so is when you want to execute some code for *every* request. That is:
 
 1. Server gets a request for "/path/"
 2. Execute some code
@@ -193,8 +193,9 @@ When we run the server and send it a couple of requests as above, we will see:
     2017/04/24 17:53:05 Got a GET request for: /status
     2017/04/24 17:53:05 Handler finished processing request
 
-As part of this middleware writing exercise, I also wanted to be able to print the HTTP status of the response that we are sending but as the comment in the code states,
-I haven't been able to figure it out yet.
+What we are doing above is we are "wrapping" our actual handler in another function ``RunSomeCode(handler http.Handler) http.Handler`` which satisfies the ``Handler`` interface. In this function, we execute some code 
+
+As part of this middleware writing exercise, I also wanted to be able to print the HTTP status of the response that we are sending but as the comment in the code states, there is no direct way to get the status via the ``ResponseWriter`` object. Our next server example will fix this.
 
 
 Learn more
