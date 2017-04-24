@@ -352,7 +352,7 @@ we register via &lt;tt class="docutils literal"&gt;Handle()&lt;/tt&gt; and &lt;t
 &lt;li&gt;Execute some code&lt;/li&gt;
 &lt;li&gt;Return the response to the client&lt;/li&gt;
 &lt;/ol&gt;
-&lt;p&gt;Either of steps 2 or 4 or both may occur and this is where &amp;quot;middleware&amp;quot; comes in.&lt;/p&gt;
+&lt;p&gt;Either of steps 2 or 4 or both may occur and this is where &amp;quot;middleware&amp;quot; comes in. Our next version of the server demonstrates how we may implement this:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kn"&gt;package&lt;/span&gt; &lt;span class="nx"&gt;main&lt;/span&gt;
 
 &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;net/http&amp;quot;&lt;/span&gt;
@@ -371,9 +371,13 @@ we register via &lt;tt class="docutils literal"&gt;Handle()&lt;/tt&gt; and &lt;t
 
 &lt;span class="kd"&gt;func&lt;/span&gt; &lt;span class="nx"&gt;RunSomeCode&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;handler&lt;/span&gt; &lt;span class="nx"&gt;http&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Handler&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="nx"&gt;http&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Handler&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
         &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nx"&gt;http&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;HandlerFunc&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kd"&gt;func&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;w&lt;/span&gt; &lt;span class="nx"&gt;http&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;ResponseWriter&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;r&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="nx"&gt;http&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Request&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
-                &lt;span class="nx"&gt;log&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Println&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Before&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="nx"&gt;log&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Printf&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Got a %s request for: %v&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;r&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Method&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;r&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;URL&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
                 &lt;span class="nx"&gt;handler&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;ServeHTTP&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;w&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;r&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-                &lt;span class="nx"&gt;log&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Println&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;After&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="c1"&gt;// At this stage, our handler has &amp;quot;handled&amp;quot; the request&lt;/span&gt;
+        &lt;span class="c1"&gt;// but we can still write to the client there&lt;/span&gt;
+        &lt;span class="c1"&gt;// but we won&amp;#39;t do that&lt;/span&gt;
+        &lt;span class="c1"&gt;// XXX: We don&amp;#39;t have the HTTP status here either, need to understand this better why&lt;/span&gt;
+        &lt;span class="nx"&gt;log&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Println&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Handler finished processing request&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
                 &lt;span class="p"&gt;})&lt;/span&gt;
 &lt;span class="p"&gt;}&lt;/span&gt;
 
@@ -390,6 +394,15 @@ we register via &lt;tt class="docutils literal"&gt;Handle()&lt;/tt&gt; and &lt;t
         &lt;span class="nx"&gt;http&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;ListenAndServe&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;:8080&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;WrappedMux&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;span class="p"&gt;}&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;When we run the server and send it a couple of requests as above, we will see:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+2017/04/24 17:53:03 Got a GET request for: /
+2017/04/24 17:53:03 Handler finished processing request
+2017/04/24 17:53:05 Got a GET request for: /status
+2017/04/24 17:53:05 Handler finished processing request
+&lt;/pre&gt;
+&lt;p&gt;As part of this middleware writing exercise, I also wanted to be able to print the HTTP status of the response that we are sending but as the comment in the code states,
+I haven't been able to figure it out yet.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="learn-more"&gt;
 &lt;h2&gt;Learn more&lt;/h2&gt;

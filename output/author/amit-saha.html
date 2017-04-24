@@ -386,7 +386,7 @@ we register via <tt class="docutils literal">Handle()</tt> and <tt class="docuti
 <li>Execute some code</li>
 <li>Return the response to the client</li>
 </ol>
-<p>Either of steps 2 or 4 or both may occur and this is where &quot;middleware&quot; comes in.</p>
+<p>Either of steps 2 or 4 or both may occur and this is where &quot;middleware&quot; comes in. Our next version of the server demonstrates how we may implement this:</p>
 <div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nx">main</span>
 
 <span class="kn">import</span> <span class="s">&quot;net/http&quot;</span>
@@ -405,9 +405,13 @@ we register via <tt class="docutils literal">Handle()</tt> and <tt class="docuti
 
 <span class="kd">func</span> <span class="nx">RunSomeCode</span><span class="p">(</span><span class="nx">handler</span> <span class="nx">http</span><span class="p">.</span><span class="nx">Handler</span><span class="p">)</span> <span class="nx">http</span><span class="p">.</span><span class="nx">Handler</span> <span class="p">{</span>
         <span class="k">return</span> <span class="nx">http</span><span class="p">.</span><span class="nx">HandlerFunc</span><span class="p">(</span><span class="kd">func</span><span class="p">(</span><span class="nx">w</span> <span class="nx">http</span><span class="p">.</span><span class="nx">ResponseWriter</span><span class="p">,</span> <span class="nx">r</span> <span class="o">*</span><span class="nx">http</span><span class="p">.</span><span class="nx">Request</span><span class="p">)</span> <span class="p">{</span>
-                <span class="nx">log</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="s">&quot;Before&quot;</span><span class="p">)</span>
+        <span class="nx">log</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="s">&quot;Got a %s request for: %v&quot;</span><span class="p">,</span> <span class="nx">r</span><span class="p">.</span><span class="nx">Method</span><span class="p">,</span> <span class="nx">r</span><span class="p">.</span><span class="nx">URL</span><span class="p">)</span>
                 <span class="nx">handler</span><span class="p">.</span><span class="nx">ServeHTTP</span><span class="p">(</span><span class="nx">w</span><span class="p">,</span> <span class="nx">r</span><span class="p">)</span>
-                <span class="nx">log</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="s">&quot;After&quot;</span><span class="p">)</span>
+        <span class="c1">// At this stage, our handler has &quot;handled&quot; the request</span>
+        <span class="c1">// but we can still write to the client there</span>
+        <span class="c1">// but we won&#39;t do that</span>
+        <span class="c1">// XXX: We don&#39;t have the HTTP status here either, need to understand this better why</span>
+        <span class="nx">log</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="s">&quot;Handler finished processing request&quot;</span><span class="p">)</span>
                 <span class="p">})</span>
 <span class="p">}</span>
 
@@ -424,6 +428,15 @@ we register via <tt class="docutils literal">Handle()</tt> and <tt class="docuti
         <span class="nx">http</span><span class="p">.</span><span class="nx">ListenAndServe</span><span class="p">(</span><span class="s">&quot;:8080&quot;</span><span class="p">,</span> <span class="nx">WrappedMux</span><span class="p">)</span>
 <span class="p">}</span>
 </pre></div>
+<p>When we run the server and send it a couple of requests as above, we will see:</p>
+<pre class="code literal-block">
+2017/04/24 17:53:03 Got a GET request for: /
+2017/04/24 17:53:03 Handler finished processing request
+2017/04/24 17:53:05 Got a GET request for: /status
+2017/04/24 17:53:05 Handler finished processing request
+</pre>
+<p>As part of this middleware writing exercise, I also wanted to be able to print the HTTP status of the response that we are sending but as the comment in the code states,
+I haven't been able to figure it out yet.</p>
 </div>
 <div class="section" id="learn-more">
 <h2>Learn more</h2>
