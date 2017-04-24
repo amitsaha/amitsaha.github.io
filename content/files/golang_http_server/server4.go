@@ -21,7 +21,9 @@ func RunSomeCode(handler http.Handler) http.Handler {
 		// At this stage, our handler has "handled" the request
 		// but we can still write to the client there
 		// but we won't do that
-		// XXX: We don't have the HTTP status here either, need to understand this better why
+		// XXX: We have the HTTP status here, but we cannot access
+		// it directly here
+		// See next example (server5.go)
 		log.Println("Handler finished processing request")
 	})
 }
