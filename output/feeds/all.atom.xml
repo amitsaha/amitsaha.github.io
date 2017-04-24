@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Programming and Writing about it</title><link href="/" rel="alternate"></link><link href="/feeds/all.atom.xml" rel="self"></link><id>/</id><updated>2017-04-22T10:00:00+10:00</updated><entry><title>Dissecting golang's HandlerFunc, Handle and DefaultServeMux</title><link href="/dissecting-golangs-handlerfunc-handle-and-defaultservemux.html" rel="alternate"></link><published>2017-04-22T10:00:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2017-04-22:dissecting-golangs-handlerfunc-handle-and-defaultservemux.html</id><summary type="html">&lt;p&gt;The &lt;a class="reference external" href="https://golang.org/pkg/net/http/#ListenAndServe"&gt;http.ListenAndServe(..)&lt;/a&gt; function is the most straightforward
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Programming and Writing about it</title><link href="/" rel="alternate"></link><link href="/feeds/all.atom.xml" rel="self"></link><id>/</id><updated>2017-04-24T10:00:00+10:00</updated><entry><title>Dissecting golang's HandlerFunc, Handle and DefaultServeMux</title><link href="/dissecting-golangs-handlerfunc-handle-and-defaultservemux.html" rel="alternate"></link><published>2017-04-24T10:00:00+10:00</published><updated>2017-04-24T10:00:00+10:00</updated><author><name>Amit Saha</name></author><id>tag:None,2017-04-24:/dissecting-golangs-handlerfunc-handle-and-defaultservemux.html</id><summary type="html">&lt;p&gt;My aim in this post is to discuss three &amp;quot;concepts&amp;quot; in Golang that I came across while writing HTTP servers. Through this
+discussion I am to get rid of my own lack of understanding (at least to a certain degree) about these. Hopefully, it will
+be of use to others …&lt;/p&gt;</summary><content type="html">&lt;p&gt;My aim in this post is to discuss three &amp;quot;concepts&amp;quot; in Golang that I came across while writing HTTP servers. Through this
+discussion I am to get rid of my own lack of understanding (at least to a certain degree) about these. Hopefully, it will
+be of use to others too.&lt;/p&gt;
+&lt;p&gt;The &lt;a class="reference external" href="https://golang.org/pkg/net/http/#ListenAndServe"&gt;http.ListenAndServe(..)&lt;/a&gt; function is the most straightforward
 approach to start a HTTP 1.1 server. The following code does just that:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;package&lt;/span&gt; &lt;span class="n"&gt;main&lt;/span&gt;
 
@@ -12,10 +17,11 @@ approach to start a HTTP 1.1 server. The following code does just that:&lt;/p&gt
         &lt;span class="n"&gt;log&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Fatal&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;http&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;ListenAndServe&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;:8080&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;nil&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
 &lt;span class="p"&gt;}&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;What is the &lt;cite&gt;nil&lt;/cite&gt; second argument above? The documentation states that the second argument to the function should be a &amp;quot;handler&amp;quot; and if it is specified as &lt;cite&gt;nil&lt;/cite&gt;, it defaults to &lt;cite&gt;DefaultServeMux&lt;/cite&gt;. By the end of next section and eventually by the end of the post, I will have successfully removed one of my main misconceptions - i.e. &lt;cite&gt;DefaultServeMux&lt;/cite&gt; was something else other than a handler.&lt;/p&gt;
+&lt;p&gt;What is the &lt;cite&gt;nil&lt;/cite&gt; second argument above? The documentation states that the second argument to the function should be a
+&amp;quot;handler&amp;quot; and if it is specified as &lt;cite&gt;nil&lt;/cite&gt;, it defaults to &lt;cite&gt;DefaultServeMux&lt;/cite&gt;.&lt;/p&gt;
 &lt;div class="section" id="what-is-defaultservemux"&gt;
 &lt;h2&gt;What is &lt;cite&gt;DefaultServeMux&lt;/cite&gt;?&lt;/h2&gt;
-&lt;p&gt;If we run our server above, and send a couple of HTTP GET requests, we will see the following:&lt;/p&gt;
+&lt;p&gt;If we run our server above via &lt;tt class="docutils literal"&gt;go run server1.go&lt;/tt&gt;, and send a couple of HTTP GET requests, we will see the following:&lt;/p&gt;
 &lt;pre class="code literal-block"&gt;
 $ curl localhost:8080
 404 page not found
@@ -23,8 +29,11 @@ $ curl localhost:8080
 $ curl localhost:8080/status/
 404 page not found
 &lt;/pre&gt;
-&lt;p&gt;This is because, we haven't specified how our server should handle requests to GET the root (&amp;quot;/&amp;quot;) - our first request or requests to GET the &amp;quot;/status&amp;quot; resource - our second request. Before we see how we could fix that, let's understand &lt;em&gt;how&lt;/em&gt; the error message &amp;quot;404 page not found&amp;quot; is generated.&lt;/p&gt;
-&lt;p&gt;The error message is generated from the function below in &lt;cite&gt;src/net/http/server.go&lt;/cite&gt; specifically the &lt;cite&gt;NotFoundHandler()&lt;/cite&gt; &amp;quot;handler&amp;quot; function:&lt;/p&gt;
+&lt;p&gt;This is because, we haven't specified how our server should handle requests to GET the root (&amp;quot;/&amp;quot;) - our first request or
+requests to GET the &amp;quot;/status&amp;quot; resource - our second request. Before we see how we could fix that, let's understand
+&lt;em&gt;how&lt;/em&gt; the error message &amp;quot;404 page not found&amp;quot; is generated.&lt;/p&gt;
+&lt;p&gt;The error message is generated from the function below in &lt;cite&gt;src/net/http/server.go&lt;/cite&gt; specifically the &lt;cite&gt;NotFoundHandler()&lt;/cite&gt;
+&amp;quot;handler&amp;quot; function:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;// handler is the main implementation of Handler.&lt;/span&gt;
 &lt;span class="c1"&gt;// The path is known to be in canonical form, except for CONNECT methods.&lt;/span&gt;
 &lt;span class="kd"&gt;func&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;mux&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="nx"&gt;ServeMux&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="nx"&gt;handler&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;host&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;path&lt;/span&gt; &lt;span class="kt"&gt;string&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;h&lt;/span&gt; &lt;span class="nx"&gt;Handler&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;pattern&lt;/span&gt; &lt;span class="kt"&gt;string&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
@@ -44,8 +53,8 @@ $ curl localhost:8080/status/
         &lt;span class="k"&gt;return&lt;/span&gt;
 &lt;span class="p"&gt;}&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;Now, let's roughly see how our GET request above reaches the above function. Let us consider the function signature of the above handler function: &lt;cite&gt;func (mux *ServeMux) handler(host, path string) (h Handler, pattern string)&lt;/cite&gt;.&lt;/p&gt;
-&lt;p&gt;This function is a method belonging to the type &lt;cite&gt;ServeMux&lt;/cite&gt;:&lt;/p&gt;
+&lt;p&gt;Now, let's roughly see how our GET request above reaches the above function.&lt;/p&gt;
+&lt;p&gt;Let us consider the function signature of the above handler function: &lt;cite&gt;func (mux *ServeMux) handler(host, path string) (h Handler, pattern string)&lt;/cite&gt;. This function is a method belonging to the type &lt;cite&gt;ServeMux&lt;/cite&gt;:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;// ServeMux also takes care of sanitizing the URL request path,&lt;/span&gt;
 &lt;span class="c1"&gt;// redirecting any request containing . or .. elements or repeated slashes&lt;/span&gt;
 &lt;span class="c1"&gt;// to an equivalent, cleaner URL.&lt;/span&gt;
@@ -69,7 +78,8 @@ $ curl localhost:8080/status/
 
 &lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;defaultServeMux&lt;/span&gt; &lt;span class="nx"&gt;ServeMux&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;So, how does &lt;cite&gt;DefaultServeMux&lt;/cite&gt; get set when the second argument to &lt;cite&gt;ListenAndServe()&lt;/cite&gt; is &lt;cite&gt;nil&lt;/cite&gt;? The following code snippet has the answer:&lt;/p&gt;
+&lt;p&gt;So, how does &lt;cite&gt;DefaultServeMux&lt;/cite&gt; get set when the second argument to &lt;cite&gt;ListenAndServe()&lt;/cite&gt; is &lt;cite&gt;nil&lt;/cite&gt;? The following code
+snippet has the answer:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kd"&gt;func&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;sh&lt;/span&gt; &lt;span class="nx"&gt;serverHandler&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="nx"&gt;ServeHTTP&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;rw&lt;/span&gt; &lt;span class="nx"&gt;ResponseWriter&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;req&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="nx"&gt;Request&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
         &lt;span class="nx"&gt;handler&lt;/span&gt; &lt;span class="o"&gt;:=&lt;/span&gt; &lt;span class="nx"&gt;sh&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;srv&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Handler&lt;/span&gt;
         &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="nx"&gt;handler&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="kc"&gt;nil&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
@@ -131,7 +141,9 @@ $ curl localhost:8080/status/
         &lt;span class="k"&gt;return&lt;/span&gt;
 &lt;span class="p"&gt;}&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;Now, when we make a request to &amp;quot;/&amp;quot; or &amp;quot;/status/&amp;quot;, no match is found by the &lt;cite&gt;mux.match()&lt;/cite&gt; call above and hence the handler returned is the &lt;cite&gt;NotFoundHandler&lt;/cite&gt; whose &lt;cite&gt;ServeHTTP()&lt;/cite&gt; function is then called to return the &amp;quot;404 page not found&amp;quot; error message:&lt;/p&gt;
+&lt;p&gt;Now, when we make a request to &amp;quot;/&amp;quot; or &amp;quot;/status/&amp;quot;, no match is found by the &lt;cite&gt;mux.match()&lt;/cite&gt; call above and hence the
+handler returned is the &lt;cite&gt;NotFoundHandler&lt;/cite&gt; whose &lt;cite&gt;ServeHTTP()&lt;/cite&gt; function is then called to return the &amp;quot;404 page not found&amp;quot;
+error message:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;// NotFound replies to the request with an HTTP 404 not found error.&lt;/span&gt;
 &lt;span class="kd"&gt;func&lt;/span&gt; &lt;span class="nx"&gt;NotFound&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;w&lt;/span&gt; &lt;span class="nx"&gt;ResponseWriter&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;r&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="nx"&gt;Request&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="nx"&gt;Error&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;w&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;404 page not found&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;StatusNotFound&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;}&lt;/span&gt;
 
@@ -197,9 +209,7 @@ OK
 &lt;span class="p"&gt;}&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;&lt;tt class="docutils literal"&gt;mux.m&lt;/tt&gt; is a a &lt;tt class="docutils literal"&gt;map&lt;/tt&gt; data structure defined in the &lt;tt class="docutils literal"&gt;ServeMux&lt;/tt&gt; structure (snippet earlier in the post) which stores a mapping of a path and the handler we have registered for it.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class="section" id="the-handlefunc-type"&gt;
-&lt;h2&gt;The HandleFunc() type&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;The HandleFunc() type&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;Let's go back to the idea of &amp;quot;converting&amp;quot; any function with the signature &lt;tt class="docutils literal"&gt;func aFunction(w http.ResponseWriter, r *http.Request)&lt;/tt&gt; to the type &amp;quot;HandlerFunc&amp;quot;.&lt;/p&gt;
 &lt;p&gt;Any type which has a ServeHTTP() method is said to implement the &lt;tt class="docutils literal"&gt;Handler&lt;/tt&gt; interface:&lt;/p&gt;
 &lt;pre class="code literal-block"&gt;
@@ -301,6 +311,8 @@ http.HandleFunc(&amp;quot;/status/&amp;quot;, StatusHandler)
 &lt;/div&gt;
 &lt;div class="section" id="using-your-own-handler-with-listenandserve"&gt;
 &lt;h2&gt;Using your own Handler with ListenAndServe()&lt;/h2&gt;
+&lt;p&gt;Earlier in this post, we saw how passsing &lt;tt class="docutils literal"&gt;nil&lt;/tt&gt; to &lt;tt class="docutils literal"&gt;ListenAndServe()&lt;/tt&gt; function sets the handler to &lt;tt class="docutils literal"&gt;DefaultServeMux&lt;/tt&gt;. The handlers
+we register via &lt;tt class="docutils literal"&gt;Handle()&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;HandleFunc()&lt;/tt&gt; are then added to this object. Hence, we could without changing any functionality rewrite our server as follows:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kn"&gt;package&lt;/span&gt; &lt;span class="nx"&gt;main&lt;/span&gt;
 
 &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;net/http&amp;quot;&lt;/span&gt;
@@ -327,9 +339,20 @@ http.HandleFunc(&amp;quot;/status/&amp;quot;, StatusHandler)
         &lt;span class="nx"&gt;http&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;ListenAndServe&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;:8080&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;mux&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;span class="p"&gt;}&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;We create an object of type &lt;tt class="docutils literal"&gt;ServeMux&lt;/tt&gt; via &lt;tt class="docutils literal"&gt;mux := http.NewServeMux()&lt;/tt&gt;, register our handlers calling the same two functions, but those that are defined for the &lt;tt class="docutils literal"&gt;ServeMux&lt;/tt&gt; object we created.&lt;/p&gt;
+&lt;p&gt;The reason we may want to use our own Handler with &lt;tt class="docutils literal"&gt;ListenAndServe()&lt;/tt&gt; is demonstrated in the next section.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="writing-middleware"&gt;
 &lt;h2&gt;Writing Middleware&lt;/h2&gt;
+&lt;p&gt;In our latest version of the server, we have specified our own handler to &lt;tt class="docutils literal"&gt;ListenAndServe()&lt;/tt&gt;. One reason for doing so is when you want to execute some code for every request. That is:&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;Server gets a request for &amp;quot;/path/&amp;quot;&lt;/li&gt;
+&lt;li&gt;Execute some code&lt;/li&gt;
+&lt;li&gt;Handler for &amp;quot;/path/&amp;quot; gets called&lt;/li&gt;
+&lt;li&gt;Execute some code&lt;/li&gt;
+&lt;li&gt;Return the response to the client&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Either of steps 2 or 4 or both may occur and this is where &amp;quot;middleware&amp;quot; comes in.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kn"&gt;package&lt;/span&gt; &lt;span class="nx"&gt;main&lt;/span&gt;
 
 &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;net/http&amp;quot;&lt;/span&gt;
@@ -367,23 +390,25 @@ http.HandleFunc(&amp;quot;/status/&amp;quot;, StatusHandler)
         &lt;span class="nx"&gt;http&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;ListenAndServe&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;:8080&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;WrappedMux&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;span class="p"&gt;}&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;&lt;a class="reference external" href="https://gocodecloud.com/blog/2016/11/15/simple-golang-http-request-context-example/"&gt;https://gocodecloud.com/blog/2016/11/15/simple-golang-http-request-context-example/&lt;/a&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="learn-more"&gt;
 &lt;h2&gt;Learn more&lt;/h2&gt;
 &lt;ul class="simple"&gt;
+&lt;li&gt;&lt;a class="reference external" href="https://gocodecloud.com/blog/2016/11/15/simple-golang-http-request-context-example/"&gt;https://gocodecloud.com/blog/2016/11/15/simple-golang-http-request-context-example/&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a class="reference external" href="http://jordanorelli.com/post/42369331748/function-types-in-go-golang"&gt;http://jordanorelli.com/post/42369331748/function-types-in-go-golang&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a class="reference external" href="https://golang.org/doc/effective_go.html#interface_methods"&gt;https://golang.org/doc/effective_go.html#interface_methods&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/div&gt;
-</summary></entry><entry><title>Doing Math with Python Humble Bundle</title><link href="/humble-bundle.html" rel="alternate"></link><published>2017-04-06T08:20:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2017-04-06:humble-bundle.html</id><summary type="html">&lt;p&gt;No Starch Press has launched a &amp;quot;Pay what you want&amp;quot; &lt;a class="reference external" href="https://www.humblebundle.com/books/python-book-bundle"&gt;Python Humble Bundle&lt;/a&gt; running from April 5th - April 19th!
+</content></entry><entry><title>Doing Math with Python Humble Bundle</title><link href="/humble-bundle.html" rel="alternate"></link><published>2017-04-06T08:20:00+10:00</published><updated>2017-04-06T08:20:00+10:00</updated><author><name>Amit Saha</name></author><id>tag:None,2017-04-06:/humble-bundle.html</id><summary type="html">&lt;p class="first last"&gt;Humble bundle&lt;/p&gt;
+</summary><content type="html">&lt;p&gt;No Starch Press has launched a &amp;quot;Pay what you want&amp;quot; &lt;a class="reference external" href="https://www.humblebundle.com/books/python-book-bundle"&gt;Python Humble Bundle&lt;/a&gt; running from April 5th - April 19th!
 Your purchases will help support the Python Software Foundation and I am excited to announce that Doing Math with Python is part of it.&lt;/p&gt;
 &lt;div class="figure align-center"&gt;
 &lt;img alt="Humble Bundle" src="/images/humble-bundle.png" /&gt;
 &lt;/div&gt;
 &lt;p&gt;For 1+ USD you can get three books including &amp;quot;Doing Math with Python&amp;quot;! For 15+ USD you get nine excellent Python books!&lt;/p&gt;
 &lt;p&gt;Get the bundle &lt;a class="reference external" href="https://www.humblebundle.com/books/python-book-bundle"&gt;here&lt;/a&gt;!&lt;/p&gt;
-</summary></entry><entry><title>Introducing distributed tracing in your Python application via Zipkin</title><link href="/introducing-distributed-tracing-in-your-python-application-via-zipkin.html" rel="alternate"></link><published>2017-03-28T17:00:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2017-03-28:introducing-distributed-tracing-in-your-python-application-via-zipkin.html</id><summary type="html">&lt;p&gt;Distributed tracing is the idea of tracing a network request as it travels through your services, as it would be in a microservices based architecture. The primary reason you may want to do is to troubleshoot or monitor the latency of a request
+</content></entry><entry><title>Introducing distributed tracing in your Python application via Zipkin</title><link href="/introducing-distributed-tracing-in-your-python-application-via-zipkin.html" rel="alternate"></link><published>2017-03-28T17:00:00+10:00</published><updated>2017-03-28T17:00:00+10:00</updated><author><name>Amit Saha</name></author><id>tag:None,2017-03-28:/introducing-distributed-tracing-in-your-python-application-via-zipkin.html</id><summary type="html">&lt;p&gt;Distributed tracing is the idea of tracing a network request as it travels through your services, as it would be in a microservices based architecture. The primary reason you may want to do is to troubleshoot or monitor the latency of a request
+as it travels through the different services …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Distributed tracing is the idea of tracing a network request as it travels through your services, as it would be in a microservices based architecture. The primary reason you may want to do is to troubleshoot or monitor the latency of a request
 as it travels through the different services.&lt;/p&gt;
 &lt;p&gt;In this post we will see a demo of how we can introduce distributed tracing into a Python network stack communicating via HTTP.
 We have a service &lt;tt class="docutils literal"&gt;demo&lt;/tt&gt; which is a Flask application, which listens on &lt;tt class="docutils literal"&gt;/&lt;/tt&gt;. The handler for &lt;tt class="docutils literal"&gt;/&lt;/tt&gt; calls another service &lt;tt class="docutils literal"&gt;service1&lt;/tt&gt; via HTTP. We want to be able to see how much time a request spends in each service by introducing distributed tracing. Before we get to the code, let's talk briefly about a few concepts.&lt;/p&gt;
@@ -523,7 +548,7 @@ has more:&lt;/p&gt;
 &lt;li&gt;&lt;a class="reference external" href="http://opentracing.io/"&gt;opentracing&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/div&gt;
-</summary></entry><entry><title>Notes on using Golang to write gitbackup</title><link href="/notes-on-using-golang-to-write-gitbackup.html" rel="alternate"></link><published>2017-03-26T10:00:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2017-03-26:notes-on-using-golang-to-write-gitbackup.html</id><summary type="html">&lt;p&gt;&lt;a class="reference external" href="https://github.com/amitsaha/gitbackup"&gt;gitbackup&lt;/a&gt; is a tool to backup your git repositories from GitHub and GitLab. I wrote the &lt;a class="reference external" href="https://github.com/amitsaha/gitbackup/releases/tag/lj-0.1"&gt;initial version&lt;/a&gt; as a project for a golang article which is in review for publication in a Linux magazine. It supports GitHub enterprise installations and custom GitLab installations in addition to repositories on github.com and gitlab.com. It's written in Golang, and built upon &lt;a class="reference external" href="https://github.com/google/go-github"&gt;go-github&lt;/a&gt; and &lt;a class="reference external" href="https://github.com/xanzy/go-gitlab"&gt;go-gitlab&lt;/a&gt; and other third party golang packages.&lt;/p&gt;
+</content></entry><entry><title>Notes on using Golang to write gitbackup</title><link href="/notes-on-using-golang-to-write-gitbackup.html" rel="alternate"></link><published>2017-03-26T10:00:00+10:00</published><updated>2017-03-26T10:00:00+10:00</updated><author><name>Amit Saha</name></author><id>tag:None,2017-03-26:/notes-on-using-golang-to-write-gitbackup.html</id><summary type="html">&lt;p&gt;&lt;a class="reference external" href="https://github.com/amitsaha/gitbackup"&gt;gitbackup&lt;/a&gt; is a tool to backup your git repositories from GitHub and GitLab. I wrote the &lt;a class="reference external" href="https://github.com/amitsaha/gitbackup/releases/tag/lj-0.1"&gt;initial version&lt;/a&gt; as a project for a golang article which is in review for publication in a Linux magazine. It supports GitHub enterprise installations and custom GitLab installations in addition to repositories on github …&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a class="reference external" href="https://github.com/amitsaha/gitbackup"&gt;gitbackup&lt;/a&gt; is a tool to backup your git repositories from GitHub and GitLab. I wrote the &lt;a class="reference external" href="https://github.com/amitsaha/gitbackup/releases/tag/lj-0.1"&gt;initial version&lt;/a&gt; as a project for a golang article which is in review for publication in a Linux magazine. It supports GitHub enterprise installations and custom GitLab installations in addition to repositories on github.com and gitlab.com. It's written in Golang, and built upon &lt;a class="reference external" href="https://github.com/google/go-github"&gt;go-github&lt;/a&gt; and &lt;a class="reference external" href="https://github.com/xanzy/go-gitlab"&gt;go-gitlab&lt;/a&gt; and other third party golang packages.&lt;/p&gt;
 &lt;p&gt;Since the initial version, the project's code has seen number of changes which has been a learning experience for me since I am still fairly new to Golang. In the rest of this post, I describe these and some personal notes about the experience.&lt;/p&gt;
 &lt;div class="section" id="using-afero-for-filesystem-operations"&gt;
 &lt;h2&gt;Using afero for filesystem operations&lt;/h2&gt;
@@ -710,7 +735,11 @@ test_script:
 &lt;p&gt;&lt;tt class="docutils literal"&gt;gitbackup&lt;/tt&gt; is mainly an educational project to build a tool which I and hopefully others find useful. I wanted to have reasonable test coverage for it, release binaries for multiple operating systems and architecture and have continuous testing setup on multiple operatng systems. So far, all of these has been successfully achieved.I am looking forward to using &lt;tt class="docutils literal"&gt;go dep&lt;/tt&gt; more as I get a chance and also happy about making &lt;tt class="docutils literal"&gt;gitbackup&lt;/tt&gt; compatible with standard go tools out of the box.&lt;/p&gt;
 &lt;p&gt;If you get a chance, please &lt;a class="reference external" href="https://github.com/amitsaha/gitbackup#gitbackup---backup-your-github-and-gitlab-repositories"&gt;try it out&lt;/a&gt; and I welcome any feedback and contributions!&lt;/p&gt;
 &lt;/div&gt;
-</summary></entry><entry><title>QueueLogger and Python JSON Logger</title><link href="/queuelogger-and-python-json-logger.html" rel="alternate"></link><published>2017-03-01T18:00:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2017-03-01:queuelogger-and-python-json-logger.html</id><summary type="html">&lt;div class="section" id="using-queuelogger-with-python-json-logger"&gt;
+</content></entry><entry><title>QueueLogger and Python JSON Logger</title><link href="/queuelogger-and-python-json-logger.html" rel="alternate"></link><published>2017-03-01T18:00:00+10:00</published><updated>2017-03-01T18:00:00+10:00</updated><author><name>Amit Saha</name></author><id>tag:None,2017-03-01:/queuelogger-and-python-json-logger.html</id><summary type="html">&lt;div class="section" id="using-queuelogger-with-python-json-logger"&gt;
+&lt;h2&gt;Using QueueLogger with Python JSON Logger&lt;/h2&gt;
+&lt;p&gt;When logging from multiple processes (via &lt;tt class="docutils literal"&gt;multiprocessing&lt;/tt&gt; module),  using &lt;a class="reference external" href="https://pythonhosted.org/logutils/queue.html#logutils.queue.QueueHandler"&gt;QueueHandler&lt;/a&gt; is one  approach with Python 2.&lt;/p&gt;
+&lt;p&gt;&lt;tt class="docutils literal"&gt;QueueHandler&lt;/tt&gt; however sets &lt;tt class="docutils literal"&gt;exc_info&lt;/tt&gt; attribute of a &lt;a class="reference external" href="https://docs.python.org/2/library/logging.html#logging.LogRecord"&gt;LogRecord&lt;/a&gt;
+to &lt;tt class="docutils literal"&gt;None&lt;/tt&gt; since it is not &amp;quot;pickleable&amp;quot; (more on this later). This becomes a problem when you use &lt;a class="reference external" href="https://github.com/madzak/python-json-logger/"&gt;python-json-logger&lt;/a&gt; to …&lt;/p&gt;&lt;/div&gt;</summary><content type="html">&lt;div class="section" id="using-queuelogger-with-python-json-logger"&gt;
 &lt;h2&gt;Using QueueLogger with Python JSON Logger&lt;/h2&gt;
 &lt;p&gt;When logging from multiple processes (via &lt;tt class="docutils literal"&gt;multiprocessing&lt;/tt&gt; module),  using &lt;a class="reference external" href="https://pythonhosted.org/logutils/queue.html#logutils.queue.QueueHandler"&gt;QueueHandler&lt;/a&gt; is one  approach with Python 2.&lt;/p&gt;
 &lt;p&gt;&lt;tt class="docutils literal"&gt;QueueHandler&lt;/tt&gt; however sets &lt;tt class="docutils literal"&gt;exc_info&lt;/tt&gt; attribute of a &lt;a class="reference external" href="https://docs.python.org/2/library/logging.html#logging.LogRecord"&gt;LogRecord&lt;/a&gt;
@@ -740,8 +769,8 @@ and add pickling support for &lt;tt class="docutils literal"&gt;exc_info&lt;/tt&
         Tracebacks via tblib. We only override the prepare()
         method to *not* set `exc_info=None`
     &amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;
-    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;__init__&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;args&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;**&lt;/span&gt;&lt;span class="n"&gt;kwargs&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
-        &lt;span class="n"&gt;logutils&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;queue&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;QueueHandler&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;__init__&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;args&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;**&lt;/span&gt;&lt;span class="n"&gt;kwargs&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="fm"&gt;__init__&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;args&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;**&lt;/span&gt;&lt;span class="n"&gt;kwargs&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+        &lt;span class="n"&gt;logutils&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;queue&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;QueueHandler&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="fm"&gt;__init__&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;args&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;**&lt;/span&gt;&lt;span class="n"&gt;kwargs&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 
     &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;prepare&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;record&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
         &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;record&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
@@ -753,7 +782,10 @@ and add pickling support for &lt;tt class="docutils literal"&gt;exc_info&lt;/tt&
 above (&lt;a class="reference external" href="https://github.com/amitsaha/python-json-logging/blob/master/multi_processes_queue_logger/multi_process_json_logging_tblib.py"&gt;Sample Code&lt;/a&gt;).&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-</summary></entry><entry><title>Setup Golang 1.8 and gb on Fedora (and other Linux distributions)</title><link href="/setup-golang-18-and-gb-on-fedora-and-other-linux-distributions.html" rel="alternate"></link><published>2017-03-01T18:00:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2017-03-01:setup-golang-18-and-gb-on-fedora-and-other-linux-distributions.html</id><summary type="html">&lt;p&gt;This guide will be how I usually setup and get started with Go development environment on Linux. By the end of this document, we will have seen how to:&lt;/p&gt;
+</content></entry><entry><title>Setup Golang 1.8 and gb on Fedora (and other Linux distributions)</title><link href="/setup-golang-18-and-gb-on-fedora-and-other-linux-distributions.html" rel="alternate"></link><published>2017-03-01T18:00:00+10:00</published><updated>2017-03-01T18:00:00+10:00</updated><author><name>Amit Saha</name></author><id>tag:None,2017-03-01:/setup-golang-18-and-gb-on-fedora-and-other-linux-distributions.html</id><summary type="html">&lt;p&gt;This guide will be how I usually setup and get started with Go development environment on Linux. By the end of this document, we will have seen how to:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;Install the Go 1.8 compiler and other tools (&lt;tt class="docutils literal"&gt;gofmt&lt;/tt&gt;, for eaxmple), collectively referred to as go tools&lt;/li&gt;
+&lt;li&gt;Install &lt;a class="reference external" href="http://getgb.io"&gt;gb&lt;/a&gt; and …&lt;/li&gt;&lt;/ul&gt;</summary><content type="html">&lt;p&gt;This guide will be how I usually setup and get started with Go development environment on Linux. By the end of this document, we will have seen how to:&lt;/p&gt;
 &lt;ul class="simple"&gt;
 &lt;li&gt;Install the Go 1.8 compiler and other tools (&lt;tt class="docutils literal"&gt;gofmt&lt;/tt&gt;, for eaxmple), collectively referred to as go tools&lt;/li&gt;
 &lt;li&gt;Install &lt;a class="reference external" href="http://getgb.io"&gt;gb&lt;/a&gt; and the &lt;tt class="docutils literal"&gt;vendor&lt;/tt&gt; plugin&lt;/li&gt;
@@ -1019,7 +1051,11 @@ $ ./bin/main
 &lt;p&gt;That's all for now, you can find the simple source code above &lt;a class="reference external" href="https://github.com/amitsaha/golang_gettingstarted"&gt;here&lt;/a&gt;.&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-</summary></entry><entry><title>Setup Golang on Fedora 24 (and other Linux distributions)</title><link href="/setup-golang-on-fedora-24-and-other-linux-distributions.html" rel="alternate"></link><published>2016-06-23T18:00:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2016-06-23:setup-golang-on-fedora-24-and-other-linux-distributions.html</id><summary type="html">&lt;p&gt;This guide will be how I usually setup and get started with Go development environment on Linux. By the end of this document, we will have seen how to:&lt;/p&gt;
+</content></entry><entry><title>Setup Golang on Fedora 24 (and other Linux distributions)</title><link href="/setup-golang-on-fedora-24-and-other-linux-distributions.html" rel="alternate"></link><published>2016-06-23T18:00:00+10:00</published><updated>2016-06-23T18:00:00+10:00</updated><author><name>Amit Saha</name></author><id>tag:None,2016-06-23:/setup-golang-on-fedora-24-and-other-linux-distributions.html</id><summary type="html">&lt;p&gt;This guide will be how I usually setup and get started with Go development environment on Linux. By the end of this document, we will have seen how to:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;Install the Go compiler and other tools (&lt;tt class="docutils literal"&gt;gofmt&lt;/tt&gt;, for eaxmple), collectively referred to as go tools&lt;/li&gt;
+&lt;li&gt;Setup Go workspace&lt;/li&gt;
+&lt;li&gt;Working with …&lt;/li&gt;&lt;/ul&gt;</summary><content type="html">&lt;p&gt;This guide will be how I usually setup and get started with Go development environment on Linux. By the end of this document, we will have seen how to:&lt;/p&gt;
 &lt;ul class="simple"&gt;
 &lt;li&gt;Install the Go compiler and other tools (&lt;tt class="docutils literal"&gt;gofmt&lt;/tt&gt;, for eaxmple), collectively referred to as go tools&lt;/li&gt;
 &lt;li&gt;Setup Go workspace&lt;/li&gt;
@@ -1208,7 +1244,7 @@ golang/
 &lt;/ul&gt;
 &lt;p&gt;That's all for now, you can find the simple source code above &lt;a class="reference external" href="https://github.com/amitsaha/golang_gettingstarted"&gt;here&lt;/a&gt;.&lt;/p&gt;
 &lt;/div&gt;
-</summary></entry><entry><title>Presentation slides with Jupyter Notebook</title><link href="/presentation-slides-with-jupyter-notebook.html" rel="alternate"></link><published>2016-05-31T22:00:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2016-05-31:presentation-slides-with-jupyter-notebook.html</id><summary type="html">&lt;p&gt;I presented at the PyCon 2016 Education Summit on &amp;quot;Doing Math with Python&amp;quot; day before yesterday and a lightning talk yesterday. This is the first time, I prepared a &lt;a class="reference external" href="doingmathwithpython.github.io/pycon-us-2016"&gt;slide deck&lt;/a&gt; using Jupyter Notebook + Reveal.js. I was pleased with the content creation process and the end result. So, here is what worked for me.&lt;/p&gt;
+</content></entry><entry><title>Presentation slides with Jupyter Notebook</title><link href="/presentation-slides-with-jupyter-notebook.html" rel="alternate"></link><published>2016-05-31T22:00:00+10:00</published><updated>2016-05-31T22:00:00+10:00</updated><author><name>Amit Saha</name></author><id>tag:None,2016-05-31:/presentation-slides-with-jupyter-notebook.html</id><summary type="html">&lt;p&gt;I presented at the PyCon 2016 Education Summit on &amp;quot;Doing Math with Python&amp;quot; day before yesterday and a lightning talk yesterday. This is the first time, I prepared a &lt;a class="reference external" href="doingmathwithpython.github.io/pycon-us-2016"&gt;slide deck&lt;/a&gt; using Jupyter Notebook + Reveal.js. I was pleased with the content creation process and the end result. So, here …&lt;/p&gt;</summary><content type="html">&lt;p&gt;I presented at the PyCon 2016 Education Summit on &amp;quot;Doing Math with Python&amp;quot; day before yesterday and a lightning talk yesterday. This is the first time, I prepared a &lt;a class="reference external" href="doingmathwithpython.github.io/pycon-us-2016"&gt;slide deck&lt;/a&gt; using Jupyter Notebook + Reveal.js. I was pleased with the content creation process and the end result. So, here is what worked for me.&lt;/p&gt;
 &lt;p&gt;&lt;em&gt;Please note that I have basically taken quite a bit of liberty with HTML where I didn't want to search for markdown way of doing something&lt;/em&gt;&lt;/p&gt;
 &lt;p&gt;Basically, there are two steps:&lt;/p&gt;
 &lt;ul class="simple"&gt;
@@ -1271,7 +1307,10 @@ $ jupyter-nbconvert --to slides slides.ipynb --reveal-prefix=reveal.js --post se
 &lt;/ul&gt;
 &lt;p&gt;Thanks for your work, Damián Avila and everyone else!&lt;/p&gt;
 &lt;/div&gt;
-</summary></entry><entry><title>New article: Write a program to tee output using Rust</title><link href="/new-article-write-a-program-to-tee-output-using-rust.html" rel="alternate"></link><published>2016-05-04T14:00:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2016-05-04:new-article-write-a-program-to-tee-output-using-rust.html</id><summary type="html">&lt;p&gt;My article &amp;quot;Write a program to tee output using Rust&amp;quot; is out in &lt;a class="reference external" href="https://linuxvoice.com"&gt;Linux
+</content></entry><entry><title>New article: Write a program to tee output using Rust</title><link href="/new-article-write-a-program-to-tee-output-using-rust.html" rel="alternate"></link><published>2016-05-04T14:00:00+10:00</published><updated>2016-05-04T14:00:00+10:00</updated><author><name>Amit Saha</name></author><id>tag:None,2016-05-04:/new-article-write-a-program-to-tee-output-using-rust.html</id><summary type="html">&lt;p&gt;My article &amp;quot;Write a program to tee output using Rust&amp;quot; is out in &lt;a class="reference external" href="https://linuxvoice.com"&gt;Linux
+Voice&lt;/a&gt; (Issue 27).&lt;/p&gt;
+&lt;p&gt;When I first set out to learning Rust, I really liked how the Rust programming language book
+took the approach of introducing the language via &lt;a class="reference external" href="https://doc.rust-lang.org/stable/book/guessing-game.html"&gt;small projects&lt;/a&gt;. In a recent &amp;quot;New Rustacean&amp;quot; &lt;a class="reference external" href="http://www.newrustacean.com/show_notes/bonus/_4/index.html"&gt;bonus …&lt;/a&gt;&lt;/p&gt;</summary><content type="html">&lt;p&gt;My article &amp;quot;Write a program to tee output using Rust&amp;quot; is out in &lt;a class="reference external" href="https://linuxvoice.com"&gt;Linux
 Voice&lt;/a&gt; (Issue 27).&lt;/p&gt;
 &lt;p&gt;When I first set out to learning Rust, I really liked how the Rust programming language book
 took the approach of introducing the language via &lt;a class="reference external" href="https://doc.rust-lang.org/stable/book/guessing-game.html"&gt;small projects&lt;/a&gt;. In a recent &amp;quot;New Rustacean&amp;quot; &lt;a class="reference external" href="http://www.newrustacean.com/show_notes/bonus/_4/index.html"&gt;bonus episode&lt;/a&gt;, Chris
@@ -1285,7 +1324,16 @@ discussed in the article.&lt;/p&gt;
 &lt;p&gt;I hope you enjoy reading the article, and please feel free to get in
 touch if you have any suggestions/comments/queries. I am &lt;cite&gt;&amp;#64;echorand&lt;/cite&gt;
 on Twitter, or you can email me at &lt;cite&gt;amitsaha.in AT gmail.com&lt;/cite&gt;.&lt;/p&gt;
-</summary></entry><entry><title>runC and libcontainer on Fedora 23/24</title><link href="/runc-and-libcontainer-on-fedora-2324.html" rel="alternate"></link><published>2016-04-27T17:00:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2016-04-27:runc-and-libcontainer-on-fedora-2324.html</id><summary type="html">&lt;p&gt;In this post, I will post my notes on how I got &lt;a class="reference external" href="https://github.com/opencontainers/runc/"&gt;runC&lt;/a&gt; and then using
+</content></entry><entry><title>runC and libcontainer on Fedora 23/24</title><link href="/runc-and-libcontainer-on-fedora-2324.html" rel="alternate"></link><published>2016-04-27T17:00:00+10:00</published><updated>2016-04-27T17:00:00+10:00</updated><author><name>Amit Saha</name></author><id>tag:None,2016-04-27:/runc-and-libcontainer-on-fedora-2324.html</id><summary type="html">&lt;p&gt;In this post, I will post my notes on how I got &lt;a class="reference external" href="https://github.com/opencontainers/runc/"&gt;runC&lt;/a&gt; and then using
+&lt;cite&gt;libcontainer&lt;/cite&gt; on Fedora. The first step is to install &lt;tt class="docutils literal"&gt;golang&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ sudo dnf -y install golang
+$ go version
+go version go1.6 linux/amd64
+&lt;/pre&gt;
+&lt;p&gt;We will set GOPATH=~/golang/ and then do the following:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ mkdir …&lt;/pre&gt;</summary><content type="html">&lt;p&gt;In this post, I will post my notes on how I got &lt;a class="reference external" href="https://github.com/opencontainers/runc/"&gt;runC&lt;/a&gt; and then using
 &lt;cite&gt;libcontainer&lt;/cite&gt; on Fedora. The first step is to install &lt;tt class="docutils literal"&gt;golang&lt;/tt&gt;:&lt;/p&gt;
 &lt;pre class="code literal-block"&gt;
 $ sudo dnf -y install golang
@@ -1360,10 +1408,14 @@ $ sudo GOPATH=/home/asaha/golang go run example1.go /home/asaha/rootfs/
 &lt;/pre&gt;
 &lt;p&gt;(Thanks Dharmit for all the suggestions)&lt;/p&gt;
 &lt;/div&gt;
-</summary></entry><entry><title>Webucator video: Python classes - basics beyond the absolute basics</title><link href="/webucator-video-python-classes-basics-beyond-the-absolute-basics.html" rel="alternate"></link><published>2016-04-17T14:00:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2016-04-17:webucator-video-python-classes-basics-beyond-the-absolute-basics.html</id><summary type="html">&lt;p&gt;&lt;a class="reference external" href="https://www.webucator.com/"&gt;Webucator&lt;/a&gt; recently created a video based on my &lt;a class="reference external" href="http://echorand.me/site/notes/articles/python_custom_class/article.html"&gt;Python classes: basics beyond the absolute basics&lt;/a&gt; article.&lt;/p&gt;
+</content></entry><entry><title>Webucator video: Python classes - basics beyond the absolute basics</title><link href="/webucator-video-python-classes-basics-beyond-the-absolute-basics.html" rel="alternate"></link><published>2016-04-17T14:00:00+10:00</published><updated>2016-04-17T14:00:00+10:00</updated><author><name>Amit Saha</name></author><id>tag:None,2016-04-17:/webucator-video-python-classes-basics-beyond-the-absolute-basics.html</id><summary type="html">&lt;p&gt;&lt;a class="reference external" href="https://www.webucator.com/"&gt;Webucator&lt;/a&gt; recently created a video based on my &lt;a class="reference external" href="http://echorand.me/site/notes/articles/python_custom_class/article.html"&gt;Python classes: basics beyond the absolute basics&lt;/a&gt; article.&lt;/p&gt;
 &lt;p&gt;You can see the video on &lt;a class="reference external" href="https://www.youtube.com/watch?v=0slsoyEhz40&amp;amp;feature=youtu.be"&gt;YouTube&lt;/a&gt;  or here below:&lt;/p&gt;
 &lt;div class="youtube youtube-16x9"&gt;&lt;iframe src="https://www.youtube.com/embed/0slsoyEhz40" allowfullscreen seamless frameBorder="0"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;p&gt;I think they really did a great job with it and supplements my article well.&lt;/p&gt;
-</summary></entry><entry><title>New article: Write an Image Cropping program with Go</title><link href="/new-article-write-an-image-cropping-program-with-go.html" rel="alternate"></link><published>2016-04-17T10:00:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2016-04-17:new-article-write-an-image-cropping-program-with-go.html</id><summary type="html">&lt;p&gt;My article &amp;quot;Write an Image Cropping with Go&amp;quot; is out in &lt;a class="reference external" href="https://linuxvoice.com"&gt;Linux Voice&lt;/a&gt; (Issue 26). It is my first article to be published in Linux Voice and I am very excited about it.&lt;/p&gt;
+</summary><content type="html">&lt;p&gt;&lt;a class="reference external" href="https://www.webucator.com/"&gt;Webucator&lt;/a&gt; recently created a video based on my &lt;a class="reference external" href="http://echorand.me/site/notes/articles/python_custom_class/article.html"&gt;Python classes: basics beyond the absolute basics&lt;/a&gt; article.&lt;/p&gt;
+&lt;p&gt;You can see the video on &lt;a class="reference external" href="https://www.youtube.com/watch?v=0slsoyEhz40&amp;amp;feature=youtu.be"&gt;YouTube&lt;/a&gt;  or here below:&lt;/p&gt;
+&lt;div class="youtube youtube-16x9"&gt;&lt;iframe src="https://www.youtube.com/embed/0slsoyEhz40" allowfullscreen seamless frameBorder="0"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;p&gt;I think they really did a great job with it and supplements my article well.&lt;/p&gt;
+</content></entry><entry><title>New article: Write an Image Cropping program with Go</title><link href="/new-article-write-an-image-cropping-program-with-go.html" rel="alternate"></link><published>2016-04-17T10:00:00+10:00</published><updated>2016-04-17T10:00:00+10:00</updated><author><name>Amit Saha</name></author><id>tag:None,2016-04-17:/new-article-write-an-image-cropping-program-with-go.html</id><summary type="html">&lt;p&gt;My article &amp;quot;Write an Image Cropping with Go&amp;quot; is out in &lt;a class="reference external" href="https://linuxvoice.com"&gt;Linux Voice&lt;/a&gt; (Issue 26). It is my first article to be published in Linux Voice and I am very excited about it.&lt;/p&gt;
+&lt;p&gt;It is challenging to write an introductory article without being able to explain everything the reader needs …&lt;/p&gt;</summary><content type="html">&lt;p&gt;My article &amp;quot;Write an Image Cropping with Go&amp;quot; is out in &lt;a class="reference external" href="https://linuxvoice.com"&gt;Linux Voice&lt;/a&gt; (Issue 26). It is my first article to be published in Linux Voice and I am very excited about it.&lt;/p&gt;
 &lt;p&gt;It is challenging to write an introductory article without being able to explain everything the reader needs to know so as to follow the article, while keeping the article concise. Therefore I have updated the &lt;a class="reference external" href="https://github.com/amitsaha/linux_voice_1"&gt;GitHub repo&lt;/a&gt; of the final code with a README which points you to various resources and tips I found useful while I was learning myself.&lt;/p&gt;
 &lt;p&gt;Go is one of the two &amp;quot;new&amp;quot; languages I have been exploring (the other being Rust). What do I like about it?&lt;/p&gt;
 &lt;div class="section" id="what-i-like-about-go"&gt;
@@ -1379,7 +1431,10 @@ $ sudo GOPATH=/home/asaha/golang go run example1.go /home/asaha/rootfs/
 &lt;p&gt;I hope you enjoy reading the article, and please feel free to get in touch if you have any suggestions/comments/queries. I am &lt;cite&gt;&amp;#64;echorand&lt;/cite&gt; on Twitter, or you can email me at &lt;cite&gt;amitsaha.in AT gmail.com&lt;/cite&gt;.&lt;/p&gt;
 &lt;p&gt;In the next issue of Linux Voice, I have an article coming up on Rust.&lt;/p&gt;
 &lt;/div&gt;
-</summary></entry><entry><title>Did your Fedora live cd build fail?</title><link href="/did-your-fedora-live-cd-build-fail.html" rel="alternate"></link><published>2016-02-17T11:00:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2016-02-17:did-your-fedora-live-cd-build-fail.html</id><summary type="html">&lt;p&gt;&lt;em&gt;Update: Changed the Koji URL to reflect the change to livemedia&lt;/em&gt;&lt;/p&gt;
+</content></entry><entry><title>Did your Fedora live cd build fail?</title><link href="/did-your-fedora-live-cd-build-fail.html" rel="alternate"></link><published>2016-02-17T11:00:00+10:00</published><updated>2016-02-17T11:00:00+10:00</updated><author><name>Amit Saha</name></author><id>tag:None,2016-02-17:/did-your-fedora-live-cd-build-fail.html</id><summary type="html">&lt;p&gt;&lt;em&gt;Update: Changed the Koji URL to reflect the change to livemedia&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;As the &lt;a class="reference external" href="http://fedora-scientific.readthedocs.org/en/latest/"&gt;Fedora Scientific&lt;/a&gt; maintainer, I
+have to make sure I look into whether the nightly build is failing so
+that I can look into the why. So far I have been doing that by going to the koji …&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;em&gt;Update: Changed the Koji URL to reflect the change to livemedia&lt;/em&gt;&lt;/p&gt;
 &lt;p&gt;As the &lt;a class="reference external" href="http://fedora-scientific.readthedocs.org/en/latest/"&gt;Fedora Scientific&lt;/a&gt; maintainer, I
 have to make sure I look into whether the nightly build is failing so
 that I can look into the why. So far I have been doing that by going to the koji &lt;a class="reference external" href="http://koji.fedoraproject.org/koji/tasks?state=all&amp;amp;view=tree&amp;amp;method=livemedia"&gt;url&lt;/a&gt;.&lt;/p&gt;
@@ -1434,7 +1489,19 @@ livecd (rawhide, Fedora-Live-Scientific_KDE-i686-rawhide, fedora-live-scientific
 createLiveCD (rawhide, Fedora-Live-Scientific_KDE-i686-rawhide-20160216, fedora-live-scientific_kde-db37b44.ks, i386)
 &lt;/pre&gt;
 &lt;p&gt;The GitHub repository for the code is available &lt;a class="reference external" href="https://github.com/amitsaha/fedora_livecd_build_failed"&gt;here&lt;/a&gt;.&lt;/p&gt;
-</summary></entry><entry><title>Replacing boto S3 mocks using moto in Python</title><link href="/replacing-boto-s3-mocks-using-moto-in-python.html" rel="alternate"></link><published>2016-01-25T16:00:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2016-01-25:replacing-boto-s3-mocks-using-moto-in-python.html</id><summary type="html">&lt;p&gt;Let's say you have some Python application code which connects to Amazon S3 which
+</content></entry><entry><title>Replacing boto S3 mocks using moto in Python</title><link href="/replacing-boto-s3-mocks-using-moto-in-python.html" rel="alternate"></link><published>2016-01-25T16:00:00+10:00</published><updated>2016-01-25T16:00:00+10:00</updated><author><name>Amit Saha</name></author><id>tag:None,2016-01-25:/replacing-boto-s3-mocks-using-moto-in-python.html</id><summary type="html">&lt;p&gt;Let's say you have some Python application code which connects to Amazon S3 which
+retrieves the keys in a bucket. Very likely, the application would be
+using &lt;a class="reference external" href="http://boto.cloudhackers.com/en/latest/s3_tut.html"&gt;boto&lt;/a&gt;
+and the code would like this:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+import boto
+
+def get_s3_conn():
+    return boto.connect_s3('&amp;lt;aws-access-key', '&amp;lt;aws-secret-key&amp;gt;')
+
+def list_keys():
+    s3_conn = get_s3_conn()
+    b = s3_conn.get_bucket …&lt;/pre&gt;</summary><content type="html">&lt;p&gt;Let's say you have some Python application code which connects to Amazon S3 which
 retrieves the keys in a bucket. Very likely, the application would be
 using &lt;a class="reference external" href="http://boto.cloudhackers.com/en/latest/s3_tut.html"&gt;boto&lt;/a&gt;
 and the code would like this:&lt;/p&gt;
@@ -1523,7 +1590,11 @@ interactions with others.&lt;/p&gt;
 benefits as mentioned previously.&lt;/p&gt;
 &lt;p&gt;Please checkout &lt;a class="reference external" href="https://github.com/spulec/moto"&gt;moto&lt;/a&gt; here.&lt;/p&gt;
 &lt;p&gt;If you like this post, please follow &lt;a class="reference external" href="https://twitter.com/PythonTestTips"&gt;PythonTestTips&lt;/a&gt; on Twitter.&lt;/p&gt;
-</summary></entry><entry><title>tempfile.NamedTemporaryFile() in Python</title><link href="/tempfilenamedtemporaryfile-in-python.html" rel="alternate"></link><published>2016-01-20T11:00:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2016-01-20:tempfilenamedtemporaryfile-in-python.html</id><summary type="html">&lt;p&gt;In Python, when you need to create a temporary file with a filename
+</content></entry><entry><title>tempfile.NamedTemporaryFile() in Python</title><link href="/tempfilenamedtemporaryfile-in-python.html" rel="alternate"></link><published>2016-01-20T11:00:00+10:00</published><updated>2016-01-20T11:00:00+10:00</updated><author><name>Amit Saha</name></author><id>tag:None,2016-01-20:/tempfilenamedtemporaryfile-in-python.html</id><summary type="html">&lt;p&gt;In Python, when you need to create a temporary file with a filename
+associated to it on disk, &lt;a class="reference external" href="https://docs.python.org/2/library/tempfile.html#tempfile.TemporaryFile"&gt;NamedTemporaryFile&lt;/a&gt;
+function in the &lt;tt class="docutils literal"&gt;tempfile&lt;/tt&gt; module is the goto function. Here are some use
+cases that I think one might use it for.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Case #1: You simply need a named empty temporary …&lt;/em&gt;&lt;/p&gt;</summary><content type="html">&lt;p&gt;In Python, when you need to create a temporary file with a filename
 associated to it on disk, &lt;a class="reference external" href="https://docs.python.org/2/library/tempfile.html#tempfile.TemporaryFile"&gt;NamedTemporaryFile&lt;/a&gt;
 function in the &lt;tt class="docutils literal"&gt;tempfile&lt;/tt&gt; module is the goto function. Here are some use
 cases that I think one might use it for.&lt;/p&gt;
@@ -1614,7 +1685,17 @@ assert not os.path.exists(path)
 &lt;p&gt;By default &lt;tt class="docutils literal"&gt;delete&lt;/tt&gt; is set to &lt;tt class="docutils literal"&gt;True&lt;/tt&gt; when calling
 &lt;tt class="docutils literal"&gt;NamedTemporaryFile()&lt;/tt&gt;, and thus setting it to &lt;tt class="docutils literal"&gt;False&lt;/tt&gt; gives more
 control on when the file gets removed from disk.&lt;/p&gt;
-</summary></entry><entry><title>Mock objects and non-existent attributes/methods in Python</title><link href="/mock-objects-and-non-existent-attributesmethods-in-python.html" rel="alternate"></link><published>2016-01-11T14:00:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2016-01-11:mock-objects-and-non-existent-attributesmethods-in-python.html</id><summary type="html">&lt;p&gt;&lt;em&gt;Updated&lt;/em&gt;: Fixed typo in the last paragraph.&lt;/p&gt;
+</content></entry><entry><title>Mock objects and non-existent attributes/methods in Python</title><link href="/mock-objects-and-non-existent-attributesmethods-in-python.html" rel="alternate"></link><published>2016-01-11T14:00:00+10:00</published><updated>2016-01-11T14:00:00+10:00</updated><author><name>Amit Saha</name></author><id>tag:None,2016-01-11:/mock-objects-and-non-existent-attributesmethods-in-python.html</id><summary type="html">&lt;p&gt;&lt;em&gt;Updated&lt;/em&gt;: Fixed typo in the last paragraph.&lt;/p&gt;
+&lt;p&gt;Today, I was curious to see this behavior of &lt;tt class="docutils literal"&gt;Mock()&lt;/tt&gt; objects when using &lt;a class="reference external" href="https://github.com/testing-cabal/mock"&gt;mock&lt;/a&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+&amp;gt;&amp;gt;&amp;gt; from mock import Mock
+&amp;gt;&amp;gt;&amp;gt; m = Mock()
+&amp;gt;&amp;gt;&amp;gt; m.i_dont_exist
+&amp;lt;Mock name='mock.i_dont_exist' id='139841609578768'&amp;gt;
+&amp;gt;&amp;gt;&amp;gt; m.i_dont_exist()
+&amp;lt;Mock name='mock.i_dont_exist()' id='139841609106896'&amp;gt;
+&lt;/pre&gt;
+&lt;p&gt;The above is expected, since I have …&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;em&gt;Updated&lt;/em&gt;: Fixed typo in the last paragraph.&lt;/p&gt;
 &lt;p&gt;Today, I was curious to see this behavior of &lt;tt class="docutils literal"&gt;Mock()&lt;/tt&gt; objects when using &lt;a class="reference external" href="https://github.com/testing-cabal/mock"&gt;mock&lt;/a&gt;:&lt;/p&gt;
 &lt;pre class="code literal-block"&gt;
 &amp;gt;&amp;gt;&amp;gt; from mock import Mock
@@ -1656,7 +1737,13 @@ if not self._mock_unsafe: # self._mock_unsafe is by default False
 &lt;p&gt;This is certainly a good thing, since I have often seen
 &lt;a class="reference external" href="http://engineeringblog.yelp.com/2015/02/assert_called_once-threat-or-menace.html"&gt;assert_called_once&lt;/a&gt;
 in codebases, and is fairly easy to overlook.&lt;/p&gt;
-</summary></entry><entry><title>Data only Docker containers</title><link href="/data-only-docker-containers.html" rel="alternate"></link><published>2015-12-13T11:00:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2015-12-13:data-only-docker-containers.html</id><summary type="html">&lt;p&gt;In this post, we shall take a look at the idea of data only
+</content></entry><entry><title>Data only Docker containers</title><link href="/data-only-docker-containers.html" rel="alternate"></link><published>2015-12-13T11:00:00+10:00</published><updated>2015-12-13T11:00:00+10:00</updated><author><name>Amit Saha</name></author><id>tag:None,2015-12-13:/data-only-docker-containers.html</id><summary type="html">&lt;p&gt;In this post, we shall take a look at the idea of data only
+containers - containers whose sole purpose is to exist on the &lt;em&gt;docker
+host&lt;/em&gt; so that other containers can have portable access to a
+persistent data volume.&lt;/p&gt;
+&lt;div class="section" id="why-do-we-need-a-persistent-data-volume"&gt;
+&lt;h2&gt;Why do we need a persistent data volume?&lt;/h2&gt;
+&lt;p&gt;We will experiment …&lt;/p&gt;&lt;/div&gt;</summary><content type="html">&lt;p&gt;In this post, we shall take a look at the idea of data only
 containers - containers whose sole purpose is to exist on the &lt;em&gt;docker
 host&lt;/em&gt; so that other containers can have portable access to a
 persistent data volume.&lt;/p&gt;
@@ -1776,7 +1863,12 @@ good approach to have persistent storage for your containers:&lt;/p&gt;
 &lt;li&gt;&lt;a class="reference external" href="https://medium.com/&amp;#64;ramangupta/why-docker-data-containers-are-good-589b3c6c749e"&gt;Why Docker Data Containers are Good&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/div&gt;
-</summary></entry><entry><title>A virtualenv first approach to Python projects</title><link href="/a-virtualenv-first-approach-to-python-projects.html" rel="alternate"></link><published>2015-11-30T12:00:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2015-11-30:a-virtualenv-first-approach-to-python-projects.html</id><summary type="html">&lt;p&gt;I have until the last few months (of my ~4 years of working with
+</content></entry><entry><title>A virtualenv first approach to Python projects</title><link href="/a-virtualenv-first-approach-to-python-projects.html" rel="alternate"></link><published>2015-11-30T12:00:00+10:00</published><updated>2015-11-30T12:00:00+10:00</updated><author><name>Amit Saha</name></author><id>tag:None,2015-11-30:/a-virtualenv-first-approach-to-python-projects.html</id><summary type="html">&lt;p&gt;I have until the last few months (of my ~4 years of working with
+Python) always worked without virtualenv for all my Python
+projects. Why? I think I found the whole idea of having to do the
+following two steps before I work on something cumbersome:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;Remember the exact virtualenv …&lt;/li&gt;&lt;/ul&gt;</summary><content type="html">&lt;p&gt;I have until the last few months (of my ~4 years of working with
 Python) always worked without virtualenv for all my Python
 projects. Why? I think I found the whole idea of having to do the
 following two steps before I work on something cumbersome:&lt;/p&gt;
@@ -1831,7 +1923,7 @@ virtualenvs as suggestions automatically.&lt;/p&gt;
 which should make working with &lt;tt class="docutils literal"&gt;virtualenvs&lt;/tt&gt; really easy. It has
 definitely made me change my approach to working on Python projects.&lt;/p&gt;
 &lt;/div&gt;
-</summary></entry><entry><title>PYTHONHASHSEED and your tests</title><link href="/pythonhashseed-and-your-tests.html" rel="alternate"></link><published>2015-11-19T11:00:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2015-11-19:pythonhashseed-and-your-tests.html</id><summary type="html">&lt;p&gt;Recently at work, I wanted to test a string which was being created by the &lt;tt class="docutils literal"&gt;urllib.urlencode()&lt;/tt&gt; function. My first attempt was simple - test my expected string with that being created by the function above using unittest's &lt;tt class="docutils literal"&gt;assertEquals()&lt;/tt&gt; function. It passed all the times I ran the tests before I committed the code, but it started failing when the tests were ran as part of the deployment process.&lt;/p&gt;
+</content></entry><entry><title>PYTHONHASHSEED and your tests</title><link href="/pythonhashseed-and-your-tests.html" rel="alternate"></link><published>2015-11-19T11:00:00+10:00</published><updated>2015-11-19T11:00:00+10:00</updated><author><name>Amit Saha</name></author><id>tag:None,2015-11-19:/pythonhashseed-and-your-tests.html</id><summary type="html">&lt;p&gt;Recently at work, I wanted to test a string which was being created by the &lt;tt class="docutils literal"&gt;urllib.urlencode()&lt;/tt&gt; function. My first attempt was simple - test my expected string with that being created by the function above using unittest's &lt;tt class="docutils literal"&gt;assertEquals()&lt;/tt&gt; function. It passed all the times I ran the tests before I …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Recently at work, I wanted to test a string which was being created by the &lt;tt class="docutils literal"&gt;urllib.urlencode()&lt;/tt&gt; function. My first attempt was simple - test my expected string with that being created by the function above using unittest's &lt;tt class="docutils literal"&gt;assertEquals()&lt;/tt&gt; function. It passed all the times I ran the tests before I committed the code, but it started failing when the tests were ran as part of the deployment process.&lt;/p&gt;
 &lt;p&gt;The input to the &lt;tt class="docutils literal"&gt;urllib.urlencode()&lt;/tt&gt; function is a dictionary of key value pairs and hence the returned value can really be any of the arrangements of the key value pairs. So, for example &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;{'key1':'value',&lt;/span&gt; &lt;span class="pre"&gt;'key2':'value'}&lt;/span&gt;&lt;/tt&gt; can result in the query string &lt;tt class="docutils literal"&gt;key1=value&amp;amp;key2=value&lt;/tt&gt; or &lt;tt class="docutils literal"&gt;key2=value&amp;amp;key1=value&lt;/tt&gt;. We cannot know for sure and we shouldn't need to.&lt;/p&gt;
 &lt;p&gt;Thus, we cannot use &lt;tt class="docutils literal"&gt;&lt;span class="pre"&gt;self.assertEquals(urllib.urlencode({'key1':'value',&lt;/span&gt; &lt;span class="pre"&gt;{'key2':'value'}),&lt;/span&gt; 'key1=value&amp;amp;key2=value')&lt;/tt&gt; without the possibility that it will fail eventually. The reason why we see such behaviour of course is that for dictionaries, the order in which the keys are stored is not deterministic - or known apriori. You can see this behaviour by explicitly setting the value of &lt;a class="reference external" href="https://docs.python.org/3.3/using/cmdline.html#envvar-PYTHONHASHSEED"&gt;PYTHONHASHSEED&lt;/a&gt; to different values.&lt;/p&gt;
 &lt;p&gt;So, how should we write such tests? Let's see one possible way which I will state as - &lt;strong&gt;Instead of asserting the equality of entire objects, we should be testing for the presence of the expected constituent objects&lt;/strong&gt;. I demonstrate it via two similar examples:&lt;/p&gt;
@@ -1891,7 +1983,12 @@ def test_where_clause_2():
 &lt;p&gt;If you run the above tests with different &lt;tt class="docutils literal"&gt;PYTHONHASHSEED&lt;/tt&gt; values, you will notice similar behaviour to the previous example.&lt;/p&gt;
 &lt;p&gt;If you are using &lt;a class="reference external" href="https://testrun.org/tox/latest/example/basic.html#special-handling-of-pythonhashseed"&gt;tox&lt;/a&gt; to run your tests, it automatically sets &lt;tt class="docutils literal"&gt;PYTHONHASHSEED&lt;/tt&gt; to a random integer when it is invoked. Hence, if you have never had your tests fail so far, there is a good chance your tests do not make any assumptions of order when dealing with Python dictionaries - but that of course is no guarantee that your tests are completely free since there may be this particular random number that has not been tried yet! So, ideally you may just want to do run your tests (especially if they don't take long) for a large number of PYTHONHASHSEED values just to be more confident.&lt;/p&gt;
 &lt;/div&gt;
-</summary></entry><entry><title>Mounting a docker volume on SELinux enabled host</title><link href="/mounting-a-docker-volume-on-selinux-enabled-host.html" rel="alternate"></link><published>2015-10-05T11:00:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2015-10-05:mounting-a-docker-volume-on-selinux-enabled-host.html</id><summary type="html">&lt;p&gt;My workflow with docker usually involves volume mounting a host
+</content></entry><entry><title>Mounting a docker volume on SELinux enabled host</title><link href="/mounting-a-docker-volume-on-selinux-enabled-host.html" rel="alternate"></link><published>2015-10-05T11:00:00+10:00</published><updated>2015-10-05T11:00:00+10:00</updated><author><name>Amit Saha</name></author><id>tag:None,2015-10-05:/mounting-a-docker-volume-on-selinux-enabled-host.html</id><summary type="html">&lt;p&gt;My workflow with docker usually involves volume mounting a host
+directory so that I can read and write to the host directory from my
+container as a &lt;em&gt;non-root&lt;/em&gt; user. On a Fedora 23 host with SELinux
+enabled, this is what I have to do differently:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+Use: -v /var/dir1:var …&lt;/pre&gt;</summary><content type="html">&lt;p&gt;My workflow with docker usually involves volume mounting a host
 directory so that I can read and write to the host directory from my
 container as a &lt;em&gt;non-root&lt;/em&gt; user. On a Fedora 23 host with SELinux
 enabled, this is what I have to do differently:&lt;/p&gt;
@@ -1900,7 +1997,7 @@ Use: -v /var/dir1:var/dir1:Z
 &lt;/pre&gt;
 &lt;p&gt;Note the extra Z above? You can learn more about it this
 &lt;a class="reference external" href="http://www.projectatomic.io/blog/2015/06/using-volumes-with-docker-can-cause-problems-with-selinux/"&gt;Project Atomic blog post&lt;/a&gt;&lt;/p&gt;
-</summary></entry><entry><title>Standalone open source puppet setup on Fedora</title><link href="/standalone-open-source-puppet-setup-on-fedora.html" rel="alternate"></link><published>2015-10-01T14:54:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2015-10-01:standalone-open-source-puppet-setup-on-fedora.html</id><summary type="html">&lt;p&gt;My goal in this post is to show how to setup puppet in standalone mode on a Fedora 23 system. This setup will allow writing puppet modules and then you can apply them on your local system and check manually and via serverspec tests that they are doing what you intend them to be doing. Obviously, a VM would be the best test environment for this, or even a container. Let's get started.&lt;/p&gt;
+</content></entry><entry><title>Standalone open source puppet setup on Fedora</title><link href="/standalone-open-source-puppet-setup-on-fedora.html" rel="alternate"></link><published>2015-10-01T14:54:00+10:00</published><updated>2015-10-01T14:54:00+10:00</updated><author><name>Amit Saha</name></author><id>tag:None,2015-10-01:/standalone-open-source-puppet-setup-on-fedora.html</id><summary type="html">&lt;p&gt;My goal in this post is to show how to setup puppet in standalone mode on a Fedora 23 system. This setup will allow writing puppet modules and then you can apply them on your local system and check manually and via serverspec tests that they are doing what you …&lt;/p&gt;</summary><content type="html">&lt;p&gt;My goal in this post is to show how to setup puppet in standalone mode on a Fedora 23 system. This setup will allow writing puppet modules and then you can apply them on your local system and check manually and via serverspec tests that they are doing what you intend them to be doing. Obviously, a VM would be the best test environment for this, or even a container. Let's get started.&lt;/p&gt;
 &lt;div class="section" id="setup"&gt;
 &lt;h2&gt;Setup&lt;/h2&gt;
 &lt;p&gt;Install &lt;tt class="docutils literal"&gt;puppet&lt;/tt&gt;:&lt;/p&gt;
@@ -2139,7 +2236,13 @@ $ puppet config print modulepath
 &lt;li&gt;Advanced serverspec tips: &lt;a class="reference external" href="http://serverspec.org/advanced_tips.html"&gt;http://serverspec.org/advanced_tips.html&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/div&gt;
-</summary></entry><entry><title>Fedora 22 Scientific</title><link href="/fedora-22-scientific.html" rel="alternate"></link><published>2015-06-11T10:20:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2015-06-11:fedora-22-scientific.html</id><summary type="html">&lt;p&gt;Fedora 22 was &lt;a class="reference external" href="http://fedoramagazine.org/fedora-22-released/"&gt;released recently&lt;/a&gt; which also means we
+</content></entry><entry><title>Fedora 22 Scientific</title><link href="/fedora-22-scientific.html" rel="alternate"></link><published>2015-06-11T10:20:00+10:00</published><updated>2015-06-11T10:20:00+10:00</updated><author><name>Amit Saha</name></author><id>tag:None,2015-06-11:/fedora-22-scientific.html</id><summary type="html">&lt;p&gt;Fedora 22 was &lt;a class="reference external" href="http://fedoramagazine.org/fedora-22-released/"&gt;released recently&lt;/a&gt; which also means we
+have a new Fedora Scientific release. &lt;a class="reference external" href="https://labs.fedoraproject.org/en/scientific/"&gt;Fedora Scientific&lt;/a&gt;
+is now part of &lt;a class="reference external" href="http://fedoramagazine.org/new-websites-fedora-22/"&gt;Fedora labs&lt;/a&gt;.&lt;/p&gt;
+&lt;a class="reference external image-reference" href="https://labs.fedoraproject.org/en/scientific/"&gt;&lt;img alt="Featured Applications Image" class="align-center" src="/images/scientific-featured-applications.png" style="width: 650.0px; height: 550.0px;" /&gt;&lt;/a&gt;
+&lt;p&gt;As you can see, the new home for Fedora Scientific looks
+amazing. The &amp;quot;Featured Applications&amp;quot; section features the most
+important and useful tools in Fedora Scientific. I …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Fedora 22 was &lt;a class="reference external" href="http://fedoramagazine.org/fedora-22-released/"&gt;released recently&lt;/a&gt; which also means we
 have a new Fedora Scientific release. &lt;a class="reference external" href="https://labs.fedoraproject.org/en/scientific/"&gt;Fedora Scientific&lt;/a&gt;
 is now part of &lt;a class="reference external" href="http://fedoramagazine.org/new-websites-fedora-22/"&gt;Fedora labs&lt;/a&gt;.&lt;/p&gt;
 &lt;a class="reference external image-reference" href="https://labs.fedoraproject.org/en/scientific/"&gt;&lt;img alt="Featured Applications Image" class="align-center" src="/images/scientific-featured-applications.png" style="width: 650.0px; height: 550.0px;" /&gt;&lt;/a&gt;
@@ -2149,6 +2252,8 @@ important and useful tools in Fedora Scientific. I think that is a
 great idea. Everyone associated with it, thank you very much.&lt;/p&gt;
 &lt;p&gt;I have also updated the &lt;a class="reference external" href="http://fedora-scientific.readthedocs.org/"&gt;Fedora Scientific Guide&lt;/a&gt; to reflect the
 changes.&lt;/p&gt;
-</summary></entry><entry><title>Remapping http://echorand.me</title><link href="/remapping-httpechorandme.html" rel="alternate"></link><published>2015-04-30T10:20:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2015-04-30:remapping-httpechorandme.html</id><summary type="html">&lt;p&gt;I changed the mapping of my domain to point to my GitHub pages. My old
+</content></entry><entry><title>Remapping http://echorand.me</title><link href="/remapping-httpechorandme.html" rel="alternate"></link><published>2015-04-30T10:20:00+10:00</published><updated>2015-04-30T10:20:00+10:00</updated><author><name>Amit Saha</name></author><id>tag:None,2015-04-30:/remapping-httpechorandme.html</id><summary type="html">&lt;p&gt;I changed the mapping of my domain to point to my GitHub pages. My old
 blog content is still available &lt;a class="reference external" href="http://amitksaha.wordpress.com"&gt;here&lt;/a&gt;.&lt;/p&gt;
-</summary></entry></feed>
+</summary><content type="html">&lt;p&gt;I changed the mapping of my domain to point to my GitHub pages. My old
+blog content is still available &lt;a class="reference external" href="http://amitksaha.wordpress.com"&gt;here&lt;/a&gt;.&lt;/p&gt;
+</content></entry></feed>

@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Programming and Writing about it</title><link href="/" rel="alternate"></link><link href="/feeds/golang.atom.xml" rel="self"></link><id>/</id><updated>2017-04-22T10:00:00+10:00</updated><entry><title>Dissecting golang's HandlerFunc, Handle and DefaultServeMux</title><link href="/dissecting-golangs-handlerfunc-handle-and-defaultservemux.html" rel="alternate"></link><published>2017-04-22T10:00:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2017-04-22:dissecting-golangs-handlerfunc-handle-and-defaultservemux.html</id><summary type="html">&lt;p&gt;The &lt;a class="reference external" href="https://golang.org/pkg/net/http/#ListenAndServe"&gt;http.ListenAndServe(..)&lt;/a&gt; function is the most straightforward
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Programming and Writing about it - golang</title><link href="/" rel="alternate"></link><link href="/feeds/golang.atom.xml" rel="self"></link><id>/</id><updated>2017-04-24T10:00:00+10:00</updated><entry><title>Dissecting golang's HandlerFunc, Handle and DefaultServeMux</title><link href="/dissecting-golangs-handlerfunc-handle-and-defaultservemux.html" rel="alternate"></link><published>2017-04-24T10:00:00+10:00</published><updated>2017-04-24T10:00:00+10:00</updated><author><name>Amit Saha</name></author><id>tag:None,2017-04-24:/dissecting-golangs-handlerfunc-handle-and-defaultservemux.html</id><summary type="html">&lt;p&gt;My aim in this post is to discuss three &amp;quot;concepts&amp;quot; in Golang that I came across while writing HTTP servers. Through this
+discussion I am to get rid of my own lack of understanding (at least to a certain degree) about these. Hopefully, it will
+be of use to others …&lt;/p&gt;</summary><content type="html">&lt;p&gt;My aim in this post is to discuss three &amp;quot;concepts&amp;quot; in Golang that I came across while writing HTTP servers. Through this
+discussion I am to get rid of my own lack of understanding (at least to a certain degree) about these. Hopefully, it will
+be of use to others too.&lt;/p&gt;
+&lt;p&gt;The &lt;a class="reference external" href="https://golang.org/pkg/net/http/#ListenAndServe"&gt;http.ListenAndServe(..)&lt;/a&gt; function is the most straightforward
 approach to start a HTTP 1.1 server. The following code does just that:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;package&lt;/span&gt; &lt;span class="n"&gt;main&lt;/span&gt;
 
@@ -12,10 +17,11 @@ approach to start a HTTP 1.1 server. The following code does just that:&lt;/p&gt
         &lt;span class="n"&gt;log&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Fatal&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;http&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;ListenAndServe&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;:8080&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;nil&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
 &lt;span class="p"&gt;}&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;What is the &lt;cite&gt;nil&lt;/cite&gt; second argument above? The documentation states that the second argument to the function should be a &amp;quot;handler&amp;quot; and if it is specified as &lt;cite&gt;nil&lt;/cite&gt;, it defaults to &lt;cite&gt;DefaultServeMux&lt;/cite&gt;. By the end of next section and eventually by the end of the post, I will have successfully removed one of my main misconceptions - i.e. &lt;cite&gt;DefaultServeMux&lt;/cite&gt; was something else other than a handler.&lt;/p&gt;
+&lt;p&gt;What is the &lt;cite&gt;nil&lt;/cite&gt; second argument above? The documentation states that the second argument to the function should be a
+&amp;quot;handler&amp;quot; and if it is specified as &lt;cite&gt;nil&lt;/cite&gt;, it defaults to &lt;cite&gt;DefaultServeMux&lt;/cite&gt;.&lt;/p&gt;
 &lt;div class="section" id="what-is-defaultservemux"&gt;
 &lt;h2&gt;What is &lt;cite&gt;DefaultServeMux&lt;/cite&gt;?&lt;/h2&gt;
-&lt;p&gt;If we run our server above, and send a couple of HTTP GET requests, we will see the following:&lt;/p&gt;
+&lt;p&gt;If we run our server above via &lt;tt class="docutils literal"&gt;go run server1.go&lt;/tt&gt;, and send a couple of HTTP GET requests, we will see the following:&lt;/p&gt;
 &lt;pre class="code literal-block"&gt;
 $ curl localhost:8080
 404 page not found
@@ -23,8 +29,11 @@ $ curl localhost:8080
 $ curl localhost:8080/status/
 404 page not found
 &lt;/pre&gt;
-&lt;p&gt;This is because, we haven't specified how our server should handle requests to GET the root (&amp;quot;/&amp;quot;) - our first request or requests to GET the &amp;quot;/status&amp;quot; resource - our second request. Before we see how we could fix that, let's understand &lt;em&gt;how&lt;/em&gt; the error message &amp;quot;404 page not found&amp;quot; is generated.&lt;/p&gt;
-&lt;p&gt;The error message is generated from the function below in &lt;cite&gt;src/net/http/server.go&lt;/cite&gt; specifically the &lt;cite&gt;NotFoundHandler()&lt;/cite&gt; &amp;quot;handler&amp;quot; function:&lt;/p&gt;
+&lt;p&gt;This is because, we haven't specified how our server should handle requests to GET the root (&amp;quot;/&amp;quot;) - our first request or
+requests to GET the &amp;quot;/status&amp;quot; resource - our second request. Before we see how we could fix that, let's understand
+&lt;em&gt;how&lt;/em&gt; the error message &amp;quot;404 page not found&amp;quot; is generated.&lt;/p&gt;
+&lt;p&gt;The error message is generated from the function below in &lt;cite&gt;src/net/http/server.go&lt;/cite&gt; specifically the &lt;cite&gt;NotFoundHandler()&lt;/cite&gt;
+&amp;quot;handler&amp;quot; function:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;// handler is the main implementation of Handler.&lt;/span&gt;
 &lt;span class="c1"&gt;// The path is known to be in canonical form, except for CONNECT methods.&lt;/span&gt;
 &lt;span class="kd"&gt;func&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;mux&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="nx"&gt;ServeMux&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="nx"&gt;handler&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;host&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;path&lt;/span&gt; &lt;span class="kt"&gt;string&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;h&lt;/span&gt; &lt;span class="nx"&gt;Handler&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;pattern&lt;/span&gt; &lt;span class="kt"&gt;string&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
@@ -44,8 +53,8 @@ $ curl localhost:8080/status/
         &lt;span class="k"&gt;return&lt;/span&gt;
 &lt;span class="p"&gt;}&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;Now, let's roughly see how our GET request above reaches the above function. Let us consider the function signature of the above handler function: &lt;cite&gt;func (mux *ServeMux) handler(host, path string) (h Handler, pattern string)&lt;/cite&gt;.&lt;/p&gt;
-&lt;p&gt;This function is a method belonging to the type &lt;cite&gt;ServeMux&lt;/cite&gt;:&lt;/p&gt;
+&lt;p&gt;Now, let's roughly see how our GET request above reaches the above function.&lt;/p&gt;
+&lt;p&gt;Let us consider the function signature of the above handler function: &lt;cite&gt;func (mux *ServeMux) handler(host, path string) (h Handler, pattern string)&lt;/cite&gt;. This function is a method belonging to the type &lt;cite&gt;ServeMux&lt;/cite&gt;:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;// ServeMux also takes care of sanitizing the URL request path,&lt;/span&gt;
 &lt;span class="c1"&gt;// redirecting any request containing . or .. elements or repeated slashes&lt;/span&gt;
 &lt;span class="c1"&gt;// to an equivalent, cleaner URL.&lt;/span&gt;
@@ -69,7 +78,8 @@ $ curl localhost:8080/status/
 
 &lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;defaultServeMux&lt;/span&gt; &lt;span class="nx"&gt;ServeMux&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;So, how does &lt;cite&gt;DefaultServeMux&lt;/cite&gt; get set when the second argument to &lt;cite&gt;ListenAndServe()&lt;/cite&gt; is &lt;cite&gt;nil&lt;/cite&gt;? The following code snippet has the answer:&lt;/p&gt;
+&lt;p&gt;So, how does &lt;cite&gt;DefaultServeMux&lt;/cite&gt; get set when the second argument to &lt;cite&gt;ListenAndServe()&lt;/cite&gt; is &lt;cite&gt;nil&lt;/cite&gt;? The following code
+snippet has the answer:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kd"&gt;func&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;sh&lt;/span&gt; &lt;span class="nx"&gt;serverHandler&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="nx"&gt;ServeHTTP&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;rw&lt;/span&gt; &lt;span class="nx"&gt;ResponseWriter&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;req&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="nx"&gt;Request&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
         &lt;span class="nx"&gt;handler&lt;/span&gt; &lt;span class="o"&gt;:=&lt;/span&gt; &lt;span class="nx"&gt;sh&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;srv&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Handler&lt;/span&gt;
         &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="nx"&gt;handler&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="kc"&gt;nil&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
@@ -131,7 +141,9 @@ $ curl localhost:8080/status/
         &lt;span class="k"&gt;return&lt;/span&gt;
 &lt;span class="p"&gt;}&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;Now, when we make a request to &amp;quot;/&amp;quot; or &amp;quot;/status/&amp;quot;, no match is found by the &lt;cite&gt;mux.match()&lt;/cite&gt; call above and hence the handler returned is the &lt;cite&gt;NotFoundHandler&lt;/cite&gt; whose &lt;cite&gt;ServeHTTP()&lt;/cite&gt; function is then called to return the &amp;quot;404 page not found&amp;quot; error message:&lt;/p&gt;
+&lt;p&gt;Now, when we make a request to &amp;quot;/&amp;quot; or &amp;quot;/status/&amp;quot;, no match is found by the &lt;cite&gt;mux.match()&lt;/cite&gt; call above and hence the
+handler returned is the &lt;cite&gt;NotFoundHandler&lt;/cite&gt; whose &lt;cite&gt;ServeHTTP()&lt;/cite&gt; function is then called to return the &amp;quot;404 page not found&amp;quot;
+error message:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;// NotFound replies to the request with an HTTP 404 not found error.&lt;/span&gt;
 &lt;span class="kd"&gt;func&lt;/span&gt; &lt;span class="nx"&gt;NotFound&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;w&lt;/span&gt; &lt;span class="nx"&gt;ResponseWriter&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;r&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="nx"&gt;Request&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="nx"&gt;Error&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;w&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;404 page not found&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;StatusNotFound&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;}&lt;/span&gt;
 
@@ -197,9 +209,7 @@ OK
 &lt;span class="p"&gt;}&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;&lt;tt class="docutils literal"&gt;mux.m&lt;/tt&gt; is a a &lt;tt class="docutils literal"&gt;map&lt;/tt&gt; data structure defined in the &lt;tt class="docutils literal"&gt;ServeMux&lt;/tt&gt; structure (snippet earlier in the post) which stores a mapping of a path and the handler we have registered for it.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class="section" id="the-handlefunc-type"&gt;
-&lt;h2&gt;The HandleFunc() type&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;The HandleFunc() type&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;Let's go back to the idea of &amp;quot;converting&amp;quot; any function with the signature &lt;tt class="docutils literal"&gt;func aFunction(w http.ResponseWriter, r *http.Request)&lt;/tt&gt; to the type &amp;quot;HandlerFunc&amp;quot;.&lt;/p&gt;
 &lt;p&gt;Any type which has a ServeHTTP() method is said to implement the &lt;tt class="docutils literal"&gt;Handler&lt;/tt&gt; interface:&lt;/p&gt;
 &lt;pre class="code literal-block"&gt;
@@ -301,6 +311,8 @@ http.HandleFunc(&amp;quot;/status/&amp;quot;, StatusHandler)
 &lt;/div&gt;
 &lt;div class="section" id="using-your-own-handler-with-listenandserve"&gt;
 &lt;h2&gt;Using your own Handler with ListenAndServe()&lt;/h2&gt;
+&lt;p&gt;Earlier in this post, we saw how passsing &lt;tt class="docutils literal"&gt;nil&lt;/tt&gt; to &lt;tt class="docutils literal"&gt;ListenAndServe()&lt;/tt&gt; function sets the handler to &lt;tt class="docutils literal"&gt;DefaultServeMux&lt;/tt&gt;. The handlers
+we register via &lt;tt class="docutils literal"&gt;Handle()&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;HandleFunc()&lt;/tt&gt; are then added to this object. Hence, we could without changing any functionality rewrite our server as follows:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kn"&gt;package&lt;/span&gt; &lt;span class="nx"&gt;main&lt;/span&gt;
 
 &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;net/http&amp;quot;&lt;/span&gt;
@@ -327,9 +339,20 @@ http.HandleFunc(&amp;quot;/status/&amp;quot;, StatusHandler)
         &lt;span class="nx"&gt;http&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;ListenAndServe&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;:8080&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;mux&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;span class="p"&gt;}&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;We create an object of type &lt;tt class="docutils literal"&gt;ServeMux&lt;/tt&gt; via &lt;tt class="docutils literal"&gt;mux := http.NewServeMux()&lt;/tt&gt;, register our handlers calling the same two functions, but those that are defined for the &lt;tt class="docutils literal"&gt;ServeMux&lt;/tt&gt; object we created.&lt;/p&gt;
+&lt;p&gt;The reason we may want to use our own Handler with &lt;tt class="docutils literal"&gt;ListenAndServe()&lt;/tt&gt; is demonstrated in the next section.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="writing-middleware"&gt;
 &lt;h2&gt;Writing Middleware&lt;/h2&gt;
+&lt;p&gt;In our latest version of the server, we have specified our own handler to &lt;tt class="docutils literal"&gt;ListenAndServe()&lt;/tt&gt;. One reason for doing so is when you want to execute some code for every request. That is:&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;Server gets a request for &amp;quot;/path/&amp;quot;&lt;/li&gt;
+&lt;li&gt;Execute some code&lt;/li&gt;
+&lt;li&gt;Handler for &amp;quot;/path/&amp;quot; gets called&lt;/li&gt;
+&lt;li&gt;Execute some code&lt;/li&gt;
+&lt;li&gt;Return the response to the client&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Either of steps 2 or 4 or both may occur and this is where &amp;quot;middleware&amp;quot; comes in.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kn"&gt;package&lt;/span&gt; &lt;span class="nx"&gt;main&lt;/span&gt;
 
 &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;net/http&amp;quot;&lt;/span&gt;
@@ -367,16 +390,16 @@ http.HandleFunc(&amp;quot;/status/&amp;quot;, StatusHandler)
         &lt;span class="nx"&gt;http&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;ListenAndServe&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;:8080&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;WrappedMux&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;span class="p"&gt;}&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;&lt;a class="reference external" href="https://gocodecloud.com/blog/2016/11/15/simple-golang-http-request-context-example/"&gt;https://gocodecloud.com/blog/2016/11/15/simple-golang-http-request-context-example/&lt;/a&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="learn-more"&gt;
 &lt;h2&gt;Learn more&lt;/h2&gt;
 &lt;ul class="simple"&gt;
+&lt;li&gt;&lt;a class="reference external" href="https://gocodecloud.com/blog/2016/11/15/simple-golang-http-request-context-example/"&gt;https://gocodecloud.com/blog/2016/11/15/simple-golang-http-request-context-example/&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a class="reference external" href="http://jordanorelli.com/post/42369331748/function-types-in-go-golang"&gt;http://jordanorelli.com/post/42369331748/function-types-in-go-golang&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a class="reference external" href="https://golang.org/doc/effective_go.html#interface_methods"&gt;https://golang.org/doc/effective_go.html#interface_methods&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/div&gt;
-</summary></entry><entry><title>Notes on using Golang to write gitbackup</title><link href="/notes-on-using-golang-to-write-gitbackup.html" rel="alternate"></link><published>2017-03-26T10:00:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2017-03-26:notes-on-using-golang-to-write-gitbackup.html</id><summary type="html">&lt;p&gt;&lt;a class="reference external" href="https://github.com/amitsaha/gitbackup"&gt;gitbackup&lt;/a&gt; is a tool to backup your git repositories from GitHub and GitLab. I wrote the &lt;a class="reference external" href="https://github.com/amitsaha/gitbackup/releases/tag/lj-0.1"&gt;initial version&lt;/a&gt; as a project for a golang article which is in review for publication in a Linux magazine. It supports GitHub enterprise installations and custom GitLab installations in addition to repositories on github.com and gitlab.com. It's written in Golang, and built upon &lt;a class="reference external" href="https://github.com/google/go-github"&gt;go-github&lt;/a&gt; and &lt;a class="reference external" href="https://github.com/xanzy/go-gitlab"&gt;go-gitlab&lt;/a&gt; and other third party golang packages.&lt;/p&gt;
+</content></entry><entry><title>Notes on using Golang to write gitbackup</title><link href="/notes-on-using-golang-to-write-gitbackup.html" rel="alternate"></link><published>2017-03-26T10:00:00+10:00</published><updated>2017-03-26T10:00:00+10:00</updated><author><name>Amit Saha</name></author><id>tag:None,2017-03-26:/notes-on-using-golang-to-write-gitbackup.html</id><summary type="html">&lt;p&gt;&lt;a class="reference external" href="https://github.com/amitsaha/gitbackup"&gt;gitbackup&lt;/a&gt; is a tool to backup your git repositories from GitHub and GitLab. I wrote the &lt;a class="reference external" href="https://github.com/amitsaha/gitbackup/releases/tag/lj-0.1"&gt;initial version&lt;/a&gt; as a project for a golang article which is in review for publication in a Linux magazine. It supports GitHub enterprise installations and custom GitLab installations in addition to repositories on github …&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a class="reference external" href="https://github.com/amitsaha/gitbackup"&gt;gitbackup&lt;/a&gt; is a tool to backup your git repositories from GitHub and GitLab. I wrote the &lt;a class="reference external" href="https://github.com/amitsaha/gitbackup/releases/tag/lj-0.1"&gt;initial version&lt;/a&gt; as a project for a golang article which is in review for publication in a Linux magazine. It supports GitHub enterprise installations and custom GitLab installations in addition to repositories on github.com and gitlab.com. It's written in Golang, and built upon &lt;a class="reference external" href="https://github.com/google/go-github"&gt;go-github&lt;/a&gt; and &lt;a class="reference external" href="https://github.com/xanzy/go-gitlab"&gt;go-gitlab&lt;/a&gt; and other third party golang packages.&lt;/p&gt;
 &lt;p&gt;Since the initial version, the project's code has seen number of changes which has been a learning experience for me since I am still fairly new to Golang. In the rest of this post, I describe these and some personal notes about the experience.&lt;/p&gt;
 &lt;div class="section" id="using-afero-for-filesystem-operations"&gt;
 &lt;h2&gt;Using afero for filesystem operations&lt;/h2&gt;
@@ -563,7 +586,10 @@ test_script:
 &lt;p&gt;&lt;tt class="docutils literal"&gt;gitbackup&lt;/tt&gt; is mainly an educational project to build a tool which I and hopefully others find useful. I wanted to have reasonable test coverage for it, release binaries for multiple operating systems and architecture and have continuous testing setup on multiple operatng systems. So far, all of these has been successfully achieved.I am looking forward to using &lt;tt class="docutils literal"&gt;go dep&lt;/tt&gt; more as I get a chance and also happy about making &lt;tt class="docutils literal"&gt;gitbackup&lt;/tt&gt; compatible with standard go tools out of the box.&lt;/p&gt;
 &lt;p&gt;If you get a chance, please &lt;a class="reference external" href="https://github.com/amitsaha/gitbackup#gitbackup---backup-your-github-and-gitlab-repositories"&gt;try it out&lt;/a&gt; and I welcome any feedback and contributions!&lt;/p&gt;
 &lt;/div&gt;
-</summary></entry><entry><title>Setup Golang 1.8 and gb on Fedora (and other Linux distributions)</title><link href="/setup-golang-18-and-gb-on-fedora-and-other-linux-distributions.html" rel="alternate"></link><published>2017-03-01T18:00:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2017-03-01:setup-golang-18-and-gb-on-fedora-and-other-linux-distributions.html</id><summary type="html">&lt;p&gt;This guide will be how I usually setup and get started with Go development environment on Linux. By the end of this document, we will have seen how to:&lt;/p&gt;
+</content></entry><entry><title>Setup Golang 1.8 and gb on Fedora (and other Linux distributions)</title><link href="/setup-golang-18-and-gb-on-fedora-and-other-linux-distributions.html" rel="alternate"></link><published>2017-03-01T18:00:00+10:00</published><updated>2017-03-01T18:00:00+10:00</updated><author><name>Amit Saha</name></author><id>tag:None,2017-03-01:/setup-golang-18-and-gb-on-fedora-and-other-linux-distributions.html</id><summary type="html">&lt;p&gt;This guide will be how I usually setup and get started with Go development environment on Linux. By the end of this document, we will have seen how to:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;Install the Go 1.8 compiler and other tools (&lt;tt class="docutils literal"&gt;gofmt&lt;/tt&gt;, for eaxmple), collectively referred to as go tools&lt;/li&gt;
+&lt;li&gt;Install &lt;a class="reference external" href="http://getgb.io"&gt;gb&lt;/a&gt; and …&lt;/li&gt;&lt;/ul&gt;</summary><content type="html">&lt;p&gt;This guide will be how I usually setup and get started with Go development environment on Linux. By the end of this document, we will have seen how to:&lt;/p&gt;
 &lt;ul class="simple"&gt;
 &lt;li&gt;Install the Go 1.8 compiler and other tools (&lt;tt class="docutils literal"&gt;gofmt&lt;/tt&gt;, for eaxmple), collectively referred to as go tools&lt;/li&gt;
 &lt;li&gt;Install &lt;a class="reference external" href="http://getgb.io"&gt;gb&lt;/a&gt; and the &lt;tt class="docutils literal"&gt;vendor&lt;/tt&gt; plugin&lt;/li&gt;
@@ -829,7 +855,11 @@ $ ./bin/main
 &lt;p&gt;That's all for now, you can find the simple source code above &lt;a class="reference external" href="https://github.com/amitsaha/golang_gettingstarted"&gt;here&lt;/a&gt;.&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-</summary></entry><entry><title>Setup Golang on Fedora 24 (and other Linux distributions)</title><link href="/setup-golang-on-fedora-24-and-other-linux-distributions.html" rel="alternate"></link><published>2016-06-23T18:00:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2016-06-23:setup-golang-on-fedora-24-and-other-linux-distributions.html</id><summary type="html">&lt;p&gt;This guide will be how I usually setup and get started with Go development environment on Linux. By the end of this document, we will have seen how to:&lt;/p&gt;
+</content></entry><entry><title>Setup Golang on Fedora 24 (and other Linux distributions)</title><link href="/setup-golang-on-fedora-24-and-other-linux-distributions.html" rel="alternate"></link><published>2016-06-23T18:00:00+10:00</published><updated>2016-06-23T18:00:00+10:00</updated><author><name>Amit Saha</name></author><id>tag:None,2016-06-23:/setup-golang-on-fedora-24-and-other-linux-distributions.html</id><summary type="html">&lt;p&gt;This guide will be how I usually setup and get started with Go development environment on Linux. By the end of this document, we will have seen how to:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;Install the Go compiler and other tools (&lt;tt class="docutils literal"&gt;gofmt&lt;/tt&gt;, for eaxmple), collectively referred to as go tools&lt;/li&gt;
+&lt;li&gt;Setup Go workspace&lt;/li&gt;
+&lt;li&gt;Working with …&lt;/li&gt;&lt;/ul&gt;</summary><content type="html">&lt;p&gt;This guide will be how I usually setup and get started with Go development environment on Linux. By the end of this document, we will have seen how to:&lt;/p&gt;
 &lt;ul class="simple"&gt;
 &lt;li&gt;Install the Go compiler and other tools (&lt;tt class="docutils literal"&gt;gofmt&lt;/tt&gt;, for eaxmple), collectively referred to as go tools&lt;/li&gt;
 &lt;li&gt;Setup Go workspace&lt;/li&gt;
@@ -1018,7 +1048,16 @@ golang/
 &lt;/ul&gt;
 &lt;p&gt;That's all for now, you can find the simple source code above &lt;a class="reference external" href="https://github.com/amitsaha/golang_gettingstarted"&gt;here&lt;/a&gt;.&lt;/p&gt;
 &lt;/div&gt;
-</summary></entry><entry><title>runC and libcontainer on Fedora 23/24</title><link href="/runc-and-libcontainer-on-fedora-2324.html" rel="alternate"></link><published>2016-04-27T17:00:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2016-04-27:runc-and-libcontainer-on-fedora-2324.html</id><summary type="html">&lt;p&gt;In this post, I will post my notes on how I got &lt;a class="reference external" href="https://github.com/opencontainers/runc/"&gt;runC&lt;/a&gt; and then using
+</content></entry><entry><title>runC and libcontainer on Fedora 23/24</title><link href="/runc-and-libcontainer-on-fedora-2324.html" rel="alternate"></link><published>2016-04-27T17:00:00+10:00</published><updated>2016-04-27T17:00:00+10:00</updated><author><name>Amit Saha</name></author><id>tag:None,2016-04-27:/runc-and-libcontainer-on-fedora-2324.html</id><summary type="html">&lt;p&gt;In this post, I will post my notes on how I got &lt;a class="reference external" href="https://github.com/opencontainers/runc/"&gt;runC&lt;/a&gt; and then using
+&lt;cite&gt;libcontainer&lt;/cite&gt; on Fedora. The first step is to install &lt;tt class="docutils literal"&gt;golang&lt;/tt&gt;:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ sudo dnf -y install golang
+$ go version
+go version go1.6 linux/amd64
+&lt;/pre&gt;
+&lt;p&gt;We will set GOPATH=~/golang/ and then do the following:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+$ mkdir …&lt;/pre&gt;</summary><content type="html">&lt;p&gt;In this post, I will post my notes on how I got &lt;a class="reference external" href="https://github.com/opencontainers/runc/"&gt;runC&lt;/a&gt; and then using
 &lt;cite&gt;libcontainer&lt;/cite&gt; on Fedora. The first step is to install &lt;tt class="docutils literal"&gt;golang&lt;/tt&gt;:&lt;/p&gt;
 &lt;pre class="code literal-block"&gt;
 $ sudo dnf -y install golang
@@ -1093,7 +1132,8 @@ $ sudo GOPATH=/home/asaha/golang go run example1.go /home/asaha/rootfs/
 &lt;/pre&gt;
 &lt;p&gt;(Thanks Dharmit for all the suggestions)&lt;/p&gt;
 &lt;/div&gt;
-</summary></entry><entry><title>New article: Write an Image Cropping program with Go</title><link href="/new-article-write-an-image-cropping-program-with-go.html" rel="alternate"></link><published>2016-04-17T10:00:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2016-04-17:new-article-write-an-image-cropping-program-with-go.html</id><summary type="html">&lt;p&gt;My article &amp;quot;Write an Image Cropping with Go&amp;quot; is out in &lt;a class="reference external" href="https://linuxvoice.com"&gt;Linux Voice&lt;/a&gt; (Issue 26). It is my first article to be published in Linux Voice and I am very excited about it.&lt;/p&gt;
+</content></entry><entry><title>New article: Write an Image Cropping program with Go</title><link href="/new-article-write-an-image-cropping-program-with-go.html" rel="alternate"></link><published>2016-04-17T10:00:00+10:00</published><updated>2016-04-17T10:00:00+10:00</updated><author><name>Amit Saha</name></author><id>tag:None,2016-04-17:/new-article-write-an-image-cropping-program-with-go.html</id><summary type="html">&lt;p&gt;My article &amp;quot;Write an Image Cropping with Go&amp;quot; is out in &lt;a class="reference external" href="https://linuxvoice.com"&gt;Linux Voice&lt;/a&gt; (Issue 26). It is my first article to be published in Linux Voice and I am very excited about it.&lt;/p&gt;
+&lt;p&gt;It is challenging to write an introductory article without being able to explain everything the reader needs …&lt;/p&gt;</summary><content type="html">&lt;p&gt;My article &amp;quot;Write an Image Cropping with Go&amp;quot; is out in &lt;a class="reference external" href="https://linuxvoice.com"&gt;Linux Voice&lt;/a&gt; (Issue 26). It is my first article to be published in Linux Voice and I am very excited about it.&lt;/p&gt;
 &lt;p&gt;It is challenging to write an introductory article without being able to explain everything the reader needs to know so as to follow the article, while keeping the article concise. Therefore I have updated the &lt;a class="reference external" href="https://github.com/amitsaha/linux_voice_1"&gt;GitHub repo&lt;/a&gt; of the final code with a README which points you to various resources and tips I found useful while I was learning myself.&lt;/p&gt;
 &lt;p&gt;Go is one of the two &amp;quot;new&amp;quot; languages I have been exploring (the other being Rust). What do I like about it?&lt;/p&gt;
 &lt;div class="section" id="what-i-like-about-go"&gt;
@@ -1109,4 +1149,4 @@ $ sudo GOPATH=/home/asaha/golang go run example1.go /home/asaha/rootfs/
 &lt;p&gt;I hope you enjoy reading the article, and please feel free to get in touch if you have any suggestions/comments/queries. I am &lt;cite&gt;&amp;#64;echorand&lt;/cite&gt; on Twitter, or you can email me at &lt;cite&gt;amitsaha.in AT gmail.com&lt;/cite&gt;.&lt;/p&gt;
 &lt;p&gt;In the next issue of Linux Voice, I have an article coming up on Rust.&lt;/p&gt;
 &lt;/div&gt;
-</summary></entry></feed>
+</content></entry></feed>

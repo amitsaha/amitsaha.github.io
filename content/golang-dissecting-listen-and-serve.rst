@@ -2,6 +2,9 @@
 :Date: 2017-04-24 10:00
 :Category: golang
 
+My aim in this post is to discuss three "concepts" in Golang that I came across while writing HTTP servers. Through this
+discussion I am to get rid of my own lack of understanding (at least to a certain degree) about these. Hopefully, it will
+be of use to others too.
 
 The `http.ListenAndServe(..) <https://golang.org/pkg/net/http/#ListenAndServe>`__ function is the most straightforward 
 approach to start a HTTP 1.1 server. The following code does just that:
@@ -9,13 +12,14 @@ approach to start a HTTP 1.1 server. The following code does just that:
 .. code-include:: files/golang_http_server/server1.go
     :lexer: python
 
-What is the `nil` second argument above? The documentation states that the second argument to the function should be a "handler" and if it is specified as `nil`, it defaults to `DefaultServeMux`. By the end of next section and eventually by the end of the post, I will have successfully removed one of my main misconceptions - i.e. `DefaultServeMux` was something else other than a handler.
+What is the `nil` second argument above? The documentation states that the second argument to the function should be a 
+"handler" and if it is specified as `nil`, it defaults to `DefaultServeMux`.
 
 
 What is `DefaultServeMux`?
 ==========================
 
-If we run our server above, and send a couple of HTTP GET requests, we will see the following:
+If we run our server above via ``go run server1.go``, and send a couple of HTTP GET requests, we will see the following:
 
 .. code::
    
@@ -25,23 +29,27 @@ If we run our server above, and send a couple of HTTP GET requests, we will see 
    $ curl localhost:8080/status/
    404 page not found
 
-This is because, we haven't specified how our server should handle requests to GET the root ("/") - our first request or requests to GET the "/status" resource - our second request. Before we see how we could fix that, let's understand *how* the error message "404 page not found" is generated.
+This is because, we haven't specified how our server should handle requests to GET the root ("/") - our first request or 
+requests to GET the "/status" resource - our second request. Before we see how we could fix that, let's understand 
+*how* the error message "404 page not found" is generated.
 
-The error message is generated from the function below in `src/net/http/server.go` specifically the `NotFoundHandler()` "handler" function:
+The error message is generated from the function below in `src/net/http/server.go` specifically the `NotFoundHandler()` 
+"handler" function:
 
 .. code-include:: files/golang_http_server/snippet1.go
     :lexer: go
 
 
-Now, let's roughly see how our GET request above reaches the above function. Let us consider the function signature of the above handler function: `func (mux *ServeMux) handler(host, path string) (h Handler, pattern string)`. 
+Now, let's roughly see how our GET request above reaches the above function. 
 
-This function is a method belonging to the type `ServeMux`:
+Let us consider the function signature of the above handler function: `func (mux *ServeMux) handler(host, path string) (h Handler, pattern string)`. This function is a method belonging to the type `ServeMux`:
 
 .. code-include:: files/golang_http_server/snippet2.go
     :lexer: go
 
 
-So, how does `DefaultServeMux` get set when the second argument to `ListenAndServe()` is `nil`? The following code snippet has the answer:
+So, how does `DefaultServeMux` get set when the second argument to `ListenAndServe()` is `nil`? The following code 
+snippet has the answer:
 
 .. code-include:: files/golang_http_server/snippet3.go
     :lexer: go
@@ -58,7 +66,9 @@ The call to `Handler()` function then calls the following implementation:
     :lexer: go
 
 
-Now, when we make a request to "/" or "/status/", no match is found by the `mux.match()` call above and hence the handler returned is the `NotFoundHandler` whose `ServeHTTP()` function is then called to return the "404 page not found" error message:
+Now, when we make a request to "/" or "/status/", no match is found by the `mux.match()` call above and hence the 
+handler returned is the `NotFoundHandler` whose `ServeHTTP()` function is then called to return the "404 page not found" 
+error message:
 
 .. code-include:: files/golang_http_server/snippet6.go
     :lexer: go
@@ -93,8 +103,7 @@ Let's now revisit how the right handler function gets called. In a code snippet 
 
 ``mux.m`` is a a ``map`` data structure defined in the ``ServeMux`` structure (snippet earlier in the post) which stores a mapping of a path and the handler we have registered for it.
 
-The HandleFunc() type
-=====================
+**The HandleFunc() type**
 
 Let's go back to the idea of "converting" any function with the signature ``func aFunction(w http.ResponseWriter, r *http.Request)`` to the type "HandlerFunc". 
 
@@ -161,8 +170,31 @@ The reason we may want to use our own Handler with ``ListenAndServe()`` is demon
 Writing Middleware
 ==================
 
+In our latest version of the server, we have specified our own handler to ``ListenAndServe()``. One reason for doing so is when you want to execute some code for every request. That is:
+
+1. Server gets a request for "/path/"
+2. Execute some code
+3. Handler for "/path/" gets called
+4. Execute some code
+5. Return the response to the client
+
+Either of steps 2 or 4 or both may occur and this is where "middleware" comes in. Our next version of the server demonstrates how we may implement this:
+
+
 .. code-include:: files/golang_http_server/server4.go
     :lexer: go
+
+When we run the server and send it a couple of requests as above, we will see:
+
+.. code::
+
+    2017/04/24 17:53:03 Got a GET request for: /
+    2017/04/24 17:53:03 Handler finished processing request
+    2017/04/24 17:53:05 Got a GET request for: /status
+    2017/04/24 17:53:05 Handler finished processing request
+
+As part of this middleware writing exercise, I also wanted to be able to print the HTTP status of the response that we are sending but as the comment in the code states,
+I haven't been able to figure it out yet.
 
 
 Learn more

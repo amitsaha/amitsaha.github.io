@@ -32,8 +32,8 @@
 
     <div class="entry-content">
 <footer class="post-info">
-        <abbr class="published" title="2017-04-22T10:00:00+10:00">
-                Published: Sat 22 April 2017
+        <abbr class="published" title="2017-04-24T10:00:00+10:00">
+                Published: Mon 24 April 2017
         </abbr>
 
         <address class="vcard author">
@@ -41,7 +41,10 @@
         </address>
 <p>In <a href="/category/golang.html">golang</a>.</p>
 
-</footer><!-- /.post-info -->      <p>The <a class="reference external" href="https://golang.org/pkg/net/http/#ListenAndServe">http.ListenAndServe(..)</a> function is the most straightforward
+</footer><!-- /.post-info -->      <p>My aim in this post is to discuss three &quot;concepts&quot; in Golang that I came across while writing HTTP servers. Through this
+discussion I am to get rid of my own lack of understanding (at least to a certain degree) about these. Hopefully, it will
+be of use to others too.</p>
+<p>The <a class="reference external" href="https://golang.org/pkg/net/http/#ListenAndServe">http.ListenAndServe(..)</a> function is the most straightforward
 approach to start a HTTP 1.1 server. The following code does just that:</p>
 <div class="highlight"><pre><span></span><span class="n">package</span> <span class="n">main</span>
 
@@ -54,10 +57,11 @@ approach to start a HTTP 1.1 server. The following code does just that:</p>
         <span class="n">log</span><span class="o">.</span><span class="n">Fatal</span><span class="p">(</span><span class="n">http</span><span class="o">.</span><span class="n">ListenAndServe</span><span class="p">(</span><span class="s2">&quot;:8080&quot;</span><span class="p">,</span> <span class="n">nil</span><span class="p">))</span>
 <span class="p">}</span>
 </pre></div>
-<p>What is the <cite>nil</cite> second argument above? The documentation states that the second argument to the function should be a &quot;handler&quot; and if it is specified as <cite>nil</cite>, it defaults to <cite>DefaultServeMux</cite>. By the end of next section and eventually by the end of the post, I will have successfully removed one of my main misconceptions - i.e. <cite>DefaultServeMux</cite> was something else other than a handler.</p>
+<p>What is the <cite>nil</cite> second argument above? The documentation states that the second argument to the function should be a
+&quot;handler&quot; and if it is specified as <cite>nil</cite>, it defaults to <cite>DefaultServeMux</cite>.</p>
 <div class="section" id="what-is-defaultservemux">
 <h2>What is <cite>DefaultServeMux</cite>?</h2>
-<p>If we run our server above, and send a couple of HTTP GET requests, we will see the following:</p>
+<p>If we run our server above via <tt class="docutils literal">go run server1.go</tt>, and send a couple of HTTP GET requests, we will see the following:</p>
 <pre class="code literal-block">
 $ curl localhost:8080
 404 page not found
@@ -65,8 +69,11 @@ $ curl localhost:8080
 $ curl localhost:8080/status/
 404 page not found
 </pre>
-<p>This is because, we haven't specified how our server should handle requests to GET the root (&quot;/&quot;) - our first request or requests to GET the &quot;/status&quot; resource - our second request. Before we see how we could fix that, let's understand <em>how</em> the error message &quot;404 page not found&quot; is generated.</p>
-<p>The error message is generated from the function below in <cite>src/net/http/server.go</cite> specifically the <cite>NotFoundHandler()</cite> &quot;handler&quot; function:</p>
+<p>This is because, we haven't specified how our server should handle requests to GET the root (&quot;/&quot;) - our first request or
+requests to GET the &quot;/status&quot; resource - our second request. Before we see how we could fix that, let's understand
+<em>how</em> the error message &quot;404 page not found&quot; is generated.</p>
+<p>The error message is generated from the function below in <cite>src/net/http/server.go</cite> specifically the <cite>NotFoundHandler()</cite>
+&quot;handler&quot; function:</p>
 <div class="highlight"><pre><span></span><span class="c1">// handler is the main implementation of Handler.</span>
 <span class="c1">// The path is known to be in canonical form, except for CONNECT methods.</span>
 <span class="kd">func</span> <span class="p">(</span><span class="nx">mux</span> <span class="o">*</span><span class="nx">ServeMux</span><span class="p">)</span> <span class="nx">handler</span><span class="p">(</span><span class="nx">host</span><span class="p">,</span> <span class="nx">path</span> <span class="kt">string</span><span class="p">)</span> <span class="p">(</span><span class="nx">h</span> <span class="nx">Handler</span><span class="p">,</span> <span class="nx">pattern</span> <span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
@@ -86,8 +93,8 @@ $ curl localhost:8080/status/
         <span class="k">return</span>
 <span class="p">}</span>
 </pre></div>
-<p>Now, let's roughly see how our GET request above reaches the above function. Let us consider the function signature of the above handler function: <cite>func (mux *ServeMux) handler(host, path string) (h Handler, pattern string)</cite>.</p>
-<p>This function is a method belonging to the type <cite>ServeMux</cite>:</p>
+<p>Now, let's roughly see how our GET request above reaches the above function.</p>
+<p>Let us consider the function signature of the above handler function: <cite>func (mux *ServeMux) handler(host, path string) (h Handler, pattern string)</cite>. This function is a method belonging to the type <cite>ServeMux</cite>:</p>
 <div class="highlight"><pre><span></span><span class="c1">// ServeMux also takes care of sanitizing the URL request path,</span>
 <span class="c1">// redirecting any request containing . or .. elements or repeated slashes</span>
 <span class="c1">// to an equivalent, cleaner URL.</span>
@@ -111,7 +118,8 @@ $ curl localhost:8080/status/
 
 <span class="kd">var</span> <span class="nx">defaultServeMux</span> <span class="nx">ServeMux</span>
 </pre></div>
-<p>So, how does <cite>DefaultServeMux</cite> get set when the second argument to <cite>ListenAndServe()</cite> is <cite>nil</cite>? The following code snippet has the answer:</p>
+<p>So, how does <cite>DefaultServeMux</cite> get set when the second argument to <cite>ListenAndServe()</cite> is <cite>nil</cite>? The following code
+snippet has the answer:</p>
 <div class="highlight"><pre><span></span><span class="kd">func</span> <span class="p">(</span><span class="nx">sh</span> <span class="nx">serverHandler</span><span class="p">)</span> <span class="nx">ServeHTTP</span><span class="p">(</span><span class="nx">rw</span> <span class="nx">ResponseWriter</span><span class="p">,</span> <span class="nx">req</span> <span class="o">*</span><span class="nx">Request</span><span class="p">)</span> <span class="p">{</span>
         <span class="nx">handler</span> <span class="o">:=</span> <span class="nx">sh</span><span class="p">.</span><span class="nx">srv</span><span class="p">.</span><span class="nx">Handler</span>
         <span class="k">if</span> <span class="nx">handler</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
@@ -173,7 +181,9 @@ $ curl localhost:8080/status/
         <span class="k">return</span>
 <span class="p">}</span>
 </pre></div>
-<p>Now, when we make a request to &quot;/&quot; or &quot;/status/&quot;, no match is found by the <cite>mux.match()</cite> call above and hence the handler returned is the <cite>NotFoundHandler</cite> whose <cite>ServeHTTP()</cite> function is then called to return the &quot;404 page not found&quot; error message:</p>
+<p>Now, when we make a request to &quot;/&quot; or &quot;/status/&quot;, no match is found by the <cite>mux.match()</cite> call above and hence the
+handler returned is the <cite>NotFoundHandler</cite> whose <cite>ServeHTTP()</cite> function is then called to return the &quot;404 page not found&quot;
+error message:</p>
 <div class="highlight"><pre><span></span><span class="c1">// NotFound replies to the request with an HTTP 404 not found error.</span>
 <span class="kd">func</span> <span class="nx">NotFound</span><span class="p">(</span><span class="nx">w</span> <span class="nx">ResponseWriter</span><span class="p">,</span> <span class="nx">r</span> <span class="o">*</span><span class="nx">Request</span><span class="p">)</span> <span class="p">{</span> <span class="nx">Error</span><span class="p">(</span><span class="nx">w</span><span class="p">,</span> <span class="s">&quot;404 page not found&quot;</span><span class="p">,</span> <span class="nx">StatusNotFound</span><span class="p">)</span> <span class="p">}</span>
 
@@ -239,9 +249,7 @@ OK
 <span class="p">}</span>
 </pre></div>
 <p><tt class="docutils literal">mux.m</tt> is a a <tt class="docutils literal">map</tt> data structure defined in the <tt class="docutils literal">ServeMux</tt> structure (snippet earlier in the post) which stores a mapping of a path and the handler we have registered for it.</p>
-</div>
-<div class="section" id="the-handlefunc-type">
-<h2>The HandleFunc() type</h2>
+<p><strong>The HandleFunc() type</strong></p>
 <p>Let's go back to the idea of &quot;converting&quot; any function with the signature <tt class="docutils literal">func aFunction(w http.ResponseWriter, r *http.Request)</tt> to the type &quot;HandlerFunc&quot;.</p>
 <p>Any type which has a ServeHTTP() method is said to implement the <tt class="docutils literal">Handler</tt> interface:</p>
 <pre class="code literal-block">
@@ -343,6 +351,8 @@ http.HandleFunc(&quot;/status/&quot;, StatusHandler)
 </div>
 <div class="section" id="using-your-own-handler-with-listenandserve">
 <h2>Using your own Handler with ListenAndServe()</h2>
+<p>Earlier in this post, we saw how passsing <tt class="docutils literal">nil</tt> to <tt class="docutils literal">ListenAndServe()</tt> function sets the handler to <tt class="docutils literal">DefaultServeMux</tt>. The handlers
+we register via <tt class="docutils literal">Handle()</tt> and <tt class="docutils literal">HandleFunc()</tt> are then added to this object. Hence, we could without changing any functionality rewrite our server as follows:</p>
 <div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nx">main</span>
 
 <span class="kn">import</span> <span class="s">&quot;net/http&quot;</span>
@@ -369,9 +379,20 @@ http.HandleFunc(&quot;/status/&quot;, StatusHandler)
         <span class="nx">http</span><span class="p">.</span><span class="nx">ListenAndServe</span><span class="p">(</span><span class="s">&quot;:8080&quot;</span><span class="p">,</span> <span class="nx">mux</span><span class="p">)</span>
 <span class="p">}</span>
 </pre></div>
+<p>We create an object of type <tt class="docutils literal">ServeMux</tt> via <tt class="docutils literal">mux := http.NewServeMux()</tt>, register our handlers calling the same two functions, but those that are defined for the <tt class="docutils literal">ServeMux</tt> object we created.</p>
+<p>The reason we may want to use our own Handler with <tt class="docutils literal">ListenAndServe()</tt> is demonstrated in the next section.</p>
 </div>
 <div class="section" id="writing-middleware">
 <h2>Writing Middleware</h2>
+<p>In our latest version of the server, we have specified our own handler to <tt class="docutils literal">ListenAndServe()</tt>. One reason for doing so is when you want to execute some code for every request. That is:</p>
+<ol class="arabic simple">
+<li>Server gets a request for &quot;/path/&quot;</li>
+<li>Execute some code</li>
+<li>Handler for &quot;/path/&quot; gets called</li>
+<li>Execute some code</li>
+<li>Return the response to the client</li>
+</ol>
+<p>Either of steps 2 or 4 or both may occur and this is where &quot;middleware&quot; comes in.</p>
 <div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nx">main</span>
 
 <span class="kn">import</span> <span class="s">&quot;net/http&quot;</span>
@@ -409,11 +430,11 @@ http.HandleFunc(&quot;/status/&quot;, StatusHandler)
         <span class="nx">http</span><span class="p">.</span><span class="nx">ListenAndServe</span><span class="p">(</span><span class="s">&quot;:8080&quot;</span><span class="p">,</span> <span class="nx">WrappedMux</span><span class="p">)</span>
 <span class="p">}</span>
 </pre></div>
-<p><a class="reference external" href="https://gocodecloud.com/blog/2016/11/15/simple-golang-http-request-context-example/">https://gocodecloud.com/blog/2016/11/15/simple-golang-http-request-context-example/</a></p>
 </div>
 <div class="section" id="learn-more">
 <h2>Learn more</h2>
 <ul class="simple">
+<li><a class="reference external" href="https://gocodecloud.com/blog/2016/11/15/simple-golang-http-request-context-example/">https://gocodecloud.com/blog/2016/11/15/simple-golang-http-request-context-example/</a></li>
 <li><a class="reference external" href="http://jordanorelli.com/post/42369331748/function-types-in-go-golang">http://jordanorelli.com/post/42369331748/function-types-in-go-golang</a></li>
 <li><a class="reference external" href="https://golang.org/doc/effective_go.html#interface_methods">https://golang.org/doc/effective_go.html#interface_methods</a></li>
 </ul>
