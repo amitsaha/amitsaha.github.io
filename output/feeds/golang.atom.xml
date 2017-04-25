@@ -414,22 +414,13 @@ i have a version which achieves what I wanted to be able to do via my middleware
 &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;fmt&amp;quot;&lt;/span&gt;
 &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;log&amp;quot;&lt;/span&gt;
 
-
 &lt;span class="kd"&gt;type&lt;/span&gt; &lt;span class="nx"&gt;MyResponseWriter&lt;/span&gt; &lt;span class="kd"&gt;struct&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
         &lt;span class="nx"&gt;http&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;ResponseWriter&lt;/span&gt;
-        &lt;span class="nx"&gt;code&lt;/span&gt;       &lt;span class="kt"&gt;int&lt;/span&gt;
+        &lt;span class="nx"&gt;code&lt;/span&gt; &lt;span class="kt"&gt;int&lt;/span&gt;
 &lt;span class="p"&gt;}&lt;/span&gt;
 
 &lt;span class="kd"&gt;func&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;mw&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="nx"&gt;MyResponseWriter&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="nx"&gt;Header&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="nx"&gt;http&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Header&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
         &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nx"&gt;mw&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;ResponseWriter&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Header&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
-&lt;span class="p"&gt;}&lt;/span&gt;
-
-&lt;span class="kd"&gt;func&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;mw&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="nx"&gt;MyResponseWriter&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="nx"&gt;Write&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;p&lt;/span&gt; &lt;span class="p"&gt;[]&lt;/span&gt;&lt;span class="kt"&gt;byte&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;error&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
-        &lt;span class="c1"&gt;// If not set, set it&lt;/span&gt;
-        &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="nx"&gt;mw&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;code&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
-                &lt;span class="nx"&gt;mw&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;code&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;http&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;StatusOK&lt;/span&gt;
-        &lt;span class="p"&gt;}&lt;/span&gt;
-        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nx"&gt;mw&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;ResponseWriter&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Write&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;p&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;span class="p"&gt;}&lt;/span&gt;
 
 &lt;span class="kd"&gt;func&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;mw&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="nx"&gt;MyResponseWriter&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="nx"&gt;WriteHeader&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;code&lt;/span&gt; &lt;span class="kt"&gt;int&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
@@ -440,10 +431,12 @@ i have a version which achieves what I wanted to be able to do via my middleware
 &lt;span class="kd"&gt;type&lt;/span&gt; &lt;span class="nx"&gt;mytype&lt;/span&gt; &lt;span class="kd"&gt;struct&lt;/span&gt;&lt;span class="p"&gt;{}&lt;/span&gt;
 
 &lt;span class="kd"&gt;func&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;t&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="nx"&gt;mytype&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="nx"&gt;ServeHTTP&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;w&lt;/span&gt; &lt;span class="nx"&gt;http&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;ResponseWriter&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;r&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="nx"&gt;http&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Request&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="nx"&gt;w&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;WriteHeader&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;http&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;StatusOK&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
         &lt;span class="nx"&gt;fmt&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Fprintf&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;w&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Hello there from mytype&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;span class="p"&gt;}&lt;/span&gt;
 
 &lt;span class="kd"&gt;func&lt;/span&gt; &lt;span class="nx"&gt;StatusHandler&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;w&lt;/span&gt; &lt;span class="nx"&gt;http&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;ResponseWriter&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;r&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="nx"&gt;http&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Request&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="nx"&gt;w&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;WriteHeader&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;http&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;StatusOK&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
         &lt;span class="nx"&gt;fmt&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Fprintf&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;w&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;OK&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;span class="p"&gt;}&lt;/span&gt;
 
@@ -469,7 +462,7 @@ i have a version which achieves what I wanted to be able to do via my middleware
 &lt;span class="p"&gt;}&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;In the example above, I define a new type &lt;tt class="docutils literal"&gt;MyResponseWriter&lt;/tt&gt; which implements the &lt;tt class="docutils literal"&gt;http.ResponseWriter&lt;/tt&gt; interface by implementing the
-three methods &lt;tt class="docutils literal"&gt;Header()&lt;/tt&gt;, &lt;tt class="docutils literal"&gt;Write()&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;WriteHeader()&lt;/tt&gt;. In bothe &lt;tt class="docutils literal"&gt;Write()&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;WriteHeader()&lt;/tt&gt;, I have some custom code that I execute before calling the corresponding method defined on the &lt;tt class="docutils literal"&gt;http.ResponseWriter()&lt;/tt&gt; interfce.&lt;/p&gt;
+three methods &lt;tt class="docutils literal"&gt;Header()&lt;/tt&gt;, &lt;tt class="docutils literal"&gt;Write()&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;WriteHeader()&lt;/tt&gt;. In bothe &lt;tt class="docutils literal"&gt;Write()&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;WriteHeader()&lt;/tt&gt;, I have some custom code that I execute before calling the corresponding method defined on the &lt;tt class="docutils literal"&gt;http.ResponseWriter()&lt;/tt&gt; interface.&lt;/p&gt;
 &lt;p&gt;Then, in &lt;tt class="docutils literal"&gt;RunSomeCode()&lt;/tt&gt;, instead of using the standard &lt;tt class="docutils literal"&gt;http.ResponseWriter()&lt;/tt&gt; object that it was passed, I wrap it in a &lt;tt class="docutils literal"&gt;MyResponseWriter&lt;/tt&gt; type as follows:&lt;/p&gt;
 &lt;pre class="code literal-block"&gt;
 myrw := &amp;amp;MyResponseWriter{ResponseWriter: w, code: -1}
@@ -484,21 +477,21 @@ handler.ServeHTTP(myrw, r)
 2017/04/25 17:33:10 Got a GET request for: /
 2017/04/25 17:33:10 Response status:  200
 &lt;/pre&gt;
-&lt;p&gt;I will end this post with a question:&lt;/p&gt;
-&lt;div class="section" id="question"&gt;
-&lt;h3&gt;Question&lt;/h3&gt;
-&lt;p&gt;As i write above, it took me a while to figure out how to wrap &lt;tt class="docutils literal"&gt;http.ResponseWriter&lt;/tt&gt; correctly so that I could get access
+&lt;p&gt;I will end this post with a question and perhaps the possible explanation:&lt;/p&gt;
+&lt;p&gt;As I write above, it took me a while to figure out how to wrap &lt;tt class="docutils literal"&gt;http.ResponseWriter&lt;/tt&gt; correctly so that I could get access
 to the HTTP status that was being set. The solution that was discussed in &lt;a class="reference external" href="http://grokbase.com/t/gg/golang-nuts/12art4wedc/go-nuts-how-do-i-get-http-status-from-my-own-servehttp-function"&gt;this post&lt;/a&gt; to just implement the &lt;tt class="docutils literal"&gt;WriteHeader()&lt;/tt&gt; method didn't work for me.
-&lt;tt class="docutils literal"&gt;WriteHeader()&lt;/tt&gt; method implemented by my &lt;tt class="docutils literal"&gt;MyResponseWriter()&lt;/tt&gt; was never called except for then there was a redirect.&lt;/p&gt;
-&lt;/div&gt;
+&lt;tt class="docutils literal"&gt;WriteHeader()&lt;/tt&gt; method implemented by my &lt;tt class="docutils literal"&gt;MyResponseWriter()&lt;/tt&gt; was never called except for then there was a redirect. I expected that
+the call to &lt;tt class="docutils literal"&gt;Write()&lt;/tt&gt; method of &lt;tt class="docutils literal"&gt;http.ResponseWriter()&lt;/tt&gt; would invoke the version of &lt;tt class="docutils literal"&gt;WriterHeader()&lt;/tt&gt; I implemented, but I cannot
+see any way that could happen from the code in &lt;tt class="docutils literal"&gt;net/http/server.go&lt;/tt&gt;. So I think this is what's &amp;quot;implied&amp;quot; in this and all the other posts I have seen: the handler for the request must call &lt;tt class="docutils literal"&gt;WriteHeader()&lt;/tt&gt; with the HTTP status as the server code above does.&lt;/p&gt;
+&lt;p&gt;It looks like &lt;a class="reference external" href="https://github.com/golang/go/issues/18997"&gt;soon&lt;/a&gt; there will be a direct way to get the HTTP response status.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class="section" id="references"&gt;
 &lt;h2&gt;References&lt;/h2&gt;
 &lt;p&gt;The following links helped me understand the above and write this post:&lt;/p&gt;
 &lt;ul class="simple"&gt;
-&lt;li&gt;&lt;a class="reference external" href="https://gocodecloud.com/blog/2016/11/15/simple-golang-http-request-context-example/"&gt;https://gocodecloud.com/blog/2016/11/15/simple-golang-http-request-context-example/&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a class="reference external" href="http://jordanorelli.com/post/42369331748/function-types-in-go-golang"&gt;http://jordanorelli.com/post/42369331748/function-types-in-go-golang&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a class="reference external" href="https://golang.org/doc/effective_go.html#interface_methods"&gt;https://golang.org/doc/effective_go.html#interface_methods&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference external" href="https://gocodecloud.com/blog/2016/11/15/simple-golang-http-request-context-example/"&gt;https://gocodecloud.com/blog/2016/11/15/simple-golang-http-request-context-example/&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a class="reference external" href="https://www.slideshare.net/blinkingsquirrel/customising-your-own-web-framework-in-go"&gt;https://www.slideshare.net/blinkingsquirrel/customising-your-own-web-framework-in-go&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/div&gt;

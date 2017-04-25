@@ -456,22 +456,13 @@ i have a version which achieves what I wanted to be able to do via my middleware
 <span class="kn">import</span> <span class="s">&quot;fmt&quot;</span>
 <span class="kn">import</span> <span class="s">&quot;log&quot;</span>
 
-
 <span class="kd">type</span> <span class="nx">MyResponseWriter</span> <span class="kd">struct</span> <span class="p">{</span>
         <span class="nx">http</span><span class="p">.</span><span class="nx">ResponseWriter</span>
-        <span class="nx">code</span>       <span class="kt">int</span>
+        <span class="nx">code</span> <span class="kt">int</span>
 <span class="p">}</span>
 
 <span class="kd">func</span> <span class="p">(</span><span class="nx">mw</span> <span class="o">*</span><span class="nx">MyResponseWriter</span><span class="p">)</span> <span class="nx">Header</span><span class="p">()</span> <span class="nx">http</span><span class="p">.</span><span class="nx">Header</span> <span class="p">{</span>
         <span class="k">return</span> <span class="nx">mw</span><span class="p">.</span><span class="nx">ResponseWriter</span><span class="p">.</span><span class="nx">Header</span><span class="p">()</span>
-<span class="p">}</span>
-
-<span class="kd">func</span> <span class="p">(</span><span class="nx">mw</span> <span class="o">*</span><span class="nx">MyResponseWriter</span><span class="p">)</span> <span class="nx">Write</span><span class="p">(</span><span class="nx">p</span> <span class="p">[]</span><span class="kt">byte</span><span class="p">)</span> <span class="p">(</span><span class="kt">int</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
-        <span class="c1">// If not set, set it</span>
-        <span class="k">if</span> <span class="nx">mw</span><span class="p">.</span><span class="nx">code</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span> <span class="p">{</span>
-                <span class="nx">mw</span><span class="p">.</span><span class="nx">code</span> <span class="p">=</span> <span class="nx">http</span><span class="p">.</span><span class="nx">StatusOK</span>
-        <span class="p">}</span>
-        <span class="k">return</span> <span class="nx">mw</span><span class="p">.</span><span class="nx">ResponseWriter</span><span class="p">.</span><span class="nx">Write</span><span class="p">(</span><span class="nx">p</span><span class="p">)</span>
 <span class="p">}</span>
 
 <span class="kd">func</span> <span class="p">(</span><span class="nx">mw</span> <span class="o">*</span><span class="nx">MyResponseWriter</span><span class="p">)</span> <span class="nx">WriteHeader</span><span class="p">(</span><span class="nx">code</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
@@ -482,10 +473,12 @@ i have a version which achieves what I wanted to be able to do via my middleware
 <span class="kd">type</span> <span class="nx">mytype</span> <span class="kd">struct</span><span class="p">{}</span>
 
 <span class="kd">func</span> <span class="p">(</span><span class="nx">t</span> <span class="o">*</span><span class="nx">mytype</span><span class="p">)</span> <span class="nx">ServeHTTP</span><span class="p">(</span><span class="nx">w</span> <span class="nx">http</span><span class="p">.</span><span class="nx">ResponseWriter</span><span class="p">,</span> <span class="nx">r</span> <span class="o">*</span><span class="nx">http</span><span class="p">.</span><span class="nx">Request</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">w</span><span class="p">.</span><span class="nx">WriteHeader</span><span class="p">(</span><span class="nx">http</span><span class="p">.</span><span class="nx">StatusOK</span><span class="p">)</span>
         <span class="nx">fmt</span><span class="p">.</span><span class="nx">Fprintf</span><span class="p">(</span><span class="nx">w</span><span class="p">,</span> <span class="s">&quot;Hello there from mytype&quot;</span><span class="p">)</span>
 <span class="p">}</span>
 
 <span class="kd">func</span> <span class="nx">StatusHandler</span><span class="p">(</span><span class="nx">w</span> <span class="nx">http</span><span class="p">.</span><span class="nx">ResponseWriter</span><span class="p">,</span> <span class="nx">r</span> <span class="o">*</span><span class="nx">http</span><span class="p">.</span><span class="nx">Request</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">w</span><span class="p">.</span><span class="nx">WriteHeader</span><span class="p">(</span><span class="nx">http</span><span class="p">.</span><span class="nx">StatusOK</span><span class="p">)</span>
         <span class="nx">fmt</span><span class="p">.</span><span class="nx">Fprintf</span><span class="p">(</span><span class="nx">w</span><span class="p">,</span> <span class="s">&quot;OK&quot;</span><span class="p">)</span>
 <span class="p">}</span>
 
@@ -511,7 +504,7 @@ i have a version which achieves what I wanted to be able to do via my middleware
 <span class="p">}</span>
 </pre></div>
 <p>In the example above, I define a new type <tt class="docutils literal">MyResponseWriter</tt> which implements the <tt class="docutils literal">http.ResponseWriter</tt> interface by implementing the
-three methods <tt class="docutils literal">Header()</tt>, <tt class="docutils literal">Write()</tt> and <tt class="docutils literal">WriteHeader()</tt>. In bothe <tt class="docutils literal">Write()</tt> and <tt class="docutils literal">WriteHeader()</tt>, I have some custom code that I execute before calling the corresponding method defined on the <tt class="docutils literal">http.ResponseWriter()</tt> interfce.</p>
+three methods <tt class="docutils literal">Header()</tt>, <tt class="docutils literal">Write()</tt> and <tt class="docutils literal">WriteHeader()</tt>. In bothe <tt class="docutils literal">Write()</tt> and <tt class="docutils literal">WriteHeader()</tt>, I have some custom code that I execute before calling the corresponding method defined on the <tt class="docutils literal">http.ResponseWriter()</tt> interface.</p>
 <p>Then, in <tt class="docutils literal">RunSomeCode()</tt>, instead of using the standard <tt class="docutils literal">http.ResponseWriter()</tt> object that it was passed, I wrap it in a <tt class="docutils literal">MyResponseWriter</tt> type as follows:</p>
 <pre class="code literal-block">
 myrw := &amp;MyResponseWriter{ResponseWriter: w, code: -1}
@@ -526,21 +519,21 @@ handler.ServeHTTP(myrw, r)
 2017/04/25 17:33:10 Got a GET request for: /
 2017/04/25 17:33:10 Response status:  200
 </pre>
-<p>I will end this post with a question:</p>
-<div class="section" id="question">
-<h3>Question</h3>
-<p>As i write above, it took me a while to figure out how to wrap <tt class="docutils literal">http.ResponseWriter</tt> correctly so that I could get access
+<p>I will end this post with a question and perhaps the possible explanation:</p>
+<p>As I write above, it took me a while to figure out how to wrap <tt class="docutils literal">http.ResponseWriter</tt> correctly so that I could get access
 to the HTTP status that was being set. The solution that was discussed in <a class="reference external" href="http://grokbase.com/t/gg/golang-nuts/12art4wedc/go-nuts-how-do-i-get-http-status-from-my-own-servehttp-function">this post</a> to just implement the <tt class="docutils literal">WriteHeader()</tt> method didn't work for me.
-<tt class="docutils literal">WriteHeader()</tt> method implemented by my <tt class="docutils literal">MyResponseWriter()</tt> was never called except for then there was a redirect.</p>
-</div>
+<tt class="docutils literal">WriteHeader()</tt> method implemented by my <tt class="docutils literal">MyResponseWriter()</tt> was never called except for then there was a redirect. I expected that
+the call to <tt class="docutils literal">Write()</tt> method of <tt class="docutils literal">http.ResponseWriter()</tt> would invoke the version of <tt class="docutils literal">WriterHeader()</tt> I implemented, but I cannot
+see any way that could happen from the code in <tt class="docutils literal">net/http/server.go</tt>. So I think this is what's &quot;implied&quot; in this and all the other posts I have seen: the handler for the request must call <tt class="docutils literal">WriteHeader()</tt> with the HTTP status as the server code above does.</p>
+<p>It looks like <a class="reference external" href="https://github.com/golang/go/issues/18997">soon</a> there will be a direct way to get the HTTP response status.</p>
 </div>
 <div class="section" id="references">
 <h2>References</h2>
 <p>The following links helped me understand the above and write this post:</p>
 <ul class="simple">
-<li><a class="reference external" href="https://gocodecloud.com/blog/2016/11/15/simple-golang-http-request-context-example/">https://gocodecloud.com/blog/2016/11/15/simple-golang-http-request-context-example/</a></li>
 <li><a class="reference external" href="http://jordanorelli.com/post/42369331748/function-types-in-go-golang">http://jordanorelli.com/post/42369331748/function-types-in-go-golang</a></li>
 <li><a class="reference external" href="https://golang.org/doc/effective_go.html#interface_methods">https://golang.org/doc/effective_go.html#interface_methods</a></li>
+<li><a class="reference external" href="https://gocodecloud.com/blog/2016/11/15/simple-golang-http-request-context-example/">https://gocodecloud.com/blog/2016/11/15/simple-golang-http-request-context-example/</a></li>
 <li><a class="reference external" href="https://www.slideshare.net/blinkingsquirrel/customising-your-own-web-framework-in-go">https://www.slideshare.net/blinkingsquirrel/customising-your-own-web-framework-in-go</a></li>
 </ul>
 </div>

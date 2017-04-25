@@ -231,14 +231,16 @@ Now, if we run the server, we will see log messages on the server as follows whe
     2017/04/25 17:33:10 Got a GET request for: /
     2017/04/25 17:33:10 Response status:  200
 
-I will end this post with a question:
 
-Question
-~~~~~~~~
+I will end this post with a question and perhaps the possible explanation:
 
-As i write above, it took me a while to figure out how to wrap ``http.ResponseWriter`` correctly so that I could get access
+As I write above, it took me a while to figure out how to wrap ``http.ResponseWriter`` correctly so that I could get access
 to the HTTP status that was being set. The solution that was discussed in `this post <http://grokbase.com/t/gg/golang-nuts/12art4wedc/go-nuts-how-do-i-get-http-status-from-my-own-servehttp-function>`__ to just implement the ``WriteHeader()`` method didn't work for me.
-``WriteHeader()`` method implemented by my ``MyResponseWriter()`` was never called except for then there was a redirect.
+``WriteHeader()`` method implemented by my ``MyResponseWriter()`` was never called except for then there was a redirect. I expected that
+the call to ``Write()`` method of ``http.ResponseWriter()`` would invoke the version of ``WriterHeader()`` I implemented, but I cannot
+see any way that could happen from the code in ``net/http/server.go``. So I think this is what's "implied" in this and all the other posts I have seen: the handler for the request must call ``WriteHeader()`` with the HTTP status as the server code above does.
+
+It looks like `soon <https://github.com/golang/go/issues/18997>`__ there will be a direct way to get the HTTP response status.
 
 
 References
@@ -246,9 +248,9 @@ References
 
 The following links helped me understand the above and write this post:
 
-- https://gocodecloud.com/blog/2016/11/15/simple-golang-http-request-context-example/
 - http://jordanorelli.com/post/42369331748/function-types-in-go-golang
 - https://golang.org/doc/effective_go.html#interface_methods
+- https://gocodecloud.com/blog/2016/11/15/simple-golang-http-request-context-example/
 - https://www.slideshare.net/blinkingsquirrel/customising-your-own-web-framework-in-go
 
 

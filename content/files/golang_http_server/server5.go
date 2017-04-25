@@ -4,22 +4,13 @@ import "net/http"
 import "fmt"
 import "log"
 
-
 type MyResponseWriter struct {
 	http.ResponseWriter
-	code       int
+	code int
 }
 
 func (mw *MyResponseWriter) Header() http.Header {
 	return mw.ResponseWriter.Header()
-}
-
-func (mw *MyResponseWriter) Write(p []byte) (int, error) {
-	// If not set, set it
-	if mw.code == -1 {
-		mw.code = http.StatusOK
-	}
-	return mw.ResponseWriter.Write(p)
 }
 
 func (mw *MyResponseWriter) WriteHeader(code int) {
@@ -30,10 +21,12 @@ func (mw *MyResponseWriter) WriteHeader(code int) {
 type mytype struct{}
 
 func (t *mytype) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
 	fmt.Fprintf(w, "Hello there from mytype")
 }
 
 func StatusHandler(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
 	fmt.Fprintf(w, "OK")
 }
 
