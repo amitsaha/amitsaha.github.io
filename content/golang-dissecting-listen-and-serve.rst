@@ -1,5 +1,5 @@
 :Title: Dissecting golang's HandlerFunc, Handle and DefaultServeMux
-:Date: 2017-04-24 10:00
+:Date: 2017-04-26 08:00
 :Category: golang
 
 My aim in this post is to discuss three "concepts" in Golang that I come across while writing HTTP servers. Through this
