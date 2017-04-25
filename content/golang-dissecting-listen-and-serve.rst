@@ -2,9 +2,9 @@
 :Date: 2017-04-24 10:00
 :Category: golang
 
-My aim in this post is to discuss three "concepts" in Golang that I came across while writing HTTP servers. Through this
-discussion I am to get rid of my own lack of understanding (at least to a certain degree) about these. Hopefully, it will
-be of use to others too.
+My aim in this post is to discuss three "concepts" in Golang that I come across while writing HTTP servers. Through this
+post, my aim to get rid of my own lack of understanding (at least to a certain degree) about these. Hopefully, it will
+be of use to others too. The code references are from `src/net/http/server.go <https://golang.org/src/net/http/server.go>`__. 
 
 The `http.ListenAndServe(..) <https://golang.org/pkg/net/http/#ListenAndServe>`__ function is the most straightforward 
 approach to start a HTTP 1.1 server. The following code does just that:
@@ -30,7 +30,7 @@ If we run our server above via ``go run server1.go``, and send a couple of HTTP 
    404 page not found
 
 This is because, we haven't specified how our server should handle requests to GET the root ("/") - our first request or 
-requests to GET the "/status" resource - our second request. Before we see how we could fix that, let's understand 
+requests to GET the "/status/" resource - our second request. Before we see how we could fix that, let's understand 
 *how* the error message "404 page not found" is generated.
 
 The error message is generated from the function below in `src/net/http/server.go` specifically the `NotFoundHandler()` 
@@ -193,23 +193,63 @@ When we run the server and send it a couple of requests as above, we will see:
     2017/04/24 17:53:05 Got a GET request for: /status
     2017/04/24 17:53:05 Handler finished processing request
 
-What we are doing above is we are "wrapping" our actual handler in another function ``RunSomeCode(handler http.Handler) http.Handler`` which satisfies the ``Handler`` interface. In this function, we execute some code 
+What we are doing above is we are "wrapping" our actual handler in another function ``RunSomeCode(handler http.Handler) http.Handler`` which satisfies the ``Handler`` interface. In this function, we print a log message, then call the ``ServeHTTP()`` method of our original
+handler, ``mux``. Once it returns from there, we are then printing another log message.
 
 As part of this middleware writing exercise, I also wanted to be able to print the HTTP status of the response that we are sending but as the comment in the code states, there is no direct way to get the status via the ``ResponseWriter`` object. Our next server example will fix this.
 
+Rewrapping ``http.ResponseWriter``
+==================================
 
-Learn more
+It took me a while to write the next version of the server, and after reading through some mailing list postings and example code, 
+i have a version which achieves what I wanted to be able to do via my middleware:
+
+.. code-include:: files/golang_http_server/server5.go
+    :lexer: go
+
+
+In the example above, I define a new type ``MyResponseWriter`` which implements the ``http.ResponseWriter`` interface by implementing the
+three methods ``Header()``, ``Write()`` and ``WriteHeader()``. In bothe ``Write()`` and ``WriteHeader()``, I have some custom code that I execute before calling the corresponding method defined on the ``http.ResponseWriter()`` interface. 
+
+
+Then, in ``RunSomeCode()``, instead of using the standard ``http.ResponseWriter()`` object that it was passed, I wrap it in a ``MyResponseWriter`` type as follows:
+
+.. code::
+    
+    myrw := &MyResponseWriter{ResponseWriter: w, code: -1}
+    handler.ServeHTTP(myrw, r)
+
+
+Now, if we run the server, we will see log messages on the server as follows when we send it HTTP get requests:
+
+.. code::
+
+    2017/04/25 17:33:06 Got a GET request for: /status/
+    2017/04/25 17:33:06 Response status:  200
+    2017/04/25 17:33:07 Got a GET request for: /status
+    2017/04/25 17:33:07 Response status:  301
+    2017/04/25 17:33:10 Got a GET request for: /
+    2017/04/25 17:33:10 Response status:  200
+
+I will end this post with a question:
+
+Question
+~~~~~~~~
+
+As i write above, it took me a while to figure out how to wrap ``http.ResponseWriter`` correctly so that I could get access
+to the HTTP status that was being set. The solution that was discussed in `this post <http://grokbase.com/t/gg/golang-nuts/12art4wedc/go-nuts-how-do-i-get-http-status-from-my-own-servehttp-function>`__ to just implement the ``WriteHeader()`` method didn't work for me.
+``WriteHeader()`` method implemented by my ``MyResponseWriter()`` was never called except for then there was a redirect.
+
+
+References
 ==========
+
+The following links helped me understand the above and write this post:
 
 - https://gocodecloud.com/blog/2016/11/15/simple-golang-http-request-context-example/
 - http://jordanorelli.com/post/42369331748/function-types-in-go-golang
 - https://golang.org/doc/effective_go.html#interface_methods
-
-
-
-
-
-
+- https://www.slideshare.net/blinkingsquirrel/customising-your-own-web-framework-in-go
 
 
 

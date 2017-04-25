@@ -10,11 +10,17 @@ type MyResponseWriter struct {
 	code       int
 }
 
-/*func (mw *MyResponseWriter) Write(p []byte) (int, error) {
-	mw.WriteHeader(http.StatusOK)
+func (mw *MyResponseWriter) Header() http.Header {
+	return mw.ResponseWriter.Header()
+}
+
+func (mw *MyResponseWriter) Write(p []byte) (int, error) {
+	// If not set, set it
+	if mw.code == -1 {
+		mw.code = http.StatusOK
+	}
 	return mw.ResponseWriter.Write(p)
 }
-*/
 
 func (mw *MyResponseWriter) WriteHeader(code int) {
 	mw.code = code
@@ -24,7 +30,6 @@ func (mw *MyResponseWriter) WriteHeader(code int) {
 type mytype struct{}
 
 func (t *mytype) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	log.Println("ServeHTTP called")
 	fmt.Fprintf(w, "Hello there from mytype")
 }
 
@@ -35,7 +40,7 @@ func StatusHandler(w http.ResponseWriter, r *http.Request) {
 func RunSomeCode(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Got a %s request for: %v", r.Method, r.URL)
-		myrw := &MyResponseWriter{ResponseWriter: w}
+		myrw := &MyResponseWriter{ResponseWriter: w, code: -1}
 		handler.ServeHTTP(myrw, r)
 		log.Println("Response status: ", myrw.code)
 	})

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Programming and Writing about it</title><link href="/" rel="alternate"></link><link href="/feeds/all.atom.xml" rel="self"></link><id>/</id><updated>2017-04-24T10:00:00+10:00</updated><entry><title>Dissecting golang's HandlerFunc, Handle and DefaultServeMux</title><link href="/dissecting-golangs-handlerfunc-handle-and-defaultservemux.html" rel="alternate"></link><published>2017-04-24T10:00:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2017-04-24:dissecting-golangs-handlerfunc-handle-and-defaultservemux.html</id><summary type="html">&lt;p&gt;My aim in this post is to discuss three &amp;quot;concepts&amp;quot; in Golang that I came across while writing HTTP servers. Through this
-discussion I am to get rid of my own lack of understanding (at least to a certain degree) about these. Hopefully, it will
-be of use to others too.&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Programming and Writing about it</title><link href="/" rel="alternate"></link><link href="/feeds/all.atom.xml" rel="self"></link><id>/</id><updated>2017-04-24T10:00:00+10:00</updated><entry><title>Dissecting golang's HandlerFunc, Handle and DefaultServeMux</title><link href="/dissecting-golangs-handlerfunc-handle-and-defaultservemux.html" rel="alternate"></link><published>2017-04-24T10:00:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2017-04-24:dissecting-golangs-handlerfunc-handle-and-defaultservemux.html</id><summary type="html">&lt;p&gt;My aim in this post is to discuss three &amp;quot;concepts&amp;quot; in Golang that I come across while writing HTTP servers. Through this
+post, my aim to get rid of my own lack of understanding (at least to a certain degree) about these. Hopefully, it will
+be of use to others too. The code references are from &lt;a class="reference external" href="https://golang.org/src/net/http/server.go"&gt;src/net/http/server.go&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;The &lt;a class="reference external" href="https://golang.org/pkg/net/http/#ListenAndServe"&gt;http.ListenAndServe(..)&lt;/a&gt; function is the most straightforward
 approach to start a HTTP 1.1 server. The following code does just that:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;package&lt;/span&gt; &lt;span class="n"&gt;main&lt;/span&gt;
@@ -28,7 +28,7 @@ $ curl localhost:8080/status/
 404 page not found
 &lt;/pre&gt;
 &lt;p&gt;This is because, we haven't specified how our server should handle requests to GET the root (&amp;quot;/&amp;quot;) - our first request or
-requests to GET the &amp;quot;/status&amp;quot; resource - our second request. Before we see how we could fix that, let's understand
+requests to GET the &amp;quot;/status/&amp;quot; resource - our second request. Before we see how we could fix that, let's understand
 &lt;em&gt;how&lt;/em&gt; the error message &amp;quot;404 page not found&amp;quot; is generated.&lt;/p&gt;
 &lt;p&gt;The error message is generated from the function below in &lt;cite&gt;src/net/http/server.go&lt;/cite&gt; specifically the &lt;cite&gt;NotFoundHandler()&lt;/cite&gt;
 &amp;quot;handler&amp;quot; function:&lt;/p&gt;
@@ -342,7 +342,7 @@ we register via &lt;tt class="docutils literal"&gt;Handle()&lt;/tt&gt; and &lt;t
 &lt;/div&gt;
 &lt;div class="section" id="writing-middleware"&gt;
 &lt;h2&gt;Writing Middleware&lt;/h2&gt;
-&lt;p&gt;In our latest version of the server, we have specified our own handler to &lt;tt class="docutils literal"&gt;ListenAndServe()&lt;/tt&gt;. One reason for doing so is when you want to execute some code for every request. That is:&lt;/p&gt;
+&lt;p&gt;In our latest version of the server, we have specified our own handler to &lt;tt class="docutils literal"&gt;ListenAndServe()&lt;/tt&gt;. One reason for doing so is when you want to execute some code for &lt;em&gt;every&lt;/em&gt; request. That is:&lt;/p&gt;
 &lt;ol class="arabic simple"&gt;
 &lt;li&gt;Server gets a request for &amp;quot;/path/&amp;quot;&lt;/li&gt;
 &lt;li&gt;Execute some code&lt;/li&gt;
@@ -374,7 +374,9 @@ we register via &lt;tt class="docutils literal"&gt;Handle()&lt;/tt&gt; and &lt;t
                 &lt;span class="c1"&gt;// At this stage, our handler has &amp;quot;handled&amp;quot; the request&lt;/span&gt;
                 &lt;span class="c1"&gt;// but we can still write to the client there&lt;/span&gt;
                 &lt;span class="c1"&gt;// but we won&amp;#39;t do that&lt;/span&gt;
-                &lt;span class="c1"&gt;// XXX: We don&amp;#39;t have the HTTP status here either, need to understand this better why&lt;/span&gt;
+                &lt;span class="c1"&gt;// XXX: We have the HTTP status here, but we cannot access&lt;/span&gt;
+                &lt;span class="c1"&gt;// it directly here&lt;/span&gt;
+                &lt;span class="c1"&gt;// See next example (server5.go)&lt;/span&gt;
                 &lt;span class="nx"&gt;log&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Println&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Handler finished processing request&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
         &lt;span class="p"&gt;})&lt;/span&gt;
 &lt;span class="p"&gt;}&lt;/span&gt;
@@ -398,15 +400,106 @@ we register via &lt;tt class="docutils literal"&gt;Handle()&lt;/tt&gt; and &lt;t
 2017/04/24 17:53:05 Got a GET request for: /status
 2017/04/24 17:53:05 Handler finished processing request
 &lt;/pre&gt;
-&lt;p&gt;As part of this middleware writing exercise, I also wanted to be able to print the HTTP status of the response that we are sending but as the comment in the code states,
-I haven't been able to figure it out yet.&lt;/p&gt;
+&lt;p&gt;What we are doing above is we are &amp;quot;wrapping&amp;quot; our actual handler in another function &lt;tt class="docutils literal"&gt;RunSomeCode(handler http.Handler) http.Handler&lt;/tt&gt; which satisfies the &lt;tt class="docutils literal"&gt;Handler&lt;/tt&gt; interface. In this function, we print a log message, then call the &lt;tt class="docutils literal"&gt;ServeHTTP()&lt;/tt&gt; method of our original
+handler, &lt;tt class="docutils literal"&gt;mux&lt;/tt&gt;. Once it returns from there, we are then printing another log message.&lt;/p&gt;
+&lt;p&gt;As part of this middleware writing exercise, I also wanted to be able to print the HTTP status of the response that we are sending but as the comment in the code states, there is no direct way to get the status via the &lt;tt class="docutils literal"&gt;ResponseWriter&lt;/tt&gt; object. Our next server example will fix this.&lt;/p&gt;
 &lt;/div&gt;
-&lt;div class="section" id="learn-more"&gt;
-&lt;h2&gt;Learn more&lt;/h2&gt;
+&lt;div class="section" id="rewrapping-http-responsewriter"&gt;
+&lt;h2&gt;Rewrapping &lt;tt class="docutils literal"&gt;http.ResponseWriter&lt;/tt&gt;&lt;/h2&gt;
+&lt;p&gt;It took me a while to write the next version of the server, and after reading through some mailing list postings and example code,
+i have a version which achieves what I wanted to be able to do via my middleware:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kn"&gt;package&lt;/span&gt; &lt;span class="nx"&gt;main&lt;/span&gt;
+
+&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;net/http&amp;quot;&lt;/span&gt;
+&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;fmt&amp;quot;&lt;/span&gt;
+&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;log&amp;quot;&lt;/span&gt;
+
+
+&lt;span class="kd"&gt;type&lt;/span&gt; &lt;span class="nx"&gt;MyResponseWriter&lt;/span&gt; &lt;span class="kd"&gt;struct&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="nx"&gt;http&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;ResponseWriter&lt;/span&gt;
+        &lt;span class="nx"&gt;code&lt;/span&gt;       &lt;span class="kt"&gt;int&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="kd"&gt;func&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;mw&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="nx"&gt;MyResponseWriter&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="nx"&gt;Header&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="nx"&gt;http&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Header&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nx"&gt;mw&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;ResponseWriter&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Header&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="kd"&gt;func&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;mw&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="nx"&gt;MyResponseWriter&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="nx"&gt;Write&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;p&lt;/span&gt; &lt;span class="p"&gt;[]&lt;/span&gt;&lt;span class="kt"&gt;byte&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;error&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="c1"&gt;// If not set, set it&lt;/span&gt;
+        &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="nx"&gt;mw&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;code&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+                &lt;span class="nx"&gt;mw&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;code&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;http&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;StatusOK&lt;/span&gt;
+        &lt;span class="p"&gt;}&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nx"&gt;mw&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;ResponseWriter&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Write&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;p&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="kd"&gt;func&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;mw&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="nx"&gt;MyResponseWriter&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="nx"&gt;WriteHeader&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;code&lt;/span&gt; &lt;span class="kt"&gt;int&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="nx"&gt;mw&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;code&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;code&lt;/span&gt;
+        &lt;span class="nx"&gt;mw&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;ResponseWriter&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;WriteHeader&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;code&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="kd"&gt;type&lt;/span&gt; &lt;span class="nx"&gt;mytype&lt;/span&gt; &lt;span class="kd"&gt;struct&lt;/span&gt;&lt;span class="p"&gt;{}&lt;/span&gt;
+
+&lt;span class="kd"&gt;func&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;t&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="nx"&gt;mytype&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="nx"&gt;ServeHTTP&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;w&lt;/span&gt; &lt;span class="nx"&gt;http&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;ResponseWriter&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;r&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="nx"&gt;http&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Request&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="nx"&gt;fmt&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Fprintf&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;w&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Hello there from mytype&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="kd"&gt;func&lt;/span&gt; &lt;span class="nx"&gt;StatusHandler&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;w&lt;/span&gt; &lt;span class="nx"&gt;http&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;ResponseWriter&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;r&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="nx"&gt;http&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Request&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="nx"&gt;fmt&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Fprintf&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;w&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;OK&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="kd"&gt;func&lt;/span&gt; &lt;span class="nx"&gt;RunSomeCode&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;handler&lt;/span&gt; &lt;span class="nx"&gt;http&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Handler&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="nx"&gt;http&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Handler&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nx"&gt;http&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;HandlerFunc&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kd"&gt;func&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;w&lt;/span&gt; &lt;span class="nx"&gt;http&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;ResponseWriter&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;r&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="nx"&gt;http&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Request&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+                &lt;span class="nx"&gt;log&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Printf&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Got a %s request for: %v&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;r&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Method&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;r&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;URL&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+                &lt;span class="nx"&gt;myrw&lt;/span&gt; &lt;span class="o"&gt;:=&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="nx"&gt;MyResponseWriter&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="nx"&gt;ResponseWriter&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="nx"&gt;w&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;code&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+                &lt;span class="nx"&gt;handler&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;ServeHTTP&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;myrw&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;r&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+                &lt;span class="nx"&gt;log&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Println&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Response status: &amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;myrw&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;code&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="p"&gt;})&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="kd"&gt;func&lt;/span&gt; &lt;span class="nx"&gt;main&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+
+        &lt;span class="nx"&gt;mux&lt;/span&gt; &lt;span class="o"&gt;:=&lt;/span&gt; &lt;span class="nx"&gt;http&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;NewServeMux&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+
+        &lt;span class="nx"&gt;t&lt;/span&gt; &lt;span class="o"&gt;:=&lt;/span&gt; &lt;span class="nb"&gt;new&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;mytype&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="nx"&gt;mux&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Handle&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;/&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;t&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="nx"&gt;mux&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;HandleFunc&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;/status/&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;StatusHandler&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+        &lt;span class="nx"&gt;WrappedMux&lt;/span&gt; &lt;span class="o"&gt;:=&lt;/span&gt; &lt;span class="nx"&gt;RunSomeCode&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;mux&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="nx"&gt;log&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Fatal&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;http&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;ListenAndServe&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;:8080&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;WrappedMux&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;In the example above, I define a new type &lt;tt class="docutils literal"&gt;MyResponseWriter&lt;/tt&gt; which implements the &lt;tt class="docutils literal"&gt;http.ResponseWriter&lt;/tt&gt; interface by implementing the
+three methods &lt;tt class="docutils literal"&gt;Header()&lt;/tt&gt;, &lt;tt class="docutils literal"&gt;Write()&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;WriteHeader()&lt;/tt&gt;. In bothe &lt;tt class="docutils literal"&gt;Write()&lt;/tt&gt; and &lt;tt class="docutils literal"&gt;WriteHeader()&lt;/tt&gt;, I have some custom code that I execute before calling the corresponding method defined on the &lt;tt class="docutils literal"&gt;http.ResponseWriter()&lt;/tt&gt; interfce.&lt;/p&gt;
+&lt;p&gt;Then, in &lt;tt class="docutils literal"&gt;RunSomeCode()&lt;/tt&gt;, instead of using the standard &lt;tt class="docutils literal"&gt;http.ResponseWriter()&lt;/tt&gt; object that it was passed, I wrap it in a &lt;tt class="docutils literal"&gt;MyResponseWriter&lt;/tt&gt; type as follows:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+myrw := &amp;amp;MyResponseWriter{ResponseWriter: w, code: -1}
+handler.ServeHTTP(myrw, r)
+&lt;/pre&gt;
+&lt;p&gt;Now, if we run the server, we will see log messages on the server as follows when we send it HTTP get requests:&lt;/p&gt;
+&lt;pre class="code literal-block"&gt;
+2017/04/25 17:33:06 Got a GET request for: /status/
+2017/04/25 17:33:06 Response status:  200
+2017/04/25 17:33:07 Got a GET request for: /status
+2017/04/25 17:33:07 Response status:  301
+2017/04/25 17:33:10 Got a GET request for: /
+2017/04/25 17:33:10 Response status:  200
+&lt;/pre&gt;
+&lt;p&gt;I will end this post with a question:&lt;/p&gt;
+&lt;div class="section" id="question"&gt;
+&lt;h3&gt;Question&lt;/h3&gt;
+&lt;p&gt;As i write above, it took me a while to figure out how to wrap &lt;tt class="docutils literal"&gt;http.ResponseWriter&lt;/tt&gt; correctly so that I could get access
+to the HTTP status that was being set. The solution that was discussed in &lt;a class="reference external" href="http://grokbase.com/t/gg/golang-nuts/12art4wedc/go-nuts-how-do-i-get-http-status-from-my-own-servehttp-function"&gt;this post&lt;/a&gt; to just implement the &lt;tt class="docutils literal"&gt;WriteHeader()&lt;/tt&gt; method didn't work for me.
+&lt;tt class="docutils literal"&gt;WriteHeader()&lt;/tt&gt; method implemented by my &lt;tt class="docutils literal"&gt;MyResponseWriter()&lt;/tt&gt; was never called except for then there was a redirect.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="references"&gt;
+&lt;h2&gt;References&lt;/h2&gt;
+&lt;p&gt;The following links helped me understand the above and write this post:&lt;/p&gt;
 &lt;ul class="simple"&gt;
 &lt;li&gt;&lt;a class="reference external" href="https://gocodecloud.com/blog/2016/11/15/simple-golang-http-request-context-example/"&gt;https://gocodecloud.com/blog/2016/11/15/simple-golang-http-request-context-example/&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a class="reference external" href="http://jordanorelli.com/post/42369331748/function-types-in-go-golang"&gt;http://jordanorelli.com/post/42369331748/function-types-in-go-golang&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a class="reference external" href="https://golang.org/doc/effective_go.html#interface_methods"&gt;https://golang.org/doc/effective_go.html#interface_methods&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference external" href="https://www.slideshare.net/blinkingsquirrel/customising-your-own-web-framework-in-go"&gt;https://www.slideshare.net/blinkingsquirrel/customising-your-own-web-framework-in-go&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/div&gt;
 </summary></entry><entry><title>Doing Math with Python Humble Bundle</title><link href="/humble-bundle.html" rel="alternate"></link><published>2017-04-06T08:20:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2017-04-06:humble-bundle.html</id><summary type="html">&lt;p&gt;No Starch Press has launched a &amp;quot;Pay what you want&amp;quot; &lt;a class="reference external" href="https://www.humblebundle.com/books/python-book-bundle"&gt;Python Humble Bundle&lt;/a&gt; running from April 5th - April 19th!

@@ -41,9 +41,9 @@
         </address>
 <p>In <a href="/category/golang.html">golang</a>.</p>
 
-</footer><!-- /.post-info -->      <p>My aim in this post is to discuss three &quot;concepts&quot; in Golang that I came across while writing HTTP servers. Through this
-discussion I am to get rid of my own lack of understanding (at least to a certain degree) about these. Hopefully, it will
-be of use to others too.</p>
+</footer><!-- /.post-info -->      <p>My aim in this post is to discuss three &quot;concepts&quot; in Golang that I come across while writing HTTP servers. Through this
+post, my aim to get rid of my own lack of understanding (at least to a certain degree) about these. Hopefully, it will
+be of use to others too. The code references are from <a class="reference external" href="https://golang.org/src/net/http/server.go">src/net/http/server.go</a>.</p>
 <p>The <a class="reference external" href="https://golang.org/pkg/net/http/#ListenAndServe">http.ListenAndServe(..)</a> function is the most straightforward
 approach to start a HTTP 1.1 server. The following code does just that:</p>
 <div class="highlight"><pre><span></span><span class="n">package</span> <span class="n">main</span>
@@ -70,7 +70,7 @@ $ curl localhost:8080/status/
 404 page not found
 </pre>
 <p>This is because, we haven't specified how our server should handle requests to GET the root (&quot;/&quot;) - our first request or
-requests to GET the &quot;/status&quot; resource - our second request. Before we see how we could fix that, let's understand
+requests to GET the &quot;/status/&quot; resource - our second request. Before we see how we could fix that, let's understand
 <em>how</em> the error message &quot;404 page not found&quot; is generated.</p>
 <p>The error message is generated from the function below in <cite>src/net/http/server.go</cite> specifically the <cite>NotFoundHandler()</cite>
 &quot;handler&quot; function:</p>
@@ -384,7 +384,7 @@ we register via <tt class="docutils literal">Handle()</tt> and <tt class="docuti
 </div>
 <div class="section" id="writing-middleware">
 <h2>Writing Middleware</h2>
-<p>In our latest version of the server, we have specified our own handler to <tt class="docutils literal">ListenAndServe()</tt>. One reason for doing so is when you want to execute some code for every request. That is:</p>
+<p>In our latest version of the server, we have specified our own handler to <tt class="docutils literal">ListenAndServe()</tt>. One reason for doing so is when you want to execute some code for <em>every</em> request. That is:</p>
 <ol class="arabic simple">
 <li>Server gets a request for &quot;/path/&quot;</li>
 <li>Execute some code</li>
@@ -416,7 +416,9 @@ we register via <tt class="docutils literal">Handle()</tt> and <tt class="docuti
                 <span class="c1">// At this stage, our handler has &quot;handled&quot; the request</span>
                 <span class="c1">// but we can still write to the client there</span>
                 <span class="c1">// but we won&#39;t do that</span>
-                <span class="c1">// XXX: We don&#39;t have the HTTP status here either, need to understand this better why</span>
+                <span class="c1">// XXX: We have the HTTP status here, but we cannot access</span>
+                <span class="c1">// it directly here</span>
+                <span class="c1">// See next example (server5.go)</span>
                 <span class="nx">log</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="s">&quot;Handler finished processing request&quot;</span><span class="p">)</span>
         <span class="p">})</span>
 <span class="p">}</span>
@@ -440,15 +442,106 @@ we register via <tt class="docutils literal">Handle()</tt> and <tt class="docuti
 2017/04/24 17:53:05 Got a GET request for: /status
 2017/04/24 17:53:05 Handler finished processing request
 </pre>
-<p>As part of this middleware writing exercise, I also wanted to be able to print the HTTP status of the response that we are sending but as the comment in the code states,
-I haven't been able to figure it out yet.</p>
+<p>What we are doing above is we are &quot;wrapping&quot; our actual handler in another function <tt class="docutils literal">RunSomeCode(handler http.Handler) http.Handler</tt> which satisfies the <tt class="docutils literal">Handler</tt> interface. In this function, we print a log message, then call the <tt class="docutils literal">ServeHTTP()</tt> method of our original
+handler, <tt class="docutils literal">mux</tt>. Once it returns from there, we are then printing another log message.</p>
+<p>As part of this middleware writing exercise, I also wanted to be able to print the HTTP status of the response that we are sending but as the comment in the code states, there is no direct way to get the status via the <tt class="docutils literal">ResponseWriter</tt> object. Our next server example will fix this.</p>
 </div>
-<div class="section" id="learn-more">
-<h2>Learn more</h2>
+<div class="section" id="rewrapping-http-responsewriter">
+<h2>Rewrapping <tt class="docutils literal">http.ResponseWriter</tt></h2>
+<p>It took me a while to write the next version of the server, and after reading through some mailing list postings and example code,
+i have a version which achieves what I wanted to be able to do via my middleware:</p>
+<div class="highlight"><pre><span></span><span class="kn">package</span> <span class="nx">main</span>
+
+<span class="kn">import</span> <span class="s">&quot;net/http&quot;</span>
+<span class="kn">import</span> <span class="s">&quot;fmt&quot;</span>
+<span class="kn">import</span> <span class="s">&quot;log&quot;</span>
+
+
+<span class="kd">type</span> <span class="nx">MyResponseWriter</span> <span class="kd">struct</span> <span class="p">{</span>
+        <span class="nx">http</span><span class="p">.</span><span class="nx">ResponseWriter</span>
+        <span class="nx">code</span>       <span class="kt">int</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="p">(</span><span class="nx">mw</span> <span class="o">*</span><span class="nx">MyResponseWriter</span><span class="p">)</span> <span class="nx">Header</span><span class="p">()</span> <span class="nx">http</span><span class="p">.</span><span class="nx">Header</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">mw</span><span class="p">.</span><span class="nx">ResponseWriter</span><span class="p">.</span><span class="nx">Header</span><span class="p">()</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="p">(</span><span class="nx">mw</span> <span class="o">*</span><span class="nx">MyResponseWriter</span><span class="p">)</span> <span class="nx">Write</span><span class="p">(</span><span class="nx">p</span> <span class="p">[]</span><span class="kt">byte</span><span class="p">)</span> <span class="p">(</span><span class="kt">int</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// If not set, set it</span>
+        <span class="k">if</span> <span class="nx">mw</span><span class="p">.</span><span class="nx">code</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span> <span class="p">{</span>
+                <span class="nx">mw</span><span class="p">.</span><span class="nx">code</span> <span class="p">=</span> <span class="nx">http</span><span class="p">.</span><span class="nx">StatusOK</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="nx">mw</span><span class="p">.</span><span class="nx">ResponseWriter</span><span class="p">.</span><span class="nx">Write</span><span class="p">(</span><span class="nx">p</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="p">(</span><span class="nx">mw</span> <span class="o">*</span><span class="nx">MyResponseWriter</span><span class="p">)</span> <span class="nx">WriteHeader</span><span class="p">(</span><span class="nx">code</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">mw</span><span class="p">.</span><span class="nx">code</span> <span class="p">=</span> <span class="nx">code</span>
+        <span class="nx">mw</span><span class="p">.</span><span class="nx">ResponseWriter</span><span class="p">.</span><span class="nx">WriteHeader</span><span class="p">(</span><span class="nx">code</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="kd">type</span> <span class="nx">mytype</span> <span class="kd">struct</span><span class="p">{}</span>
+
+<span class="kd">func</span> <span class="p">(</span><span class="nx">t</span> <span class="o">*</span><span class="nx">mytype</span><span class="p">)</span> <span class="nx">ServeHTTP</span><span class="p">(</span><span class="nx">w</span> <span class="nx">http</span><span class="p">.</span><span class="nx">ResponseWriter</span><span class="p">,</span> <span class="nx">r</span> <span class="o">*</span><span class="nx">http</span><span class="p">.</span><span class="nx">Request</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">fmt</span><span class="p">.</span><span class="nx">Fprintf</span><span class="p">(</span><span class="nx">w</span><span class="p">,</span> <span class="s">&quot;Hello there from mytype&quot;</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="nx">StatusHandler</span><span class="p">(</span><span class="nx">w</span> <span class="nx">http</span><span class="p">.</span><span class="nx">ResponseWriter</span><span class="p">,</span> <span class="nx">r</span> <span class="o">*</span><span class="nx">http</span><span class="p">.</span><span class="nx">Request</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">fmt</span><span class="p">.</span><span class="nx">Fprintf</span><span class="p">(</span><span class="nx">w</span><span class="p">,</span> <span class="s">&quot;OK&quot;</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="nx">RunSomeCode</span><span class="p">(</span><span class="nx">handler</span> <span class="nx">http</span><span class="p">.</span><span class="nx">Handler</span><span class="p">)</span> <span class="nx">http</span><span class="p">.</span><span class="nx">Handler</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">http</span><span class="p">.</span><span class="nx">HandlerFunc</span><span class="p">(</span><span class="kd">func</span><span class="p">(</span><span class="nx">w</span> <span class="nx">http</span><span class="p">.</span><span class="nx">ResponseWriter</span><span class="p">,</span> <span class="nx">r</span> <span class="o">*</span><span class="nx">http</span><span class="p">.</span><span class="nx">Request</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nx">log</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="s">&quot;Got a %s request for: %v&quot;</span><span class="p">,</span> <span class="nx">r</span><span class="p">.</span><span class="nx">Method</span><span class="p">,</span> <span class="nx">r</span><span class="p">.</span><span class="nx">URL</span><span class="p">)</span>
+                <span class="nx">myrw</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">MyResponseWriter</span><span class="p">{</span><span class="nx">ResponseWriter</span><span class="p">:</span> <span class="nx">w</span><span class="p">,</span> <span class="nx">code</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">}</span>
+                <span class="nx">handler</span><span class="p">.</span><span class="nx">ServeHTTP</span><span class="p">(</span><span class="nx">myrw</span><span class="p">,</span> <span class="nx">r</span><span class="p">)</span>
+                <span class="nx">log</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="s">&quot;Response status: &quot;</span><span class="p">,</span> <span class="nx">myrw</span><span class="p">.</span><span class="nx">code</span><span class="p">)</span>
+        <span class="p">})</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="nx">main</span><span class="p">()</span> <span class="p">{</span>
+
+        <span class="nx">mux</span> <span class="o">:=</span> <span class="nx">http</span><span class="p">.</span><span class="nx">NewServeMux</span><span class="p">()</span>
+
+        <span class="nx">t</span> <span class="o">:=</span> <span class="nb">new</span><span class="p">(</span><span class="nx">mytype</span><span class="p">)</span>
+        <span class="nx">mux</span><span class="p">.</span><span class="nx">Handle</span><span class="p">(</span><span class="s">&quot;/&quot;</span><span class="p">,</span> <span class="nx">t</span><span class="p">)</span>
+        <span class="nx">mux</span><span class="p">.</span><span class="nx">HandleFunc</span><span class="p">(</span><span class="s">&quot;/status/&quot;</span><span class="p">,</span> <span class="nx">StatusHandler</span><span class="p">)</span>
+
+        <span class="nx">WrappedMux</span> <span class="o">:=</span> <span class="nx">RunSomeCode</span><span class="p">(</span><span class="nx">mux</span><span class="p">)</span>
+        <span class="nx">log</span><span class="p">.</span><span class="nx">Fatal</span><span class="p">(</span><span class="nx">http</span><span class="p">.</span><span class="nx">ListenAndServe</span><span class="p">(</span><span class="s">&quot;:8080&quot;</span><span class="p">,</span> <span class="nx">WrappedMux</span><span class="p">))</span>
+<span class="p">}</span>
+</pre></div>
+<p>In the example above, I define a new type <tt class="docutils literal">MyResponseWriter</tt> which implements the <tt class="docutils literal">http.ResponseWriter</tt> interface by implementing the
+three methods <tt class="docutils literal">Header()</tt>, <tt class="docutils literal">Write()</tt> and <tt class="docutils literal">WriteHeader()</tt>. In bothe <tt class="docutils literal">Write()</tt> and <tt class="docutils literal">WriteHeader()</tt>, I have some custom code that I execute before calling the corresponding method defined on the <tt class="docutils literal">http.ResponseWriter()</tt> interfce.</p>
+<p>Then, in <tt class="docutils literal">RunSomeCode()</tt>, instead of using the standard <tt class="docutils literal">http.ResponseWriter()</tt> object that it was passed, I wrap it in a <tt class="docutils literal">MyResponseWriter</tt> type as follows:</p>
+<pre class="code literal-block">
+myrw := &amp;MyResponseWriter{ResponseWriter: w, code: -1}
+handler.ServeHTTP(myrw, r)
+</pre>
+<p>Now, if we run the server, we will see log messages on the server as follows when we send it HTTP get requests:</p>
+<pre class="code literal-block">
+2017/04/25 17:33:06 Got a GET request for: /status/
+2017/04/25 17:33:06 Response status:  200
+2017/04/25 17:33:07 Got a GET request for: /status
+2017/04/25 17:33:07 Response status:  301
+2017/04/25 17:33:10 Got a GET request for: /
+2017/04/25 17:33:10 Response status:  200
+</pre>
+<p>I will end this post with a question:</p>
+<div class="section" id="question">
+<h3>Question</h3>
+<p>As i write above, it took me a while to figure out how to wrap <tt class="docutils literal">http.ResponseWriter</tt> correctly so that I could get access
+to the HTTP status that was being set. The solution that was discussed in <a class="reference external" href="http://grokbase.com/t/gg/golang-nuts/12art4wedc/go-nuts-how-do-i-get-http-status-from-my-own-servehttp-function">this post</a> to just implement the <tt class="docutils literal">WriteHeader()</tt> method didn't work for me.
+<tt class="docutils literal">WriteHeader()</tt> method implemented by my <tt class="docutils literal">MyResponseWriter()</tt> was never called except for then there was a redirect.</p>
+</div>
+</div>
+<div class="section" id="references">
+<h2>References</h2>
+<p>The following links helped me understand the above and write this post:</p>
 <ul class="simple">
 <li><a class="reference external" href="https://gocodecloud.com/blog/2016/11/15/simple-golang-http-request-context-example/">https://gocodecloud.com/blog/2016/11/15/simple-golang-http-request-context-example/</a></li>
 <li><a class="reference external" href="http://jordanorelli.com/post/42369331748/function-types-in-go-golang">http://jordanorelli.com/post/42369331748/function-types-in-go-golang</a></li>
 <li><a class="reference external" href="https://golang.org/doc/effective_go.html#interface_methods">https://golang.org/doc/effective_go.html#interface_methods</a></li>
+<li><a class="reference external" href="https://www.slideshare.net/blinkingsquirrel/customising-your-own-web-framework-in-go">https://www.slideshare.net/blinkingsquirrel/customising-your-own-web-framework-in-go</a></li>
 </ul>
 </div>
 
