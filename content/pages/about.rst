@@ -8,12 +8,7 @@ and continue to write as I get a chance for various technical magazines.
 My articles have appeared in Linux Voice, Linux Journal and Linux Magazine.
 
 You can contact me via `email <mailto:amitsaha.in@gmail.com>`__.
-I am on `Twitter <http://twitter.com/echorand>`__ , `Google+
-<https://plus.google.com/u/0/117236901152985389993/posts/p/pub>`__ and
-`Facebook <http://facebook.com/echorand>`__.
-
-Work
-----
+and I am on Twitter as `echorand <http://twitter.com/echorand>`__.
 
 I work as a software engineer at Freelancer.com since July 2015.
 
