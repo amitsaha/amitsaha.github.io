@@ -349,6 +349,16 @@ $ docker build -t amitsaha/apigateway .
 ..
 
 
+$ kubectl create -f kubernetes/deployment.yaml
+deployment "apigateway" created
+
+$ kubectl create -f kubernetes/service.yaml
+service "apigateway" created
+
+..
+
+
+
 
 What's running on port 443 kubernetes?
 ======================================
