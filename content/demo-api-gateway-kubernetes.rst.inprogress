@@ -358,6 +358,24 @@ service "apigateway" created
 ..
 
 
+➜  apigateway git:(kubernetes) ✗ kubectl get pod | grep 'apigateway' | cut -d " " -f1 - | xargs -n1 -P 10 kubectl delete pod
+p
+
+
+$ kubectl get services
+NAME         CLUSTER-IP   EXTERNAL-IP   PORT(S)    AGE
+apigateway   10.0.0.153   <none>        80/TCP     21h
+kubernetes   10.0.0.1     <none>        443/TCP    23d
+rpc-app-1    10.0.0.30    <none>        6000/TCP   14d
+webapp-1     10.0.0.46    <none>        80/TCP     22d
+
+$ curl -q -H "Content-type: application/json" -X POST -d '{"title1":"My project hello hello11"}' 10.0.0.153/projects/
+{
+  "id": 123,
+  "url": "Project-None"
+}
+
+
 
 
 What's running on port 443 kubernetes?
