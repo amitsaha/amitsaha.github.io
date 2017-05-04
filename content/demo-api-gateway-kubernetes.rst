@@ -310,127 +310,130 @@ First, we will build the image:
 API gateway: Deploying the API gateway
 =====================================
 
-$ cd apigatewaydemo/apigateway
-$ docker build -t amitsaha/apigateway .
-..
+Let's build the docker image first:
+
+.. code::
+
+   $ cd apigatewaydemo/apigateway
+   $ docker build -t amitsaha/apigateway .
+
+Next, we will create the deployment:
+
+.. code::
+
+   $ kubectl create -f kubernetes/deployment.yaml
+   deployment "apigateway" created
 
 
-$ kubectl create -f kubernetes/deployment.yaml
-deployment "apigateway" created
+And the service:
 
-$ kubectl create -f kubernetes/service.yaml
-service "apigateway" created
+.. code::
 
-..
-
-
-➜  apigateway git:(kubernetes) ✗ kubectl get pod | grep 'apigateway' | cut -d " " -f1 - | xargs -n1 -P 10 kubectl delete pod
-p
+   $ kubectl create -f kubernetes/service.yaml
+   service "apigateway" created
 
 
-$ kubectl get services
-NAME         CLUSTER-IP   EXTERNAL-IP   PORT(S)    AGE
-apigateway   10.0.0.153   <none>        80/TCP     21h
-kubernetes   10.0.0.1     <none>        443/TCP    23d
-rpc-app-1    10.0.0.30    <none>        6000/TCP   14d
-webapp-1     10.0.0.46    <none>        80/TCP     22d
-
-$ curl -q -H "Content-type: application/json" -X POST -d '{"title1":"My project hello hello11"}' 10.0.0.153/projects/
-{
-  "id": 123,
-  "url": "Project-None"
-}
+Let's see how the services now look like:
 
 
-diff --git a/apigateway/kubernetes/service.yaml b/apigateway/kubernetes/service.yaml
-index 8c32a97..819ae25 100644
---- a/apigateway/kubernetes/service.yaml
-+++ b/apigateway/kubernetes/service.yaml
-@@ -9,3 +9,4 @@ spec:
-     - protocol: TCP
-       port: 80
-       targetPort: 8000
-+  type: NodePort
-(END)
+.. code::
+
+   $ kubectl get services
+   NAME         CLUSTER-IP   EXTERNAL-IP   PORT(S)    AGE
+   apigateway   10.0.0.153   <none>        80/TCP     21h
+   kubernetes   10.0.0.1     <none>        443/TCP    23d
+   rpc-app-1    10.0.0.30    <none>        6000/TCP   14d
+   webapp-1     10.0.0.46    <none>        80/TCP     22d
+   
+
+Now if, we ssh into our minikube VM (via ``minikube ssh``), we can send requests to the the API gateway and see that
+it forwards it successfully to the correct service:
+
+.. code::
 
 
-➜  apigateway git:(kubernetes) ✗ kubectl describe services apigateway
-Name:                   apigateway
-Namespace:              default
-Labels:                 <none>
-Annotations:            <none>
-Selector:               app=apigateway
-Type:                   ClusterIP
-IP:                     10.0.0.153
-Port:                   <unset> 80/TCP
-Endpoints:              172.17.0.11:8000,172.17.0.14:8000,172.17.0.15:8000
-Session Affinity:       None
-Events:                 <none>
-➜  apigateway git:(kubernetes) ✗ kubectl apply -f kubernetes/service.yaml
-Warning: kubectl apply should be used on resource created by either kubectl create --save-config or kubectl apply
-service "apigateway" configured
-➜  apigateway git:(kubernetes) ✗ kubectl describe services apigateway
-Name:                   apigateway
-Namespace:              default
-Labels:                 <none>
-Annotations:            kubectl.kubernetes.io/last-applied-configuration={"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"name":"apigateway","namespace":"default"},"spec":{"ports":[{"port":80,"protocol":"TCP...
-Selector:               app=apigateway
-Type:                   NodePort
-IP:                     10.0.0.153
-Port:                   <unset> 80/TCP
-NodePort:               <unset> 30638/TCP
-Endpoints:              172.17.0.11:8000,172.17.0.14:8000,172.17.0.15:8000
-Session Affinity:       None
-Events:                 <none>
-➜
+   $ curl -q -H "Content-type: application/json" -X POST -d '{"title":"My project hello hello11"}' 10.0.0.153/projects/
+   {
+     "id": 123,
+     "url": "Project-My project hello hello11"
+   }
+   
+   $ curl -q -H "Content-type: application/json" -X POST -d '{"id": 121, "token": "a$$" }' 10.0.0.153/verify/
+   {"message":"Verified: 121"}
 
-➜  apigateway git:(kubernetes) ✗ minikube service --url apigateway
-http://192.168.99.100:30638
-➜
+However, this IP is only accessible from this VM, not from the host  machine. We need to configure a `NodePort <https://kubernetes.io/docs/concepts/services-networking/service/#type-nodeport>`__ as follows:
 
+.. code::
 
-$ curl -q -H "Content-type: application/json" -X POST -d '{"title1":"My project hello hello11"}' 10.0.0.153/projects/
-{
-  "id": 123,
-  "url": "Project-None"
-}
-$
-$ curl -q -H "Content-type: application/json" -X POST -d '{"title1":"My project hello hello11"}' 10.0.0.153/verify/
-{"message":"Verified: 12321"}
-$
-$ curl -q -H "Content-type: application/json" -X POST -d '{"id": 111, "token": "a$$" }'
-10.0.0.153/verify/
-{"message":"Verified: 111"}
-$ curl -q -H "Content-type: application/json" -X POST -d '{"id": 121, "token": "a$$" }'
-10.0.0.153/verify/
-{"message":"Verified: 121"}
-$
-$ curl -q -H "Content-type: application/json" -X POST -d '{"id1": 121, "token": "a$$" }'
- 10.0.0.153/verify/
-{"message":"Verified: 0"}
-$
-$
+   diff --git a/apigateway/kubernetes/service.yaml b/apigateway/kubernetes/service.yaml
+   index 8c32a97..819ae25 100644
+   --- a/apigateway/kubernetes/service.yaml
+   +++ b/apigateway/kubernetes/service.yaml
+   @@ -9,3 +9,4 @@ spec:
+        - protocol: TCP
+          port: 80
+          targetPort: 8000
+   +  type: NodePort
+
+Now, we will apply the changes:
+
+.. code::
+
+   $ kubectl apply -f kubernetes/service.yaml
+   Warning: kubectl apply should be used on resource created by either kubectl create --save-config or kubectl apply
+   service "apigateway" configured
+   
+Now, if we show the ``apigateway`` service details, we will see a ``NodePort`` configured:
+
+.. code::
+   
+   $ kubectl describe services apigateway
+   Name:                   apigateway
+   Namespace:              default
+   Labels:                 <none>
+   Annotations:            kubectl.kubernetes.io/last-applied-configuration={"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"name":"apigateway","namespace":"default"},"spec":{"ports":[{"port":80,"protocol":"TCP...
+   Selector:               app=apigateway
+   Type:                   NodePort
+   IP:                     10.0.0.153
+   Port:                   <unset> 80/TCP
+   NodePort:               <unset> 30638/TCP
+   Endpoints:              172.17.0.11:8000,172.17.0.14:8000,172.17.0.15:8000
+   Session Affinity:       None
+   Events:                 <none>
 
 
-➜  apigateway git:(kubernetes) ✗ curl -q -H "Content-type: application/json" -X POST -d '{"id": 121, "token": "a$$" }' `minikube service --url apigateway`/verify/
-{"message":"Verified: 121"}
-➜  apigateway git:(kubernetes) ✗
-➜  apigateway git:(kubernetes) ✗
-➜  apigateway git:(kubernetes) ✗ curl -q -H "Content-type: application/json" -X POST -d '{"title1":"My project hello hello11"}'  `minikube service --url apigateway`/projects/
-{
-  "id": 123,
-  "url": "Project-None"
-}
-➜  apigateway git:(kubernetes) ✗ curl -q -H "Content-type: application/json" -X POST -d '{"title":"An awesome project"}'  `minikube service --url apigateway`/projects/
-{
-  "id": 123,
-  "url": "Project-An awesome project"
-}
+We can get the URL of the ``apigateway`` service:
+
+.. code::
+
+   $ minikube service --url apigateway
+   http://192.168.99.100:30638
+
+We now send requests to our API gateway from the host system:
+
+.. code::
+
+   $ curl -q -H "Content-type: application/json" -X POST -d '{"id": 121, "token": "a$$" }' `minikube service --url apigateway`/verify/
+   {"message":"Verified: 121"}
+
+   $ curl -q -H "Content-type: application/json" -X POST -d '{"title":"An awesome project"}'  `minikube service --url apigateway`/projects/
+   {
+     "id": 123,
+     "url": "Project-An awesome project"
+   }
 
 
 
-What's running on port 443 kubernetes?
-======================================
+Notes
+=====
+
+Restart pods to run an updated image:
+
+.. code::
+
+    $ kubectl get pod | grep 'apigateway' | cut -d " " -f1 - | xargs -n1 -P 10 kubectl delete pod
+    
+
 
 **How to update service config changes**
 
