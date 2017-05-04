@@ -84,7 +84,7 @@ running in pods. To access the application running inside a pod, we access it vi
 Deploying the services
 ======================
 
-At this stage, we have a Kubernetes cluster up and running. Now a bit about what we are going to deploy in it? We are going to deploy an "API gateway" and two other services. The API gateway forwards requests it gets to one of these services - `webapp-1` via HTTP 1.1 and `rpc-app-1` via `gRPC <http://www.grpc.io/>`__. 
+At this stage, we have a Kubernetes cluster up and running. Now a bit about what we are going to deploy in it? We are going to deploy an "API gateway" and two other services. The API gateway forwards requests it gets to one of these services - `webapp-1` via HTTP 1.1 and `grpc-app-1` via `gRPC <http://www.grpc.io/>`__. 
 
 What are the features we want to have?
 
@@ -231,76 +231,18 @@ To create the deployment:
       Events:			<none>
 
 
-**How to update service config changes**
+Interacting with the service:
 
-$ minikube ssh
-..
-$ curl 10.0.0.91/create
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
-<title>405 Method Not Allowed</title>
-<h1>Method Not Allowed</h1>
-<p>The method is not allowed for the requested URL.</p>
+.. code::
 
-$ kubectl get services kube-dns --namespace=kube-system
-NAME       CLUSTER-IP   EXTERNAL-IP   PORT(S)         AGE
-kube-dns   10.0.0.10    <none>        53/UDP,53/TCP   4h
+   $ minikube ssh
+   $ curl 10.0.0.91/create
+   <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+   <title>405 Method Not Allowed</title>
+   <h1>Method Not Allowed</h1>
+   <p>The method is not allowed for the requested URL.</p>
 
-At this stage, we will be able to talk to our webapp1 service using "webapp1". 
-
-kubectl run curl --image=radial/busyboxplus:curl -i --tty
-If you don't see a command prompt, try pressing enter.
-[ root@curl-57077659-gkqk0:/ ]$ curl webapp1
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
-<title>404 Not Found</title>
-<h1>Not Found</h1>
-<p>The requested URL was not found on the server.  If you entered the URL manually please check your spelling and try again.</p>
-[ root@curl-57077659-gkqk0:/ ]$ curl webapp1/create
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
-<title>405 Method Not Allowed</title>
-<h1>Method Not Allowed</h1>
-<p>The method is not allowed for the requested URL.</p>
-[ root@curl-57077659-gkqk0:/ ]$ nslookup webapp1
-Server:    10.0.0.10
-Address 1: 10.0.0.10 kube-dns.kube-system.svc.cluster.local
-
-Name:      webapp1
-Address 1: 10.0.0.91 webapp1.default.svc.cluster.local
-
-
-$ curl 10.0.0.91/_status/healthcheck/
-OK
-
-
-$ kubectl logs -f webapp1-deployment-2794365971-mz4mj
-
-Adding healthcheck to a deployment
-==================================
-
-apiVersion: apps/v1beta1
-kind: Deployment
-metadata:
-  name: webapp1-deployment
-spec:
-  replicas: 3
-  template:
-    metadata:
-      labels:
-        app: webapp1
-    spec:
-      containers:
-      - name: webapp1
-        image: amitsaha/webapp1:latest
-        imagePullPolicy: Never
-        ports:
-        - containerPort: 5000
-        livenessProbe:
-          httpGet:
-            path: /_status/healthcheck/
-            port: 80
-          initialDelaySeconds: 30
-          timeoutSeconds: 1
-
-
+We will also be able to talk to our webapp1 service using "webapp-1" from another *pod*.
 
 Service #2: Deploying the RPC service
 =====================================
@@ -486,6 +428,8 @@ $
 
 What's running on port 443 kubernetes?
 ======================================
+
+**How to update service config changes**
 
 
 References
