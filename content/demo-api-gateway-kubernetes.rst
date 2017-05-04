@@ -60,8 +60,33 @@ The last output is interesting. Applications/services live inside a pod in Kuber
 hence no pods are shown. Similarly, `kubectl get services` runs only the `kubernetes` service running on port 443. I believe this is the kubernetes API server.
 
 
+    
 
-At this stage, we have a Kubernetes cluster up and running. Now a bit about what we are going to deploy in it? We are going to deploy an "API gateway" and two other services. The API gateway forwards requests it gets to one of these services - one via HTTP, the other via gRPC. 
+Before we delve into deploying all the services, I will discuss three concepts which we will apply this post.
+
+Kubernetes concepts
+===================
+
+**Pods**
+
+A `pod <https://kubernetes.io/docs/concepts/workloads/pods/pod/>`__ is a logical group of one or more containers, together providing the functionality of a single application. In our case, each of the API gateway and the services will be a pod each with a single docker container. We won't be creating a pod directly, but via a *deployment*.
+
+**Deployment**
+
+A `deployment <https://kubernetes.io/docs/concepts/workloads/controllers/deployment/>`__ is a declaration of the desired
+state of the *pods*. Here's where we can specify how many of the *pods* we want running, what should be running in those
+pods (container image, name), ports to expose, healthcheck and others.
+
+**Service**
+
+A `service <https://kubernetes.io/docs/concepts/services-networking/service/>`__ is an abstraction to access the application
+running in pods. To access the application running inside a pod, we access it via the service which automatically load balances the requests among the pods. Another helpful document I found was `this one <https://kubernetes.io/docs/concepts/services-networking/connect-applications-service/>`__.
+
+
+Deploying the services
+======================
+
+At this stage, we have a Kubernetes cluster up and running. Now a bit about what we are going to deploy in it? We are going to deploy an "API gateway" and two other services. The API gateway forwards requests it gets to one of these services - `webapp-1` via HTTP 1.1 and `rpc-app-1` via `gRPC <http://www.grpc.io/>`__. 
 
 What are the features we want to have?
 
@@ -86,28 +111,10 @@ We will be using the `docker` engine running in the minikube VM so that we can b
 .. code::
 
     $ eval $(minikube docker-env)
-    
-
-Kubernetes concepts and ``kubectl``
-===================================
-
-The common concepts across deployment are as follows:
-
-**Pods**
-
-A `pod <https://kubernetes.io/docs/concepts/workloads/pods/pod/>`__ is a logical group of one or more containers, together providing the functionality of a single application. In our case, each of the API gateway and the services will be a pod each with a single docker container. We won't be creating a pod directly, but via a *deployment*.
-
-**Deployment**
-
-A `deployment <https://kubernetes.io/docs/concepts/workloads/controllers/deployment/>`__ is a 
-
-**Service**
-
-
 
 
 Service #1: Deploying the HTTP service
-======================================
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 First, let's build the image for the `webapp-1` service:
 
@@ -116,24 +123,28 @@ First, let's build the image for the `webapp-1` service:
     $ cd webapp-1
     $ docker build -t amitsaha/webapp-1 .
     
-T
+Next, we will create a kubernetes `deployment`:
 
-apiVersion: apps/v1beta1
-kind: Deployment
-metadata:
-  name: webapp1-deployment
-spec:
-  replicas: 3
-  template:
-    metadata:
-      labels:
-        app: webapp1
-    spec:
-      containers:
-      - name: webapp1
-        image: amitsaha/webapp1
-        ports:
-        - containerPort: 5000
+.. code::
+
+    $ cat kubernetes/deployment.yml
+
+      apiVersion: apps/v1beta1
+      kind: Deployment
+      metadata:
+        name: webapp1-deployment
+      spec:
+        replicas: 3
+        template:
+          metadata:
+            labels:
+              app: webapp1
+          spec:
+            containers:
+            - name: webapp1
+              image: amitsaha/webapp1
+              ports:
+              - containerPort: 5000
         
 $ kubectl create -f deployment.yaml
 deployment "webapp1-deployment" created
