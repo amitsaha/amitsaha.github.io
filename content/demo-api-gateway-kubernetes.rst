@@ -1,4 +1,4 @@
-:Title: Deploy an API gateway in a local Kubernetes setup
+:Title: Getting started with deploying services in a local Kubernetes cluster
 :Date: 2017-05-06 19:00
 :Category: kubernetes
 
