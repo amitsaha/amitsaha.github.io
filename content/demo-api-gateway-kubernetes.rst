@@ -60,8 +60,6 @@ The last output is interesting. Applications/services live inside a pod in Kuber
 hence no pods are shown. Similarly, `kubectl get services` runs only the `kubernetes` service running on port 443. I believe this is the kubernetes API server.
 
 
-    
-
 Before we delve into deploying all the services, I will discuss three concepts which we will apply this post.
 
 Kubernetes concepts
