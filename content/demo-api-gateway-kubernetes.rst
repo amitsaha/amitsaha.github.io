@@ -130,133 +130,105 @@ Next, we will create a kubernetes `deployment`:
       apiVersion: apps/v1beta1
       kind: Deployment
       metadata:
-        name: webapp1-deployment
+        name: webapp-1-deployment
       spec:
         replicas: 3
         template:
           metadata:
             labels:
-              app: webapp1
+              app: webapp-1
           spec:
             containers:
-            - name: webapp1
+            - name: webapp-1
               image: amitsaha/webapp1
               ports:
               - containerPort: 5000
         
-$ kubectl create -f deployment.yaml
-deployment "webapp1-deployment" created
-$ kubectl describe deployment webapp1-deployment
-Name:			webapp1-deployment
-Namespace:		default
-CreationTimestamp:	Tue, 11 Apr 2017 11:58:46 +1000
-Labels:			app=webapp1
-Annotations:		deployment.kubernetes.io/revision=1
-Selector:		app=webapp1
-Replicas:		3 desired | 3 updated | 3 total | 0 available | 3 unavailable
-StrategyType:		RollingUpdate
-MinReadySeconds:	0
-RollingUpdateStrategy:	25% max unavailable, 25% max surge
-Pod Template:
-  Labels:	app=webapp1
-  Containers:
-   webapp1:
-    Image:		amitsaha/webapp1
-    Port:		5000/TCP
-    Environment:	<none>
-    Mounts:		<none>
-  Volumes:		<none>
-Conditions:
-  Type		Status	Reason
-  ----		------	------
-  Available 	False	MinimumReplicasUnavailable
-  Progressing 	True	ReplicaSetUpdated
-OldReplicaSets:	<none>
-NewReplicaSet:	webapp1-deployment-2199260651 (3/3 replicas created)
-Events:
-  FirstSeen	LastSeen	Count	From			SubObjectPath	Type	Reason			Message
-  ---------	--------	-----	----			-------------	--------------			-------
-  4m		4m		1	deployment-controller			Normal	ScalingReplicaSet	Scaled up replica set webapp1-deployment-2199260651 to 3
+To create the deployment:
+
+.. code::
+    
+    $ kubectl create -f deployment.yaml
+    deployment "webapp-1-deployment" created
+    
+
+.. code::
+    
+   $ kubectl describe deployment webapp-1-deployment
+
+   Name:                   webapp-1-deployment
+   Namespace:              default
+   CreationTimestamp:      Wed, 03 May 2017 13:46:46 +1000
+   Labels:                 app=webapp-1
+   Annotations:            deployment.kubernetes.io/revision=1
+   Selector:               app=webapp-1
+   Replicas:               3 desired | 3 updated | 3 total | 1 available | 2 unavailable
+   StrategyType:           RollingUpdate
+   MinReadySeconds:        0
+   RollingUpdateStrategy:  25% max unavailable, 25% max surge
+   Pod Template:
+     Labels:       app=webapp-1
+     Containers:
+      webapp-1:
+       Image:              amitsaha/webapp1:latest
+       Port:               5000/TCP
+       Liveness:           http-get http://:80/_status/healthcheck/ delay=30s timeout=1s period=10s #success=1 #failure=3
+       Environment:        <none>
+       Mounts:             <none>
+     Volumes:              <none>
+   Conditions:
+     Type          Status  Reason
+     ----          ------  ------
+     Progressing   True    NewReplicaSetAvailable
+     Available     False   MinimumReplicasUnavailable
+   OldReplicaSets: <none>
+   NewReplicaSet:  webapp-1-deployment-4250575981 (3/3 replicas created)
+   Events:         <none>
 
 
+.. code::
 
-Fix the image name:
+   $ kubectl get pods -l app=webapp-1
+   NAME                                 READY     STATUS    RESTARTS   AGE
+   webapp1-deployment-536678510-dtmjb   1/1       Running   0          4m
+   webapp1-deployment-536678510-kt1zs   1/1       Running   0          4m
+   webapp1-deployment-536678510-wkmkq   1/1       Running   0          4m
 
-apiVersion: apps/v1beta1
-kind: Deployment
-metadata:
-  name: webapp1-deployment
-spec:
-  replicas: 3
-  template:
-    metadata:
-      labels:
-        app: webapp1
-    spec:
-      containers:
-      - name: webapp1
-        image: amitsaha/webapp-1
+
+.. code::
+    $ cat kubernetes/service.yml
+      apiVersion: v1
+      kind: Service
+      metadata:
+        name: webapp-1
+      spec:
+        selector:
+          app: webapp-1
         ports:
-        - containerPort: 5000
-        
-        
-
-kubectl apply -f deployment.yaml
-
-apiVersion: apps/v1beta1
-kind: Deployment
-metadata:
-  name: webapp1-deployment
-spec:
-  replicas: 3
-  template:
-    metadata:
-      labels:
-        app: webapp1
-    spec:
-      containers:
-      - name: webapp1
-        image: amitsaha/webapp-1:latest
-        imagePullPolicy: Never
-        ports:
-        - containerPort: 5000
-
-kubectl get pods -l app=webapp1
-NAME                                 READY     STATUS    RESTARTS   AGE
-webapp1-deployment-536678510-dtmjb   1/1       Running   0          4m
-webapp1-deployment-536678510-kt1zs   1/1       Running   0          4m
-webapp1-deployment-536678510-wkmkq   1/1       Running   0          4m
-➜  webapp-1 git:(kubernetes) ✗
+          - protocol: TCP
+            port: 80
+            targetPort: 5000
 
 
-$ cat service.yaml
-kind: Service
-apiVersion: v1
-metadata:
-  name: webapp-1
-spec:
-  selector:
-    app: webapp-1
-  ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 5000
+.. code::
 
-$ kubectl create -f service.yaml
-service "webapp-1" created
+    $ kubectl create -f kubernetes/service.yaml
+    service "webapp-1" created
       
-kubectl describe svc webapp1
-Name:			webapp1
-Namespace:		default
-Labels:			<none>
-Annotations:		<none>
-Selector:		app=webapp1
-Type:			ClusterIP
-IP:			10.0.0.91
-Port:			<unset>	80/TCP
-Endpoints:		172.17.0.5:5000,172.17.0.8:5000,172.17.0.9:5000
-Session Affinity:	None
-Events:			<none>
+.. code::
+
+      $ kubectl describe svc webapp1
+      Name:			webapp1
+      Namespace:		default
+      Labels:			<none>
+      Annotations:		<none>
+      Selector:		app=webapp1
+      Type:			ClusterIP
+      IP:			10.0.0.91
+      Port:			<unset>	80/TCP
+      Endpoints:		172.17.0.5:5000,172.17.0.8:5000,172.17.0.9:5000
+      Session Affinity:	None
+      Events:			<none>
 
 
 **How to update service config changes**
