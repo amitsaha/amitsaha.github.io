@@ -9,7 +9,7 @@ examples. In this post, I attempt to deploy the services in a Kubernetes cluster
 To follow along, we will use the `kubernetes branch <https://github.com/amitsaha/apigatewaydemo/tree/kubernetes>`__ of
 the code. One notable change to the code for the API gateway itself is removing the use of 
 `go kit <https://github.com/go-kit/kit>`__, since at this point it does seem like, I should be able to get the features i was looking for 
-from ``kubernetes`` and other software I plan to try (such as `linkerd <https://linkerd.io/>`__) for service proxying, circuit breaking, distributed tracing, etc). But, I will see how that goes. If I succeed, it means my API gateway code will be simpler.
+from ``kubernetes`` and other software I plan to try (such as `linkerd <https://linkerd.io/>`__ for service proxying, circuit breaking, distributed tracing, etc). But, I will see how that goes. If I succeed, it means my API gateway code will be simpler.
 
 Le'ts get started.
 
@@ -61,9 +61,7 @@ hence no pods are shown. Similarly, `kubectl get services` runs only the `kubern
 
 
 
-At this stage, we have a Kubernetes cluster up and running. 
-
-Now a bit about what we are going to deploy in it? We are going to deploy an "API gateway" and two other services. The API gateway forwards requests it gets to one of these services - one via HTTP, the other via gRPC. 
+At this stage, we have a Kubernetes cluster up and running. Now a bit about what we are going to deploy in it? We are going to deploy an "API gateway" and two other services. The API gateway forwards requests it gets to one of these services - one via HTTP, the other via gRPC. 
 
 What are the features we want to have?
 
@@ -83,8 +81,7 @@ What are the features we want to have?
 
 **Setting up docker**
 
-We will be using the `docker` engine running in the minikube VM so that we can build the images in the VM and deploy them without having to push to a remote registry. In the shell where we will build docker images, doing the following will
-suffice:
+We will be using the `docker` engine running in the minikube VM so that we can build the images in the VM and deploy them without having to push to a remote registry. In the shell on the host system, where we will build docker images, doing the following will suffice:
 
 .. code::
 
@@ -98,9 +95,11 @@ The common concepts across deployment are as follows:
 
 **Pods**
 
-A *pod* 
+A `pod <https://kubernetes.io/docs/concepts/workloads/pods/pod/>`__ is a logical group of one or more containers, together providing the functionality of a single application. In our case, each of the API gateway and the services will be a pod each with a single docker container. We won't be creating a pod directly, but via a *deployment*.
 
 **Deployment**
+
+A `deployment <https://kubernetes.io/docs/concepts/workloads/controllers/deployment/>`__ is a 
 
 **Service**
 
