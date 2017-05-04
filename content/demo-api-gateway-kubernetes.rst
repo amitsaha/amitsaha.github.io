@@ -1,10 +1,12 @@
+:Title: Deploy an API gateway in a local Kubernetes setup
+:Date: 2017-05-06 19:00
+:Category: kubernetes
+
+
 Setting up Kubernetes
 =====================
 
-https://github.com/kubernetes/minikube
-https://coreos.com/kubernetes/docs/latest/configure-kubectl.html
-
-Mac OS X + VirtualBox
+My host configuration is Mac OS X and I am using VirtualBox. Install `minkube <https://github.com/kubernetes/minikube>`__ and  `kubectl <https://coreos.com/kubernetes/docs/latest/configure-kubectl.html>`__ and we will do the following:
 
 .. code::
 
@@ -20,7 +22,7 @@ Mac OS X + VirtualBox
    Setting up kubeconfig...
    Kubectl is now configured to use the cluster.
    
-Sanity checking
+Let's perfomr some sanity checking:
 
 .. code::
 
@@ -45,38 +47,57 @@ Sanity checking
   No resources found.
 
 The last output is interesting. Applications/services live inside a pod in Kubernetes and we currently don't have any running,
-hence no pods are shown. Similarly, `kubectl get services` runs only the `kubernetes` service running on port 443. I will get
-back to this later on.
+hence no pods are shown. Similarly, `kubectl get services` runs only the `kubernetes` service running on port 443. I believe this is the kubernetes API server.
 
 At this stage, we have a Kubernetes cluster up and running. 
 
-Now a bit about what we are going to deploy in it? We are going to
-deploy an "API gateway" and two other services. The API gateway forwards requests it get to one of these services - one via HTTP,
-the other via gRPC. What are the features we want to have?
+Now a bit about what we are going to deploy in it? We are going to deploy an "API gateway" and two other services. The API gateway forwards requests it gets to one of these services - one via HTTP, the other via gRPC. 
 
-- We will be running 3 instances of the API gateway service and 3 instances each of the other services
-- API gateway should not have any hard coded IP address for any service it talks to. If an instance of a service goes up or down, the API gateway
-  shouldn't have to know about it
-- API gateway should load balance between the services
-- External requests should be load balanced between the multiple API gateway instances
-- We should have circuit breaking between API gateway and any of the other services
-- We should have rate limitting across the API gateway
-- We should have metrics on each service
-- We should have correlated logging
-- We should have distributed tracing
-- We should be able to scale up or down automatically based on incoming requests
-- Upgrades and downgrades without downtime
-- Only healthy instances should get traffic
+What are the features we want to have?
 
-That's a huge list of desirable features. So, let's get to work.
+# We will be running 3 instances of the API gateway service and 3 instances each of the other services
+# API gateway should not have any hard coded IP address for any service it talks to. If an instance of a service goes up or down, the API gateway shouldn't have to know about it
+# API gateway should load balance between the services
+# External requests should be load balanced between the multiple API gateway instances
+# We should have circuit breaking between API gateway and any of the other services
+# We should have rate limitting across the API gateway
+# We should have metrics on each service
+# We should have correlated logging
+# We should have distributed tracing
+# We should be able to scale up or down automatically based on incoming requests
+# Upgrades and downgrades without downtime
+# Only healthy instances should get traffic
+
+That's a big list of desirable features. So, let's get to work.
+
+We will be using the `docker` engine running in the minikube VM so that we can build the images in the VM and deploy them without having to push to a remote registry. In the shell where we will build docker images, doing the following will
+suffice:
+
+.. code::
+
+    $ eval $(minikube docker-env)
+    
+
+Next, we will see how we can deploy each service to the kubernetes cluster. The common concepts across deployment are as follows:
+
+**Pods**
+
+**Deployment**
+
+**Service**
+
 
 Service #1: Deploying the HTTP service
 ======================================
 
-$ cd webapp-1
-$ ...export..
+First, let's build the image for the `webapp-1` service:
 
-$ docker build -t amitsaha/webapp-1 .
+.. code::
+
+    $ cd webapp-1
+    $ docker build -t amitsaha/webapp-1 .
+    
+T
 
 apiVersion: apps/v1beta1
 kind: Deployment
