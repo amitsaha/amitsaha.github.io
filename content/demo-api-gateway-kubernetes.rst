@@ -247,62 +247,65 @@ We will also be able to talk to our webapp1 service using "webapp-1" from anothe
 Service #2: Deploying the RPC service
 =====================================
 
-$ cd apigatewaydemo/grpc-app-1/server
-$ docker build -t amitsaha/rpc-app-1 .
-..
+First, we will build the image:
 
-$ cat kubernetes/deployment.yaml
+.. code::
 
-apiVersion: apps/v1beta1
-kind: Deployment
-metadata:
-  name: rpc-app-1-deployment
-spec:
-  replicas: 3
-  template:
-    metadata:
-      labels:
-        app: rpc-app-1
-    spec:
-      containers:
-      - name: rpc-app-1
-        image: amitsaha/rpc-app-1:latest
-        imagePullPolicy: Never
-        ports:
-        - containerPort: 6000
-        livenessProbe:
-          tcpSocket:
-            port: 6000
-          initialDelaySeconds: 30
-          timeoutSeconds: 1
-$ kubectl create -f kubernetes/deployment.yaml
-deployment "rpc-app-1-deployment" created
+   $ cd apigatewaydemo/grpc-app-1/server
+   $ docker build -t amitsaha/rpc-app-1 .
 
+.. code::
 
-$ cat kubernetes/service.yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: rpc-app-1
-spec:
-  selector:
-    app: rpc-app-1
-  ports:
-    - protocol: TCP
-      port: 6000
-      targetPort: 6000
+   $ cat kubernetes/deployment.yaml
 
-$ kubectl create -f kubernetes/service.yaml
-service "rpc-app-1" created
+   apiVersion: apps/v1beta1
+   kind: Deployment
+   metadata:
+     name: rpc-app-1-deployment
+   spec:
+     replicas: 3
+     template:
+       metadata:
+         labels:
+           app: rpc-app-1
+       spec:
+         containers:
+         - name: rpc-app-1
+           image: amitsaha/rpc-app-1:latest
+           imagePullPolicy: Never
+           ports:
+           - containerPort: 6000
+           livenessProbe:
+             tcpSocket:
+               port: 6000
+             initialDelaySeconds: 30
+             timeoutSeconds: 1
 
+.. code::
 
+   $ kubectl create -f kubernetes/deployment.yaml
+   deployment "rpc-app-1-deployment" created
 
-$ kubectl get services
-NAME         CLUSTER-IP   EXTERNAL-IP   PORT(S)    AGE
-kubernetes   10.0.0.1     <none>        443/TCP    8d
-rpc-app-1    10.0.0.30    <none>        6000/TCP   17s
-webapp-1     10.0.0.46    <none>        80/TCP     8d
-webapp1      10.0.0.91    <none>        80/TCP     8d
+.. code::
+
+   $ cat kubernetes/service.yaml
+   apiVersion: v1
+   kind: Service
+   metadata:
+     name: rpc-app-1
+   spec:
+     selector:
+       app: rpc-app-1
+     ports:
+       - protocol: TCP
+         port: 6000
+         targetPort: 6000
+         
+.. code::
+
+   $ kubectl create -f kubernetes/service.yaml
+   service "rpc-app-1" created
+
 
 API gateway: Deploying the API gateway
 =====================================
