@@ -2,6 +2,15 @@
 :Date: 2017-05-06 19:00
 :Category: kubernetes
 
+I wrote up an `API Gateway <https://github.com/amitsaha/apigatewaydemo>`__ a while back which demonstrated how we can
+write an API gateway which would forward incoming requests to downstream services using HTTP and a gRPC service as
+examples. In this post, I attempt to deploy the services in a Kubernetes cluster as a way to learn about Kubernetes.
+
+To follow along, we will use the `kubernetes branch <https://github.com/amitsaha/apigatewaydemo/tree/kubernetes>`__ of
+the code. One notable change to the code for the API gateway itself is removing the use of `go kit <https://github.com/go-kit/kit>__, since at this point it does seem like, I should be able to get the features i was looking for 
+from ``kubernetes`` and other software I plan to try (such as `linkerd <https://linkerd.io/>`__) for service proxying). But, I will see how that goes. If I succeed, it means my API gateway code will be simpler.
+
+Le'ts get started.
 
 Setting up Kubernetes
 =====================
@@ -49,26 +58,29 @@ Let's perfomr some sanity checking:
 The last output is interesting. Applications/services live inside a pod in Kubernetes and we currently don't have any running,
 hence no pods are shown. Similarly, `kubectl get services` runs only the `kubernetes` service running on port 443. I believe this is the kubernetes API server.
 
+
+
 At this stage, we have a Kubernetes cluster up and running. 
 
 Now a bit about what we are going to deploy in it? We are going to deploy an "API gateway" and two other services. The API gateway forwards requests it gets to one of these services - one via HTTP, the other via gRPC. 
 
 What are the features we want to have?
 
-# We will be running 3 instances of the API gateway service and 3 instances each of the other services
-# API gateway should not have any hard coded IP address for any service it talks to. If an instance of a service goes up or down, the API gateway shouldn't have to know about it
-# API gateway should load balance between the services
-# External requests should be load balanced between the multiple API gateway instances
-# We should have circuit breaking between API gateway and any of the other services
-# We should have rate limitting across the API gateway
-# We should have metrics on each service
-# We should have correlated logging
-# We should have distributed tracing
-# We should be able to scale up or down automatically based on incoming requests
-# Upgrades and downgrades without downtime
-# Only healthy instances should get traffic
+- We will be running 3 instances of the API gateway service and 3 instances each of the other services
+- API gateway should not have any hard coded IP address for any service it talks to. If an instance of a service goes up or down, the API gateway shouldn't have to know about it
+- API gateway should load balance between the services
+- External requests should be load balanced between the multiple API gateway instances
+- We should have circuit breaking between API gateway and any of the other services
+- We should have rate limitting across the API gateway
+- We should have metrics on each service
+- We should have correlated logging
+- We should have distributed tracing
+- We should be able to scale up or down automatically based on incoming requests
+- Upgrades and downgrades without downtime
+- Only healthy instances should get traffic
+- Monitoring our service system usage
 
-That's a big list of desirable features. So, let's get to work.
+**Setting up docker**
 
 We will be using the `docker` engine running in the minikube VM so that we can build the images in the VM and deploy them without having to push to a remote registry. In the shell where we will build docker images, doing the following will
 suffice:
@@ -78,13 +90,20 @@ suffice:
     $ eval $(minikube docker-env)
     
 
-Next, we will see how we can deploy each service to the kubernetes cluster. The common concepts across deployment are as follows:
+Kubernetes concepts and ``kubectl``
+===================================
+
+The common concepts across deployment are as follows:
 
 **Pods**
+
+A *pod* 
 
 **Deployment**
 
 **Service**
+
+
 
 
 Service #1: Deploying the HTTP service
