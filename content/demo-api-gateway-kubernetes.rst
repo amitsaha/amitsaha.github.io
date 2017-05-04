@@ -2,7 +2,7 @@
 :Date: 2017-05-06 19:00
 :Category: kubernetes
 
-I wrote up an `API Gateway <https://github.com/amitsaha/apigatewaydemo>`__ a while back which demonstrated how we can
+I wrote up a demo `API Gateway <https://github.com/amitsaha/apigatewaydemo>`__ a while back which demonstrated how we can
 write an API gateway which would forward incoming requests to downstream services using HTTP and a gRPC service as
 examples. In this post, I attempt to deploy the services in a Kubernetes cluster as a way to learn about Kubernetes.
 
