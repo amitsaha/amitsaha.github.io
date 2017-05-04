@@ -112,7 +112,7 @@ We will be using the `docker` engine running in the minikube VM so that we can b
 
 
 Service #1: Deploying the HTTP service
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+======================================
 
 First, let's build the image for the `webapp-1` service:
 
