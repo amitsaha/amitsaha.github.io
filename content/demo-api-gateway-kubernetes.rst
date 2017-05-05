@@ -462,6 +462,9 @@ Setting up ``linkerd`` as the service mesh
 Instead of the API gateway directly communicating with the services via DNS, we will setup a `service mesh <https://blog.buoyant.io/2016/10/04/a-service-mesh-for-kubernetes-part-i-top-line-service-metrics/>`__ via ``linkerd``.
 
 
+https://linkerd.io/features/http-proxy/
+https://blog.buoyant.io/2017/04/19/a-service-mesh-for-kubernetes-part-ix-grpc-for-fun-and-profit/
+
 
 
 Setting up prometheus and metrics aggregation
