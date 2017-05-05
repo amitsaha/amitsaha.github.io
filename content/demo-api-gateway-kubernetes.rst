@@ -1,4 +1,4 @@
-:Title: Getting started with deploying services in a local Kubernetes cluster
+:Title: Deploying a demo API gateway in a local Kubernetes cluster
 :Date: 2017-05-06 19:00
 :Category: kubernetes
 
@@ -462,6 +462,12 @@ Setting up ``linkerd`` as the service mesh
 Instead of the API gateway directly communicating with the services via DNS, we will setup a `service mesh <https://blog.buoyant.io/2016/10/04/a-service-mesh-for-kubernetes-part-i-top-line-service-metrics/>`__ via ``linkerd``.
 
 
+
+
+Setting up prometheus and metrics aggregation
+=============================================
+
+https://coreos.com/blog/prometheus-and-kubernetes-up-and-running.html
 
 Kubernetes Notes
 ================
