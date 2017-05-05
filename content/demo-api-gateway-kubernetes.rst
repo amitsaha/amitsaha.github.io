@@ -447,12 +447,12 @@ When we exposed our API gateway service to the host via a ``NodePort`` we got au
 among the the ``apigateway`` instances.
 
 
-Next, I am going to look at achieving the following:
+Next, I am going to look at achieving the following
 
- - We should have circuit breaking between API gateway and any of the other services
- - We should have rate limitting across the API gateway
- - We should have metrics on each service
- - We should have distributed tracing
+- We should have circuit breaking between API gateway and any of the other services
+- We should have rate limitting across the API gateway
+- We should have metrics on each service
+- We should have distributed tracing
 
 From the looks of it, ``linkerd`` should allow me to achieve all of it in some capacity, `except <https://github.com/linkerd/linkerd/issues/1006>`__ for "rate limiting".
 
