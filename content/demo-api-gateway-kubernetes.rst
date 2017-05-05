@@ -485,6 +485,14 @@ Restart pods to run an updated image:
 **How to update service config changes**
 
 
+Next post
+=========
+
+Deploy to AWS
+
+https://aws.amazon.com/blogs/apn/coreos-and-ticketmaster-collaborate-to-bring-aws-application-load-balancer-support-to-kubernetes/?sc_channel=sm&sc_campaign=apnblog_sa_post_coreos_2017&sc_publisher=tw&sc_country=global&sc_geo=global&sc_category=alb&sc_outcome=aware&adbsc=APN_Blog_20170504_72057946&adbid=859920541901180928&adbpl=tw&adbpr=66780587
+
+
 References
 ==========
 
