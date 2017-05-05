@@ -422,10 +422,49 @@ We now send requests to our API gateway from the host system:
      "url": "Project-An awesome project"
    }
 
+How far have we come and where next?
+====================================
+
+I started off with a list of features I wanted to have, and at this stage we have achieved some of the following:
+
+**We will be running 3 instances of the API gateway service and 3 instances each of the other services**
+
+We got this via running 3 pods for each deployment of the services
+
+**API gateway should not have any hard coded IP address for any service it talks to. If an instance of a service goes up or down, the API gateway shouldn't have to know about it**
+
+We got this by using Kubernetes's internal DNS service which allows us to use a service name (such as ``webapp-1``) for 
+service to service communication inside a cluster. Since the service is an abstraction over the deployment, a pod can come
+and go, but the DNS will always direct traffic to a healthy instance of the service.
+
+**API gateway should load balance between the services**
+
+We get this via the previous feature.
+
+**External requests should be load balanced between the multiple API gateway instances**
+
+When we exposed our API gateway service to the host via a ``NodePort`` we got automatic load balancing of requests
+among the the ``apigateway`` instances.
 
 
-Notes
-=====
+Next, I am going to look at achieving the following:
+
+# We should have circuit breaking between API gateway and any of the other services
+# We should have rate limitting across the API gateway
+# We should have metrics on each service
+# We should have distributed tracing
+
+From the looks of it, ``linkerd`` should allow me to achieve all of it.
+
+
+Setting up ``linkerd`` as the service mesh
+==========================================
+
+Instead of the API gateway directly communicating with the services via DNS, we will setup a `service mesh <https://blog.buoyant.io/2016/10/04/a-service-mesh-for-kubernetes-part-i-top-line-service-metrics/>`__ via ``linkerd``.
+
+
+Kubernetes Notes
+================
 
 Restart pods to run an updated image:
 
