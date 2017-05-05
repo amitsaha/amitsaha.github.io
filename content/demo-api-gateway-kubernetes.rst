@@ -8,10 +8,9 @@ examples. In this post, I attempt to deploy the services in a Kubernetes cluster
 
 To follow along, we will use the `kubernetes branch <https://github.com/amitsaha/apigatewaydemo/tree/kubernetes>`__ of
 the code. One notable change to the code for the API gateway itself is removing the use of 
-`go kit <https://github.com/go-kit/kit>`__, since at this point it does seem like, I should be able to get the features i was looking for 
-from ``kubernetes`` and other software I plan to try (such as `linkerd <https://linkerd.io/>`__ for service proxying, circuit breaking, distributed tracing, etc). But, I will see how that goes. If I succeed, it means my API gateway code will be simpler.
+`go kit <https://github.com/go-kit/kit>`__. At this point it does seem like, I should be able to get those features (which I
+used `go kit` for) from ``kubernetes`` and other software I plan to try (such as `linkerd <https://linkerd.io/>`__ for service proxying, circuit breaking, distributed tracing, etc). But, I will see how that goes. If I succeed, it means my API gateway code will be simpler.
 
-Le'ts get started.
 
 Setting up Kubernetes
 =====================
