@@ -449,18 +449,18 @@ among the the ``apigateway`` instances.
 
 Next, I am going to look at achieving the following:
 
-# We should have circuit breaking between API gateway and any of the other services
-# We should have rate limitting across the API gateway
-# We should have metrics on each service
-# We should have distributed tracing
+ - We should have circuit breaking between API gateway and any of the other services
+ - We should have rate limitting across the API gateway
+ - We should have metrics on each service
+ - We should have distributed tracing
 
-From the looks of it, ``linkerd`` should allow me to achieve all of it.
-
+From the looks of it, ``linkerd`` should allow me to achieve all of it in some capacity, `except <https://github.com/linkerd/linkerd/issues/1006>`__ for "rate limiting".
 
 Setting up ``linkerd`` as the service mesh
 ==========================================
 
 Instead of the API gateway directly communicating with the services via DNS, we will setup a `service mesh <https://blog.buoyant.io/2016/10/04/a-service-mesh-for-kubernetes-part-i-top-line-service-metrics/>`__ via ``linkerd``.
+
 
 
 Kubernetes Notes
