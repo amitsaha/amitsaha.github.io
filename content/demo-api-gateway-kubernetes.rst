@@ -31,7 +31,7 @@ My host configuration is Mac OS X and I am using VirtualBox. Install `minkube <h
    Setting up kubeconfig...
    Kubectl is now configured to use the cluster.
    
-Let's perfomr some sanity checking:
+Let's perfrom some sanity checking:
 
 .. code::
 
