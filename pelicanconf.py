@@ -22,7 +22,7 @@ DISPLAY_CATEGORIES_ON_MENU = False
 DISPLAY_TAGS_ON_SIDEBAR = False
 
 THEME='/tmp/pelican-svbhack/'
-USER_LOGO_URL=SITEURL+'/static/images/logo.png'
+USER_LOGO_URL=SITEURL+'/images/logo.png'
 
 STATIC_PATHS = ['images']
 
