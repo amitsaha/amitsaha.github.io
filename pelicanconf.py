@@ -21,7 +21,7 @@ DEFAULT_PAGINATION = 10
 DISPLAY_CATEGORIES_ON_MENU = False
 DISPLAY_TAGS_ON_SIDEBAR = False
 
-THEME='/tmp/pelican-themes/pelican-svbhack/'
+THEME='/tmp/pelican-svbhack/'
 
 
 STATIC_PATHS = ['images']
