@@ -13,6 +13,7 @@ RUN git config --global user.name $git_username && git config --global user.emai
 RUN pip3 install pelican pelican-youtube 
 USER $user
 RUN git clone https://github.com/gfidente/pelican-svbhack /tmp/
+RUN ls -lrt /tmp/pelican-svbhack
 RUN git clone --recursive https://github.com/getpelican/pelican-plugins /tmp/pelican-plugins
 WORKDIR /site
 ENTRYPOINT ["make", "build"]
