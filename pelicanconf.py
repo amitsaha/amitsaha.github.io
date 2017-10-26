@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 
 AUTHOR = u'Amit Saha'
 SITENAME = u'Programming and Writing about it'
-SITEURL = ''
+SITEURL = 'http://echorand.me'
 PATH = 'content'
 TIMEZONE = 'Australia/Brisbane'
 
