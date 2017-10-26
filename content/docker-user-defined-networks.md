@@ -6,7 +6,7 @@ Let's say a program in a container wants to communicate with a service running i
 on the same host. The current recommended approach to do so is using a `user-defined` network and 
 [avoid](https://docs.docker.com/engine/userguide/networking/default_network/dockerlinks/) using `links`.
 
-![Docker user defined network]({filename}/images/docker-network.png "Docker user defined network")
+![Docker user defined network]({filename}/images/docker-user-defined-network.png "Docker user defined network")
 
 
 Create an [user-defined network](https://docs.docker.com/engine/userguide/networking/#user-defined-networks)

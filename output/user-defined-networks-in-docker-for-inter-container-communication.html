@@ -58,7 +58,7 @@
     <p>Let's say a program in a container wants to communicate with a service running in another docker container
 on the same host. The current recommended approach to do so is using a <code>user-defined</code> network and 
 <a href="https://docs.docker.com/engine/userguide/networking/default_network/dockerlinks/">avoid</a> using <code>links</code>.</p>
-<p><img alt="Docker user defined network" src="{filename}/images/docker-network.png" title="Docker user defined network"></p>
+<p><img alt="Docker user defined network" src="http://echorand.me/images/docker-user-defined-network.png" title="Docker user defined network"></p>
 <p>Create an <a href="https://docs.docker.com/engine/userguide/networking/#user-defined-networks">user-defined network</a>
 and run both (or as many you have) the containers in this network:
 (For reference, I am using docker 17.09.0-ce)</p>
