@@ -1,6 +1,6 @@
-:Title: Monitoring Python applications with Prometheus
-:Date: 2017-10-26 13:00
-:Category: Python
+Title: Monitoring Python applications with Prometheus
+Date: 2017-10-26 13:00
+Category: Python
 
 
 I recently wrote two articles on Python application monitoring with Prometheus:

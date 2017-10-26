@@ -51,6 +51,24 @@
 
 <article>
   <div class="article_title">
+    <h1><a href="http://echorand.me/runc-and-libcontainer-on-fedora-2324.html">runC and libcontainer on Fedora 23/24</a></h1>
+  </div>
+  <div class="article_text">
+    <p>In this post, I will post my notes on how I got <a class="reference external" href="https://github.com/opencontainers/runc/">runC</a> and then using
+<cite>libcontainer</cite> on Fedora. The first step is to install <tt class="docutils literal">golang</tt>:</p>
+<pre class="code literal-block">
+$ sudo dnf -y install golang
+$ go version
+go version go1.6 linux/amd64
+</pre>
+<p>We will set GOPATH=~/golang/ and then do the following:</p>
+<pre class="code literal-block">
+$ mkdir …</pre>
+  </div>
+</article>
+<hr />
+<article>
+  <div class="article_title">
     <h1><a href="http://echorand.me/webucator-video-python-classes-basics-beyond-the-absolute-basics.html">Webucator video: Python classes - basics beyond the absolute basics</a></h1>
   </div>
   <div class="article_text">
@@ -171,20 +189,6 @@ following two steps before I work on something cumbersome:</p>
   </div>
   <div class="article_text">
     <p>Recently at work, I wanted to test a string which was being created by the <tt class="docutils literal">urllib.urlencode()</tt> function. My first attempt was simple - test my expected string with that being created by the function above using unittest's <tt class="docutils literal">assertEquals()</tt> function. It passed all the times I ran the tests before I …</p>
-  </div>
-</article>
-<hr />
-<article>
-  <div class="article_title">
-    <h1><a href="http://echorand.me/mounting-a-docker-volume-on-selinux-enabled-host.html">Mounting a docker volume on SELinux enabled host</a></h1>
-  </div>
-  <div class="article_text">
-    <p>My workflow with docker usually involves volume mounting a host
-directory so that I can read and write to the host directory from my
-container as a <em>non-root</em> user. On a Fedora 23 host with SELinux
-enabled, this is what I have to do differently:</p>
-<pre class="code literal-block">
-Use: -v /var/dir1:var …</pre>
   </div>
 </article>
 
