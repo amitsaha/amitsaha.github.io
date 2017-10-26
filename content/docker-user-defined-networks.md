@@ -63,7 +63,7 @@ NETWORK ID          NAME                DRIVER              SCOPE
 b0dfa09e8949        none                null                local
 ```
 
-When we run a container (like so, docker run -ti <image>), it will use the default `bridge` network. 
+When we run a container (like so, `docker run -ti <image>`), it will use the default `bridge` network. 
 In this network mode, your container can access the outside world and the outside world can communicate 
 with your container via published service ports. In this mode, however there is no "automagic" way for 
 another container using the bridge network to communicate with it. The `host` network runs a container in 

@@ -60,7 +60,7 @@ b0dfa09e8949        none                null                &lt;span class="nb"&
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;When we run a container (like so, docker run -ti &lt;image&gt;), it will use the default &lt;code&gt;bridge&lt;/code&gt; network. 
+&lt;p&gt;When we run a container (like so, &lt;code&gt;docker run -ti &amp;lt;image&amp;gt;&lt;/code&gt;), it will use the default &lt;code&gt;bridge&lt;/code&gt; network. 
 In this network mode, your container can access the outside world and the outside world can communicate 
 with your container via published service ports. In this mode, however there is no "automagic" way for 
 another container using the bridge network to communicate with it. The &lt;code&gt;host&lt;/code&gt; network runs a container in 
