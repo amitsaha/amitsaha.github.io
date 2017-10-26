@@ -58,10 +58,7 @@
     <p>Let's say a program in a container wants to communicate with a service running in another docker container
 on the same host. The current recommended approach to do so is using a <code>user-defined</code> network and 
 <a href="https://docs.docker.com/engine/userguide/networking/default_network/dockerlinks/">avoid</a> using <code>links</code>.</p>
-<p>.. figure:: {filename}/images/docker-network.png
-   :align: center
-   :alt: Docker user defined network
-   :scale: 100%</p>
+<p><img alt="Docker user defined network" src="{filename}/images/docker-network.png" title="Docker user defined network"></p>
 <p>Create an <a href="https://docs.docker.com/engine/userguide/networking/#user-defined-networks">user-defined network</a>
 and run both (or as many you have) the containers in this network:
 (For reference, I am using docker 17.09.0-ce)</p>
@@ -82,50 +79,50 @@ CMD ["python3", "-m", "http.server"]</code></pre>
 <p>Start the container in the network we created above:</p>
 <div class="highlight"><pre><span></span>$ sudo docker run -d -network webapp1 -name webapp amitsaha/webapp
 94a3f4631eb924f7e4339986b73b1af7fca4c09b2a1a8d3ea106b698eae5c577
-
-Now, we will communicate with the web application from another container:
 </pre></div>
 
 
-<p>$ sudo docker run -network webapp1 -rm appropriate/curl -fsSL webapp:8000
-&lt;!DOCTYPE HTML PUBLIC “-//W3C//DTD HTML 4.01//EN” “http://www.w3.org/TR/html4/strict.dtd"&gt;
-<html>
-...</p>
-<div class="highlight"><pre><span></span>If we tried to communicate with webapp container from a container on a different network, 
-we will get a name resolution error:
+<p>Now, we will communicate with the web application from another container:</p>
+<div class="highlight"><pre><span></span>$ sudo docker run -network webapp1 -rm appropriate/curl -fsSL webapp:8000
+&lt;!DOCTYPE HTML PUBLIC “-//W3C//DTD HTML <span class="m">4</span>.01//EN” “http://www.w3.org/TR/html4/strict.dtd<span class="s2">&quot;&gt;</span>
+<span class="s2">&lt;html&gt;</span>
+<span class="s2">...</span>
 </pre></div>
 
 
-<p>$ sudo docker run --rm appropriate/curl -fsSL webapp:8000
-curl: (6) Couldn't resolve host 'webapp'</p>
-<div class="highlight"><pre><span></span>When we install docker, by default, we have three networks:
+<p>If we tried to communicate with webapp container from a container on a different network, 
+we will get a name resolution error:</p>
+<div class="highlight"><pre><span></span>$ sudo docker run --rm appropriate/curl -fsSL webapp:8000
+curl: <span class="o">(</span><span class="m">6</span><span class="o">)</span> Couldn<span class="s1">&#39;t resolve host &#39;</span>webapp<span class="err">&#39;</span>
 </pre></div>
 
 
-<p>$ sudo docker network ls
+<p>When we install docker, by default, we have three networks:</p>
+<div class="highlight"><pre><span></span>$ sudo docker network ls
 NETWORK ID          NAME                DRIVER              SCOPE
-8a6a3da7b5a2        bridge              bridge              local
-31f4f28111f0        host                host                local
-b0dfa09e8949        none                null                local</p>
-<div class="highlight"><pre><span></span>When we run a container (like so, docker run -ti &lt;image&gt;), it will use the default `bridge` network. 
-In this network mode, your container can access the outside world and the outside world can communicate 
-with your container via published service ports. In this mode, however there is no &quot;automagic&quot; way for 
-another container using the bridge network to communicate with it. The `host` network runs a container in 
-the host’s network space. The `none` network essentially gives our container only the loopback interface.
+8a6a3da7b5a2        bridge              bridge              <span class="nb">local</span>
+31f4f28111f0        host                host                <span class="nb">local</span>
+b0dfa09e8949        none                null                <span class="nb">local</span>
+</pre></div>
 
-When we create a user-defined network, we are creating an isolated network for our containers where we 
-[automatically](https://docs.docker.com/engine/userguide/networking/configure-dns/)
+
+<p>When we run a container (like so, docker run -ti <image>), it will use the default <code>bridge</code> network. 
+In this network mode, your container can access the outside world and the outside world can communicate 
+with your container via published service ports. In this mode, however there is no "automagic" way for 
+another container using the bridge network to communicate with it. The <code>host</code> network runs a container in 
+the host’s network space. The <code>none</code> network essentially gives our container only the loopback interface.</p>
+<p>When we create a user-defined network, we are creating an isolated network for our containers where we 
+<a href="https://docs.docker.com/engine/userguide/networking/configure-dns/">automatically</a>
 get container name resolution to facilitate inter-container communication. In addition, 
 we can expose and publish ports for a service to be also accessible from outside the container.
-If you look at the output of `docker network ls` again, you will see an additional entry 
-for the network we created:
+If you look at the output of <code>docker network ls</code> again, you will see an additional entry 
+for the network we created:</p>
+<div class="highlight"><pre><span></span>$ sudo docker network ls
+NETWORK ID          NAME                DRIVER              SCOPE
+e865bd63c762        webapp1             bridge              <span class="nb">local</span>
 </pre></div>
 
 
-<p>$ sudo docker network ls
-NETWORK ID          NAME                DRIVER              SCOPE
-e865bd63c762        webapp1             bridge              local
-```</p>
 <p>Learn <a href="https://docs.docker.com/engine/userguide/networking/">more</a> about docker container networking.</p>
   </div>
   <div class="article_meta">
