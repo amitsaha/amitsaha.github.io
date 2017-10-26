@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- ## for client-side less
+  <link rel="stylesheet/less" type="text/css" href="/theme/css/style.less">
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/less.js/1.7.3/less.min.js" type="text/javascript"></script>
+  -->
+  <link rel="stylesheet" type="text/css" href="/theme/css/style.css">
+  <link rel="stylesheet" type="text/css" href="/theme/css/pygments.css">
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=PT+Sans|PT+Serif|PT+Mono">
+
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="author" content="Amit Saha">
+  <meta name="description" content="Posts and writings by Amit Saha">
+
+  <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Programming and Writing about it Atom" />
+
+<meta name="keywords" content="">
+
+  <title>
+    Programming and Writing about it
+&ndash; Introducing distributed tracing in your Python application via Zipkin  </title>
+
+</head>
+
+<body>
+  <aside>
+    <div id="user_meta">
+      <a href="">
+        <img src="/theme/images/logo.png" alt="logo">
+      </a>
+      <h2><a href="">Amit Saha</a></h2>
+      <p></p>
+      <ul>
+        <li><a href="/pages/about.html">About</a></li>
+        <li><a href="/pages/articles.html">Articles</a></li>
+        <li><a href="/pages/books.html">Books</a></li>
+        <li><a href="/pages/personal-projects.html">Personal Projects</a></li>
+      </ul>
+    </div>
+  </aside>
+
+  <main>
+    <header>
+      <p>
+      <a href="">Index</a> &brvbar; <a href="/archives.html">Archives</a>
+      &brvbar; <a href="/feeds/all.atom.xml">Atom</a>
+      </p>
+    </header>
+
+<article>
+  <div class="article_title">
+    <h1><a href="/introducing-distributed-tracing-in-your-python-application-via-zipkin.html">Introducing distributed tracing in your Python application via Zipkin</a></h1>
+  </div>
+  <div class="article_text">
+    <p>Distributed tracing is the idea of tracing a network request as it travels through your services, as it would be in a microservices based architecture. The primary reason you may want to do is to troubleshoot or monitor the latency of a request
+as it travels through the different services.</p>
+<p>In this post we will see a demo of how we can introduce distributed tracing into a Python network stack communicating via HTTP.
+We have a service <tt class="docutils literal">demo</tt> which is a Flask application, which listens on <tt class="docutils literal">/</tt>. The handler for <tt class="docutils literal">/</tt> calls another service <tt class="docutils literal">service1</tt> via HTTP. We want to be able to see how much time a request spends in each service by introducing distributed tracing. Before we get to the code, let's talk briefly about a few concepts.</p>
+<div class="section" id="distributed-tracing-concepts">
+<h2>Distributed Tracing concepts</h2>
+<p>Roughly, a call to an &quot;external service&quot; starts a <cite>span</cite>. We can have a <cite>span</cite> nested within another span in a tree like fashion. All the spans in the context of a single request would form a <cite>trace</cite>.</p>
+<p>Something like the following would perhaps explain it better in the context of our <tt class="docutils literal">demo</tt> and <tt class="docutils literal">service</tt> network application stack:</p>
+<pre class="code literal-block">
+                &lt;--------------------          Trace       ------------------------------------ &gt;
+                                    Start Root Span                        Start a nested span
+External Request -&gt; Demo HTTP app       ---&gt;          Service 1 HTTP app        ---&gt;          Process
+</pre>
+<p>The span that is started from the <tt class="docutils literal">service1</tt> is designated as a child of the <tt class="docutils literal">root span</tt> which was started from the <tt class="docutils literal">demo</tt> application. In the context of Python, we can think of a span as a context manager and one context manager living within another context manager. And all these &quot;contexts&quot; together forming a trace.</p>
+<p>From the above it is somewhat clear (or not) that, the start of each span initiates a &quot;timer&quot; which then on the request's way back (or end of the span) is used to calculate the time the span lasted for. So, we need to have some thing (or things) which has to:</p>
+<ul class="simple">
+<li>Emit these data</li>
+<li>Recieve these data</li>
+<li>Allow us to collate them together and make it available to us for each trace or request.</li>
+</ul>
+<p>This brings us to our next section.</p>
+</div>
+<div class="section" id="zipkin">
+<h2>Zipkin</h2>
+<p><a class="reference external" href="http://zipkin.io/">zipkin</a> is a distributed tracing system which gives us the last two of the above requirements. How we emit these data from our application (the first point above) is dependent on the language we have written the application in and the distributed tracing system we chose for the last two requirements. In our case, <a class="reference external" href="https://github.com/Yelp/py_zipkin">py_zipkin</a> solves our problem.</p>
+<p>First, we will start <tt class="docutils literal">zipkin</tt> with <tt class="docutils literal">elasticsearch</tt> as the backend as <tt class="docutils literal">docker containers</tt>. So, you need to have <tt class="docutils literal">docker</tt> installed. To get the data in <tt class="docutils literal">elasticsearch</tt> persisted, we will first create a <a class="reference external" href="http://echorand.me/data-only-docker-containers.html">data container</a> as follows:</p>
+<pre class="code literal-block">
+$ docker create --name esdata openzipkin/zipkin-elasticsearch
+</pre>
+<p>Then, download my code from <a class="reference external" href="https://github.com/amitsaha/python-web-app-recipes/archive/zipkin_python_demo.zip">here</a> and:</p>
+<pre class="code literal-block">
+$ wget ..
+$ unzip ..
+$ cd tracing/http_collector
+$ ./start_zipkin.sh
+..
+..
+zipkin          | 2017-03-28 03:48:00.936  INFO 9 --- [           main] zipkin.server.ZipkinServer
+Started ZipkinServer in 7.36 seconds (JVM running for 8.595)
+</pre>
+<p>If you now go to <tt class="docutils literal"><span class="pre">http://localhost:9411/</span></tt> in your browser, you will see the Zipkin Web UI.</p>
+</div>
+<div class="section" id="creating-traces">
+<h2>Creating traces</h2>
+<p>Now, let's install the two libraries we need from the <tt class="docutils literal">requirements.txt</tt> via <tt class="docutils literal">pip install <span class="pre">-r</span> requirements.txt</tt>.</p>
+<p>Let's now start our two services, first the &quot;external&quot; facing demo service:</p>
+<pre class="code literal-block">
+$ python demo.py
+
+* Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+* Restarting with stat
+* Debugger is active!
+* Debugger pin code: 961-605-579
+</pre>
+<p>Then, the &quot;internal&quot; service 1:</p>
+<pre class="code literal-block">
+$ python service1.py
+* Running on http://127.0.0.1:6000/ (Press CTRL+C to quit)
+* Restarting with stat
+* Debugger is active!
+* Debugger pin code: 961-605-579
+</pre>
+<p>Now, let's make couple of requests to the <tt class="docutils literal">demo</tt> service using <tt class="docutils literal">$ curl localhost:5000</tt> twice. If we go back to the Zipkin Web UI and click on &quot;Find Traces&quot;, we will see something like this:</p>
+<img alt="" class="align-center" src="/images/zipkin-traces.png" />
+<p>If we click on one of the traces, we will see something like this:</p>
+<img alt="" class="align-center" src="/images/zipkin-trace1.png" />
+<p>As we can see four spans were created (two spans in each service) with the 2nd, 3rd and 4th spans nested inside the first span. The time reported to be spent in each span will become clear next.</p>
+</div>
+<div class="section" id="application-code">
+<h2>Application code</h2>
+<p>Let's look at the <tt class="docutils literal">demo.py</tt> file first:</p>
+<pre class="code literal-block">
+&#64;zipkin_span(service_name='webapp', span_name='do_stuff')
+def do_stuff():
+    time.sleep(5)
+    headers = create_http_headers_for_new_span()
+    requests.get('http://localhost:6000/service1/', headers=headers)
+    return 'OK'
+
+&#64;app.route('/')
+def index():
+    with zipkin_span(
+        service_name='webapp',
+        span_name='index',
+        transport_handler=http_transport,
+        port=5000,
+        sample_rate=100, #0.05, # Value between 0.0 and 100.0
+    ):
+        do_stuff()
+        time.sleep(10)
+    return 'OK', 200
+</pre>
+<p>We create the first span inside the <tt class="docutils literal">/</tt> handler function <tt class="docutils literal">index()</tt> via the <tt class="docutils literal">zipkin_span()</tt> context manager.
+We specify the <tt class="docutils literal">sample_rate=100</tt> meaning it will trace every request (only for demo). The <tt class="docutils literal">transport_handler</tt>
+specifies &quot;how&quot; the emitted traces are transported to the Zipkin &quot;collector&quot;. Here we use the <tt class="docutils literal">http_transport</tt>
+provided as example by the <tt class="docutils literal">py_zipkin</tt> project.</p>
+<p>This handler function calls the <tt class="docutils literal">do_stuff()</tt> function where we create another span, but since it is in the same
+service, we specify the same <tt class="docutils literal">service_name</tt> and decorate it with the <tt class="docutils literal">zipkin_span</tt> decorator. We have an artificial
+time delay of 5s before we make a HTTP call to the <tt class="docutils literal">service1</tt> service. Since we want to continue the current span, we
+pass in the span data as HTTP headers. These headers are created via the helper function, <tt class="docutils literal">create_http_headers_for_new_span()</tt> provided via <tt class="docutils literal">py_zipkin</tt>.</p>
+<p>Let's look at the <tt class="docutils literal">service1.py</tt> file next:</p>
+<pre class="code literal-block">
+&#64;zipkin_span(service_name='service1', span_name='service1_do_stuff')
+def do_stuff():
+    time.sleep(5)
+    return 'OK'
+
+&#64;app.route('/service1/')
+def index():
+    with zipkin_span(
+        service_name='service1',
+        zipkin_attrs=ZipkinAttrs(
+            trace_id=request.headers['X-B3-TraceID'],
+            span_id=request.headers['X-B3-SpanID'],
+            parent_span_id=request.headers['X-B3-ParentSpanID'],
+            flags=request.headers['X-B3-Flags'],
+            is_sampled=request.headers['X-B3-Sampled'],
+        ),
+        span_name='index_service1',
+        transport_handler=http_transport,
+        port=6000,
+        sample_rate=100, #0.05, # Value between 0.0 and 100.0
+    ):
+        do_stuff()
+    return 'OK', 200
+</pre>
+<p>This is almost the same as our <tt class="docutils literal">demo</tt> service above, but note how we set the <tt class="docutils literal">zipkin_attrs</tt> by making using of the
+headers we were passed from the <tt class="docutils literal">demo</tt> service aboev. This makes sure that the span of <tt class="docutils literal">service1</tt> is nested within
+the span of <tt class="docutils literal">demo</tt>. Note once again, how we introduce artificial delays here once again to make the trace show
+the time spent in each service more clearly.</p>
+</div>
+<div class="section" id="ending-notes">
+<h2>Ending Notes</h2>
+<p>Hopefully this post has given you a starting point of how you may go about implement distributed tracing. The following links
+has more:</p>
+<ul class="simple">
+<li><a class="reference external" href="zipkin.io">zipkin</a></li>
+<li><a class="reference external" href="http://opentracing.io/">opentracing</a></li>
+</ul>
+</div>
+
+  </div>
+  <div class="article_meta">
+    <p>Posted on: Tue 28 March 2017</p>
+    <p>Category: <a href="/category/python.html">Python</a>
+    </p>
+  </div>
+
+
+</article>
+
+
+    <div id="ending_message">
+      <p>&copy; Amit Saha. Built using <a href="http://getpelican.com" target="_blank">Pelican</a>. Theme by Giulio Fidente on <a href="https://github.com/gfidente/pelican-svbhack" target="_blank">github</a>. </p>
+    </div>
+  </main>
+</body>
+</html>

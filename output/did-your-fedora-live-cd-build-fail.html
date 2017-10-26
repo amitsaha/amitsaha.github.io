@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- ## for client-side less
+  <link rel="stylesheet/less" type="text/css" href="/theme/css/style.less">
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/less.js/1.7.3/less.min.js" type="text/javascript"></script>
+  -->
+  <link rel="stylesheet" type="text/css" href="/theme/css/style.css">
+  <link rel="stylesheet" type="text/css" href="/theme/css/pygments.css">
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=PT+Sans|PT+Serif|PT+Mono">
+
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="author" content="Amit Saha">
+  <meta name="description" content="Posts and writings by Amit Saha">
+
+  <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Programming and Writing about it Atom" />
+
+<meta name="keywords" content="">
+
+  <title>
+    Programming and Writing about it
+&ndash; Did your Fedora live cd build fail?  </title>
+
+</head>
+
+<body>
+  <aside>
+    <div id="user_meta">
+      <a href="">
+        <img src="/theme/images/logo.png" alt="logo">
+      </a>
+      <h2><a href="">Amit Saha</a></h2>
+      <p></p>
+      <ul>
+        <li><a href="/pages/about.html">About</a></li>
+        <li><a href="/pages/articles.html">Articles</a></li>
+        <li><a href="/pages/books.html">Books</a></li>
+        <li><a href="/pages/personal-projects.html">Personal Projects</a></li>
+      </ul>
+    </div>
+  </aside>
+
+  <main>
+    <header>
+      <p>
+      <a href="">Index</a> &brvbar; <a href="/archives.html">Archives</a>
+      &brvbar; <a href="/feeds/all.atom.xml">Atom</a>
+      </p>
+    </header>
+
+<article>
+  <div class="article_title">
+    <h1><a href="/did-your-fedora-live-cd-build-fail.html">Did your Fedora live cd build fail?</a></h1>
+  </div>
+  <div class="article_text">
+    <p><em>Update: Changed the Koji URL to reflect the change to livemedia</em></p>
+<p>As the <a class="reference external" href="http://fedora-scientific.readthedocs.org/en/latest/">Fedora Scientific</a> maintainer, I
+have to make sure I look into whether the nightly build is failing so
+that I can look into the why. So far I have been doing that by going to the koji <a class="reference external" href="http://koji.fedoraproject.org/koji/tasks?state=all&amp;view=tree&amp;method=livemedia">url</a>.</p>
+<p>But I think there is a better way - make a program do it
+regularly. First, the program (a Python script):</p>
+<pre class="code literal-block">
+from lxml import html
+import requests
+
+def main():
+   page = requests.get('http://koji.fedoraproject.org/koji/tasks?state=all&amp;view=tree&amp;method=livemedia')
+   tree = html.fromstring(page.content)
+
+   a_class_failed = tree.xpath('//a[&#64;class=&quot;taskfailed&quot;]')
+   for image in  a_class_failed:
+   print image.text
+
+if __name__ == '__main__':
+   main()
+</pre>
+<p>This incidentally happens to be my first scraping program and I got
+the help I needed <a class="reference external" href="http://docs.python-guide.org/en/latest/scenarios/scrape/">here</a>.</p>
+<p>If you install the <tt class="docutils literal">requests</tt> and <tt class="docutils literal">lxml</tt> packages and run the
+script, it will print the list of failing builds.</p>
+<p>Next step: I want to set this up regularly and send me an email. The
+script is <a class="reference external" href="https://github.com/amitsaha/fedora_livecd_build_failed/blob/master/failing_images.py">here</a>.
+As you can see, I have used <a class="reference external" href="https://sendgrid.com/">sendgrid</a> to
+send myself the email using their  <a class="reference external" href="https://github.com/sendgrid/sendgrid-python">Python library</a>. So you will need to
+get an API key to use this program. Before you can use the script,
+please install the dependencies using <tt class="docutils literal">pip install <span class="pre">-r</span>
+requirements.txt</tt> preferably in it's own <a class="reference external" href="http://python-packaging-user-guide.readthedocs.org/en/develop/using-a-virtualenv/">virtualenv</a>.</p>
+<p>I set this up in a cron job as follows:</p>
+<pre class="code literal-block">
+0 8 * * * /home/asaha/.local/share/virtualenvs/koji_scraper/bin/python /home/asaha/work/koji_livecd_scraper/python/failing_images.py
+</pre>
+<p>You will of course have to setup the path correctly for your setup. The script will send me an email every morning at 8 as follows:</p>
+<pre class="code literal-block">
+livecd (rawhide, Fedora-Live-Workstation-x86_64-rawhide, fedora-live-workstation-db37b44.ks)
+
+createLiveCD (rawhide, Fedora-Live-Workstation-x86_64-rawhide-20160216, fedora-live-workstation-db37b44.ks, x86_64)
+
+livecd (rawhide, Fedora-Live-Workstation-i686-rawhide, fedora-live-workstation-db37b44.ks)
+
+createLiveCD (rawhide, Fedora-Live-Workstation-i686-rawhide-20160216, fedora-live-workstation-db37b44.ks, i386)
+
+livecd (rawhide, Fedora-Live-Scientific_KDE-x86_64-rawhide, fedora-live-scientific_kde-db37b44.ks)
+
+createLiveCD (rawhide, Fedora-Live-Scientific_KDE-x86_64-rawhide-20160216, fedora-live-scientific_kde-db37b44.ks, x86_64)
+
+livecd (rawhide, Fedora-Live-Scientific_KDE-i686-rawhide, fedora-live-scientific_kde-db37b44.ks)
+
+createLiveCD (rawhide, Fedora-Live-Scientific_KDE-i686-rawhide-20160216, fedora-live-scientific_kde-db37b44.ks, i386)
+</pre>
+<p>The GitHub repository for the code is available <a class="reference external" href="https://github.com/amitsaha/fedora_livecd_build_failed">here</a>.</p>
+
+  </div>
+  <div class="article_meta">
+    <p>Posted on: Wed 17 February 2016</p>
+    <p>Category: <a href="/category/fedora.html">Fedora</a>
+    </p>
+  </div>
+
+
+</article>
+
+
+    <div id="ending_message">
+      <p>&copy; Amit Saha. Built using <a href="http://getpelican.com" target="_blank">Pelican</a>. Theme by Giulio Fidente on <a href="https://github.com/gfidente/pelican-svbhack" target="_blank">github</a>. </p>
+    </div>
+  </main>
+</body>
+</html>
