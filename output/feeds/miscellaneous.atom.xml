@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Programming and Writing about it</title><link href="/" rel="alternate"></link><link href="/feeds/miscellaneous.atom.xml" rel="self"></link><id>/</id><updated>2015-04-30T10:20:00+10:00</updated><entry><title>Remapping http://echorand.me</title><link href="/remapping-httpechorandme.html" rel="alternate"></link><published>2015-04-30T10:20:00+10:00</published><author><name>Amit Saha</name></author><id>tag:,2015-04-30:remapping-httpechorandme.html</id><summary type="html">&lt;p&gt;I changed the mapping of my domain to point to my GitHub pages. My old
-blog content is still available &lt;a class="reference external" href="http://amitksaha.wordpress.com"&gt;here&lt;/a&gt;.&lt;/p&gt;
-</summary></entry></feed>
