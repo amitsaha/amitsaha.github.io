@@ -55,11 +55,11 @@
     <h1><a href="http://echorand.me/user-defined-networks-in-docker-for-inter-container-communication.html">User-defined networks in Docker for inter-container communication</a></h1>
   </div>
   <div class="article_text">
-    <h2>Problem</h2>
+    <p><strong>Problem</strong></p>
 <p>Let's say a program in a container wants to communicate with a service running in another docker container
 on the same host. The current recommended approach to do so is using a <code>user-defined</code> network and 
 <a href="https://docs.docker.com/engine/userguide/networking/default_network/dockerlinks/">avoid</a> using <code>links</code>.</p>
-<h2>Solution</h2>
+<p><strong>Solution</strong></p>
 <p><img alt="Docker user defined network" src="http://echorand.me/images/docker-user-defined-network.png" title="Docker user defined network"></p>
 <p>Create an <a href="https://docs.docker.com/engine/userguide/networking/#user-defined-networks">user-defined network</a>
 and run both (or as many you have) the containers in this network:
@@ -99,7 +99,7 @@ curl: <span class="o">(</span><span class="m">6</span><span class="o">)</span> C
 </pre></div>
 
 
-<h2>Background information</h2>
+<p><strong>Background information</strong></p>
 <p>When we install docker, by default, we have three networks:</p>
 <div class="highlight"><pre><span></span>$ sudo docker network ls
 NETWORK ID          NAME                DRIVER              SCOPE
@@ -126,7 +126,11 @@ e865bd63c762        webapp1             bridge              <span class="nb">loc
 </pre></div>
 
 
-<p>Learn <a href="https://docs.docker.com/engine/userguide/networking/">more</a> about docker container networking.</p>
+<p><strong>References</strong></p>
+<ul>
+<li>Learn <a href="https://docs.docker.com/engine/userguide/networking/">more</a> about docker container networking.</li>
+<li>To learn even more, I recommend <a href="http://blog.mbrt.it/2017-10-01-demystifying-container-networking/?utm_source=webopsweekly&amp;utm_medium=email">Demystifying container networkking</a>.</li>
+</ul>
   </div>
   <div class="article_meta">
     <p>Posted on: Thu 26 October 2017</p>

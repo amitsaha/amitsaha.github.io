@@ -3,13 +3,13 @@ Date: 2017-10-26 15:00
 Category: Docker
 
 
-## Problem
+**Problem**
 
 Let's say a program in a container wants to communicate with a service running in another docker container
 on the same host. The current recommended approach to do so is using a `user-defined` network and 
 [avoid](https://docs.docker.com/engine/userguide/networking/default_network/dockerlinks/) using `links`.
 
-## Solution
+**Solution**
 
 ![Docker user defined network]({filename}/images/docker-user-defined-network.png "Docker user defined network")
 
@@ -51,7 +51,7 @@ $ sudo docker run --rm appropriate/curl -fsSL webapp:8000
 curl: (6) Couldn't resolve host 'webapp'
 ```
 
-## Background information
+**Background information**
 
 When we install docker, by default, we have three networks:
 
@@ -82,4 +82,7 @@ NETWORK ID          NAME                DRIVER              SCOPE
 e865bd63c762        webapp1             bridge              local
 ```
 
-Learn [more](https://docs.docker.com/engine/userguide/networking/) about docker container networking.
+**References**
+
+- Learn [more](https://docs.docker.com/engine/userguide/networking/) about docker container networking.
+- To learn even more, I recommend [Demystifying container networkking](http://blog.mbrt.it/2017-10-01-demystifying-container-networking/?utm_source=webopsweekly&utm_medium=email).
