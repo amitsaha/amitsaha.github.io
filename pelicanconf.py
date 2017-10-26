@@ -21,12 +21,8 @@ DEFAULT_PAGINATION = 10
 DISPLAY_CATEGORIES_ON_MENU = False
 DISPLAY_TAGS_ON_SIDEBAR = False
 
-#THEME='/tmp/pelican-themes/blue-penguin/'
+THEME='/tmp/pelican-themes/pelican-svbhack/'
 
-TWITTER_USERNAME="echorand"
-TWITTER_WIDGET_ID="608854659248181251"
-
-ADDTHIS_PROFILE="ra-557910c01cb1eb5c"
 
 STATIC_PATHS = ['images']
 
