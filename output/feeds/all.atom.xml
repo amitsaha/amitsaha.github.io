@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Exploring Software and Writing about it</title><link href="http://echorand.me/" rel="alternate"></link><link href="http://echorand.me/feeds/all.atom.xml" rel="self"></link><id>http://echorand.me/</id><updated>2017-10-26T15:00:00+10:00</updated><entry><title>User-defined networks in Docker for inter-container communication</title><link href="http://echorand.me/user-defined-networks-in-docker-for-inter-container-communication.html" rel="alternate"></link><published>2017-10-26T15:00:00+10:00</published><updated>2017-10-26T15:00:00+10:00</updated><author><name>Amit Saha</name></author><id>tag:echorand.me,2017-10-26:/user-defined-networks-in-docker-for-inter-container-communication.html</id><summary type="html">&lt;p&gt;Let's say a program in a container wants to communicate with a service running in another docker container
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Exploring Software and Writing about it</title><link href="http://echorand.me/" rel="alternate"></link><link href="http://echorand.me/feeds/all.atom.xml" rel="self"></link><id>http://echorand.me/</id><updated>2017-10-26T15:00:00+10:00</updated><entry><title>User-defined networks in Docker for inter-container communication</title><link href="http://echorand.me/user-defined-networks-in-docker-for-inter-container-communication.html" rel="alternate"></link><published>2017-10-26T15:00:00+10:00</published><updated>2017-10-26T15:00:00+10:00</updated><author><name>Amit Saha</name></author><id>tag:echorand.me,2017-10-26:/user-defined-networks-in-docker-for-inter-container-communication.html</id><summary type="html">&lt;h2&gt;Problem&lt;/h2&gt;
+&lt;p&gt;Let's say a program in a container wants to communicate with a service running in another docker container
 on the same host. The current recommended approach to do so is using a &lt;code&gt;user-defined&lt;/code&gt; network and 
 &lt;a href="https://docs.docker.com/engine/userguide/networking/default_network/dockerlinks/"&gt;avoid&lt;/a&gt; using &lt;code&gt;links&lt;/code&gt;.&lt;/p&gt;
+&lt;h2&gt;Solution&lt;/h2&gt;
 &lt;p&gt;&lt;img alt="Docker user defined network" src="http://echorand.me/images/docker-user-defined-network.png" title="Docker user defined network"&gt;&lt;/p&gt;
 &lt;p&gt;Create an &lt;a href="https://docs.docker.com/engine/userguide/networking/#user-defined-networks"&gt;user-defined network&lt;/a&gt;
-and run both (or as many you have …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Let's say a program in a container wants to communicate with a service running in another docker container
+and run both (or as many …&lt;/p&gt;</summary><content type="html">&lt;h2&gt;Problem&lt;/h2&gt;
+&lt;p&gt;Let's say a program in a container wants to communicate with a service running in another docker container
 on the same host. The current recommended approach to do so is using a &lt;code&gt;user-defined&lt;/code&gt; network and 
 &lt;a href="https://docs.docker.com/engine/userguide/networking/default_network/dockerlinks/"&gt;avoid&lt;/a&gt; using &lt;code&gt;links&lt;/code&gt;.&lt;/p&gt;
+&lt;h2&gt;Solution&lt;/h2&gt;
 &lt;p&gt;&lt;img alt="Docker user defined network" src="http://echorand.me/images/docker-user-defined-network.png" title="Docker user defined network"&gt;&lt;/p&gt;
 &lt;p&gt;Create an &lt;a href="https://docs.docker.com/engine/userguide/networking/#user-defined-networks"&gt;user-defined network&lt;/a&gt;
 and run both (or as many you have) the containers in this network:
@@ -46,6 +50,7 @@ curl: &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="m"&gt;6&lt;/span&gt;&l
 &lt;/pre&gt;&lt;/div&gt;
 
 
+&lt;h2&gt;Background information&lt;/h2&gt;
 &lt;p&gt;When we install docker, by default, we have three networks:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ sudo docker network ls
 NETWORK ID          NAME                DRIVER              SCOPE

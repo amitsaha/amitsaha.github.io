@@ -2,9 +2,14 @@ Title: User-defined networks in Docker for inter-container communication
 Date: 2017-10-26 15:00
 Category: Docker
 
+
+## Problem
+
 Let's say a program in a container wants to communicate with a service running in another docker container
 on the same host. The current recommended approach to do so is using a `user-defined` network and 
 [avoid](https://docs.docker.com/engine/userguide/networking/default_network/dockerlinks/) using `links`.
+
+## Solution
 
 ![Docker user defined network]({filename}/images/docker-user-defined-network.png "Docker user defined network")
 
@@ -45,6 +50,8 @@ we will get a name resolution error:
 $ sudo docker run --rm appropriate/curl -fsSL webapp:8000
 curl: (6) Couldn't resolve host 'webapp'
 ```
+
+## Background information
 
 When we install docker, by default, we have three networks:
 
