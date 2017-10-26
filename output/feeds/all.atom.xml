@@ -1,5 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Programming and Writing about it</title><link href="http://echorand.me/" rel="alternate"></link><link href="http://echorand.me/feeds/all.atom.xml" rel="self"></link><id>http://echorand.me/</id><updated>2017-10-26T13:00:00+10:00</updated><entry><title>Getting started with gRPC and Python</title><link href="http://echorand.me/getting-started-with-grpc-and-python.html" rel="alternate"></link><published>2017-10-26T13:00:00+10:00</published><updated>2017-10-26T13:00:00+10:00</updated><author><name>Amit Saha</name></author><id>tag:echorand.me,2017-10-26:/getting-started-with-grpc-and-python.html</id><summary type="html">&lt;p&gt;My article on getting started with gRPC in Python is up on the codeship blog:&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Exploring Software and Writing about it</title><link href="http://echorand.me/" rel="alternate"></link><link href="http://echorand.me/feeds/all.atom.xml" rel="self"></link><id>http://echorand.me/</id><updated>2017-10-26T15:00:00+10:00</updated><entry><title>User-defined networks in Docker for inter-container communication</title><link href="http://echorand.me/user-defined-networks-in-docker-for-inter-container-communication.html" rel="alternate"></link><published>2017-10-26T15:00:00+10:00</published><updated>2017-10-26T15:00:00+10:00</updated><author><name>Amit Saha</name></author><id>tag:echorand.me,2017-10-26:/user-defined-networks-in-docker-for-inter-container-communication.html</id><summary type="html">&lt;p&gt;Let's say a program in a container wants to communicate with a service running in another docker container
+on the same host. The current recommended approach to do so is using a &lt;code&gt;user-defined&lt;/code&gt; network and 
+&lt;a href="https://docs.docker.com/engine/userguide/networking/default_network/dockerlinks/"&gt;avoid&lt;/a&gt; using &lt;code&gt;links&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;.. figure:: {filename}/images/docker-network.png
+   :align: center
+   :alt: Docker user defined network …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Let's say a program in a container wants to communicate with a service running in another docker container
+on the same host. The current recommended approach to do so is using a &lt;code&gt;user-defined&lt;/code&gt; network and 
+&lt;a href="https://docs.docker.com/engine/userguide/networking/default_network/dockerlinks/"&gt;avoid&lt;/a&gt; using &lt;code&gt;links&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;.. figure:: {filename}/images/docker-network.png
+   :align: center
+   :alt: Docker user defined network
+   :scale: 100%&lt;/p&gt;
+&lt;p&gt;Create an &lt;a href="https://docs.docker.com/engine/userguide/networking/#user-defined-networks"&gt;user-defined network&lt;/a&gt;
+and run both (or as many you have) the containers in this network:
+(For reference, I am using docker 17.09.0-ce)&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ sudo docker network create --driver bridge webapp1
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The first container which we will launch in this network is a HTTP server listening 
+on port 8000. The &lt;code&gt;Dockerfile&lt;/code&gt; is as follows:&lt;/p&gt;
+&lt;div class="gist"&gt;
+    &lt;script src='https://gist.github.com/bd31ad432f83bfd178f0cedd7a45d59f.js?file=webapp.Dockerfile'&gt;&lt;/script&gt;
+    &lt;noscript&gt;
+        &lt;pre&gt;&lt;code&gt;# Build me using: docker build -t amitsaha/webapp .
+FROM python:3
+CMD ["python3", "-m", "http.server"]&lt;/code&gt;&lt;/pre&gt;
+    &lt;/noscript&gt;
+&lt;/div&gt;
+&lt;p&gt;Start the container in the network we created above:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ sudo docker run -d -network webapp1 -name webapp amitsaha/webapp
+94a3f4631eb924f7e4339986b73b1af7fca4c09b2a1a8d3ea106b698eae5c577
+
+Now, we will communicate with the web application from another container:
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;$ sudo docker run -network webapp1 -rm appropriate/curl -fsSL webapp:8000
+&amp;lt;!DOCTYPE HTML PUBLIC “-//W3C//DTD HTML 4.01//EN” “http://www.w3.org/TR/html4/strict.dtd"&amp;gt;
+&lt;html&gt;
+...&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;If we tried to communicate with webapp container from a container on a different network, 
+we will get a name resolution error:
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;$ sudo docker run --rm appropriate/curl -fsSL webapp:8000
+curl: (6) Couldn't resolve host 'webapp'&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;When we install docker, by default, we have three networks:
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;$ sudo docker network ls
+NETWORK ID          NAME                DRIVER              SCOPE
+8a6a3da7b5a2        bridge              bridge              local
+31f4f28111f0        host                host                local
+b0dfa09e8949        none                null                local&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;When we run a container (like so, docker run -ti &amp;lt;image&amp;gt;), it will use the default `bridge` network. 
+In this network mode, your container can access the outside world and the outside world can communicate 
+with your container via published service ports. In this mode, however there is no &amp;quot;automagic&amp;quot; way for 
+another container using the bridge network to communicate with it. The `host` network runs a container in 
+the host’s network space. The `none` network essentially gives our container only the loopback interface.
+
+When we create a user-defined network, we are creating an isolated network for our containers where we 
+[automatically](https://docs.docker.com/engine/userguide/networking/configure-dns/)
+get container name resolution to facilitate inter-container communication. In addition, 
+we can expose and publish ports for a service to be also accessible from outside the container.
+If you look at the output of `docker network ls` again, you will see an additional entry 
+for the network we created:
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;$ sudo docker network ls
+NETWORK ID          NAME                DRIVER              SCOPE
+e865bd63c762        webapp1             bridge              local
+```&lt;/p&gt;
+&lt;p&gt;Learn &lt;a href="https://docs.docker.com/engine/userguide/networking/"&gt;more&lt;/a&gt; about docker container networking.&lt;/p&gt;</content></entry><entry><title>Getting started with gRPC and Python</title><link href="http://echorand.me/getting-started-with-grpc-and-python.html" rel="alternate"></link><published>2017-10-26T13:00:00+10:00</published><updated>2017-10-26T13:00:00+10:00</updated><author><name>Amit Saha</name></author><id>tag:echorand.me,2017-10-26:/getting-started-with-grpc-and-python.html</id><summary type="html">&lt;p&gt;My article on getting started with gRPC in Python is up on the codeship blog:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;a href="https://blog.codeship.com/using-grpc-in-python/"&gt;Using gRPC in Python&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;

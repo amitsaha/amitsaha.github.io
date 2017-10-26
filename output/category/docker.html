@@ -17,11 +17,11 @@
 
   <link href="http://echorand.me/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Exploring Software and Writing about it Atom" />
 
-<meta name="keywords" content="">
+<link href="http://echorand.me/feeds/docker.atom.xml" type="application/atom+xml" rel="alternate" title="Exploring Software and Writing about it Docker Category Atom" />
 
   <title>
     Exploring Software and Writing about it
-&ndash; Getting started with gRPC and Python  </title>
+&ndash; Category: Docker  </title>
 
 </head>
 
@@ -47,29 +47,30 @@
       <p>
       <a href="http://echorand.me">Index</a> &brvbar; <a href="http://echorand.me/archives.html">Archives</a>
       &brvbar; <a href="http://echorand.me/feeds/all.atom.xml">Atom</a>
+&gt; Category: Docker
+&brvbar; <a href="http://echorand.me/feeds/docker.atom.xml">Atom</a>
       </p>
     </header>
 
 <article>
   <div class="article_title">
-    <h1><a href="http://echorand.me/getting-started-with-grpc-and-python.html">Getting started with gRPC and Python</a></h1>
+    <h1><a href="http://echorand.me/user-defined-networks-in-docker-for-inter-container-communication.html">User-defined networks in Docker for inter-container communication</a></h1>
   </div>
   <div class="article_text">
-    <p>My article on getting started with gRPC in Python is up on the codeship blog:</p>
-<ul>
-<li><a href="https://blog.codeship.com/using-grpc-in-python/">Using gRPC in Python</a></li>
-</ul>
-<p>The demos can be found in the <a href="https://github.com/amitsaha/python-grpc-demo">python-grpc-demo</a> repository.</p>
+    <p>Let's say a program in a container wants to communicate with a service running in another docker container
+on the same host. The current recommended approach to do so is using a <code>user-defined</code> network and 
+<a href="https://docs.docker.com/engine/userguide/networking/default_network/dockerlinks/">avoid</a> using <code>links</code>.</p>
+<p>.. figure:: {filename}/images/docker-network.png
+   :align: center
+   :alt: Docker user defined network …</p>
   </div>
-  <div class="article_meta">
-    <p>Posted on: Thu 26 October 2017</p>
-    <p>Category: <a href="http://echorand.me/category/python.html">Python</a>
-    </p>
-  </div>
-
-
 </article>
 
+<footer>
+<div id="paginator">
+
+</div>
+</footer>
 
     <div id="ending_message">
       <p>&copy; Amit Saha. Built using <a href="http://getpelican.com" target="_blank">Pelican</a>. Theme by Giulio Fidente on <a href="https://github.com/gfidente/pelican-svbhack" target="_blank">github</a>. </p>

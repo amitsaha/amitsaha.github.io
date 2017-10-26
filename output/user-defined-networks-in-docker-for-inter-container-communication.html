@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- ## for client-side less
+  <link rel="stylesheet/less" type="text/css" href="http://echorand.me/theme/css/style.less">
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/less.js/1.7.3/less.min.js" type="text/javascript"></script>
+  -->
+  <link rel="stylesheet" type="text/css" href="http://echorand.me/theme/css/style.css">
+  <link rel="stylesheet" type="text/css" href="http://echorand.me/theme/css/pygments.css">
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=PT+Sans|PT+Serif|PT+Mono">
+
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="author" content="Amit Saha">
+  <meta name="description" content="Posts and writings by Amit Saha">
+
+  <link href="http://echorand.me/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Exploring Software and Writing about it Atom" />
+
+<meta name="keywords" content="">
+
+  <title>
+    Exploring Software and Writing about it
+&ndash; User-defined networks in Docker for inter-container communication  </title>
+
+</head>
+
+<body>
+  <aside>
+    <div id="user_meta">
+      <a href="http://echorand.me">
+        <img src="http://echorand.me/images/logo.png" alt="logo">
+      </a>
+      <h2><a href="http://echorand.me">Amit Saha</a></h2>
+      <p></p>
+      <ul>
+        <li><a href="http://echorand.me/pages/about.html">About</a></li>
+        <li><a href="http://echorand.me/pages/articles.html">Articles</a></li>
+        <li><a href="http://echorand.me/pages/books.html">Books</a></li>
+        <li><a href="http://echorand.me/pages/personal-projects.html">Personal Projects</a></li>
+      </ul>
+    </div>
+  </aside>
+
+  <main>
+    <header>
+      <p>
+      <a href="http://echorand.me">Index</a> &brvbar; <a href="http://echorand.me/archives.html">Archives</a>
+      &brvbar; <a href="http://echorand.me/feeds/all.atom.xml">Atom</a>
+      </p>
+    </header>
+
+<article>
+  <div class="article_title">
+    <h1><a href="http://echorand.me/user-defined-networks-in-docker-for-inter-container-communication.html">User-defined networks in Docker for inter-container communication</a></h1>
+  </div>
+  <div class="article_text">
+    <p>Let's say a program in a container wants to communicate with a service running in another docker container
+on the same host. The current recommended approach to do so is using a <code>user-defined</code> network and 
+<a href="https://docs.docker.com/engine/userguide/networking/default_network/dockerlinks/">avoid</a> using <code>links</code>.</p>
+<p>.. figure:: {filename}/images/docker-network.png
+   :align: center
+   :alt: Docker user defined network
+   :scale: 100%</p>
+<p>Create an <a href="https://docs.docker.com/engine/userguide/networking/#user-defined-networks">user-defined network</a>
+and run both (or as many you have) the containers in this network:
+(For reference, I am using docker 17.09.0-ce)</p>
+<div class="highlight"><pre><span></span>$ sudo docker network create --driver bridge webapp1
+</pre></div>
+
+
+<p>The first container which we will launch in this network is a HTTP server listening 
+on port 8000. The <code>Dockerfile</code> is as follows:</p>
+<div class="gist">
+    <script src='https://gist.github.com/bd31ad432f83bfd178f0cedd7a45d59f.js?file=webapp.Dockerfile'></script>
+    <noscript>
+        <pre><code># Build me using: docker build -t amitsaha/webapp .
+FROM python:3
+CMD ["python3", "-m", "http.server"]</code></pre>
+    </noscript>
+</div>
+<p>Start the container in the network we created above:</p>
+<div class="highlight"><pre><span></span>$ sudo docker run -d -network webapp1 -name webapp amitsaha/webapp
+94a3f4631eb924f7e4339986b73b1af7fca4c09b2a1a8d3ea106b698eae5c577
+
+Now, we will communicate with the web application from another container:
+</pre></div>
+
+
+<p>$ sudo docker run -network webapp1 -rm appropriate/curl -fsSL webapp:8000
+&lt;!DOCTYPE HTML PUBLIC “-//W3C//DTD HTML 4.01//EN” “http://www.w3.org/TR/html4/strict.dtd"&gt;
+<html>
+...</p>
+<div class="highlight"><pre><span></span>If we tried to communicate with webapp container from a container on a different network, 
+we will get a name resolution error:
+</pre></div>
+
+
+<p>$ sudo docker run --rm appropriate/curl -fsSL webapp:8000
+curl: (6) Couldn't resolve host 'webapp'</p>
+<div class="highlight"><pre><span></span>When we install docker, by default, we have three networks:
+</pre></div>
+
+
+<p>$ sudo docker network ls
+NETWORK ID          NAME                DRIVER              SCOPE
+8a6a3da7b5a2        bridge              bridge              local
+31f4f28111f0        host                host                local
+b0dfa09e8949        none                null                local</p>
+<div class="highlight"><pre><span></span>When we run a container (like so, docker run -ti &lt;image&gt;), it will use the default `bridge` network. 
+In this network mode, your container can access the outside world and the outside world can communicate 
+with your container via published service ports. In this mode, however there is no &quot;automagic&quot; way for 
+another container using the bridge network to communicate with it. The `host` network runs a container in 
+the host’s network space. The `none` network essentially gives our container only the loopback interface.
+
+When we create a user-defined network, we are creating an isolated network for our containers where we 
+[automatically](https://docs.docker.com/engine/userguide/networking/configure-dns/)
+get container name resolution to facilitate inter-container communication. In addition, 
+we can expose and publish ports for a service to be also accessible from outside the container.
+If you look at the output of `docker network ls` again, you will see an additional entry 
+for the network we created:
+</pre></div>
+
+
+<p>$ sudo docker network ls
+NETWORK ID          NAME                DRIVER              SCOPE
+e865bd63c762        webapp1             bridge              local
+```</p>
+<p>Learn <a href="https://docs.docker.com/engine/userguide/networking/">more</a> about docker container networking.</p>
+  </div>
+  <div class="article_meta">
+    <p>Posted on: Thu 26 October 2017</p>
+    <p>Category: <a href="http://echorand.me/category/docker.html">Docker</a>
+    </p>
+  </div>
+
+
+</article>
+
+
+    <div id="ending_message">
+      <p>&copy; Amit Saha. Built using <a href="http://getpelican.com" target="_blank">Pelican</a>. Theme by Giulio Fidente on <a href="https://github.com/gfidente/pelican-svbhack" target="_blank">github</a>. </p>
+    </div>
+  </main>
+</body>
+</html>

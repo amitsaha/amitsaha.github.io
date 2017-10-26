@@ -3,7 +3,7 @@
 from __future__ import unicode_literals
 
 AUTHOR = u'Amit Saha'
-SITENAME = u'Programming and Writing about it'
+SITENAME = u'Exploring Software and Writing about it'
 SITEURL = 'http://echorand.me'
 PATH = 'content'
 TIMEZONE = 'Australia/Brisbane'
@@ -28,4 +28,4 @@ STATIC_PATHS = ['images']
 
 
 PLUGIN_PATHS = ['/tmp/pelican-plugins']
-PLUGINS = ['code_include', 'pelican_youtube']
+PLUGINS = ['code_include', 'pelican_youtube', 'pelican_gist']
