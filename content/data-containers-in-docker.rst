@@ -1,6 +1,6 @@
 :Title: Data only Docker containers
 :Date: 2015-12-13 11:00
-:Category: Fedora
+:Category: docker
 
 In this post, we shall take a look at the idea of data only
 containers - containers whose sole purpose is to exist on the *docker
