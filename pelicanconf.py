@@ -23,6 +23,7 @@ DISPLAY_TAGS_ON_SIDEBAR = False
 
 THEME='/tmp/pelican-svbhack/'
 USER_LOGO_URL=SITEURL+'/images/logo.png'
+ROUND_USER_LOGO=True
 
 STATIC_PATHS = ['images']
 
