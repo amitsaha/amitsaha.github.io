@@ -6,7 +6,7 @@ AUTHOR = u'Amit Saha'
 SITENAME = u'Exploring Software and Writing about it'
 SITEURL = 'http://echorand.me'
 PATH = 'content'
-TIMEZONE = 'Australia/Brisbane'
+TIMEZONE = 'Australia/Sydney'
 
 DEFAULT_LANG = u'en'
 
@@ -24,6 +24,9 @@ DISPLAY_TAGS_ON_SIDEBAR = False
 THEME='/tmp/pelican-svbhack/'
 USER_LOGO_URL=SITEURL+'/images/logo.png'
 ROUND_USER_LOGO=True
+TAGLINE=SITENAME
+
+GOOGLE_ANALYTICS='UA-108901610-1'
 
 STATIC_PATHS = ['images']
 
