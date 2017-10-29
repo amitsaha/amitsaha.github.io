@@ -51,6 +51,23 @@
 
 <article>
   <div class="article_title">
+    <h1><a href="http://echorand.me/add-an-additional-host-entry-to-docker-container.html">Add an additional host entry to docker container</a></h1>
+  </div>
+  <div class="article_text">
+    <p><strong>Problem</strong></p>
+<p>Let's say a program in a container should be able to resolve a custom hostname.</p>
+<p><strong>Solution</strong></p>
+<p>When using <code>docker run</code>:</p>
+<div class="highlight"><pre><span></span>$ sudo docker run --add-host myhost.name:127.0.0.1 -ti python bash
+Unable to find image <span class="s1">&#39;python:latest&#39;</span> locally
+latest: Pulling from library/python
+Digest: sha256:eb20fd0c13d2c57fb602572f27f05f7f1e87f606045175c108a7da1af967313e
+Status …</pre></div>
+  </div>
+</article>
+<hr />
+<article>
+  <div class="article_title">
     <h1><a href="http://echorand.me/user-defined-networks-in-docker-for-inter-container-communication.html">User-defined networks in Docker for inter-container communication</a></h1>
   </div>
   <div class="article_text">
@@ -155,19 +172,6 @@ to <tt class="docutils literal">None</tt> since it is not &quot;pickleable&quot;
 <ul class="simple">
 <li>Install the Go 1.8 compiler and other tools (<tt class="docutils literal">gofmt</tt>, for eaxmple), collectively referred to as go tools</li>
 <li>Install <a class="reference external" href="http://getgb.io">gb</a> and …</li></ul>
-  </div>
-</article>
-<hr />
-<article>
-  <div class="article_title">
-    <h1><a href="http://echorand.me/setup-golang-on-fedora-24-and-other-linux-distributions.html">Setup Golang on Fedora 24 (and other Linux distributions)</a></h1>
-  </div>
-  <div class="article_text">
-    <p>This guide will be how I usually setup and get started with Go development environment on Linux. By the end of this document, we will have seen how to:</p>
-<ul class="simple">
-<li>Install the Go compiler and other tools (<tt class="docutils literal">gofmt</tt>, for eaxmple), collectively referred to as go tools</li>
-<li>Setup Go workspace</li>
-<li>Working with …</li></ul>
   </div>
 </article>
 

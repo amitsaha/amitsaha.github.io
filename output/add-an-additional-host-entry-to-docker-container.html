@@ -21,7 +21,7 @@
 
   <title>
     Exploring Software and Writing about it
-&ndash; Mounting a docker volume on SELinux enabled host  </title>
+&ndash; Add an additional host entry to docker container  </title>
 
 </head>
 
@@ -52,23 +52,37 @@
 
 <article>
   <div class="article_title">
-    <h1><a href="http://echorand.me/mounting-a-docker-volume-on-selinux-enabled-host.html">Mounting a docker volume on SELinux enabled host</a></h1>
+    <h1><a href="http://echorand.me/add-an-additional-host-entry-to-docker-container.html">Add an additional host entry to docker container</a></h1>
   </div>
   <div class="article_text">
-    <p>My workflow with docker usually involves volume mounting a host
-directory so that I can read and write to the host directory from my
-container as a <em>non-root</em> user. On a Fedora 23 host with SELinux
-enabled, this is what I have to do differently:</p>
-<pre class="code literal-block">
-Use: -v /var/dir1:var/dir1:Z
-</pre>
-<p>Note the extra Z above? You can learn more about it this
-<a class="reference external" href="http://www.projectatomic.io/blog/2015/06/using-volumes-with-docker-can-cause-problems-with-selinux/">Project Atomic blog post</a></p>
+    <p><strong>Problem</strong></p>
+<p>Let's say a program in a container should be able to resolve a custom hostname.</p>
+<p><strong>Solution</strong></p>
+<p>When using <code>docker run</code>:</p>
+<div class="highlight"><pre><span></span>$ sudo docker run --add-host myhost.name:127.0.0.1 -ti python bash
+Unable to find image <span class="s1">&#39;python:latest&#39;</span> locally
+latest: Pulling from library/python
+Digest: sha256:eb20fd0c13d2c57fb602572f27f05f7f1e87f606045175c108a7da1af967313e
+Status: Downloaded newer image <span class="k">for</span> python:latest
+...
+</pre></div>
 
+
+<p>This will show up as an additional entry in the container's <code>/etc/hosts</code> file:</p>
+<div class="highlight"><pre><span></span>root@fee9aeccbc4b:/# cat /etc/hosts
+...
+127.0.0.1   myhost.name
+</pre></div>
+
+
+<p>With <code>docker compose</code>, we can use the <code>extra_hosts</code> key:</p>
+<div class="highlight"><pre><span></span>extra_hosts:
+    - &quot;myhost.name:127.0.0.1&quot;
+</pre></div>
   </div>
   <div class="article_meta">
-    <p>Posted on: Mon 05 October 2015</p>
-    <p>Category: <a href="http://echorand.me/category/docker.html">docker</a>
+    <p>Posted on: Sun 29 October 2017</p>
+    <p>Category: <a href="http://echorand.me/category/docker.html">Docker</a>
     </p>
   </div>
 

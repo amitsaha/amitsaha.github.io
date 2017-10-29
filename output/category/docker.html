@@ -54,6 +54,23 @@
 
 <article>
   <div class="article_title">
+    <h1><a href="http://echorand.me/add-an-additional-host-entry-to-docker-container.html">Add an additional host entry to docker container</a></h1>
+  </div>
+  <div class="article_text">
+    <p><strong>Problem</strong></p>
+<p>Let's say a program in a container should be able to resolve a custom hostname.</p>
+<p><strong>Solution</strong></p>
+<p>When using <code>docker run</code>:</p>
+<div class="highlight"><pre><span></span>$ sudo docker run --add-host myhost.name:127.0.0.1 -ti python bash
+Unable to find image <span class="s1">&#39;python:latest&#39;</span> locally
+latest: Pulling from library/python
+Digest: sha256:eb20fd0c13d2c57fb602572f27f05f7f1e87f606045175c108a7da1af967313e
+Status …</pre></div>
+  </div>
+</article>
+<hr />
+<article>
+  <div class="article_title">
     <h1><a href="http://echorand.me/user-defined-networks-in-docker-for-inter-container-communication.html">User-defined networks in Docker for inter-container communication</a></h1>
   </div>
   <div class="article_text">
@@ -65,6 +82,35 @@ on the same host. The current recommended approach to do so is using a <code>use
 <p><img alt="Docker user defined network" src="http://echorand.me/images/docker-user-defined-network.png" title="Docker user defined network"></p>
 <p>Create an <a href="https://docs.docker.com/engine/userguide/networking/#user-defined-networks">user-defined network</a>
 and run both (or as many …</p>
+  </div>
+</article>
+<hr />
+<article>
+  <div class="article_title">
+    <h1><a href="http://echorand.me/data-only-docker-containers.html">Data only Docker containers</a></h1>
+  </div>
+  <div class="article_text">
+    <p>In this post, we shall take a look at the idea of data only
+containers - containers whose sole purpose is to exist on the <em>docker
+host</em> so that other containers can have portable access to a
+persistent data volume.</p>
+<div class="section" id="why-do-we-need-a-persistent-data-volume">
+<h2>Why do we need a persistent data volume?</h2>
+<p>We will experiment …</p></div>
+  </div>
+</article>
+<hr />
+<article>
+  <div class="article_title">
+    <h1><a href="http://echorand.me/mounting-a-docker-volume-on-selinux-enabled-host.html">Mounting a docker volume on SELinux enabled host</a></h1>
+  </div>
+  <div class="article_text">
+    <p>My workflow with docker usually involves volume mounting a host
+directory so that I can read and write to the host directory from my
+container as a <em>non-root</em> user. On a Fedora 23 host with SELinux
+enabled, this is what I have to do differently:</p>
+<pre class="code literal-block">
+Use: -v /var/dir1:var …</pre>
   </div>
 </article>
 

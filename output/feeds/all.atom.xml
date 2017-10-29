@@ -1,5 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Exploring Software and Writing about it</title><link href="http://echorand.me/" rel="alternate"></link><link href="http://echorand.me/feeds/all.atom.xml" rel="self"></link><id>http://echorand.me/</id><updated>2017-10-26T15:00:00+10:00</updated><entry><title>User-defined networks in Docker for inter-container communication</title><link href="http://echorand.me/user-defined-networks-in-docker-for-inter-container-communication.html" rel="alternate"></link><published>2017-10-26T15:00:00+10:00</published><updated>2017-10-26T15:00:00+10:00</updated><author><name>Amit Saha</name></author><id>tag:echorand.me,2017-10-26:/user-defined-networks-in-docker-for-inter-container-communication.html</id><summary type="html">&lt;p&gt;&lt;strong&gt;Problem&lt;/strong&gt;&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Exploring Software and Writing about it</title><link href="http://echorand.me/" rel="alternate"></link><link href="http://echorand.me/feeds/all.atom.xml" rel="self"></link><id>http://echorand.me/</id><updated>2017-10-29T22:00:00+10:00</updated><entry><title>Add an additional host entry to docker container</title><link href="http://echorand.me/add-an-additional-host-entry-to-docker-container.html" rel="alternate"></link><published>2017-10-29T22:00:00+10:00</published><updated>2017-10-29T22:00:00+10:00</updated><author><name>Amit Saha</name></author><id>tag:echorand.me,2017-10-29:/add-an-additional-host-entry-to-docker-container.html</id><summary type="html">&lt;p&gt;&lt;strong&gt;Problem&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Let's say a program in a container should be able to resolve a custom hostname.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Solution&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;When using &lt;code&gt;docker run&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ sudo docker run --add-host myhost.name:127.0.0.1 -ti python bash
+Unable to find image &lt;span class="s1"&gt;&amp;#39;python:latest&amp;#39;&lt;/span&gt; locally
+latest: Pulling from library/python
+Digest: sha256:eb20fd0c13d2c57fb602572f27f05f7f1e87f606045175c108a7da1af967313e
+Status …&lt;/pre&gt;&lt;/div&gt;</summary><content type="html">&lt;p&gt;&lt;strong&gt;Problem&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Let's say a program in a container should be able to resolve a custom hostname.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Solution&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;When using &lt;code&gt;docker run&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ sudo docker run --add-host myhost.name:127.0.0.1 -ti python bash
+Unable to find image &lt;span class="s1"&gt;&amp;#39;python:latest&amp;#39;&lt;/span&gt; locally
+latest: Pulling from library/python
+Digest: sha256:eb20fd0c13d2c57fb602572f27f05f7f1e87f606045175c108a7da1af967313e
+Status: Downloaded newer image &lt;span class="k"&gt;for&lt;/span&gt; python:latest
+...
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;This will show up as an additional entry in the container's &lt;code&gt;/etc/hosts&lt;/code&gt; file:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;root@fee9aeccbc4b:/# cat /etc/hosts
+...
+127.0.0.1   myhost.name
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;With &lt;code&gt;docker compose&lt;/code&gt;, we can use the &lt;code&gt;extra_hosts&lt;/code&gt; key:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;extra_hosts:
+    - &amp;quot;myhost.name:127.0.0.1&amp;quot;
+&lt;/pre&gt;&lt;/div&gt;</content></entry><entry><title>User-defined networks in Docker for inter-container communication</title><link href="http://echorand.me/user-defined-networks-in-docker-for-inter-container-communication.html" rel="alternate"></link><published>2017-10-26T15:00:00+10:00</published><updated>2017-10-26T15:00:00+10:00</updated><author><name>Amit Saha</name></author><id>tag:echorand.me,2017-10-26:/user-defined-networks-in-docker-for-inter-container-communication.html</id><summary type="html">&lt;p&gt;&lt;strong&gt;Problem&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;Let's say a program in a container wants to communicate with a service running in another docker container
 on the same host. The current recommended approach to do so is using a &lt;code&gt;user-defined&lt;/code&gt; network and 
 &lt;a href="https://docs.docker.com/engine/userguide/networking/default_network/dockerlinks/"&gt;avoid&lt;/a&gt; using &lt;code&gt;links&lt;/code&gt;.&lt;/p&gt;
