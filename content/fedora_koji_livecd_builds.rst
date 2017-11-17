@@ -1,6 +1,6 @@
 :Title: Did your Fedora live cd build fail?
 :Date: 2016-02-17 11:00
-:Category: Fedora
+:Category: fedora
 
 *Update: Changed the Koji URL to reflect the change to livemedia*
 

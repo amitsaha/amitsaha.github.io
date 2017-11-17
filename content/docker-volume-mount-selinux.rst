@@ -1,6 +1,6 @@
 :Title: Mounting a docker volume on SELinux enabled host
 :Date: 2015-10-05 11:00
-:Category: docker
+:Category: infrastructure
 
 My workflow with docker usually involves volume mounting a host
 directory so that I can read and write to the host directory from my

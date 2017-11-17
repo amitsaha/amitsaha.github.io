@@ -1,6 +1,6 @@
 Title: Add an additional host entry to docker container
 Date: 2017-10-29 22:00
-Category: Docker
+Category: infrastructure
 
 **Problem**
 

@@ -1,6 +1,6 @@
 :Title: Fedora 22 Scientific
 :Date: 2015-06-11 10:20
-:Category: Fedora
+:Category: fedora
 
 Fedora 22 was `released recently <http://fedoramagazine.org/fedora-22-released/>`__ which also means we
 have a new Fedora Scientific release. `Fedora Scientific <https://labs.fedoraproject.org/en/scientific/>`__

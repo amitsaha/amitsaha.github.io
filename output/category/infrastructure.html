@@ -17,10 +17,11 @@
 
   <link href="http://echorand.me/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Exploring Software and Writing about it Atom" />
 
+<link href="http://echorand.me/feeds/infrastructure.atom.xml" type="application/atom+xml" rel="alternate" title="Exploring Software and Writing about it infrastructure Category Atom" />
 
   <title>
     Exploring Software and Writing about it
-&ndash; Posts by: Amit Saha  </title>
+&ndash; Category: infrastructure  </title>
 
 <script type="text/javascript">
   var _gaq = _gaq || [];
@@ -57,7 +58,8 @@
       <p>
       <a href="http://echorand.me">Index</a> &brvbar; <a href="http://echorand.me/archives.html">Archives</a>
       &brvbar; <a href="http://echorand.me/feeds/all.atom.xml">Atom</a>
-&gt; Author: Amit Saha
+&gt; Category: infrastructure
+&brvbar; <a href="http://echorand.me/feeds/infrastructure.atom.xml">Atom</a>
       </p>
     </header>
 
@@ -110,88 +112,35 @@ and run both (or as many …</p>
 <hr />
 <article>
   <div class="article_title">
-    <h1><a href="http://echorand.me/getting-started-with-grpc-and-python.html">Getting started with gRPC and Python</a></h1>
+    <h1><a href="http://echorand.me/data-only-docker-containers.html">Data only Docker containers</a></h1>
   </div>
   <div class="article_text">
-    <p>My article on getting started with gRPC in Python is up on the codeship blog:</p>
-<ul>
-<li><a href="https://blog.codeship.com/using-grpc-in-python/">Using gRPC in Python</a></li>
-</ul>
-<p>The demos can be found in the <a href="https://github.com/amitsaha/python-grpc-demo">python-grpc-demo</a> repository.</p>
+    <p>In this post, we shall take a look at the idea of data only
+containers - containers whose sole purpose is to exist on the <em>docker
+host</em> so that other containers can have portable access to a
+persistent data volume.</p>
+<div class="section" id="why-do-we-need-a-persistent-data-volume">
+<h2>Why do we need a persistent data volume?</h2>
+<p>We will experiment …</p></div>
   </div>
 </article>
 <hr />
 <article>
   <div class="article_title">
-    <h1><a href="http://echorand.me/monitoring-python-applications-with-prometheus.html">Monitoring Python applications with Prometheus</a></h1>
+    <h1><a href="http://echorand.me/mounting-a-docker-volume-on-selinux-enabled-host.html">Mounting a docker volume on SELinux enabled host</a></h1>
   </div>
   <div class="article_text">
-    <p>I recently wrote two articles on Python application monitoring with Prometheus:</p>
-<ul>
-<li><a href="https://blog.codeship.com/monitoring-your-synchronous-python-web-applications-using-prometheus/">Monitoring Your Synchronous Python Web Applications Using Prometheus</a></li>
-<li><a href="https://blog.codeship.com/monitoring-your-asynchronous-python-web-applications-using-prometheus/">Monitoring Your Asynchronous Python Web Applications Using Prometheus</a></li>
-</ul>
-<p>The demos can be found in the <a href="https://github.com/amitsaha/python-prometheus-demo">python-prometheus-demo</a> repository.</p>
-<p>Also checkout <a href="https://github.com/amitsaha/aiohttp-prometheus">aiohttp-prometheus</a>.</p>
-  </div>
-</article>
-<hr />
-<article>
-  <div class="article_title">
-    <h1><a href="http://echorand.me/dissecting-golangs-handlerfunc-handle-and-defaultservemux.html">Dissecting golang's HandlerFunc, Handle and DefaultServeMux</a></h1>
-  </div>
-  <div class="article_text">
-    <p>My aim in this post is to discuss three &quot;concepts&quot; in Golang that I come across while writing HTTP servers. Through this
-post, my aim to get rid of my own lack of understanding (at least to a certain degree) about these. Hopefully, it will
-be of use to others …</p>
-  </div>
-</article>
-<hr />
-<article>
-  <div class="article_title">
-    <h1><a href="http://echorand.me/humble-bundle.html">Doing Math with Python Humble Bundle</a></h1>
-  </div>
-  <div class="article_text">
-    <p class="first last">Humble bundle</p>
-
-  </div>
-</article>
-<hr />
-<article>
-  <div class="article_title">
-    <h1><a href="http://echorand.me/introducing-distributed-tracing-in-your-python-application-via-zipkin.html">Introducing distributed tracing in your Python application via Zipkin</a></h1>
-  </div>
-  <div class="article_text">
-    <p>Distributed tracing is the idea of tracing a network request as it travels through your services, as it would be in a microservices based architecture. The primary reason you may want to do is to troubleshoot or monitor the latency of a request
-as it travels through the different services …</p>
-  </div>
-</article>
-<hr />
-<article>
-  <div class="article_title">
-    <h1><a href="http://echorand.me/notes-on-using-golang-to-write-gitbackup.html">Notes on using Golang to write gitbackup</a></h1>
-  </div>
-  <div class="article_text">
-    <p><a class="reference external" href="https://github.com/amitsaha/gitbackup">gitbackup</a> is a tool to backup your git repositories from GitHub and GitLab. I wrote the <a class="reference external" href="https://github.com/amitsaha/gitbackup/releases/tag/lj-0.1">initial version</a> as a project for a golang article which is in review for publication in a Linux magazine. It supports GitHub enterprise installations and custom GitLab installations in addition to repositories on github …</p>
-  </div>
-</article>
-<hr />
-<article>
-  <div class="article_title">
-    <h1><a href="http://echorand.me/queuelogger-and-python-json-logger.html">QueueLogger and Python JSON Logger</a></h1>
-  </div>
-  <div class="article_text">
-    <div class="section" id="using-queuelogger-with-python-json-logger">
-<h2>Using QueueLogger with Python JSON Logger</h2>
-<p>When logging from multiple processes (via <tt class="docutils literal">multiprocessing</tt> module),  using <a class="reference external" href="https://pythonhosted.org/logutils/queue.html#logutils.queue.QueueHandler">QueueHandler</a> is one  approach with Python 2.</p>
-<p><tt class="docutils literal">QueueHandler</tt> however sets <tt class="docutils literal">exc_info</tt> attribute of a <a class="reference external" href="https://docs.python.org/2/library/logging.html#logging.LogRecord">LogRecord</a>
-to <tt class="docutils literal">None</tt> since it is not &quot;pickleable&quot; (more on this later). This becomes a problem when you use <a class="reference external" href="https://github.com/madzak/python-json-logger/">python-json-logger</a> to …</p></div>
+    <p>My workflow with docker usually involves volume mounting a host
+directory so that I can read and write to the host directory from my
+container as a <em>non-root</em> user. On a Fedora 23 host with SELinux
+enabled, this is what I have to do differently:</p>
+<pre class="code literal-block">
+Use: -v /var/dir1:var …</pre>
   </div>
 </article>
 
 <footer>
 <div id="paginator">
-<a href="http://echorand.me/author/amit-saha2.html" class="button_accent">&larr; Older Posts</a>
 
 </div>
 </footer>
