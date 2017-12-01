@@ -1,35 +1,177 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Exploring Software and Writing about it - infrastructure</title><link href="http://echorand.me/" rel="alternate"></link><link href="http://echorand.me/feeds/infrastructure.atom.xml" rel="self"></link><id>http://echorand.me/</id><updated>2017-11-16T18:00:00+11:00</updated><entry><title>Demo of using consul tags</title><link href="http://echorand.me/demo-of-using-consul-tags.html" rel="alternate"></link><published>2017-11-16T18:00:00+11:00</published><updated>2017-11-16T18:00:00+11:00</updated><author><name>Amit Saha</name></author><id>tag:echorand.me,2017-11-16:/demo-of-using-consul-tags.html</id><summary type="html">&lt;p&gt;We have a server offering a service which is discovered via &lt;a href="https://www.consul.io/"&gt;consul&lt;/a&gt;. Consul tags
-allow us to achieve different goals we may have in interacting with this service.&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;Problem #1&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;Let's say our service is a HTTP server acting as a routing point for multiple independent resources&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;Solution&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;When using …&lt;/p&gt;</summary><content type="html">&lt;p&gt;We have a server offering a service which is discovered via &lt;a href="https://www.consul.io/"&gt;consul&lt;/a&gt;. Consul tags
-allow us to achieve different goals we may have in interacting with this service.&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;Problem #1&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;Let's say our service is a HTTP server acting as a routing point for multiple independent resources&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;Solution&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;When using &lt;code&gt;docker run&lt;/code&gt;:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ sudo docker run --add-host myhost.name:127.0.0.1 -ti python bash
-Unable to find image &lt;span class="s1"&gt;&amp;#39;python:latest&amp;#39;&lt;/span&gt; locally
-latest: Pulling from library/python
-Digest: sha256:eb20fd0c13d2c57fb602572f27f05f7f1e87f606045175c108a7da1af967313e
-Status: Downloaded newer image &lt;span class="k"&gt;for&lt;/span&gt; python:latest
-...
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Exploring Software and Writing about it - infrastructure</title><link href="http://echorand.me/" rel="alternate"></link><link href="http://echorand.me/feeds/infrastructure.atom.xml" rel="self"></link><id>http://echorand.me/</id><updated>2017-12-01T16:00:00+11:00</updated><entry><title>Brief overview of using consul tags</title><link href="http://echorand.me/brief-overview-of-using-consul-tags.html" rel="alternate"></link><published>2017-12-01T16:00:00+11:00</published><updated>2017-12-01T16:00:00+11:00</updated><author><name>Amit Saha</name></author><id>tag:echorand.me,2017-12-01:/brief-overview-of-using-consul-tags.html</id><summary type="html">&lt;p&gt;&lt;a href="https://www.consul.io/"&gt;consul&lt;/a&gt; allows a service to associate itself with &lt;code&gt;tags&lt;/code&gt;. These are arbitrary
+metadata that can be associated with the service and can be used for different purposes. Below I outline
+a few examples of making use of tags and discuss some related topics.&lt;/p&gt;
+&lt;h2&gt;Use case #1: Dedicated service instances based …&lt;/h2&gt;</summary><content type="html">&lt;p&gt;&lt;a href="https://www.consul.io/"&gt;consul&lt;/a&gt; allows a service to associate itself with &lt;code&gt;tags&lt;/code&gt;. These are arbitrary
+metadata that can be associated with the service and can be used for different purposes. Below I outline
+a few examples of making use of tags and discuss some related topics.&lt;/p&gt;
+&lt;h2&gt;Use case #1: Dedicated service instances based on requests&lt;/h2&gt;
+&lt;p&gt;Let's say our service is a HTTP server (REST API) acting as a routing point for multiple 
+independent resources with the following service definition:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;{
+  &amp;quot;service&amp;quot;: {
+    &amp;quot;name&amp;quot;: &amp;quot;api&amp;quot;,
+    &amp;quot;address&amp;quot;: &amp;quot;&amp;quot;,
+    &amp;quot;port&amp;quot;: 8080,
+    &amp;quot;checks&amp;quot;: [],
+  }
+}
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;This will show up as an additional entry in the container's &lt;code&gt;/etc/hosts&lt;/code&gt; file:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;root@fee9aeccbc4b:/# cat /etc/hosts
-...
-127.0.0.1   myhost.name
+&lt;p&gt;We can then communicate with service using the DNS, &lt;code&gt;api.service.consul&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Let's assume we are running N copies of this service, but want to have dedicated sub-pools for 
+separate resource groups. We will assign the services in each pool a different tag as follows:&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;projects&lt;/strong&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;{
+  &amp;quot;service&amp;quot;: {
+    &amp;quot;name&amp;quot;: &amp;quot;api&amp;quot;,
+    &amp;quot;address&amp;quot;: &amp;quot;&amp;quot;,
+    &amp;quot;port&amp;quot;: 8080,
+    &amp;quot;checks&amp;quot;: [],
+    &amp;quot;tags&amp;quot;:[&amp;quot;projects&amp;quot;],
+  }
+}
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;With &lt;code&gt;docker compose&lt;/code&gt;, we can use the &lt;code&gt;extra_hosts&lt;/code&gt; key:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;extra_hosts:
-    - &amp;quot;myhost.name:127.0.0.1&amp;quot;
-&lt;/pre&gt;&lt;/div&gt;</content></entry><entry><title>Add an additional host entry to docker container</title><link href="http://echorand.me/add-an-additional-host-entry-to-docker-container.html" rel="alternate"></link><published>2017-10-29T22:00:00+11:00</published><updated>2017-10-29T22:00:00+11:00</updated><author><name>Amit Saha</name></author><id>tag:echorand.me,2017-10-29:/add-an-additional-host-entry-to-docker-container.html</id><summary type="html">&lt;p&gt;&lt;strong&gt;Problem&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;users&lt;/strong&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;{
+  &amp;quot;service&amp;quot;: {
+    &amp;quot;name&amp;quot;: &amp;quot;api&amp;quot;,
+    &amp;quot;address&amp;quot;: &amp;quot;&amp;quot;,
+    &amp;quot;port&amp;quot;: 8080,
+    &amp;quot;checks&amp;quot;: [],
+    &amp;quot;tags&amp;quot;:[&amp;quot;users&amp;quot;],
+  }
+}
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Once we register the services using the different tags, they automatically become discoverable via DNS
+as &lt;code&gt;projects.api.service.consul&lt;/code&gt; and &lt;code&gt;users.api.service.consul&lt;/code&gt; respectively. Assuming that the routing 
+to our HTTP server is happening in a higher layer, we will then direct traffic to these pools as follows:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;api/projects/ -&amp;gt; projects.api.service.consul
+api/users/ -&amp;gt; users.api.service.consul
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Use case #2: Running different versions of your service&lt;/h2&gt;
+&lt;p&gt;We can use tags to run two different versions of our application for testing, gathering
+performance data, blue-green deployment or any other reason:&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;v1&lt;/strong&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;{
+  &amp;quot;service&amp;quot;: {
+    &amp;quot;name&amp;quot;: &amp;quot;api&amp;quot;,
+    &amp;quot;address&amp;quot;: &amp;quot;&amp;quot;,
+    &amp;quot;port&amp;quot;: 8080,
+    &amp;quot;checks&amp;quot;: [],
+    &amp;quot;tags&amp;quot;:[&amp;quot;v1&amp;quot;],
+  }
+}
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;strong&gt;v2&lt;/strong&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;{
+  &amp;quot;service&amp;quot;: {
+    &amp;quot;name&amp;quot;: &amp;quot;api&amp;quot;,
+    &amp;quot;address&amp;quot;: &amp;quot;&amp;quot;,
+    &amp;quot;port&amp;quot;: 8080,
+    &amp;quot;checks&amp;quot;: [],
+    &amp;quot;tags&amp;quot;:[&amp;quot;v2&amp;quot;],
+  }
+}
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;We can then use a tag based weighted mechanism at a higher level proxy (such as &lt;a href="https://github.com/linkerd/linkerd/commit/718514fb1d4b86153820880162d3c9559e115725"&gt;linkerd&lt;/a&gt;) to send traffic to these different service
+versions.&lt;/p&gt;
+&lt;h2&gt;Use case #3: Other metadata&lt;/h2&gt;
+&lt;p&gt;This &lt;a href="https://github.com/hashicorp/consul/issues/997/"&gt;issue&lt;/a&gt; on consul's project discusses using
+tags as a way to have artbitary metadata for a service due to the lack of support for key-value
+labels.&lt;/p&gt;
+&lt;h2&gt;Using tags for discovery&lt;/h2&gt;
+&lt;p&gt;Besides using the DNS interface for communicating with the services, we can use &lt;code&gt;tags&lt;/code&gt; as filter with
+the consul &lt;a href="https://www.consul.io/api/catalog.html"&gt;catalog API&lt;/a&gt;. However, it currently supports a single
+tag. There is a feature request &lt;a href="https://github.com/hashicorp/consul/issues/1781"&gt;open&lt;/a&gt; to support multiple
+tags.&lt;/p&gt;
+&lt;h2&gt;Demo: Running two versions of a service&lt;/h2&gt;
+&lt;p&gt;I have two versions of a service, &lt;code&gt;api&lt;/code&gt;. Each service is running in a separate docker container on port 8080.
+&lt;code&gt;v1&lt;/code&gt; and &lt;code&gt;v2&lt;/code&gt; are also the tags associated with the respective instances. The demo source code can be found 
+&lt;a href="https://github.com/amitsaha/consul-demo"&gt;here&lt;/a&gt;. To follow along, clone the repository, install &lt;code&gt;docker&lt;/code&gt; and 
+&lt;code&gt;docker-compose&lt;/code&gt;.&lt;/p&gt;
+&lt;h3&gt;Start consul and the two versions of the API&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ &lt;span class="nb"&gt;pushd&lt;/span&gt; tags/api/v1
+$ ./build-image.sh
+$ &lt;span class="nb"&gt;popd&lt;/span&gt;
+
+$ &lt;span class="nb"&gt;pushd&lt;/span&gt; tags/api/v2
+$ ./build-image.sh
+$ &lt;span class="nb"&gt;popd&lt;/span&gt;
+
+$ &lt;span class="nb"&gt;pushd&lt;/span&gt; tags
+$ docker-compose up
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;We should see the following output from &lt;code&gt;docker-compose up&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;consul    |     2017/12/01 04:01:03 [DEBUG] http: Request PUT /v1/agent/service/register (1.020389ms) from=172.21.0.4:34030
+consul    |     2017/12/01 04:01:03 [DEBUG] agent: Service &amp;#39;apiv2&amp;#39; in sync
+consul    |     2017/12/01 04:01:03 [DEBUG] agent: Node info in sync
+consul    |     2017/12/01 04:01:03 [DEBUG] agent: Service &amp;#39;apiv2&amp;#39; in sync
+consul    |     2017/12/01 04:01:03 [DEBUG] agent: Node info in sync
+consul    |     2017/12/01 04:01:04 [DEBUG] agent: Service &amp;#39;apiv2&amp;#39; in sync
+consul    |     2017/12/01 04:01:04 [INFO] agent: Synced service &amp;#39;apiv1&amp;#39;
+consul    |     2017/12/01 04:01:04 [DEBUG] agent: Node info in sync
+consul    |     2017/12/01 04:01:04 [DEBUG] http: Request PUT /v1/agent/service/register (3.333932ms) from=172.21.0.3:42486
+consul    |     2017/12/01 04:01:04 [DEBUG] agent: Service &amp;#39;apiv2&amp;#39; in sync
+consul    |     2017/12/01 04:01:04 [DEBUG] agent: Service &amp;#39;apiv1&amp;#39; in sync
+consul    |     2017/12/01 04:01:04 [DEBUG] agent: Node info in sync
+consul    |     2017/12/01 04:01:04 [DEBUG] agent: Service &amp;#39;apiv1&amp;#39; in sync
+consul    |     2017/12/01 04:01:04 [DEBUG] agent: Service &amp;#39;apiv2&amp;#39; in sync
+consul    |     2017/12/01 04:01:04 [DEBUG] agent: Node info in sync
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h3&gt;Start the dnsmasq container&lt;/h3&gt;
+&lt;p&gt;Next, we are going to start a new docker container running &lt;a href="http://www.thekelleys.org.uk/dnsmasq/doc.html"&gt;dnsmasq&lt;/a&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ &amp;lt; repo root &amp;gt;
+$ &lt;span class="nb"&gt;pushd&lt;/span&gt; support/dnsmasq
+$ ./start-dnsmasq.sh
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h3&gt;Start the API client container&lt;/h3&gt;
+&lt;p&gt;Now, let's start a container which will act as an API client:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ &amp;lt; repo root &amp;gt;
+$ &lt;span class="nb"&gt;cd&lt;/span&gt; support/apiclient
+$ ./start-client.sh 
+
+/ &lt;span class="c1"&gt;# dig api.service.consul +short&lt;/span&gt;
+&lt;span class="m"&gt;172&lt;/span&gt;.21.0.4
+&lt;span class="m"&gt;172&lt;/span&gt;.21.0.3
+
+/ &lt;span class="c1"&gt;# dig v1.api.service.consul +short&lt;/span&gt;
+&lt;span class="m"&gt;172&lt;/span&gt;.21.0.3
+
+/ &lt;span class="c1"&gt;# dig v2.api.service.consul +short&lt;/span&gt;
+&lt;span class="m"&gt;172&lt;/span&gt;.21.0.4
+
+/ &lt;span class="c1"&gt;# curl v1.api.service.consul:8080/ping/&lt;/span&gt;
+Hi there! I am v1/ &lt;span class="c1"&gt;# &lt;/span&gt;
+
+/ &lt;span class="c1"&gt;# curl v2.api.service.consul:8080/ping/&lt;/span&gt;
+Hi there! I am v2/ &lt;span class="c1"&gt;# &lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h3&gt;Points to note&lt;/h3&gt;
+&lt;p&gt;While working on the demo, I found out that I needed to specify the IP address of the service I was registering.
+Otherwise, they were being registered with empty IP addresses. This could be due to those services running in the 
+&lt;code&gt;docker&lt;/code&gt; container. I am not sure.&lt;/p&gt;
+&lt;p&gt;I also learned that since I was running a single consul agent, I had to specify a unique service ID for the two
+service instances.&lt;/p&gt;</content></entry><entry><title>Add an additional host entry to docker container</title><link href="http://echorand.me/add-an-additional-host-entry-to-docker-container.html" rel="alternate"></link><published>2017-10-29T22:00:00+11:00</published><updated>2017-10-29T22:00:00+11:00</updated><author><name>Amit Saha</name></author><id>tag:echorand.me,2017-10-29:/add-an-additional-host-entry-to-docker-container.html</id><summary type="html">&lt;p&gt;&lt;strong&gt;Problem&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;Let's say a program in a container should be able to resolve a custom hostname.&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;Solution&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;When using &lt;code&gt;docker run&lt;/code&gt;:&lt;/p&gt;
