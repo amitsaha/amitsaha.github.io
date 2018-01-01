@@ -14,8 +14,8 @@ deploy:
   target_branch: master
   local_dir: ${TRAVIS_BUILD_DIR}/output
   fqdn: echorand.me
-  before_install:
-    - docker build \
+before_install:
+  - docker build \
         --build-arg git_username="Amit Saha" \
         --build-arg git_useremail="amitsaha.in@gmail.com" \
         --build-arg gid=`id -g` \
@@ -23,5 +23,5 @@ deploy:
         --build-arg uid=`id -u` \
         --build-arg user=`id -u -n` \
         -t amitsaha/pelican  .
-  install:
-    - docker run -v `pwd`:/site:Z -t amitsaha/pelican
+install:
+  - docker run -v `pwd`:/site:Z -t amitsaha/pelican
