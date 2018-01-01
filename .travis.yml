@@ -21,5 +21,5 @@ deploy:
         --build-arg uid=`id -u` \
         --build-arg user=`id -u -n` \
         -t amitsaha/pelican  .
-  script:
+  install:
     - docker run -v `pwd`:/site:Z -t amitsaha/pelican
