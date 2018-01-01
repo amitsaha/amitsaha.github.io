@@ -30,7 +30,6 @@ clean:
 
 build:
 	$(PELICAN) $(INPUTDIR) -o $(OUTPUTDIR) -s $(PUBLISHCONF) $(PELICANOPTS)
-	cp CNAME $(OUTPUTDIR)/
 	cp 404.md $(OUTPUTDIR)/
 
 # Commit changes in site, push, update master, commit, push
