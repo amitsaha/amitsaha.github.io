@@ -8,7 +8,7 @@ deploy:
   on:
     branch: site
   target_branch: master
-  local_dir: output
+  local_dir: ${TRAVIS_BUILD_DIR}/output
   before_install:
     - docker build \
         --build-arg git_username="Amit Saha" \
