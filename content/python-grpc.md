@@ -1,15 +1,10 @@
-Title: Getting started with gRPC and Python
-Date: 2018-01-01 16:00
-Category: Python
+Title: Rotating video frames using iMovie
+Date: 2018-01-01 18:00
+Category: software
 
+I had to rotate a few video fromes using [iMovie](https://itunes.apple.com/au/app/imovie/id377298193?mt=8).
+The instructions for rotating the frames were working, but the rotation was being applied to "neighboring" 
+frames as well. It turns out the trick is to use "split clip" to split a frame so that you can isolate
+the exact frame to be rotated. And that worked!
 
-My article on getting started with gRPC in Python is up on the codeship blog:
-
-- [Using gRPC in Python](https://blog.codeship.com/using-grpc-in-python/)
-
-I build upon it in the next article:
-
-- [Exploring Security, Metrics, and Error-handling with gRPC in Python](https://blog.codeship.com/exploring-security-metrics-and-error-handling-with-grpc-in-python/)
-
-
-The demos can be found in the [python-grpc-demo](https://github.com/amitsaha/python-grpc-demo) repository.
+Thanks to this [forum reply](https://discussions.apple.com/thread/2466945).
