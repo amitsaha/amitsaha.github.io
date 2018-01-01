@@ -1,6 +1,7 @@
 git:
   depth: false
   submodules: false
+language: generic
 sudo: required
 services:
   - docker
