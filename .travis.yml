@@ -13,6 +13,7 @@ deploy:
     branch: site
   target_branch: master
   local_dir: ${TRAVIS_BUILD_DIR}/output
+  fqdn: echorand.me
   before_install:
     - docker build \
         --build-arg git_username="Amit Saha" \
