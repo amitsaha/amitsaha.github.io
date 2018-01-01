@@ -1,5 +1,6 @@
 git:
   depth: false
+  submodules: false
 sudo: required
 services:
   - docker
