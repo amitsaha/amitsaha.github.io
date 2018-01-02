@@ -1,10 +1,21 @@
+# The blog source is in the site branch
+# so we want to only build when a push has been made to that branch
+branches:
+  only:
+  - site
 git:
   depth: false
   submodules: false
+
+# This gives us full control over what we intend to do
+# in the job
 language: generic
+# Needed for docker
 sudo: required
 services:
   - docker
+
+# Specify the github pages deploy provider
 deploy:
   provider: pages
   skip_cleanup: true
@@ -13,7 +24,7 @@ deploy:
     branch: site
   target_branch: master
   local_dir: ${TRAVIS_BUILD_DIR}/output
-  fqdn: echorand.me
+  fqdn: echorand.me # This updates the repository settings in GitHub and also adds a CNAME file in the master branch
 before_install:
   - docker build --build-arg git_username="Amit Saha" --build-arg git_useremail="amitsaha.in@gmail.com" --build-arg gid=`id -g` --build-arg group=`id -g -n` --build-arg uid=`id -u` --build-arg user=`id -u -n` -t amitsaha/pelican  .
 install:

@@ -41,11 +41,22 @@ To summarize, my blog has two branches:
 
 The generation step is done via Travis and the generated files are pushed to the `master` branch.
 
-Before we move onto setting up Travis
-
 
 ## Generating the blog
 
 
+## Adding the repository to Travis CI
 
+We will then login to [Travis CI](https://travis-ci.org) and follow the [guide](https://docs.travis-ci.com/user/getting-started/)
+to add our repository. Under the hood, this step adds a new service integration to our repository. We can see the
+integrations at `https://github.com/<username>/<repository>/settings/installations`
+
+## Travis CI repository settings
+
+Next, we will configure the repository settings in Travis to add the `GITHUB_TOKEN` environment 
+variable and set the value to a generated a personal access token. You can generate one by going to
+https://github.com/settings/tokens and giving it only the `repo` OAuth 
+[scope](https://developer.github.com/apps/building-oauth-apps/scopes-for-oauth-apps/).
+
+![Travis CI repository settings]({filename}/images/travisci-1.png "Repository settings in Travis CI")
 
