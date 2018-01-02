@@ -59,4 +59,3 @@ https://github.com/settings/tokens and giving it only the `repo` OAuth
 [scope](https://developer.github.com/apps/building-oauth-apps/scopes-for-oauth-apps/).
 
 ![Travis CI repository settings]({filename}/images/travisci-1.png "Repository settings in Travis CI")
-
