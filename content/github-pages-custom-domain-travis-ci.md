@@ -135,7 +135,7 @@ We basically tell travis CI that we want the build to be done on the `site` bran
 files from the `local_dir` directory to be pushed to the `target_branch` which is `master`.
 
 Setting the `fqdn` to the custom domain updates the repository settings in GitHub and also adds 
-a CNAME file in the master branch ([Learn more](https://help.github.com/articles/adding-or-removing-a-custom-domain-for-your-github-pages-site/)).
+a CNAME file in the master branch ([Learn more](https://help.github.com/articles/adding-or-removing-a-custom-domain-for-your-github-pages-site/)). Please see [documentation](https://help.github.com/articles/quick-start-setting-up-a-custom-domain/) on how to setup a custom domain from scratch.
 
 ## Adding the repository to Travis CI
 
@@ -156,6 +156,7 @@ https://github.com/settings/tokens and giving it only the `repo` OAuth
 
 - [Blog github repository](https://github.com/amitsaha/amitsaha.github.io)
 - [Travis CI + GitHub Pages](https://docs.travis-ci.com/user/deployment/pages/)
+- [GitHub Pages + Custom Domain](https://help.github.com/articles/quick-start-setting-up-a-custom-domain/)
 
 Hope you find the post useful. I reverse engineered this process after having already done all 
 the setup, so I may have missed something. Please file an 
