@@ -171,5 +171,4 @@ variable and set the value to a generated a personal access token. You can gener
 - [GitHub Pages + Custom Domain](https://help.github.com/articles/quick-start-setting-up-a-custom-domain/)
 
 Hope you find the post useful. I reverse engineered this process after having already done all 
-the setup, so I may have missed something. Please file an 
-[issue](https://github.com/amitsaha/amitsaha.github.io/issues) if you find a problem.
+the setup, so I may have missed something. Please let me know (*link below*).
