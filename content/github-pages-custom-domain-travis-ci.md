@@ -3,11 +3,13 @@ Date: 2018-01-03 17:00
 Category: software
 Status: draft
 
-As of today, this blog is automatically being published via [Travis CI](travis-ci.org). 
+As of yesterday, this blog is automatically being published via [Travis CI](travis-ci.org). 
 When I push a new commit to my [GitHub repository](https://github.com/amitsaha/amitsaha.github.io/)
-it triggers a new build in Travis CI. The build completes and the the git repository is then
-updated with the generated output (mostly HTML with some static CSS). This is how I set it all
-up.
+it triggers a new [build](https://travis-ci.org/amitsaha/amitsaha.github.io) in Travis CI. 
+The build completes and the the git repository is then
+updated with the generated output (mostly HTML with some static CSS). 
+
+This is how I set it all up.
 
 ## Blog repository setup
 
