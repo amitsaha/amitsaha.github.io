@@ -146,6 +146,10 @@ We will then login to [Travis CI](https://travis-ci.org) and follow the [guide](
 to add our repository. Under the hood, this step adds a new service integration to our repository. We can see the
 integrations at `https://github.com/<username>/<repository>/settings/installations`
 
+If you are logging in for the first time using GitHub (or signing up), you will be presented with the following:
+
+![Travis CI permissions]({filename}/images/travisci-github.png "GitHub Pages Custom Domain")
+
 ## Travis CI repository settings
 
 Next, we will configure the repository settings in Travis to add the `GITHUB_TOKEN` environment 
