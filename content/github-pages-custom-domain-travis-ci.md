@@ -1,7 +1,6 @@
 Title: Using Travis CI to publish to GitHub pages with custom domain
 Date: 2018-01-03 17:00
 Category: software
-Status: draft
 
 As of yesterday, this blog is automatically being published via [Travis CI](travis-ci.org). 
 When I push a new commit to my [GitHub repository](https://github.com/amitsaha/amitsaha.github.io/)
