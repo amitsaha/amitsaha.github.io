@@ -5,7 +5,6 @@ branches:
   - site
 git:
   depth: false
-  submodules: false
 
 # This gives us full control over what we intend to do
 # in the job

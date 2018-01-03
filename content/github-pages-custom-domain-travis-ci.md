@@ -28,11 +28,12 @@ build:
 	cp 404.md $(OUTPUTDIR)/
 ```
 
-The first commane generates the site and places the generated files in the `output` sub-directory. In addition
+The first command generates the site and places the generated files in the `output` sub-directory. In addition
 we also copy the `404.md` file to the `output` directory to serve a 
 [custom 404](https://help.github.com/articles/creating-a-custom-404-page-for-your-github-pages-site/) page.
 
-The contents of the `output` sub-directory is what we copy to the `master` branch.
+The contents of the `output` sub-directory is what we copy to the `master` branch. This is
+done via Travis CI.
 
 To summarize, my blog has two branches:
 
@@ -43,6 +44,47 @@ The generation step is done via Travis and the generated files are pushed to the
 
 
 ## Generating the blog
+
+The `.travis.yml` file is read by Travis CI and is the entry point for what happens when we push a
+commit to the `site` branch of the repository. Below I reproduce snippets from the file and their
+function.
+
+The blog source is in the site branch  so we want to only build when a push has been made to that branch:
+
+```
+branches:
+  only:
+  - site
+git:
+  depth: false
+```
+
+We also don't bother cloning more than the last commit and also don't clone any submodules.
+
+
+# This gives us full control over what we intend to do
+# in the job
+language: generic
+# Needed for docker
+sudo: required
+services:
+  - docker
+
+# Specify the github pages deploy provider
+deploy:
+  provider: pages
+  skip_cleanup: true
+  github_token: $GITHUB_TOKEN # Set in travis-ci.org dashboard
+  on:
+    branch: site
+  target_branch: master
+  local_dir: ${TRAVIS_BUILD_DIR}/output
+  fqdn: echorand.me # This updates the repository settings in GitHub and also adds a CNAME file in the master branch
+before_install:
+  - docker build -t amitsaha/pelican  .
+install:
+  - docker run -v `pwd`:/site:Z -t amitsaha/pelican
+
 
 
 ## Adding the repository to Travis CI
