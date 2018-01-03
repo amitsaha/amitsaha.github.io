@@ -32,3 +32,10 @@ STATIC_PATHS = ['images']
 
 PLUGIN_PATHS = ['/tmp/pelican-plugins']
 PLUGINS = ['code_include', 'pelican_youtube', 'pelican_gist']
+
+def basename(path):
+    return os.path.basename(path)
+JINJA_FILTERS = {
+    'basename': basename,
+}
+
