@@ -147,7 +147,7 @@ integrations at `https://github.com/<username>/<repository>/settings/installatio
 
 Next, we will configure the repository settings in Travis to add the `GITHUB_TOKEN` environment 
 variable and set the value to a generated a personal access token. You can generate one by going to
-https://github.com/settings/tokens and giving it only the `repo` OAuth 
+`https://github.com/settings/tokens` and giving it only the `repo` OAuth 
 [scope](https://developer.github.com/apps/building-oauth-apps/scopes-for-oauth-apps/).
 
 ![Travis CI repository settings]({filename}/images/travisci-1.png "Repository settings in Travis CI")
