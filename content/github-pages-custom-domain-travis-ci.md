@@ -59,18 +59,51 @@ git:
   depth: false
 ```
 
-We also don't bother cloning more than the last commit and also don't clone any submodules.
+We also don't bother cloning more than the last commit ([Learn more](https://docs.travis-ci.com/user/customizing-the-build/#Git-Clone-Depth)).
 
 
-# This gives us full control over what we intend to do
-# in the job
+Next, we configure the language and specify that we want to use docker:
+
+```
 language: generic
-# Needed for docker
+```
+
+The `generic` language ensures that our `.travis.yml` completely controls what commands are run
+as part of our build.
+
+We use `docker` to carry out the build and generation. To do so, we have to specify the following:
+
+```
 sudo: required
 services:
   - docker
+```
 
-# Specify the github pages deploy provider
+(To learn more about docker in Travis CI, see [this](https://docs.travis-ci.com/user/docker/))
+
+
+We then specify the `before_install` and `install` steps. The `before_install` step builds
+the docker image:
+
+```
+before_install:
+  - docker build -t amitsaha/pelican  .
+```
+
+The `install` step then creates a container from the image we just built:
+
+```
+install:
+  - docker run -v `pwd`:/site -t amitsaha/pelican
+```
+
+The `install` step runs a container which populates the `output` sub-directory with the generated
+files. 
+
+The remaining step is to tell Travis CI's [GitHub pages](https://docs.travis-ci.com/user/deployment/pages/)
+"deployer" to deploy the generated output files:
+
+```
 deploy:
   provider: pages
   skip_cleanup: true
@@ -79,13 +112,16 @@ deploy:
     branch: site
   target_branch: master
   local_dir: ${TRAVIS_BUILD_DIR}/output
-  fqdn: echorand.me # This updates the repository settings in GitHub and also adds a CNAME file in the master branch
-before_install:
-  - docker build -t amitsaha/pelican  .
-install:
-  - docker run -v `pwd`:/site:Z -t amitsaha/pelican
+  fqdn: echorand.me 
+```
 
+We we will learn how we set the environment variable, `GITHUB_TOKEN` next.
 
+We basically tell travis CI that we want the build to be done on the `site` branch and the generated
+files from the `local_dir` directory to be pushed to the `target_branch` which is `master`.
+
+Setting the `fqdn` to the custom domain updates the repository settings in GitHub and also adds 
+a CNAME file in the master branch ([Learn more](https://help.github.com/articles/adding-or-removing-a-custom-domain-for-your-github-pages-site/)).
 
 ## Adding the repository to Travis CI
 
@@ -101,3 +137,9 @@ https://github.com/settings/tokens and giving it only the `repo` OAuth
 [scope](https://developer.github.com/apps/building-oauth-apps/scopes-for-oauth-apps/).
 
 ![Travis CI repository settings]({filename}/images/travisci-1.png "Repository settings in Travis CI")
+
+## Conclusion
+
+Hope you find the post useful. I reverse engineered this process after having already done all 
+the setup, so I may have missed something. Please file an 
+[issue](https://github.com/amitsaha/amitsaha.github.io/issues) if you find a problem.
