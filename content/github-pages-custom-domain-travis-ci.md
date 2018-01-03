@@ -9,6 +9,10 @@ it triggers a new [build](https://travis-ci.org/amitsaha/amitsaha.github.io) in 
 The build completes and the the git repository is then
 updated with the generated output (mostly HTML with some static CSS). 
 
+The overall flow looks as follows:
+
+![High level flow]({filename}/images/github-travisci-flow.png "GitHub Pages Custom Domain")
+
 This is how I set it all up.
 
 ## Blog repository setup
