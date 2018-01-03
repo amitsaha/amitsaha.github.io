@@ -1,5 +1,5 @@
 Title: Using Travis CI to publish to GitHub pages with custom domain
-Date: 2018-01-02 22:00
+Date: 2018-01-03 17:00
 Category: software
 Status: draft
 
@@ -17,8 +17,22 @@ repository's `site` branch. Besides the content (markdown and restructured text 
 pelican specific files, the important files related to publishing are:
 
 - `Dockerfile`
-- `.travis.yml`
 - `Makefile`
+- `.travis.yml`
+
+The `Dockerfile` is used in Travis for building the site and is as follows:
+
+```
+FROM ubuntu:latest
+
+RUN apt-get update && apt-get -y install python3-pip make bash git
+RUN pip3 install pelican pelican-youtube markdown pelican-gist
+RUN git clone https://github.com/gfidente/pelican-svbhack /tmp/pelican-svbhack
+RUN git clone --recursive https://github.com/getpelican/pelican-plugins /tmp/pelican-plugins
+WORKDIR /site
+ENTRYPOINT ["make", "build"]
+```
+
 
 The `Makefile` has a number of targets, but only the `build` target is currently being used:
 
@@ -33,7 +47,7 @@ we also copy the `404.md` file to the `output` directory to serve a
 [custom 404](https://help.github.com/articles/creating-a-custom-404-page-for-your-github-pages-site/) page.
 
 The contents of the `output` sub-directory is what we copy to the `master` branch. This is
-done via Travis CI.
+done via Travis CI via the instructions in the `.travis.yml` file.
 
 To summarize, my blog has two branches:
 
@@ -115,7 +129,7 @@ deploy:
   fqdn: echorand.me 
 ```
 
-We we will learn how we set the environment variable, `GITHUB_TOKEN` next.
+We we will learn how we set the environment variable, `GITHUB_TOKEN` in a later section.
 
 We basically tell travis CI that we want the build to be done on the `site` branch and the generated
 files from the `local_dir` directory to be pushed to the `target_branch` which is `master`.
@@ -138,7 +152,10 @@ https://github.com/settings/tokens and giving it only the `repo` OAuth
 
 ![Travis CI repository settings]({filename}/images/travisci-1.png "Repository settings in Travis CI")
 
-## Conclusion
+## Links
+
+- [Blog github repository](https://github.com/amitsaha/amitsaha.github.io)
+- [Travis CI + GitHub Pages](https://docs.travis-ci.com/user/deployment/pages/)
 
 Hope you find the post useful. I reverse engineered this process after having already done all 
 the setup, so I may have missed something. Please file an 
