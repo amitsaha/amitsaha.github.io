@@ -137,6 +137,9 @@ files from the `local_dir` directory to be pushed to the `target_branch` which i
 Setting the `fqdn` to the custom domain updates the repository settings in GitHub and also adds 
 a CNAME file in the master branch ([Learn more](https://help.github.com/articles/adding-or-removing-a-custom-domain-for-your-github-pages-site/)). Please see [documentation](https://help.github.com/articles/quick-start-setting-up-a-custom-domain/) on how to setup a custom domain from scratch.
 
+![Travis CI repository settings]({filename}/images/github-pages-custom-domain.png "GitHub Pages Custom Domain")
+
+
 ## Adding the repository to Travis CI
 
 We will then login to [Travis CI](https://travis-ci.org) and follow the [guide](https://docs.travis-ci.com/user/getting-started/)
