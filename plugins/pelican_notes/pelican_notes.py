@@ -83,7 +83,7 @@ class NotesGenerator(CachingGenerator):
 
         for note in chain(self.translations, self.notes):
             writer.write_file(
-                os.path.join(notes_path, note.save_as), self.get_template(note.template),
+                note.save_as, self.get_template(note.template),
                 self.context, page=note,
                 relative_urls=self.settings['RELATIVE_URLS'],
                 override_output=hasattr(note, 'override_save_as'))

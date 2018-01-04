@@ -36,6 +36,7 @@ PLUGIN_PATHS = ['/tmp/pelican-plugins', 'plugins']
 PLUGINS = ['code_include', 'pelican_youtube', 'pelican_gist', 'pelican_notes']
 
 NOTE_PATHS = 'notes'
+NOTE_SAVE_AS = 'notes/{slug}.html'
 
 def basename(path):
     return os.path.basename(path)
