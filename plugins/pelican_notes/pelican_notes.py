@@ -35,7 +35,7 @@ class NotesGenerator(Generator):
         mdreader = MarkdownReader(self.settings)
         for article in self.context['articles']:
             text, meta = mdreader.read(article.source_path)
-            if meta['Status'] == 'Note':
+            if meta.get('Status') and meta.get('Status') == 'Note':
                 write(os.path.join(notes_path, article.save_as), self.get_template(article.template),
                       self.context, article=article, category=article.category,
                       override_output=hasattr(article, 'override_save_as'),
