@@ -87,7 +87,7 @@ class NotesGenerator(CachingGenerator):
                 self.context, page=note,
                 relative_urls=self.settings['RELATIVE_URLS'],
                 override_output=hasattr(note, 'override_save_as'))
-            writer.write_file('notes/notes.html', self.get_template(note.template),
+            writer.write_file('notes/notes.html', self.get_template('notes_home_template'),
                              self.context, page='<a href="{0}">note.title</a>'.format(note.save_as),
                              relative_urls=self.settings['RELATIVE_URLS'],
                              override_output=hasattr(note, 'override_save_as'),
