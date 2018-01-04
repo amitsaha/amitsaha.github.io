@@ -22,7 +22,7 @@ class Note(Content):
 
 
 class NoteHome(Content):
-    pass
+    default_template = 'notes_home_template'
 
 
 class NotesGenerator(CachingGenerator):
