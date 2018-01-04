@@ -81,14 +81,18 @@ class NotesGenerator(CachingGenerator):
                 logger.error("Couldn't create the notes output folder in " +
                              notes_path)
 
+        f = open(os.path.join(self.output_path, 'notes/notes.html'), 'w')
         for note in chain(self.translations, self.notes):
             writer.write_file(
                 note.save_as, self.get_template(note.template),
                 self.context, page=note,
                 relative_urls=self.settings['RELATIVE_URLS'],
                 override_output=hasattr(note, 'override_save_as'))
+            f.write('<a href="{0}">note.title</a>'.format(note.save_as))
         signals.page_writer_finalized.send(self, writer=writer)
 
+        # Write pages/notes.html and update it
+        f.close()
 
 def get_generators(generators):
     return NotesGenerator
