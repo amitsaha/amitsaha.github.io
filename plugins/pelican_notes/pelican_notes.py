@@ -1,7 +1,8 @@
 from pelican import signals
-from pelican.generators import Generator
-from pelican.readers import MarkdownReader
-from functools import partial
+from pelican.generators import CachingGenerator
+from pelican.contents import Content
+from pelican.utils import process_translations
+from itertools import chain
 
 import os
 import logging
@@ -9,21 +10,65 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class NotesGenerator(Generator):
+class Note(Content):
+    mandatory_properties = ('title',)
+    allowed_statuses = ('published')
+    default_status = 'published'
+    default_template = 'page'
+
+
+class NotesGenerator(CachingGenerator):
     """Generate notes sub-directory for articles which are notes"""
 
     def __init__(self, *args, **kwargs):
+        self.notes = []
+        self.hidden_translations = []
         super(NotesGenerator, self).__init__(*args, **kwargs)
+        # XXX TODO
+        signals.page_generator_init.send(self)
 
     def generate_context(self):
-        pass
+        all_notes = []
+        for f in self.get_files(
+                self.settings['NOTE_PATHS']):
+            note = self.get_cached_data(f, None)
+            if note is None:
+                try:
+                    note = self.readers.read_file(
+                        base_path=self.path, path=f, content_class=Note,
+                        context=self.context,
+                        preread_signal=signals.page_generator_preread,
+                        preread_sender=self,
+                        context_signal=signals.page_generator_context,
+                        context_sender=self)
+                except Exception as e:
+                    logger.error(
+                        'Could not process %s\n%s', f, e,
+                        exc_info=self.settings.get('DEBUG', False))
+                    self._add_failed_source_path(f)
+                    continue
 
-    def generate_output(self, writer=None):
+                if not note.is_valid():
+                    self._add_failed_source_path(f)
+                    continue
 
-        # we don't use the writer passed as argument here
-        # since we write our own files
-        write = partial(writer.write_file,
-                        relative_urls=self.settings['RELATIVE_URLS'])
+                self.cache_data(f, note)
+
+            if note.status == "published":
+                all_notes.append(note)
+            self.add_source_path(note)
+
+        self.notes, self.translations = process_translations(
+            all_notes,
+            order_by=self.settings['PAGE_ORDER_BY'])
+
+        self._update_context(('notes',))
+
+        self.save_cache()
+        self.readers.save_cache()
+        signals.page_generator_finalized.send(self)
+
+    def generate_output(self, writer):
         notes_path = os.path.join(self.output_path, 'notes')
         if not os.path.exists(notes_path):
             try:
@@ -32,14 +77,13 @@ class NotesGenerator(Generator):
                 logger.error("Couldn't create the notes output folder in " +
                              notes_path)
 
-        mdreader = MarkdownReader(self.settings)
-        for article in self.context['articles']:
-            text, meta = mdreader.read(article.source_path)
-            if meta.get('Status') and meta.get('Status') == 'Note':
-                write(os.path.join(notes_path, article.save_as), self.get_template(article.template),
-                      self.context, article=article, category=article.category,
-                      override_output=hasattr(article, 'override_save_as'),
-                      blog=True)
+        for note in chain(self.translations, self.notes):
+            writer.write_file(
+                os.path.join(notes_path, note.save_as), self.get_template(note.template),
+                self.context, page=note,
+                relative_urls=self.settings['RELATIVE_URLS'],
+                override_output=hasattr(note, 'override_save_as'))
+        signals.page_writer_finalized.send(self, writer=writer)
 
 
 def get_generators(generators):

@@ -1,8 +1,5 @@
 Title: Notes on Vim
 Date: 2018-01-05 10:00
-Category: software
-Status: Note
-
 
 
 **Modes**
