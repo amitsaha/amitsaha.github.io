@@ -21,6 +21,10 @@ class Note(Content):
         return True
 
 
+class NoteHome(Content):
+    pass
+
+
 class NotesGenerator(CachingGenerator):
     """Generate notes sub-directory for articles which are notes"""
 
@@ -81,17 +85,20 @@ class NotesGenerator(CachingGenerator):
                 logger.error("Couldn't create the notes output folder in " +
                              notes_path)
 
+        note_home_content = []
         for note in chain(self.translations, self.notes):
             writer.write_file(
                 note.save_as, self.get_template(note.template),
                 self.context, page=note,
                 relative_urls=self.settings['RELATIVE_URLS'],
                 override_output=hasattr(note, 'override_save_as'))
-            writer.write_file('notes/notes.html', self.get_template('notes_home_template'),
-                             self.context, page='<a href="{0}">note.title</a>'.format(note.save_as),
-                             relative_urls=self.settings['RELATIVE_URLS'],
-                             override_output=hasattr(note, 'override_save_as'),
-                            )
+            note_home_content.append(NoteHome(str(note.title))
+        print(self.context)
+        writer.write_file('notes/index.html', self.get_template('notes_home_template'),
+                         self.context, page=note_home_content,
+                         relative_urls=self.settings['RELATIVE_URLS'],
+                         override_output=hasattr(note, 'override_save_as'),
+                        )
         signals.page_writer_finalized.send(self, writer=writer)
 
 def get_generators(generators):
