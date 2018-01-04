@@ -32,8 +32,8 @@ GOOGLE_ANALYTICS='UA-108901610-1'
 STATIC_PATHS = ['images']
 
 
-PLUGIN_PATHS = ['/tmp/pelican-plugins']
-PLUGINS = ['code_include', 'pelican_youtube', 'pelican_gist']
+PLUGIN_PATHS = ['/tmp/pelican-plugins', 'plugins']
+PLUGINS = ['code_include', 'pelican_youtube', 'pelican_gist', 'pelican_notes']
 
 def basename(path):
     return os.path.basename(path)
