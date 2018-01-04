@@ -29,7 +29,7 @@ class NotesGenerator(CachingGenerator):
         self.hidden_translations = []
         super(NotesGenerator, self).__init__(*args, **kwargs)
         # XXX TODO
-        # signals.page_generator_init.send(self)
+        signals.page_generator_init.send(self)
 
     def generate_context(self):
         all_notes = []
@@ -70,7 +70,7 @@ class NotesGenerator(CachingGenerator):
 
         self.save_cache()
         self.readers.save_cache()
-        #signals.page_generator_finalized.send(self)
+        signals.page_generator_finalized.send(self)
 
     def generate_output(self, writer):
         notes_path = os.path.join(self.output_path, 'notes')
@@ -87,7 +87,7 @@ class NotesGenerator(CachingGenerator):
                 self.context, page=note,
                 relative_urls=self.settings['RELATIVE_URLS'],
                 override_output=hasattr(note, 'override_save_as'))
-        #signals.page_writer_finalized.send(self, writer=writer)
+        signals.page_writer_finalized.send(self, writer=writer)
 
 
 def get_generators(generators):
