@@ -1,4 +1,4 @@
-Title: Notes on Vim
+Title: Vim
 Date: 2018-01-05 10:00
 
 
