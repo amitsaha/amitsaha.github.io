@@ -37,6 +37,7 @@ PLUGINS = ['code_include', 'pelican_youtube', 'pelican_gist', 'pelican_notes']
 
 NOTE_PATHS = 'notes'
 NOTE_SAVE_AS = 'notes/{slug}.html'
+NOTE_URL = 'notes/{slug}.html'
 
 def basename(path):
     return os.path.basename(path)
