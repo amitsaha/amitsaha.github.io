@@ -16,6 +16,10 @@ class Note(Content):
     default_status = 'published'
     default_template = 'page'
 
+    def is_valid(self):
+        # TODO
+        return True
+
 
 class NotesGenerator(CachingGenerator):
     """Generate notes sub-directory for articles which are notes"""
