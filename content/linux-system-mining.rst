@@ -1,6 +1,6 @@
-Title: Linux System Mining with Python
-Date: 2018-01-05 16:00
-Category: Python
+:Title: Linux System Mining with Python
+:Date: 2018-01-05 16:00
+:Category: Python
 
 
 In this article, we will explore the Python programming language as a tool
