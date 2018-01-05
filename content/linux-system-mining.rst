@@ -115,7 +115,7 @@ You will get similar results if you specify any other executable on the system, 
 You are encouraged to explore other functions of the `platform`
 module which among others, allow you to find the current Python version you are
 running. If you are keen to know how this module retrieves this
-information, the :file:`Lib/platform.py` file in the Python source
+information, the `Lib/platform.py` file in the Python source
 directory is where you should look into.
 
 The `os` and `sys` modules are also of interest to retrieve
@@ -132,21 +132,21 @@ retrieve information from these files.
 CPU Information
 ===============
 
-The file :file:`/proc/cpuinfo` contains information about the
+The file `/proc/cpuinfo` contains information about the
 processing units on your system. For example, here is a Python version
 of what the Linux command ``cat /proc/cpuinfo`` would do:
 
-.. literalinclude:: code/cpu_info.py
+{include}/code/linux_system_mining/cpu_info.py
 
 When you execute this program either using Python 2 or Python 3, you
-should see all the contents of :file:`/proc/cpuinfo` dumped on your
+should see all the contents of `/proc/cpuinfo` dumped on your
 screen (In the above program, the ``rstrip()`` method removes the
 trailing newline character from the end of each line).
 
 The next code listing uses the ``startswith()`` string method to
 display the models of your processing units:
 
-.. literalinclude:: code/cpu_model.py
+{include}/code/linux_system_mining/cpu_model.py
 
 
 When you run this program, you should see the model names of each of
@@ -164,17 +164,17 @@ running. So, if your computer is actually a 64-bit computer, but is
 running a 32-bit kernel, then the above methods will report it as
 having a 32-bit architecture. To find the true architecture of the computer
 you can look for the ``lm`` flag in the list of flags in
-:file:`/proc/cpuinfo`. The ``lm`` flag stands for long mode and
+`/proc/cpuinfo`. The ``lm`` flag stands for long mode and
 is only present on computers with a 64-bit architecture. The next
 program shows how you can do this:
 
-.. literalinclude:: code/cpu_arch.py
+{include}/code/linux_system_mining/cpu_arch.py
 
 As we have seen so far, it is possible to read the
-:file:`/proc/cpuinfo` and use simple text processing techniques to
+`/proc/cpuinfo` and use simple text processing techniques to
 read the data we are looking for. To make it friendlier for other
 programs to use this data, it is perhaps a better idea to make the
-contents of :file:`/proc/cpuinfo` available as a standard data
+contents of `/proc/cpuinfo` available as a standard data
 structure, such as a dictionary. The idea is simple: if you see the
 contents of this file, you will find that for each processing unit,
 there are a number of key, value pairs (in an earlier example, we
@@ -183,10 +183,10 @@ key). The information about different processing units are separated
 from each other by a blank line. It is simple to build a dictionary
 structure which has each of the processing unit's data as keys. For
 each of the these keys, the value is all the information about the
-corresponding processing unit present in the file :file:`/proc/cpuinfo`. 
+corresponding processing unit present in the file `/proc/cpuinfo`. 
 The next listing shows how you can do so.
 
-.. literalinclude:: code/cpu_dict.py
+{include}/code/linux_system_mining/cpu_dict.py
 
 This code uses an `OrderedDict` (Ordered dictionary) instead of a usual dictionary so
 that the key and values are stored in the order which they are found in
@@ -208,11 +208,11 @@ the statement ``print(cpuinfo[processor]['model name'])``::
 Memory Information
 ==================
 
-Similar to :file:`/proc/cpuinfo`, the file :file:`/proc/meminfo`
+Similar to `/proc/cpuinfo`, the file `/proc/meminfo`
 contains information about the main memory on your computer. The next program
 creates a dictionary from the contents of this file and dumps it.
 
-.. literalinclude:: code/mem_dict.py
+{include}/code/linux_system_mining/mem_dict.py
 
 As earlier, you could also access any specific information you are
 looking for by using that as a key (shown in the ``if
@@ -228,7 +228,7 @@ Network Statistics
 Next, we explore the network devices on our computer system. We will
 retrieve the network interfaces on the system and the data bytes sent
 and recieved by them since your system reboot. The
-:file:`/proc/net/dev` file makes this information available. If you
+`/proc/net/dev` file makes this information available. If you
 examine the contents of this file, you will notice that the first two
 lines contain header information - i.e. the first column of this file
 is the network interface name, the second and the third columns
@@ -236,9 +236,9 @@ display information about the received and the transmitted bytes (such
 as total bytes sent, number of packets, errors, etc.). Our interest
 here is to extract the total data sent and recieved by the
 different network devices. The next listing shows how we can extract this
-information from :file:`/proc/net/dev`:
+information from `/proc/net/dev`:
 
-.. literalinclude:: code/net_devs.py
+{include}/code/linux_system_mining/net_devs.py
 
 When you run the above program, the output should display your
 network devices along with the total recieved and transmitted data in
@@ -253,9 +253,9 @@ monitoring program.
 Processes
 =========
 
-The :file:`/proc` directory also contains a directory each for all
+The `/proc` directory also contains a directory each for all
 the running processes. The directory names are the same as the process
-IDs for these processes. Hence, if you scan :file:`/proc` for all
+IDs for these processes. Hence, if you scan `/proc` for all
 directories which have digits as their names, you will have a list of
 process IDs of all the currently running processes. The function
 ``process_list()`` in the next listing returns a list with process IDs of
@@ -263,7 +263,7 @@ all the currently running processes. The length of this list will
 hence be the total number of processes running on the system as you
 will see when you execute the above program.
 
-.. literalinclude:: code/list_pids.py
+{include}/code/linux_system_mining/list_pids.py
 
 The above program when executed will show an output similar to::
 
@@ -278,10 +278,10 @@ others.
 .. ========================
 
 .. So far, we have concentrated on "hand-picking" the files or
-.. directories we wanted to read from :file:`/proc`. The next listing presents a
-.. more generic reader of :file:`/proc` entries. 
+.. directories we wanted to read from `/proc`. The next listing presents a
+.. more generic reader of `/proc` entries. 
 
-.. .. literalinclude:: code/readproc.py
+{include}/code/linux_system_mining/readproc.py
 
 .. The function ``readproc()`` takes inputs such as ``proc.meminfo``,
 .. ``proc.cpuinfo`` or ``proc.cmdline`` and returns the contents of
@@ -302,13 +302,13 @@ Block devices
 
 The next program lists all the block devices by reading from the
 `sysfs` virtual file system. The block devices on your system can
-be found in the :file:`/sys/block` directory. Thus, you may have
-directories such as :file:`/sys/block/sda, /sys/block/sdb` and so on.
-To find all such devices, we perform a scan of the :file:`/sys/block`
+be found in the `/sys/block` directory. Thus, you may have
+directories such as `/sys/block/sda, /sys/block/sdb` and so on.
+To find all such devices, we perform a scan of the `/sys/block`
 directory using a simple regular expression to express the block devices we
 are interested in finding.
 
-.. literalinclude:: code/block_devs.py
+{include}/code/linux_system_mining/block_devs.py
 
 If you run this program, you will see output similar to as follows::
 
@@ -360,7 +360,7 @@ to be able to choose whether he or she wants to see the system users
 `argparse` module to implement this feature in by extending the
 previous listing as follows.
 
-.. literalinclude:: code/getusers.py
+{include}/code/linux_system_mining/getusers.py
 
 On executing the above program with the ``--help`` option, you
 will see a nice help message with the available options (and what they do)::
@@ -421,7 +421,7 @@ program. This program is a rewrite of Listing 6, with the additional
 option to specify the network device you may be interested in.
 
 
-.. literalinclude:: code/net_devs_2.py
+{include}/code/linux_system_mining/net_devs_2.py
 
 When you execute the program without any arguments, it behaves exactly
 as the earlier version. However, you can also specify the network
@@ -455,7 +455,7 @@ useful scripts for yourself which you want to use everyday like any
 other Linux command. The easiest way to do is make this script
 executable and setup a BASH alias to this script. You could also
 remove the .py extension and place this file in a standard location
-such as :file:`/usr/local/sbin`. 
+such as `/usr/local/sbin`. 
 
 Other useful standard library modules
 =====================================
