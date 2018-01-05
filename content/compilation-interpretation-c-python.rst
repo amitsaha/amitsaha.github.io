@@ -1,4 +1,4 @@
-:Tittle: Compilation and Interpretation in C and CPython
+:Title: Compilation and Interpretation in C and CPython
 :Date: 2018-01-05 11:00
 :Category: python
 
