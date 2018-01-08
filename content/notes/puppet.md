@@ -97,10 +97,104 @@ $attributes = {
   'permissions' => 0777.
 }
 
+
 file {'/tmp/hello':
   ensure => present,
   * => $attributes,
  }
+```
+
+**Comparison operators**
+
+- `==`: Equal to
+- `!=`: Not equal to
+- `>`, '>=`, '<`, `<=`: Greater/Greater or equal, Less/lesser or equal
+- `=~`: Match a [regular expression](http://ruby-doc.org/core/Regexp.html)
 
 
+**Control flow constructs**
+
+
+Example of `if`:
+
+```
+$install_package = true
+if $install_package {
+  package { $package_name:
+    ensure => installed,
+  }
+} else {
+  package { $package_name:
+    ensure => absent,
+  }
+}
+```
+
+Puppet also has "switch" case:
+
+```
+$os_name = 'ubuntu'
+
+case $os_name {
+  'ubuntu': {
+    $pkg_manager = 'apt-get'
+  }
+  'fedora': {
+    $pkg_manager = 'dnf'
+   }
+   default: {
+     $pkg_manager = false
+   }
+ }
+..
+```
+
+**Facter and facts**
+
+Puppet makes the system information available via `facter` as an array `$facts` which is available to all puppet manifests.
+
+Using the `$facts` array is as follows:
+
+```
+if $facts['os']['selinux']['enabled'] {
+  notice('SELinux is enabled')
+} else {
+  notice('SELinux is disabled')
+}
+```
+
+The `facter` command line program can be used to query various system facts:
+
+```
+$ facter os
+{
+  architecture => "amd64",
+  distro => {
+    codename => "xenial",
+    description => "Ubuntu 16.04.3 LTS",
+    id => "Ubuntu",
+    release => {
+      full => "16.04",
+      major => "16.04"
+    }
+  },
+  family => "Debian",
+  hardware => "x86_64",
+  name => "Ubuntu",
+  release => {
+    full => "16.04",
+    major => "16.04"
+  },
+  selinux => {
+    enabled => false
+  }
+}
+```
+
+```
+$ facter kernel
+Linux
+```
+
+Use `$ puppet facts` to show the facts available to puppet manifests. This includes custom facts loaded from modules.
 
