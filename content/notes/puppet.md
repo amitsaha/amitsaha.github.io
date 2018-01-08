@@ -225,4 +225,20 @@ key3=value3
 ```
 
 
+**Iteration**
+
+Example code:
+
+```
+$ sudo cat /etc/puppetlabs/code/environments/production/manifests/iteration_example.pp
+$my_partitions = $facts['partitions']
+$my_partitions.each | String $device, Hash $attrs | {
+   notice("Device ${device} has attributes ${attrs}")
+}
+
+# apply
+Notice: Scope(Class[main]): Device /dev/sda1 has attributes {filesystem => ext4, label => cloudimg-rootfs, mount => /, partuuid => c5572b29-01, size => 10.00 GiB, size_bytes => 10736352768, uuid => 09cea002-3bc0-41b2-81b5-2cbf8b138eb7}
+
+```
+
 
