@@ -149,7 +149,7 @@ case $os_name {
 ..
 ```
 
-**Facter and facts**
+**Facter and Retrieving facts**
 
 Puppet makes the system information available via `facter` as an array `$facts` which is available to all puppet manifests.
 
@@ -191,10 +191,38 @@ $ facter os
 }
 ```
 
+Another example:
+
 ```
 $ facter kernel
 Linux
 ```
 
 Use `$ puppet facts` to show the facts available to puppet manifests. This includes custom facts loaded from modules.
+
+**Setting custom facts**
+
+Quick way to set custom fact is via an environment variable, like so:
+
+```
+$ FACTER_myapp_version=0.1 facter myapp_version 
+0.1
+```
+
+External facts can be specified via dropping files in `/opt/puppetlabs/facter/facts.d/`, like so:
+
+```
+myapp_version=0.1
+```
+
+If we mark the [external file](https://puppet.com/docs/facter/3.9/custom_facts.html#executable-facts-----unix) as executable, it will be executed - the only condition is that the output must be a list
+of key value pairs. For example:
+
+```
+key1=value1
+key2=value2
+key3=value3
+```
+
+
 
