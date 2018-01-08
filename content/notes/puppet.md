@@ -242,3 +242,5 @@ Notice: Scope(Class[main]): Device /dev/sda1 has attributes {filesystem => ext4,
 ```
 
 
+Note in the above I can't use `$partitions` as the variable name, since `partitions` is a fact and is a [classic fact name fact](https://puppet.com/docs/puppet/5.3/lang_facts_and_builtin_vars.html#classic-factname-facts)
+
