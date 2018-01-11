@@ -1,12 +1,12 @@
 
-Title: Tip: Setting up OpenVPN client and Systemd template unit files
+Title: Tip: Setting up OpenVPN client with systemd template unit files
 Date: 2018-01-12 09:00
 Category: fedora
 Status: Draft
 
 
 I used the following systemd unit file from [here](https://ask.fedoraproject.org/en/question/113988/openvpn-will-not-start-via-systemd-after-upgrade-to-f25/?answer=114099#post-id-114099) to create a systemd service for creating a new VPN
-connection:
+connection on Fedora 27:
 
 ```
 $ cat /etc/systemd/system/openvpn@.service 
