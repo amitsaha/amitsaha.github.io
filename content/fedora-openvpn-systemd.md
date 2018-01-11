@@ -4,8 +4,13 @@ Date: 2018-01-12 09:00
 Category: fedora
 Status: Draft
 
+First, I installed `openvpn`:
 
-I used the following systemd unit file from [here](https://ask.fedoraproject.org/en/question/113988/openvpn-will-not-start-via-systemd-after-upgrade-to-f25/?answer=114099#post-id-114099) to create a systemd service for creating a new VPN
+```
+$ sudo dnf  -y install openvpn
+```
+
+Then, I used the following systemd unit file from [here](https://ask.fedoraproject.org/en/question/113988/openvpn-will-not-start-via-systemd-after-upgrade-to-f25/?answer=114099#post-id-114099) to create a systemd service for creating a new VPN
 connection on Fedora 27:
 
 ```
