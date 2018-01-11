@@ -27,8 +27,8 @@ Documentation=https://community.openvpn.net/openvpn/wiki/HOWTO
 [Service]
 Type=notify
 PrivateTmp=true
-WorkingDirectory=/etc/openvpn/%i/
-ExecStart=/usr/sbin/openvpn --status %t/openvpn-server/status-%i.log --status-version 2 --suppress-timestamps --cipher AES-256-GCM --ncp-ciphers AES-256-GCM:AES-128-GCM:AES-256-CBC:AES-128-CBC:BF-CBC --config /etc/openvpn/%i/%i.conf
+WorkingDirectory=/etc/openvpn/client/%i/
+ExecStart=/usr/sbin/openvpn --status %t/openvpn-server/status-%i.log --status-version 2 --suppress-timestamps --cipher AES-256-GCM --ncp-ciphers AES-256-GCM:AES-128-GCM:AES-256-CBC:AES-128-CBC:BF-CBC --config /etc/openvpn/client/%i/%i.conf
 CapabilityBoundingSet=CAP_IPC_LOCK CAP_NET_ADMIN CAP_NET_BIND_SERVICE CAP_NET_RAW CAP_SETGID CAP_SETUID CAP_SYS_CHROOT CAP_DAC_OVERRIDE
 LimitNPROC=10
 DeviceAllow=/dev/null rw
@@ -42,8 +42,7 @@ Restart=on-failure
 [Install]
 WantedBy=multi-user.target
 ```
-The `WorkingDirectory` set as `/etc/openvpn/%i` has the client configuration and all the other configuration that I needed.
-If you nedded support for two VPN connections, we would have two directories here corresponding to each.
+The `WorkingDirectory` set as `/etc/openvpn/client/%i` has the client configuration and all the other configuration that I needed. If you nedded support for two VPN connections, we would have two directories here corresponding to each.
 
 Once I created the unit file, I enabled and started it as follows:
 
@@ -52,11 +51,20 @@ $ sudo systemctl enable openvpn@fln.service
 $ sudo systemctl start openvpn@fln.service
 ```
 
-If I had a second configuration, I would do somethine like:
+If I had a second configuration, I would do something like:
 
 ```
 $ sudo systemctl enable openvpn@fln2.service
 $ sudo systemctl start openvpn@fln2.service
+```
+
+## Troubleshooting
+
+If something goes wrong, you can see the logs via `journalctl`:
+
+```
+$ sudo journalctl -u openvpn@fln
+..
 ```
 
 ## References
