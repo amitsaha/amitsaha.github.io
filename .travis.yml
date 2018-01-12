@@ -22,7 +22,7 @@ deploy:
   on:
     branch: site
   target-branch: master
-  local-dir: ${TRAVIS_BUILD_DIR}/output
+  local-dir: output
   fqdn: echorand.me # This updates the repository settings in GitHub and also adds a CNAME file in the master branch
   verbose: true
 before_install:
