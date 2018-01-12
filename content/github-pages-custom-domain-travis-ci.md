@@ -14,6 +14,8 @@ The overall flow looks as follows:
 
 This is how I set it all up.
 
+Please see issue [issue](https://github.com/amitsaha/amitsaha.github.io/issues/1).
+
 ## Blog repository setup
 
 I use [pelican](http://docs.getpelican.com/en/stable/) as my blog engine. The "source" code for my
