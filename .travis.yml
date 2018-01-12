@@ -22,7 +22,7 @@ deploy:
   on:
     branch: site
   target_branch: master
-  local_dir: ${TRAVIS_BUILD_DIR}/output
+  local_dir: ${TRAVIS_BUILD_DIR}/site/output
   fqdn: echorand.me # This updates the repository settings in GitHub and also adds a CNAME file in the master branch
 before_install:
   - docker build -t amitsaha/pelican  .
