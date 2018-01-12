@@ -1,8 +1,7 @@
 
 Title: Tip: Setting up OpenVPN client with systemd template unit files
-Date: 2018-01-12 09:00
+Date: 2018-01-12 12:00
 Category: fedora
-Status: Draft
 
 First, I installed `openvpn`:
 
@@ -42,7 +41,7 @@ Restart=on-failure
 [Install]
 WantedBy=multi-user.target
 ```
-The `WorkingDirectory` set as `/etc/openvpn/client/%i` has the client configuration and all the other configuration that I needed. If you nedded support for two VPN connections, we would have two directories here corresponding to each.
+The `WorkingDirectory` set as `/etc/openvpn/client/%i` has the client configuration and all the other configuration that I needed. If you nedded support for two VPN connections, we would have two directories here corresponding to each. In my case, the files in my `client/fln`directory are: `vpn.key`, `vpn.crt`, `ca.crt`, `fln.conf` and `tls-auth.key`.
 
 Once I created the unit file, I enabled and started it as follows:
 
