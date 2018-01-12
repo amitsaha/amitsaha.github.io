@@ -1,5 +1,4 @@
-
-Title: Tip: Setting up OpenVPN client with systemd template unit files
+Title: Setting up OpenVPN client with systemd template unit files
 Date: 2018-01-12 12:00
 Category: fedora
 
