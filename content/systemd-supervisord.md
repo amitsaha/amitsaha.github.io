@@ -5,17 +5,18 @@ Status: Draft
 
 ```
 [Unit]
-Description=Drain Connections
-After=supervisord
+Description=Drain connections
+After=supervisord.service
 BindsTo=supervisord.service
+Conflicts=shutdown.target reboot.target halt.target
 
 [Service]
 Type=oneshot
-RemainAfterExit=True
+RemainAfterExit=true
 ExecStart=/bin/true
-ExecStop=/usr/bin/touch /var/shuttingdown1
-ExecStop=/usr/bin/sleep 30
-ExecStop=/usr/bin/touch /var/shuttingdown2
+ExecStop=/usr/local/bin/supervisorctl stop sheldon
+ExecStop=/bin/sleep 300
+TimeoutSec=300
 
 [Install]
 WantedBy=multi-user.target
