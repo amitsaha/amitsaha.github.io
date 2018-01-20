@@ -244,3 +244,57 @@ Notice: Scope(Class[main]): Device /dev/sda1 has attributes {filesystem => ext4,
 
 Note in the above I can't use `$partitions` as the variable name, since `partitions` is a fact and is a [classic fact name fact](https://puppet.com/docs/puppet/5.3/lang_facts_and_builtin_vars.html#classic-factname-facts)
 
+
+**Look up hiera data**
+
+```
+$ sudo puppet lookup --environment pbg test
+..
+```
+
+In manifests, we use the `lookup()` function to look up values of keys:
+
+```
+$numworkers = lookup('apache_workers', int)
+
+```
+
+The second argument allows us to specify an expected type of the value we are looking up. Examples including `int`, `Boolean`, `Hash`.
+
+To apply the manifest to a certain environment:
+
+```
+$ sudo puppet apply --environment <env> <manifest>
+..
+```
+
+Hiera values can be: single values, arrays and hashes. Single values:
+
+```
+package_version: 1.1
+```
+
+Array:
+
+```
+packages:
+  - vim
+  - docker
+```
+
+Hash:
+
+```
+services:
+  webapp: 8080
+  db: 3306
+  master: true
+```
+
+Directly looking up a value in a hash from hiera:
+
+```
+$value = lookup('services.webapp', String)
+..
+```
+
