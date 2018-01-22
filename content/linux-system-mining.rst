@@ -136,7 +136,7 @@ The file `/proc/cpuinfo` contains information about the
 processing units on your system. For example, here is a Python version
 of what the Linux command ``cat /proc/cpuinfo`` would do:
 
-{include}/code/linux_system_mining/cpu_info.py
+.. code-include:: code/linux_system_mining/cpu_info.py
 
 When you execute this program either using Python 2 or Python 3, you
 should see all the contents of `/proc/cpuinfo` dumped on your
@@ -146,7 +146,7 @@ trailing newline character from the end of each line).
 The next code listing uses the ``startswith()`` string method to
 display the models of your processing units:
 
-{include}/code/linux_system_mining/cpu_model.py
+.. code-include:: code/linux_system_mining/cpu_model.py
 
 
 When you run this program, you should see the model names of each of
@@ -168,7 +168,7 @@ you can look for the ``lm`` flag in the list of flags in
 is only present on computers with a 64-bit architecture. The next
 program shows how you can do this:
 
-{include}/code/linux_system_mining/cpu_arch.py
+.. code-include:: code/linux_system_mining/cpu_arch.py
 
 As we have seen so far, it is possible to read the
 `/proc/cpuinfo` and use simple text processing techniques to
@@ -186,7 +186,7 @@ each of the these keys, the value is all the information about the
 corresponding processing unit present in the file `/proc/cpuinfo`. 
 The next listing shows how you can do so.
 
-{include}/code/linux_system_mining/cpu_dict.py
+.. code-include:: code/linux_system_mining/cpu_dict.py
 
 This code uses an `OrderedDict` (Ordered dictionary) instead of a usual dictionary so
 that the key and values are stored in the order which they are found in
@@ -212,7 +212,7 @@ Similar to `/proc/cpuinfo`, the file `/proc/meminfo`
 contains information about the main memory on your computer. The next program
 creates a dictionary from the contents of this file and dumps it.
 
-{include}/code/linux_system_mining/mem_dict.py
+.. code-include:: code/linux_system_mining/mem_dict.py
 
 As earlier, you could also access any specific information you are
 looking for by using that as a key (shown in the ``if
@@ -238,7 +238,7 @@ here is to extract the total data sent and recieved by the
 different network devices. The next listing shows how we can extract this
 information from `/proc/net/dev`:
 
-{include}/code/linux_system_mining/net_devs.py
+.. code-include:: code/linux_system_mining/net_devs.py
 
 When you run the above program, the output should display your
 network devices along with the total recieved and transmitted data in
@@ -263,7 +263,7 @@ all the currently running processes. The length of this list will
 hence be the total number of processes running on the system as you
 will see when you execute the above program.
 
-{include}/code/linux_system_mining/list_pids.py
+.. code-include:: code/lude:: code/lude:: code/linux_system_mining/list_pids.py
 
 The above program when executed will show an output similar to::
 
@@ -281,7 +281,7 @@ others.
 .. directories we wanted to read from `/proc`. The next listing presents a
 .. more generic reader of `/proc` entries. 
 
-{include}/code/linux_system_mining/readproc.py
+.. code-include:: code/linux_system_mining/readproc.py
 
 .. The function ``readproc()`` takes inputs such as ``proc.meminfo``,
 .. ``proc.cpuinfo`` or ``proc.cmdline`` and returns the contents of
@@ -308,7 +308,7 @@ To find all such devices, we perform a scan of the `/sys/block`
 directory using a simple regular expression to express the block devices we
 are interested in finding.
 
-{include}/code/linux_system_mining/block_devs.py
+.. code-include:: code/lude:: code/lude:: code/lude:: code/lude:: code/linux_system_mining/block_devs.py
 
 If you run this program, you will see output similar to as follows::
 
@@ -360,7 +360,7 @@ to be able to choose whether he or she wants to see the system users
 `argparse` module to implement this feature in by extending the
 previous listing as follows.
 
-{include}/code/linux_system_mining/getusers.py
+.. code-include:: code/linux_system_mining/getusers.py
 
 On executing the above program with the ``--help`` option, you
 will see a nice help message with the available options (and what they do)::
@@ -421,7 +421,7 @@ program. This program is a rewrite of Listing 6, with the additional
 option to specify the network device you may be interested in.
 
 
-{include}/code/linux_system_mining/net_devs_2.py
+.. code-include:: code/lude:: code/lude:: code/linux_system_mining/net_devs_2.py
 
 When you execute the program without any arguments, it behaves exactly
 as the earlier version. However, you can also specify the network
