@@ -298,3 +298,40 @@ $value = lookup('services.webapp', String)
 ..
 ```
 
+**Interpolation in Hiera data**
+
+We can look up another variable in a hiera file:
+
+```
+ backup_path: "/backup/%{facts.hostname}"
+```
+
+We can also look up another variable value defined in hiera:
+
+```
+package_name: 'mypackage'
+package_version: '1.1'
+package: "%{lookup('package_name')}-%{lookup('package_version')}"
+```
+
+**Creating resources with Hiera data**
+
+Let's consider the following hiera data:
+
+```
+packages:
+  'htop':
+    version: latest
+  'nginx':
+    version: 1.6
+```
+
+We can then write the following manifest to install the above packages.
+
+```
+lookup('packages', Hash, 'hash').each | String $package, Hash $attrs | {
+  package { $package:
+    ensure => $attrs['version'],
+  }
+}
+```
