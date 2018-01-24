@@ -1,7 +1,6 @@
 Title: Your options for monitoring multi-process Python applications with Prometheus
 Date: 2018-01-24 15:00
 Category: Python
-Status: Draft
 
 In an earlier article, [Monitoring Your Synchronous Python Web Applications Using Prometheus](https://blog.codeship.com/monitoring-your-synchronous-python-web-applications-using-prometheus/), I discussed a limitation of using the Python client for prometheus. 
 
@@ -100,6 +99,7 @@ This option  becomes even more attractive if we are migrating from using `statsd
 - Replace the native statsd client by `dogstatsd-py`
 - Point the DNS for the statsd host to the `statsd exporter` instance instead
 
+If I am wrong in my thinking here, please let me know.
 
 ## Learn more
 
