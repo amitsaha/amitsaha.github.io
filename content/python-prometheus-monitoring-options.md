@@ -24,9 +24,9 @@ that it knows of. You can have one scrape response having a value
 of a `counter` metric as `200` and the immediate next scrape having a counter value of `100`. 
 The same inconsistent behaviour can happen with a `gauge` or a `histogram`. 
 
-However, what you really want each scraping response to return the `overall` values for a
-metric rather than what each invidividual worker thinks (a.k.a [WYSIATI](https://jeffreysaltzman.wordpress.com/2013/04/08/wysiati/))
-the value to be.
+However, what you really want is each scraping response to return the application level values for a
+metric rather worker level. (Aside: this is each worker behaving in [WYSIATI](https://jeffreysaltzman.wordpress.com/2013/04/08/wysiati/) manner
+).
 
 What can we do? We have a few options.
 
@@ -89,14 +89,17 @@ to have a HTTP server running.
 
 ## Conclusion
 
-Option #4 above seems to be the best option to me especially when we have to manage/work with
+Option #4 (using the `statsd exporter`) seems to be the best option to me especially when we have to manage/work with
 both WSGI and non-HTTP multi-process applications. Combined with the [dogstatsd-py](https://github.com/DataDog/datadogpy)
 client for StatsD, I think it is a really powerful option and the most straightforward. You just run
 an instance of `statsd exporter` for each application instance (or share among multiple instances) and
-we are done. It becomes even more attractive if we are migrating from using `statsd` to prometheus.
+we are done. 
 
-I would be keen to hear what you think. If you have a suggestion or a comment, please look for the link
-in the footer text or I am [@echorand](https://twitter.com/echorand/) on Twitter.
+This option  becomes even more attractive if we are migrating from using `statsd` to prometheus:
+
+- Replace the native statsd client by `dogstatsd-py`
+- Point the DNS for the statsd host to the `statsd exporter` instance instead
+
 
 ## Learn more
 
