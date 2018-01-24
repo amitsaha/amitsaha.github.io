@@ -3,7 +3,6 @@ Date: 2018-01-23 13:00
 Category: Python
 Status: Draft
 
-
 In an earlier article, [Monitoring Your Synchronous Python Web Applications Using Prometheus](https://blog.codeship.com/monitoring-your-synchronous-python-web-applications-using-prometheus/), I discussed a limitation of using the Python client for prometheus. 
 
 ##  Limitation of native prometheus exporting
@@ -11,21 +10,27 @@ In an earlier article, [Monitoring Your Synchronous Python Web Applications Usin
 [prometheus](https://prometheus.io) was built with single process multi-threaded applications in mind.
 I use the term multi-threaded here to also include coroutine based concurrent applications such as
 those written in `golang` or using Python's asynchronous primitives 
-(Example: [Monitoring Your Asynchronous Python Web Applications Using Prometheus](https://blog.codeship.com/monitoring-your-asynchronous-python-web-applications-using-prometheus/)). 
+(Example: [Monitoring Your Asynchronous Python Web Applications Using Prometheus](https://blog.codeship.com/monitoring-your-asynchronous-python-web-applications-using-prometheus/)). Perhaps, that is a result of prometheus expecting that the 
+application which we are monitoring has the full responsibility of the absolute value of the metric values. 
+This is different from [statsd](https://github.com/etsy/statsd/blob/master/docs/metric_types.md), 
+where the application can specify the operation (`increment`, `decrement` a counter,
+for example) to perform on a metric rather than its absolute value.
 
-The problem arises when you have multi-process applications using the model of independent
-processes such as WSGI web applications deployed  via `uwsgi`or `gunicorn`.
+As a result of the above, problem arises when you try to integrate prometheus into Python WSGI applications which are usually deployed
+using multiple processes via `uwsgi`or `gunicorn`. When you have these multi-process applications 
+running as a single application instance, you get into a situation where any of the multiple workers
+can respond to prometheus's scraping request.  Each worker then responds with a value for a metric
+that it knows of. You can have one scrape response having a value
+of a `counter` metric as `200` and the immediate next scrape having a counter value of `100`. 
+The same inconsistent behaviour can happen with a `gauge` or a `histogram`. 
 
-When you have these multi-process applications (as a single application instance), 
-you get into a situation where any of the multiple workers
-can respond to prometheus's scraping request and hence you can have one scrape response having a value
-of a `counter` as `200` and the immediate next scrape having a counter value of `100`. To prometheus, they
-seem like actual values since they are the same metric. The same inconsistent behaviour can happen with a
-`gauge` or a `histogram`. You really want each scraping response to return the `overall` values for a
+However, what you really want each scraping response to return the `overall` values for a
 metric rather than what each invidividual worker thinks (a.k.a [WYSIATI](https://jeffreysaltzman.wordpress.com/2013/04/08/wysiati/))
 the value to be.
 
-## Solution #1 - Add a unique label to each metric
+What can we do? We have a few options.
+
+## Option #1 - Add a unique label to each metric
 
 To work around this problem, you can add a unique `worker_id` as a label such that each metric as scraped
 by prometheus is unique for one application instance (by virtue of having different value for the 
@@ -45,7 +50,7 @@ metrics per application instance.
 
 A demo of this approach can be found [here](https://github.com/amitsaha/python-prometheus-demo/tree/master/flask_app_prometheus_worker_id).
 
-## Solution #2: Multi-process mode
+## Option #2: Multi-process mode
 
 The prometheus [Python Client](https://github.com/prometheus/client_python)
 has a multi-processing mode which essentially creates a shared prometheus registry and shares
@@ -57,13 +62,13 @@ the worker responding.
 
 A demo of this approach can be found [here](https://github.com/amitsaha/python-prometheus-demo/tree/master/flask_app_prometheus_multiprocessing).
 
-## Solution #3: The Django way
+## Option #3: The Django way
 
 The Django prometheus client adopts an approach where you basically have each [worker listening](https://github.com/korfuri/django-prometheus/blob/master/documentation/exports.md) on a unique
 port for prometheus's scraping requests. Thus, to prometheus, each of these workers are different targets
 as if they were running on different instances of the application.
 
-## Solution #4: StatsD exporter
+## Option #4: StatsD exporter
 
 I discussed this solution in [Monitoring Your Synchronous Python Web Applications Using Prometheus](https://blog.codeship.com/monitoring-your-synchronous-python-web-applications-using-prometheus/). Essentially, instead of exporting native prometheus metrics from your
 application and prometheus scraping our application, we push our metrics to a locally running [statsd exporter](https://github.com/prometheus/statsd_exporter) instance. Then, we setup prometheus to scrape the statsd exporter instance.
@@ -81,6 +86,14 @@ the limitation that Python HTTP applications (in this context) suffer.
 
 The second option is to push the metrics to the statsd exporter. This is simpler since we don't have
 to have a HTTP server running.
+
+## Conclusion
+
+Option #4 above seems to be the best option for me especially when we have to manage/work with
+both WSGI and non-HTTP multi-process applications. Combined with the [dogstatsd-py](https://github.com/DataDog/datadogpy)
+client for StatsD, I think it is a really powerful option and the most straightforward. You just run
+an instance of `statsd exporter` for each application instances (or per-pod if using Kubernetes) and
+we are done.
 
 ## Learn more
 
