@@ -69,9 +69,12 @@ application and prometheus scraping our application, we push our metrics to a lo
 
 
 
-## Resources
+## Learn more
 
 - [Common query patterns in PromQL](https://www.robustperception.io/common-query-patterns-in-promql/)
 
+## Acknowledgements
 
-
+Thanks to Hynek Schlawack for a private email discussion on Python + prometheus. On their suggestion
+I tried using the `worker_id` approach and took another look at the multiprocessing support in
+the Python client.
