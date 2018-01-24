@@ -1,4 +1,4 @@
-Title: Monitoring multi-process Python applications with Prometheus
+Title: Your options for monitoring multi-process Python applications with Prometheus
 Date: 2018-01-23 13:00
 Category: Python
 Status: Draft
@@ -57,10 +57,13 @@ the worker responding.
 
 A demo of this approach can be found [here](https://github.com/amitsaha/python-prometheus-demo/tree/master/flask_app_prometheus_multiprocessing).
 
-## Solution #3: StatsD exporter
+## Solution #3: The Django way
+
+## Solution #4: StatsD exporter
 
 I discussed this solution in [Monitoring Your Synchronous Python Web Applications Using Prometheus](https://blog.codeship.com/monitoring-your-synchronous-python-web-applications-using-prometheus/). Essentially, instead of exporting native prometheus metrics from your
 application and prometheus scraping our application, we push our metrics to a locally running [statsd exporter](https://github.com/prometheus/statsd_exporter) instance. Then, we setup prometheus to scrape the statsd exporter instance.
+
 
 ## Exporting metrics for non-HTTP applications
 
