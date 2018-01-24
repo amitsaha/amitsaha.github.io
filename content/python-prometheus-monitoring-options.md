@@ -1,5 +1,5 @@
 Title: Your options for monitoring multi-process Python applications with Prometheus
-Date: 2018-01-23 13:00
+Date: 2018-01-24 15:00
 Category: Python
 Status: Draft
 
@@ -44,8 +44,8 @@ This will perform the aggregation across all `worker_id` metrics (basically igno
 and then we can group by the `instance` and any other label associated to the metric
 of interest.
 
-One point worth noting here is that this leads to a proliferation of metrics: 
-for a single metric we now have `# of workers x metric` number of 
+One point worth noting here is that this leads to a [proliferation](https://prometheus.io/docs/practices/naming/) 
+of metrics: for a single metric we now have `# of workers x metric` number of 
 metrics per application instance. 
 
 A demo of this approach can be found [here](https://github.com/amitsaha/python-prometheus-demo/tree/master/flask_app_prometheus_worker_id).
@@ -92,12 +92,11 @@ to have a HTTP server running.
 Option #4 above seems to be the best option to me especially when we have to manage/work with
 both WSGI and non-HTTP multi-process applications. Combined with the [dogstatsd-py](https://github.com/DataDog/datadogpy)
 client for StatsD, I think it is a really powerful option and the most straightforward. You just run
-an instance of `statsd exporter` for each application instances (or per-pod if using Kubernetes) and
+an instance of `statsd exporter` for each application instance (or share among multiple instances) and
 we are done. It becomes even more attractive if we are migrating from using `statsd` to prometheus.
 
 I would be keen to hear what you think. If you have a suggestion or a comment, please look for the link
 in the footer text or I am [@echorand](https://twitter.com/echorand/) on Twitter.
-
 
 ## Learn more
 
