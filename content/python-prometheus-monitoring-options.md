@@ -89,14 +89,19 @@ to have a HTTP server running.
 
 ## Conclusion
 
-Option #4 above seems to be the best option for me especially when we have to manage/work with
+Option #4 above seems to be the best option to me especially when we have to manage/work with
 both WSGI and non-HTTP multi-process applications. Combined with the [dogstatsd-py](https://github.com/DataDog/datadogpy)
 client for StatsD, I think it is a really powerful option and the most straightforward. You just run
 an instance of `statsd exporter` for each application instances (or per-pod if using Kubernetes) and
-we are done.
+we are done. It becomes even more attractive if we are migrating from using `statsd` to prometheus.
+
+I would be keen to hear what you think. If you have a suggestion or a comment, please look for the link
+in the footer text or I am [@echorand](https://twitter.com/echorand/) on Twitter.
+
 
 ## Learn more
 
+- [Monitoring Your Synchronous Python Web Applications Using Prometheus](https://blog.codeship.com/monitoring-your-synchronous-python-web-applications-using-prometheus/)
 - [Python prometheus client](https://github.com/prometheus/client_python)
 - [Common query patterns in PromQL](https://www.robustperception.io/common-query-patterns-in-promql/)
 
