@@ -59,18 +59,32 @@ A demo of this approach can be found [here](https://github.com/amitsaha/python-p
 
 ## Solution #3: The Django way
 
+The Django prometheus client adopts an approach where you basically have each [worker listening](https://github.com/korfuri/django-prometheus/blob/master/documentation/exports.md) on a unique
+port for prometheus's scraping requests. Thus, to prometheus, each of these workers are different targets
+as if they were running on different instances of the application.
+
 ## Solution #4: StatsD exporter
 
 I discussed this solution in [Monitoring Your Synchronous Python Web Applications Using Prometheus](https://blog.codeship.com/monitoring-your-synchronous-python-web-applications-using-prometheus/). Essentially, instead of exporting native prometheus metrics from your
 application and prometheus scraping our application, we push our metrics to a locally running [statsd exporter](https://github.com/prometheus/statsd_exporter) instance. Then, we setup prometheus to scrape the statsd exporter instance.
 
+For Django, we can use a similar approach as well.
 
 ## Exporting metrics for non-HTTP applications
 
+For non-HTTP applications (such as Thrift or gRPC servers), we have two options as far as I see it.
 
+The first option is to setup a basic HTTP server (in a separate thread or process) which responds
+to requests for the `/metrics` endpoint. If we have a master process which then forks the child 
+processes from within the application, we may be able to get native prometheus metrics without
+the limitation that Python HTTP applications (in this context) suffer.
+
+The second option is to push the metrics to the statsd exporter. This is simpler since we don't have
+to have a HTTP server running.
 
 ## Learn more
 
+- [Python prometheus client](https://github.com/prometheus/client_python)
 - [Common query patterns in PromQL](https://www.robustperception.io/common-query-patterns-in-promql/)
 
 ## Acknowledgements
