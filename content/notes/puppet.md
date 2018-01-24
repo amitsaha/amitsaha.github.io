@@ -335,3 +335,11 @@ lookup('packages', Hash, 'hash').each | String $package, Hash $attrs | {
   }
 }
 ```
+
+
+**Storing secrets in Hiera**
+
+- Use gnupg
+- Create a key
+- Encrypt your secrets using that key
+- Distribute the decrypting key across all nodes that needs access to the secret
