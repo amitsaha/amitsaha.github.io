@@ -7,7 +7,7 @@ In this post, we will learn about a quick and easy workflow for
 building and deploying your golang applications as Debian packages.
 
 
-**Assumptions**
+## Assumptions
 
 I have been using [dep]() for dependency management, and I assume that
 you are doing the same. Other dependency management solutions should
@@ -17,9 +17,9 @@ a recent `golang` toolset installed, and use `git` as your
 version control.
 
 If you want to integrate my workflow into an existing project, 
-please skip ahead to the second use case.
+please skip ahead to the second use case and then read back.
 
-**Use case #1: New golang application project**
+## Use case #1: New golang application project
 
 Create a new directory which will be the home of our new project.
 Since we are going to use [dep](), it has to be somewhere in our
@@ -41,7 +41,6 @@ func main() {
 
 This is a simple program, but it uses a thirdy party package
 [logrus](https://github.com/sirupsen/logrus) (which is awesome btw).
-
 
 **Workflow - Step #1**
 
@@ -189,7 +188,221 @@ servers - after one last step.
 
 **Workflow - Step #5**
 
+To package the application binary as a debian package, we will
+use [fpm](). At this stage, my workflow supports any of the
+following approaches:
 
+# Install `fpm` on our host system
+# Use `docker`
+
+The second approach has the advantage that it will work the same
+anywhere once you have `docker` engine installed and running.
+
+If you don't care about using `docker`, create a file, `build-deb-host.sh` with the following contents and mark it as executable:
+
+```
+#!/bin/bash
+set -xe
+
+BUILD_ARTIFACTS_DIR="artifacts"
+version=`git rev-parse --short HEAD`
+VERSION_STRING="$(cat VERSION)-${version}"
+
+
+# check all the required environment variables are supplied
+[ -z "$BINARY_NAME" ] && echo "Need to set BINARY_NAME" && exit 1;
+[ -z "$DEB_PACKAGE_NAME" ] && echo "Need to set DEB_PACKAGE_NAME" && exit 1;
+[ -z "$DEB_PACKAGE_DESCRIPTION" ] && echo "Need to set DEB_PACKAGE_DESCRIPTION" && exit 1;
+
+if which go; then
+    make build BINARY_NAME=${BINARY_NAME}
+    echo "Binary built. Building DEB now."
+else
+    echo "golang not installed or not reachable"
+    exit 1
+fi
+
+mkdir -p $BUILD_ARTIFACTS_DIR && cp $BINARY_NAME $BUILD_ARTIFACTS_DIR
+if which fpm; then
+    fpm --output-type deb \
+      --input-type dir --chdir /$BUILD_ARTIFACTS_DIR \
+      --prefix /usr/bin --name $BINARY_NAME \
+      --version $VERSION_STRING \
+      --description '${DEB_PACKAGE_DESCRIPTION}' \
+      -p ${DEB_PACKAGE_NAME}-${VERSION_STRING}.deb \
+      $BINARY_NAME && cp *.deb /$BUILD_ARTIFACTS_DIR/
+    rm -f $BUILD_ARTIFACTS_DIR/$BINARY_NAME
+else
+    echo "fpm not installed or not reachable"
+    exit 1
+fi
+```
+
+Now, we can build a debian package as follows:
+
+```
+$ make build-deb DEB_PACKAGE_DESCRIPTION="Logrus Demo" DEB_PACKAGE_NA
+ME=demo BINARY_NAME=demo HOST_BUILD=yes
+...
+```
+
+You will see the resulting debian package in `ARTIFCATS` sub-directory.
+
+In addition or to have a way to build debians where you don't
+want to worry about having to install golang toolchain or fpm
+manually, `docker` comes to the rescue. We will create the following
+additional files:
+
+`Dockerfile-go`:
+
+```
+FROM golang:1.9
+RUN go get -u github.com/golang/dep/cmd/dep
+ENV PACKAGE_PATH $GOPATH/src/git.host/mypackage
+RUN mkdir -p  $PACKAGE_PATH
+COPY . $PACKAGE_PATH
+WORKDIR $PACKAGE_PATH
+ARG version_string
+ARG binary_name
+RUN dep ensure && go build -o $GOPATH/bin/${binary_name} -ldflags "-X main.Version=${version_string}" && cp $GOPATH/bin/${binary_name} /${binary_name}
+ENTRYPOINT "/${binary_name}"
+```
+
+`Dockerfile-fpm`:
+
+```
+FROM ruby:2.3
+RUN  gem install --quiet --no-document fpm
+
+ARG binary_name
+ARG deb_package_name
+ARG version_string
+ARG deb_package_description
+
+RUN mkdir /deb-package
+ADD $binary_name /deb-package/
+RUN mkdir dpkg-source
+WORKDIR dpkg-source
+RUN fpm --output-type deb \
+  --input-type dir --chdir /deb-package \
+  --prefix /usr/bin --name $binary_name \
+  --version $version_string \
+  --description '${deb_package_description}' \
+  -p ${deb_package_name}-${version_string}.deb \
+  $binary_name && cp *.deb /deb-package/
+CMD ["/bin/bash"]
+```
+
+`./build-deb-docker.sh`:
+
+```
+#!/bin/bash
+set -xe
+
+if ! which docker; then
+    echo "docker engine not installed"
+    exit 1
+fi
+# Check if we have docker running and accessible
+# as the current user
+# If not bail out with the default error message
+docker ps
+
+BUILD_IMAGE='amitsaha/golang-binary-builder'
+FPM_IMAGE='amitsaha/golang-deb-builder'
+BUILD_ARTIFACTS_DIR="artifacts"
+
+version=`git rev-parse --short HEAD`
+VERSION_STRING="$(cat VERSION)-${version}"
+
+
+# check all the required environment variables are supplied
+[ -z "$BINARY_NAME" ] && echo "Need to set BINARY_NAME" && exit 1;
+[ -z "$DEB_PACKAGE_NAME" ] && echo "Need to set DEB_PACKAGE_NAME" && exit 1;
+[ -z "$DEB_PACKAGE_DESCRIPTION" ] && echo "Need to set DEB_PACKAGE_DESCRIPTION" && exit 1;
+
+
+docker build --build-arg \
+    version_string=$VERSION_STRING \
+    --build-arg \
+    binary_name=$BINARY_NAME \
+    -t $BUILD_IMAGE -f Dockerfile-go .
+containerID=$(docker run --detach $BUILD_IMAGE)
+docker cp $containerID:/${BINARY_NAME} .
+sleep 1
+docker rm $containerID
+
+echo "Binary built. Building DEB now."
+
+docker build --build-arg \
+    version_string=$VERSION_STRING \
+    --build-arg \
+    binary_name=$BINARY_NAME \
+    --build-arg \
+    deb_package_name=$DEB_PACKAGE_NAME  \
+    --build-arg \
+    deb_package_description="$DEB_PACKAGE_DESCRIPTION" \
+    -t $FPM_IMAGE -f Dockerfile-fpm .
+containerID=$(docker run -dt $FPM_IMAGE)
+# docker cp does not support wildcard:
+# https://github.com/moby/moby/issues/7710
+mkdir -p $BUILD_ARTIFACTS_DIR
+docker cp $containerID:/deb-package/${DEB_PACKAGE_NAME}-${VERSION_STRING}.deb $BUILD_ARTIFACTS_DIR/.
+sleep 1
+docker rm -f $containerID
+rm $BINARY_NAME
+```
+
+We can build the debian package with:
+
+```
+$ make build-deb DEB_PACKAGE_DESCRIPTION="Logrus Demo" DEB_PACKAGE_NA
+ME=demo BINARY_NAME=demo
+...
+```
+
+The resulting debian package will be in the `artifacts/` 
+sub-directory.
+
+## Use case #2: Existing golang application project
+
+If you want to use the proposed workflow in an existing golang
+application project, you will have to carry out all the workflow
+steps above other than step #3. In addition, since we also be
+switching to use [dep]() as the package management program, 
+you will need to remove the `vendor` or similar directory, and
+any other metadata files that may be related to the package
+management tool you are migrating from.
+
+## Example project
+
+An example project with the above files is at 
+[golang-packaging-demo](https://github.com/amitsaha/golang-packaging-emo). The files in the project are:
+
+```
+16:55 $ tree -L 1
+.
+├── build-deb-docker.sh
+├── build-deb-host.sh
+├── Dockerfile-fpm
+├── Dockerfile-go
+├── Gopkg.lock
+├── Gopkg.toml
+├── main.go
+├── Makefile
+└── VERSION
+```
+
+The most important files above are:
+
+- `build-deb-docker.sh`
+- `build-deb-host.sh`
+- `Dockerfile-fpm`
+- `Dockerfile-go`
+- `Makefile`
+- `VERSION`
+
+These files are generic and should work for any golang application project which uses `dep` as for package management.
 
 
 
