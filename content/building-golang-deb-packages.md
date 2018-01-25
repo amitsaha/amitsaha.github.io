@@ -22,7 +22,7 @@ please skip ahead to the second use case and then read back.
 ## Use case #1: New golang application project
 
 Create a new directory which will be the home of our new project.
-Since we are going to use [dep](), it has to be somewhere in our
+Since we are going to use [dep](https://golang.github.io/dep/), it has to be somewhere in our
 `GOPATH`. In my case, I will assume it is in 
 `$GOPATH/src/github.com/amitsaha/packaging-demo`. The first file,
 I will create is a `main.go` which looks like this:
@@ -369,7 +369,7 @@ sub-directory.
 If you want to use the proposed workflow in an existing golang
 application project, you will have to carry out all the workflow
 steps above other than step #3. In addition, since we also be
-switching to use [dep]() as the package management program, 
+switching to use [dep](https://golang.github.io/dep/) as the package management program, 
 you will need to remove the `vendor` or similar directory, and
 any other metadata files that may be related to the package
 management tool you are migrating from.
@@ -402,11 +402,9 @@ The most important files above are:
 - `Makefile`
 - `VERSION`
 
-These files are generic and should work for any golang application project which uses `dep` as for package management.
-
-
-
-
+These files are generic and should work for any golang application project once they are dropped in alongwith the application code. The
+assumptions in the beginning ofcourse hold - the primary one being
+the use of [dep](https://github.com/jordansissel/fpm) as the package management tool.
 
 ## Resources
 
