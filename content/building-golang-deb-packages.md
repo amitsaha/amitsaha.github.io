@@ -134,12 +134,7 @@ $ git init
 
 And we will make a first commit:
 
-`
-
-Let's now run the `demo` binary that was created for us:
-
 ```
-$ ./demo``
 $ git add -A .
 $ git commit -m "Initial commit"
 ```
