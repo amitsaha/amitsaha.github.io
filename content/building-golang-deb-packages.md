@@ -371,7 +371,7 @@ management tool you are migrating from.
 ## Example project
 
 An example project with the above files is at 
-[golang-packaging-demo](https://github.com/amitsaha/golang-packaging-emo). The files in the project are:
+[golang-packaging-demo](https://github.com/amitsaha/golang-packaging-demo). The files in the project are:
 
 ```
 16:55 $ tree -L 1
