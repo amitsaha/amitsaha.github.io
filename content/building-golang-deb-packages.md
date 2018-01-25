@@ -5,16 +5,16 @@ Status: Draft
 
 In this post, we will learn about a quick and easy workflow for
 building and deploying your golang applications as Debian packages.
-
+The packages produced will not be official quality DEB packages.
 
 ## Assumptions
 
-I have been using [dep]() for dependency management, and I assume that
+I have been using [dep](https://golang.github.io/dep/) for dependency management, and I assume that
 you are doing the same. Other dependency management solutions should
 work with only the specific bits of the workflow swapped out to suit
 the one you may be using. I also assume that you have `make` and 
 a recent `golang` toolset installed, and use `git` as your 
-version control.
+version control. 
 
 If you want to integrate my workflow into an existing project, 
 please skip ahead to the second use case and then read back.
@@ -189,7 +189,7 @@ servers - after one last step.
 **Workflow - Step #5**
 
 To package the application binary as a debian package, we will
-use [fpm](). At this stage, my workflow supports any of the
+use [fpm](https://github.com/jordansissel/fpm). At this stage, my workflow supports any of the
 following approaches:
 
 # Install `fpm` on our host system
@@ -408,6 +408,6 @@ the use of [dep](https://github.com/jordansissel/fpm) as the package management 
 
 ## Resources
 
+- [Dep](https://golang.github.io/dep/)
 - [Daily Dep](https://golang.github.io/dep/docs/daily-dep.html)
-
-
+- [Help Makefile target](https://gist.github.com/prwhite/8168133)
