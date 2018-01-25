@@ -1,7 +1,6 @@
 Title: Quick and dirty debian packages for your Golang application 
 Date: 2018-01-25 15:00
 Category: golang
-Status: Draft
 
 In this post, we will learn about a quick and easy workflow for
 building and deploying your golang applications as Debian packages.
@@ -293,7 +292,7 @@ RUN fpm --output-type deb \
 CMD ["/bin/bash"]
 ```
 
-`./build-deb-docker.sh`:
+`build-deb-docker.sh`:
 
 ```
 #!/bin/bash
@@ -403,7 +402,7 @@ The most important files above are:
 - `VERSION`
 
 These files are generic and should work for any golang application project once they are dropped in alongwith the application code. The
-assumptions in the beginning ofcourse hold - the primary one being
+assumptions in the beginning of course hold - the primary one being
 the use of [dep](https://github.com/jordansissel/fpm) as the package management tool.
 
 ## Resources
