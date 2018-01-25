@@ -12,10 +12,9 @@ building and deploying your golang applications as Debian packages.
 I have been using [dep]() for dependency management, and I assume that
 you are doing the same. Other dependency management solutions should
 work with only the specific bits of the workflow swapped out to suit
-the one you may be using.
-
-I also assume that you have `make` and a recent `golang` toolset
-installed.
+the one you may be using. I also assume that you have `make` and 
+a recent `golang` toolset installed, and use `git` as your 
+version control.
 
 If you want to integrate my workflow into an existing project, 
 please skip ahead to the second use case.
@@ -137,7 +136,12 @@ $ git init
 
 And we will make a first commit:
 
+`
+
+Let's now run the `demo` binary that was created for us:
+
 ```
+$ ./demo``
 $ git add -A .
 $ git commit -m "Initial commit"
 ```
@@ -155,6 +159,38 @@ vet:             Run go vet
 lint:            Run go lint
 help:            Show this help
 ```
+
+Let's now use the `build` target to build a binary of our application:
+
+```
+$ make build BINARY_NAME=demo
+/home/asaha/go/bin/dep init
+  Using ^1.0.4 as constraint for direct dep github.com/sirupsen/logrus
+  Locking in v1.0.4 (d682213) for direct dep github.com/sirupsen/logrus
+  Locking in master (3d37316) for transitive dep golang.org/x/crypto
+  Locking in master (af9a212) for transitive dep golang.org/x/sys
+No vendor dir found. Fetching dependencies now...
+GOPATH=/home/asaha/go:. /home/asaha/go/bin/dep ensure
+test demo
+go build -o demo -ldflags "-X main.Version=0.1-c3c6990"
+```
+
+Let's now run the `demo` binary that was created for us:
+
+```
+$ ./demo
+INFO[0000] I love logrus!
+```
+
+Great! We have built a binary of our application and since it is
+a statically linked binary, we are ready to deploy it to our 
+servers - after one last step.
+
+
+**Workflow - Step #5**
+
+
+
 
 
 
