@@ -191,8 +191,8 @@ To package the application binary as a debian package, we will
 use [fpm](https://github.com/jordansissel/fpm). At this stage, my workflow supports any of the
 following approaches:
 
-# Install `fpm` on our host system
-# Use `docker`
+- Install `fpm` on our host system
+- Use `docker`
 
 The second approach has the advantage that it will work the same
 anywhere once you have `docker` engine installed and running.
