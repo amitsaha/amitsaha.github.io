@@ -1,6 +1,7 @@
-:Title: Resource Acquisition Is Initialization (RAII)
-:Date: 2015-11-24 15:00
-:Category: Programming
+:Title: Resource Acquisition Is Initialization (RAII) in C
+:Date: 2017-01-24 15:00
+:Category: C
+:Status: Draft
 
 
 GCC's C compiler allows you to define various `variable attributes
