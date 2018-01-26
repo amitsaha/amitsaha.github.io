@@ -20,28 +20,26 @@ Demo
 
 The next code listing declares an integer variable, ``avar`` with the
 ``cleanup`` attribute set such that the function ``clean_up`` is
-called before ``main()`` returns:
+called before ``main()`` returns::
 
-.. code::
 
-   # include <stdio.h>
+     # include <stdio.h>
+     void clean_up(int *final_value)
+     {
+         printf("Cleaning up\n");
+         printf("Final value: %d\n",*final_value);
+     }
 
-   void clean_up(int *final_value)
-   {
-     printf("Cleaning up\n");
-     printf("Final value: %d\n",*final_value);
-   }
-
-   int main(int argc, char **argv)
-   {
-     /* declare cleanup attribute along with initiliazation
-     Without the cleanup attribute, this is equivalent
-     to:int avar = 1;
-     */
-     int avar __attribute__ ((__cleanup__(clean_up))) = 1;
-     avar = 5;
-     return 0;
-   }
+      int main(int argc, char **argv)
+      {
+          /* declare cleanup attribute along with initiliazation
+          Without the cleanup attribute, this is equivalent
+          to:int avar = 1;
+          */
+          int avar __attribute__ ((__cleanup__(clean_up))) = 1;
+          avar = 5;
+          return 0;
+      }
 
 The ``clean_up`` function above accepts an argument which is an
 integer pointer. This is a pointer to the integer variable ``avar``
@@ -66,13 +64,8 @@ program exits. Defining a ``__cleanup__`` attribute on the ``FILE *`` variable
 sounds like something which could be put to good use. We don't have to
 manually call the cleanup function.
 
-Here is the program:
+Here is the program::
 
-.. code::
-
-   /* Demo code showing the usage of the cleanup variable
-   attribute. See:http://gcc.gnu.org/onlinedocs/gcc/Variable-Attributes.html
-   */
 
   /* Defines two cleanup functions to close and delete a temporary file
    and free a buffer
@@ -112,10 +105,7 @@ Here is the program:
     fscanf(fp, "%s", buffer);
     printf("%s\n", buffer);
     return 0;
-}
-
-
-
+    }
 
 The above program creates a temporary file in the location specified
 by ``TMP_FILE``, writes a line of text with no spaces, resets the file
