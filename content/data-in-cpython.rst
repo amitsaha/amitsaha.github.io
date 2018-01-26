@@ -2,9 +2,6 @@
 :Date: 2018-01-26 17:00
 :Category: Python
 
-Data in CPython
----------------
-
 When writing programs in Python (CPython), you have access to `data
 types` such as a ``int``, ``str``, ``tuple``, ``list`` and a
 ``dict``. It is fairly obvious what each of these data types would

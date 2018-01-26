@@ -2,9 +2,6 @@
 :Date: 2018-01-26 17:00
 :Category: C
 
-Data in C
----------
-
 In C, the data you use in your programs will usually fall into one of the three
 basic categories: ``int``, ``char`` and ``float``. Data in C has no
 existence without an associated memory location labeled by an
