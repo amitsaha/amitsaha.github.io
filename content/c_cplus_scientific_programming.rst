@@ -459,7 +459,7 @@ complex or any user defined data type, N_rank is the dimension of the
 array, obj_name is the variable name and m1, m2 .. mN are the number
 of elements in each dimension. As you can see, once the arrays have
 been declared you can carry out basic arithmetic functions on them
-just like scalars. (Please see the manual pages `here <http://www.oonumerics.org/blitz/manual/blitz02.html>`_ and `here <http://www.oonumerics.org/blitz/manual/blitz03.html#l67>`_ to learn
+just like scalars. (Please see the manual pages `here <http://www.oonumerics.org/blitz/manual/blitz02.html>`__ and `here <http://www.oonumerics.org/blitz/manual/blitz03.html#l67>`__ to learn
 more). 
 
 The above code assumes that you already know the number of elements you want to store in the array. What if you don't? 
@@ -521,15 +521,15 @@ elements in the array and then use the ``resize()`` method to resize the array.
 Then, we use the ``()`` operator to index individual element of the array where we store the input data. Note, that this is in
 contrast to the indexing of C-style arrays (where we index using
 ``[]``) and the details of the operator () can be seen `here
-<http://www.oonumerics.org/blitz/manual/blitz02.html#l45>`_ . The Array class support features like sub-arrays, splicing, Range
+<http://www.oonumerics.org/blitz/manual/blitz02.html#l45>`__ . The Array class support features like sub-arrays, splicing, Range
 objects and custom storage orders and the detailed reference is
-available `here <http://www.oonumerics.org/blitz/manual/blitz02.html#l27>`_.
+available `here <http://www.oonumerics.org/blitz/manual/blitz02.html#l27>`__.
 
 Besides the arithmetic operations, you may also carry out the familiar math operations: ``abs(), cos(), floor()``, etc which are carried
 out in an element-wise fashion. For example, consider two array objects, ``A`` and ``B`` declared as ``Array<float,1> A(10),B(10)``. A statement
 such as ``B=sin(A)``, will result in assigning the individual ``sin`` values of the elements in ``A`` to ``B``. You may also compare two
 array objects. For further information on this, please refer to the
-project documentation `here <http://www.oonumerics.org/blitz/manual/blitz03.html#l64>`_.
+project documentation `here <http://www.oonumerics.org/blitz/manual/blitz03.html#l64>`__.
 
 Next, we take a look at the random number generators facility. Blitz++ supports uniform, discrete uniform, normal, exponential, beta, gamma
 and F distributions. Let us try out the normal random number generation facility (Listing 7).
