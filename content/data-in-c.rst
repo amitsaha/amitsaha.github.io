@@ -604,5 +604,5 @@ reference` and how different data types behave differently when passed
 as function parameters.
 
 If you are familiar with Python, you may be interested in my article
-on [data in CPython](http://echorand.me/data-in-cpython.html). In my next article, I will summarize these two
+on `data in CPython <http://echorand.me/data-in-cpython.html>`__. In my next article, I will summarize these two
 articles highlighting the differences between the two. 
