@@ -1,7 +1,6 @@
 :Title: Data in CPython
 :Date: 2018-01-26 17:00
 :Category: Python
-:Status: Draft
 
 Data in CPython
 ---------------
