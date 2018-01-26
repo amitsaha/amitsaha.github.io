@@ -1,7 +1,6 @@
 :Title: C/C++ Scientific Programming Libraries and Tools
 :Date: 2017-01-26 19:00
 :Category: C
-:Status: Draft
 
 
 ``math.h`` provides basic mathematical functions as part of the `C` standard library and are also usable from `C++`. However, it needs
