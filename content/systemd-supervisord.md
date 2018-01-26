@@ -1,4 +1,4 @@
-Title: Setting up OpenVPN client with systemd template unit files
+Title: Getting a chance before systemd shuts you down
 Date: 2018-01-12 12:00
 Category: fedora
 Status: Draft
