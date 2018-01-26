@@ -2,7 +2,7 @@
 :Date: 2018-01-26 17:00
 :Category: software
 
-In the last two articles (`Data in CPython <http://echorand.me/data-in-cpython.html>`__ and `Data in C<http://echorand.me/data-in-c.html>`_), as it
+In the last two articles (`Data in CPython <http://echorand.me/data-in-cpython.html>`__ and `Data in C <http://echorand.me/data-in-c.html>`_), as it
 turned out, I discussed two fundamental points in each language:
 
 - What happens in an assignment operation (such as ``a=2``)?
