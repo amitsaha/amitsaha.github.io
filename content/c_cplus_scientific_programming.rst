@@ -14,7 +14,7 @@ the features. For C/C++, we will use ``gcc`` and ``g++`` compilers respectively,
 GNU Scientific Library
 ======================
 
-The `GNU Scientific Library <http://www.gnu.org/software/gsl)>`_ (GSL) is perhaps the most well-developed library for scientific computing in C/C++. It has routines
+The `GNU Scientific Library <http://www.gnu.org/software/gsl)>`__ (GSL) is perhaps the most well-developed library for scientific computing in C/C++. It has routines
 for working with vectors and matrices, support for complex numbers, calculus, interpolation, statistics, random numbers generation
 and host of others. The easiest way to install the library will be via your Linux distribution's package manager. Let us now 
 get started with using the library.
@@ -375,10 +375,10 @@ capabilities of GSL.
 A look at Blitz++
 =================
 
-`Blitz++ <http://www.oonumerics.org/blitz/>`_ is a C++ class library for scientific computing. The project page reports performance
+`Blitz++ <http://www.oonumerics.org/blitz/>`__ is a C++ class library for scientific computing. The project page reports performance
 on part with Fortran 77/90 and currently has support for arrays, vectors, matrices and random number generators. To install this
 library, either use your distribution's package manager or you may
-download the source from `here <http://sourceforge.net/projects/blitz/files>`_.
+download the source from `here <http://sourceforge.net/projects/blitz/files>`__.
 
 Let us now write our first program using Blitz++ where we learn about
 using the Array class (Listing 5).
