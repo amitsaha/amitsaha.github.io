@@ -343,3 +343,22 @@ lookup('packages', Hash, 'hash').each | String $package, Hash $attrs | {
 - Create a key
 - Encrypt your secrets using that key
 - Distribute the decrypting key across all nodes that needs access to the secret
+
+**Using puppet forge modules**
+
+`r10k` is the defactor standard module manager for Puppet deployments.
+
+- Create a `Puppetfile` listing the modules we want to use
+- Use `r10k` to install it at "build" time and deploy it
+
+```
+$ sudo r10k puppetfile install --verbose
+$ sudo r10k puppetfile install --verbose
+INFO	 -> Updating module /etc/puppetlabs/code/environments/pbg/modules/docker
+INFO	 -> Updating module /etc/puppetlabs/code/environments/pbg/modules/archive
+INFO	 -> Updating module /etc/puppetlabs/code/environments/pbg/modules/staging
+INFO	 -> Updating module /etc/puppetlabs/code/environments/pbg/modules/apache
+..
+```
+
+
