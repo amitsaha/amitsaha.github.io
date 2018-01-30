@@ -361,4 +361,11 @@ INFO	 -> Updating module /etc/puppetlabs/code/environments/pbg/modules/apache
 ..
 ```
 
+This will create a `modules` sub-directory with the downloaded modules. Using the `--moduledir`
+option, we can specify a different sub-directory to download the modules.
+
+`r10k` doesn't automatically manage dependencies between modules. That is if `module1` depends on
+`module2`, it will not automatically pull it. [puppet-generate-puppetfile](https://github.com/rnelson0/puppet-generate-puppetfile)
+is a useful tool to help to manage this. We can use it to update dependency versions as well.
+
 
