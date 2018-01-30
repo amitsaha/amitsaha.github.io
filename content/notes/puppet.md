@@ -373,4 +373,33 @@ Learn about [module path](https://puppet.com/docs/puppet/5.2/dirs_modulepath.htm
 The puppet [stdlib](https://github.com/puppetlabs/puppetlabs-stdlib) module provides functions to provide
 various functionalities.
 
+**Classes**
+
+Definition:
+
+```
+class mymodule {
+}
+```
+
+Declaration:
+
+```
+include mymodule
+```
+
+
+Defining class parameters:
+
+```
+class mymodule(
+  String $version = 'installed',
+```
+
+Specifying a default value here means that if a declaration doesn't specify the value, `puppet` doesn't
+error out. The type `String` also ensures non-string values error out.
+
+A `String[1]` ensures a string value of atleast 1 character.
+
+
 
