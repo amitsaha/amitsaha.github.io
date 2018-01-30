@@ -401,5 +401,11 @@ error out. The type `String` also ensures non-string values error out.
 
 A `String[1]` ensures a string value of atleast 1 character.
 
+We can specify a list of allowed values via the `Enum` datatype:
+
+```
+Enum['running', 'stopped'] $service_state = 'running',
+```
+
 
 
