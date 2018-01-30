@@ -368,4 +368,9 @@ option, we can specify a different sub-directory to download the modules.
 `module2`, it will not automatically pull it. [puppet-generate-puppetfile](https://github.com/rnelson0/puppet-generate-puppetfile)
 is a useful tool to help to manage this. We can use it to update dependency versions as well.
 
+Learn about [module path](https://puppet.com/docs/puppet/5.2/dirs_modulepath.html) here.
+
+The puppet [stdlib](https://github.com/puppetlabs/puppetlabs-stdlib) module provides functions to provide
+various functionalities.
+
 
