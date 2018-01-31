@@ -429,3 +429,18 @@ Abstract data types
 - `Variant`
 
 [documentation](https://puppet.com/docs/puppet/5.3/lang_data_abstract.html)
+
+**Defined resource types**
+
+A defined resource type allows grouping of resources:
+
+```
+define myresource {
+...
+}
+```
+
+The difference between a defined resource type and `class` is that a class can be declared
+only once.
+
+
