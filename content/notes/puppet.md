@@ -407,5 +407,25 @@ We can specify a list of allowed values via the `Enum` datatype:
 Enum['running', 'stopped'] $service_state = 'running',
 ```
 
+**Parameter data types**
 
+- `Integer`
+- `Float`
+- `Numeric`
+- `Array`
+- `Hash`
+- `Regexp`
+- `Undef`
+- `Type`
 
+Hashes/Arrays can also specify the type of the elements: `Array[Integer]` or `Hash[String, Integer]`
+
+Abstract data types
+
+- `Optional`
+- `Pattern`
+- `Scalar`
+- `Data`
+- `Variant`
+
+[documentation](https://puppet.com/docs/puppet/5.3/lang_data_abstract.html)
