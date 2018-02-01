@@ -454,3 +454,35 @@ class myclass(
 }
 ```
 
+**Roles and Profiles**
+
+`Role` identify a particular function for a node - an app server, a DB server, etc.
+
+`Profile` identify a particular piece of software or functionality which contributes
+to a role.
+
+**Templates**
+
+- `Embedded Puppet` - has the extension `epp`
+- [epp v$ erb](http://puppet-on-the-edge.blogspot.com.au/2014/03/templating-with-embedded-puppet.html)
+
+Templates from files:
+
+```
+file { '/etc/systemd/system/myunit.service':
+  content => epp('module_name/myunit.service.epp'),
+}
+```
+
+Puppet will look for the `myunit.service.epp` file in the `templates` sub-directory
+of the module automatically.
+
+
+**Validating template syntax**: `puppet epp validate /examples/template.epp`
+
+**Rendering template on the command line**: `puppet epp render --values_file <params.pp> <template>`
+
+
+
+ 
+
