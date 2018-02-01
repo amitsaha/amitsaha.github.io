@@ -443,4 +443,14 @@ define myresource {
 The difference between a defined resource type and `class` is that a class can be declared
 only once.
 
+**Type alias**
+
+```
+type ServiceName = Pattern[..]
+class myclass(
+  Array[ServiceName] $services,
+){
+...
+}
+```
 
