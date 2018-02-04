@@ -483,6 +483,5 @@ of the module automatically.
 **Rendering template on the command line**: `puppet epp render --values_file <params.pp> <template>`
 
 
-
  
 
