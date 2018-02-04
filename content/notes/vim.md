@@ -100,6 +100,25 @@ Date: 2018-01-05 10:00
 - `ggn` - go to the top of the file and find next occurence
 - Search history: `/` and type `Ctrl+r`, `ctrl+w` to search in reverse and forward
 
+**Folds**
+
+- `set foldmethod=indent`
+
+Movements:
+
+```
+zo Open current fold under the cursor.
+zc Close current fold under the cursor.
+za Toggle current fold under the cursor.
+zd Delete fold under the cursor. (only the fold, text is unchanged.)
+zj Move the cursor to the next fold.
+zk Move the cursor to the previous fold.
+zR Open all folds in a current buffer. (Reduce all folds)
+zM Close all open folds in a current buffer. (Close more and More folds)
+zE Delete all folds the current buffer
+:fold In Visual mode: fold selected lines
+```
+
 
 **Miscellaneous movements**
 
