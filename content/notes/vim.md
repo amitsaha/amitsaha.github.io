@@ -119,6 +119,13 @@ zE Delete all folds the current buffer
 :fold In Visual mode: fold selected lines
 ```
 
+**Powerless verbs**
+
+- x - delete character under the cursor to the right
+- X - delete character under the cursor to the left
+- r - replace character under the cursor with another character
+- s- delete character under the cursor and enter the Insert mode
+
 
 **Miscellaneous movements**
 
