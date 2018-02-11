@@ -10,7 +10,7 @@ The question often comes up especially when thinking about the future - why not 
 all services? HTTP 1.1 is simple and easy to understand. Implementing a HTTP API endpoint doesn't also mean having 
 to learn about Apache Thrift so that the data we want to respond with can come from another service written
 in a different language. HTTP is also not coupled to any specific language, which means you can still use
-different programming language across services. So, **Why not use HTTP throughout?**
+different programming language across services. So, __Why not use HTTP throughout?__
 
 Without going into technicalities, the one reason I think RPCs are a better fit than HTTP is very well put in this
 [blog post](https://blog.bugsnag.com/grpc-and-microservices-architecture/) on why they chose RPC:
