@@ -40,7 +40,7 @@ Now, if we install `pip install . --process-dependency-links`, we will see:
   Requested fire>0.1.2 from git+https://github.com/google/python-fire.git@9bff9d01ce16589201f57ffef27ea84744951c11#egg=fire-0.1.2.1 (from my-awesome-cli==0.1), but installing version None
 ```
  
- To then distribute this to  PyPI, we need to make sure that we distribute this as a source tarball, not a wheel:
+ To then distribute this to  PyPI, we need to make sure that we distribute this as a source tarball, [not a wheel](https://github.com/pypa/pip/issues/3172):
  
  ```
  $ python setup.py sdist
