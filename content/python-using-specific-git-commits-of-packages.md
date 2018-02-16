@@ -12,7 +12,7 @@ I went back to the drawing board - basically reading
 
 This is what I did:
 
-- If you have a `setup.py, add the library name to `setup.py` (abstract dependency)
+- If you have a `setup.py`, add the library name to `setup.py` (abstract dependency)
 - Add the git URL in a `requirements.txt` file (concrete dependency)
 - When you create your deployment artifact, do `pip install -r requirements.txt`.
 
