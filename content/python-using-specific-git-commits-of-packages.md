@@ -40,6 +40,48 @@ Now, if we install `pip install . --process-dependency-links`, we will see:
   Requested fire>0.1.2 from git+https://github.com/google/python-fire.git@9bff9d01ce16589201f57ffef27ea84744951c11#egg=fire-0.1.2.1 (from my-awesome-cli==0.1), but installing version None
 ```
  
+ To then distribute this to  PyPI, we need to make sure that we distribute this as a source tarball, not a wheel:
+ 
+ ```
+ $ python setup.py sdist
+ $ TWINE_REPOSITORY_URL=https://test.pypi.org/legacy/ TWINE_USERNAME=echorand TWINE_PASSWORD="secret" twine upload dist/*
+
+ ```
+ 
+ Once we have done that, we can install it, like so:
+ 
+ ```
+$ pip install my-awesome-cli==0.2 --process-dependency-links -i https://test.pypi.org/simple/
+
+Collecting my-awesome-cli==0.2
+  Downloading https://test-files.pythonhosted.org/packages/5b/ac/7c307602de47a832a7f61094515cf3f49b0d80db135c56e960133c439dff/my_awesome_cli-0.2.tar.gz
+  DEPRECATION: Dependency Links processing has been deprecated and will be removed in a future release.
+Collecting fire>0.1.2 (from my-awesome-cli==0.2)
+  Cloning https://github.com/google/python-fire.git (to 9bff9d01ce16589201f57ffef27ea84744951c11) to /tmp/pip-build-SykxjY/fire
+  Could not find a tag or branch '9bff9d01ce16589201f57ffef27ea84744951c11', assuming commit.
+  Requested fire>0.1.2 from git+https://github.com/google/python-fire.git@9bff9d01ce16589201f57ffef27ea84744951c11#egg=fire-0.1.2.1 (from my-awesome-cli==0.2), but installing version None
+Collecting six (from fire>0.1.2->my-awesome-cli==0.2)
+  Downloading https://test-files.pythonhosted.org/packages/b3/b2/238e2590826bfdd113244a40d9d3eb26918bd798fc187e2360a8367068db/six-1.10.0.tar.gz
+Building wheels for collected packages: my-awesome-cli, six
+  Running setup.py bdist_wheel for my-awesome-cli ... done
+  Stored in directory: /home/asaha/.cache/pip/wheels/bd/92/e5/b7aa57da22bddad31418b524cc6d64f2be1fbe480c4cc69bbf
+  Running setup.py bdist_wheel for six ... done
+  Stored in directory: /home/asaha/.cache/pip/wheels/5b/14/2e/85da3578e30a577e4edf5b477cbc6b8a3bdc3228d211bf9fef
+Successfully built my-awesome-cli six
+Installing collected packages: six, fire, my-awesome-cli
+  Running setup.py install for fire ... done
+Successfully installed fire-0.1.2 my-awesome-cli-0.2 six-1.10.0
+(fire2) asaha@asaha-desktop:~$ my-awesome-cli
+Type:        Calculator
+String form: <my_awesome_cli.main.Calculator object at 0x7feecae69850>
+Docstring:   A simple calculator class.
+
+Usage:       my-awesome-cli
+             my-awesome-cli double
+
+```
+
+ 
  ```
  pip install --process-dependency-links
  ```
