@@ -1,7 +1,6 @@
 Title: Python: Using specific git commits of third party packages
-Date: 2018-02-16 16:00
+Date: 2018-02-16 17:30
 Category: Python
-Status: Draft
 
 After a fair number of furious impatient attempts to try and use specific git commits
 of third party packages in my Python software, I finally have been able to make it work.
