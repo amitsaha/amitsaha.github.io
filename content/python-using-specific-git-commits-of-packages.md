@@ -1,37 +1,60 @@
-Setup.py:
+Title: Python: Using specific git commits of third party packages
+Date: 2018-02-16 16:00
+Category: Python
+Status: Draft
 
-Install a specific commit of a package:
+After a fair number of furious impatient attempts to try and use specific git commits
+of third party packages in my applications, I finally have been able to make it work.
+I went back to the drawing board - basically reading 
+[setup-vs-requirement](https://caremad.io/posts/2013/07/setup-vs-requirement/)
+
+
+## Applications
+
+This is what I did:
+
+- Add the library name to `setup.py` (abstract dependency)
+- Add the git URL in a `requirements.txt` file (concrete dependency)
+- When you create your deployment artifact, do `pip install -r requirements.txt`.
+
+An example requirements.txt file would look like:
+
+```
+git+https://<git repo>@master
+..
+
+```
+
+You can replace the `master` by a specific commit/git tag.
+
+## Libraries/End-user focused tools
+
+Now, let's say you are publishing a package to PyPI and this package has a dependency on
+a version of a package which is not in PyPi or in a git repo. This is what we do:
+
+In our `setup.py`, we add the package name in `install_requires` and add `dependency_links`
+as follows:
 
 ```
  dependency_links=['git+https://<git-repo>@4ed6231457c244b8459037ee2224b0ef430cf766#egg=<package-name>-0'],
- ```
+```
+
  
-However if the package is already in `pypi`, we have a problem. So, we fool `pip` like, so:
+However if the third party package is already in `pypi`, we have a problem. So, we fool `pip` like, so:
 
 ```
-import setuptools
-
-setuptools.setup(
-    name='my_awesome_cli',
-    version='0.1',
-    description='My Awesome CLI',
-    packages=setuptools.find_packages(),
-    # I fool `pip` by specifying the version number which
-    # is greater than the one released in PyPi and force
-    # it to look at the dependency_links where i wrongly specify
-    # that i have a version which is greater than 0.1.2
-    install_requires='fire>0.1.2',
-    dependency_links=[
-        'git+https://github.com/google/python-fire.git@9bff9d01ce16589201f57ffef27ea84744951c11#egg=fire-0.1.2.1',
-    ],
-    entry_points={
-        'console_scripts': [
-            'my-awesome-cli=my_awesome_cli.main:main'
-        ],
-    }
-)
+# I fool `pip` by specifying the version number which
+# is greater than the one released in PyPi and force
+# it to look at the dependency_links where i wrongly specify
+# that i have a version which is greater than 0.1.2
+install_requires='fire>0.1.2',
+dependency_links=[
+    'git+https://github.com/google/python-fire.git@9bff9d01ce16589201f57ffef27ea84744951c11#egg=fire-0.1.2.1',
+],
 
 ```
+
+See an [example project](https://github.com/amitsaha/python-git-dependency-demo/tree/master/application)
 
 Now, if we install `pip install . --process-dependency-links`, we will see:
 
@@ -42,11 +65,10 @@ Now, if we install `pip install . --process-dependency-links`, we will see:
  
  To then distribute this to  PyPI, we need to make sure that we distribute this as a source tarball, [not a wheel](https://github.com/pypa/pip/issues/3172):
  
- ```
+```
  $ python setup.py sdist
  $ TWINE_REPOSITORY_URL=https://test.pypi.org/legacy/ TWINE_USERNAME=echorand TWINE_PASSWORD="secret" twine upload dist/*
-
- ```
+```
  
  Once we have done that, we can install it, like so:
  
@@ -71,7 +93,12 @@ Successfully built my-awesome-cli six
 Installing collected packages: six, fire, my-awesome-cli
   Running setup.py install for fire ... done
 Successfully installed fire-0.1.2 my-awesome-cli-0.2 six-1.10.0
-(fire2) asaha@asaha-desktop:~$ my-awesome-cli
+```
+
+We can then run our application:
+
+```
+$ my-awesome-cli
 Type:        Calculator
 String form: <my_awesome_cli.main.Calculator object at 0x7feecae69850>
 Docstring:   A simple calculator class.
@@ -80,21 +107,6 @@ Usage:       my-awesome-cli
              my-awesome-cli double
 
 ```
-
- 
- ```
- pip install --process-dependency-links
- ```
- 
- 
-# requirements.txt
-
-```
-git+https://<git repo>@master
-```
-
-pip install -r requirements.txt
-
 
 ## Helpful links
 
