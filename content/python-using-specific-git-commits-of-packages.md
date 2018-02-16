@@ -17,3 +17,8 @@ git+https://<git repo>@master
 
 pip install -r requirements.txt
 
+
+## Helpful links
+
+- https://caremad.io/posts/2013/07/setup-vs-requirement/
+- https://yuji.wordpress.com/2011/04/11/pip-install-specific-commit-from-git-repository/
