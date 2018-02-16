@@ -6,7 +6,7 @@ Status: Draft
 After a fair number of furious impatient attempts to try and use specific git commits
 of third party packages in my Python software, I finally have been able to make it work.
 I went back to the drawing board - basically reading 
-[setup-vs-requirement](https://caremad.io/posts/2013/07/setup-vs-requirement/)
+[setup-vs-requirement](https://caremad.io/posts/2013/07/setup-vs-requirement/).
 
 
 ## Applications
