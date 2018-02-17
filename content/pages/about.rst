@@ -3,9 +3,9 @@ About
 
 My name is Amit, I am a Software Engineer and Author (most recently of
 `Doing Math with Python <https://doingmathwithpython.github.io>`__),
-currently living in Sydney, Australia. Besides my books, I  have written
-and continue to write as I get a chance for various technical magazines.
-My articles have appeared in Linux Voice, Linux Journal and Linux Magazine.
+from Sydney, Australia. Besides my books, I  have written
+and continue to write as I get a chance for various technical magazines and online
+blogs. My articles have appeared in Linux Voice, Linux Journal and Linux Magazine.
 
 I work as a software engineer at Freelancer.com since July 2015. In the
 past I have worked at Red Hat on the `Beaker Project <http://beaker-project.org/>`__.
