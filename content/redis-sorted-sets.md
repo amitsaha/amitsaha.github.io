@@ -1,6 +1,6 @@
-Title: Example of using Sorted Sets in Redis
+Title: Quickstart: Using Sorted Sets in Redis from CLI, Python and Golang
 Date: 2018-01-25 15:00
-Category: fedora
+Category: software
 Status: draft
 
 In this post, I will first install a [redis](https://redis.io/) server on Fedora, and demo 
@@ -38,4 +38,18 @@ Feb 18 00:08:22 fedora.home systemd[1]: Started Redis persistent key-value datab
 ..
 ```
 
+## Using `redis-cli`
+
+Once the server has started, let's check if our server is alive and well:
+
+```
+$ redis-cli ping
+PONG
+```
+
+
+## Resources
+
+- [Redis data types](https://redis.io/topics/data-types-intro)
+- [Redis quick start](https://redis.io/topics/quickstart)
 
