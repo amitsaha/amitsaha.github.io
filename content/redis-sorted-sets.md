@@ -49,12 +49,14 @@ PONG
 
 ## Sorted Sets
 
-Redis' sorted set is a set data structure but each element in the set is also associated with a `score`. The set is
-ordered based on this `score` value. This allows us to perform the following operations easily:
+Redis' sorted set is a set data structure but each element in the set is also associated with a `score`. It is a
+hash map but with an interesting property - the set is ordered based on this `score` value. 
+
+This allows us to perform the following operations easily:
 
 - Retrieve the top or bottom 10 keys based on the score
 - Find the rank/position of a key in the set
-- The score of a key can be updated anytime
+- The score of a key can be updated anytime while the set will be adjusted (if needed) based on the new score
 
 The section on [sorted sets](https://redis.io/topics/data-types-intro) in the Redis docs has more details on this.
 
