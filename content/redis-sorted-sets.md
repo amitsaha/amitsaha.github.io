@@ -66,7 +66,7 @@ We will now create a sorted set called `tags`. This set will store tags for post
 system where entries can have one or more tags associated with them. At any given point of time, we would like to
 know what are the top 5 tags in our system.
 
-## Implementation using `redis-cli`
+## `redis-cli` demo
 
 We will first add a few tags to our sorted set `tags` using the [ZADD](https://redis.io/commands/zadd) command:
 
@@ -153,7 +153,7 @@ Now, to get the top 5 tags, we will do the following:
 1
 ```
 
-
+## Python demo
 
 ## Resources
 
