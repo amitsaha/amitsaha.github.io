@@ -5,7 +5,9 @@ Status: draft
 
 In this post, we will see a demo of *sorted sets* in [redis](https://redis.io/). I just learned about them and I think they are really cool! This post shows how we can play with sorted sets first via the `redis-cli`, then from Python and Golang.
 
-```                               ┌─────────────────────┐
+```
+
+                                  ┌─────────────────────┐
  .───────────────.                │                     │            .─────────────────.
 (    Redis CLI    )   ──────▶     │      Redis          │  ◀──────  (      Golang       )
  `───────────────'                │                     │            `─────────────────'
