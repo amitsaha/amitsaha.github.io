@@ -1,7 +1,7 @@
 Title: Sorted Sets in Redis from CLI, Python and Golang
-Date: 2018-02-18 15:00
+Date: 2018-02-18 23:40
 Category: software
-Status: draft
+
 
 In this post, we will see a demo of *sorted sets* in [redis](https://redis.io/). I just learned about them and I think they are really cool! This post shows how we can play with sorted sets first via the `redis-cli`, then from Python and Golang.
 
