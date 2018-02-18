@@ -60,6 +60,75 @@ This allows us to perform the following operations easily:
 
 The section on sorted sets [here](https://redis.io/topics/data-types#sorted-sets) and [here](https://redis.io/topics/data-types-intro) in the Redis docs has more details on this.
 
+## Example scenario: Top tags
+
+We will now create a sorted set called `tags`. This set will store tags for posts in a blog or some other content
+system where entries can have one or more tags associated with them. At any given point of time, we would like to
+know what are the top 5 tags in our system.
+
+## Implementation using `redis-cli`
+
+```
+127.0.0.1:6379> ZADD tags 1 "python"
+(integer) 1
+127.0.0.1:6379> ZADD tags 1 "golang"
+(integer) 1
+127.0.0.1:6379> ZADD tags 1 "redis"
+(integer) 1
+127.0.0.1:6379> ZADD tags 1 "flask"
+(integer) 1
+127.0.0.1:6379> ZADD tags 1 "rust"
+(integer) 1
+127.0.0.1:6379> ZADD tags 2 "rust"
+(integer) 0
+127.0.0.1:6379> ZADD tags 3 "python"
+(integer) 0
+127.0.0.1:6379> ZRANGE tags 0 -1
+1) "flask"
+2) "golang"
+3) "redis"
+4) "rust"
+5) "python"
+127.0.0.1:6379> ZREVRANGE tags 0 -1
+1) "python"
+2) "rust"
+3) "redis"
+4) "golang"
+5) "flask"
+127.0.0.1:6379> ZREVRANGE tags 0 -1
+1) "python"
+2) "rust"
+3) "redis"
+4) "golang"
+5) "flask"
+127.0.0.1:6379> ZREVRANGE tags 0 -1 withscores
+ 1) "python"
+ 2) "3"
+ 3) "rust"
+ 4) "2"
+ 5) "redis"
+ 6) "1"
+ 7) "golang"
+ 8) "1"
+ 9) "flask"
+10) "1"
+1
+
+127.0.0.1:6379> ZREVRANGE tags 0 4 withscores
+ 1) "python"
+ 2) "3"
+ 3) "rust"
+ 4) "2"
+ 5) "software"
+ 6) "1"
+ 7) "redis"
+ 8) "1"
+ 9) "memcache"
+10) "1"
+1
+
+```
+
 
 ## Resources
 
