@@ -1,9 +1,11 @@
-Title: Quickstart: Using Sorted Sets in Redis from CLI, Python and Golang
+Title: Sorted Sets in Redis from CLI, Python and Golang
 Date: 2018-02-18 15:00
 Category: software
 Status: draft
 
-In this post, I will first install a [redis](https://redis.io/) server on Fedora, and demo 
+In this post, we will see a demo of *sorted sets* in Redis. I just learned about them and I think they are really cool.
+
+I will first install a [redis](https://redis.io/) server on Fedora, and demo 
 [redis sorted sets](https://redis.io/topics/data-types-intro) and talk to the server using `redis-cli` and clients
 from Python and Golang. If you are running another operating system, please see the [download page](https://redis.io/download).
 
@@ -156,6 +158,48 @@ Now, to get the top 5 tags, we will do the following:
 ```
 
 ## Python demo
+
+We will use the [redis-py](https://github.com/andymccurdy/redis-py) package to talk to redis and perform the above operations. The Python client looks as follows:
+
+```
+import redis
+r = redis.StrictRedis(host='localhost', port=6379, db=0)
+
+tags_scores = {
+    'rust': 2,
+    'python': 3,
+    'golang': 1,
+    'redis': 1,
+    'docker': 1,
+    'linux': 1,
+    'software': 1,
+    'c': 1,
+    'memcache': 1,
+    'flask': 1,
+}
+    
+
+# Add the keys with scores     
+for tag, score in tags_scores.items():
+    r.zadd('tags', score, tag)
+
+# Retrieve the top 5 keys
+for key, score in r.zrevrange('tags', 0, 4, 'withscores'):
+    print(key, score)
+```
+
+
+Running the above ([How?](https://github.com/amitsaha/python-redis-demo)) will give us the output:
+
+```
+b'python' 3.0
+b'rust' 2.0
+b'software' 1.0
+b'redis' 1.0
+b'memcache' 1.0
+```
+
+Note above how the syntax for the Python wrappers  are almost the same as the corresponding redis CLI command.
 
 ## Resources
 
