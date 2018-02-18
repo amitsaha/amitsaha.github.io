@@ -38,6 +38,7 @@ Feb 18 00:08:22 fedora.home systemd[1]: Started Redis persistent key-value datab
 ..
 ```
 
+## Check if Redis is alive
 
 Once the server has started, let's check if our server is up and running:
 
