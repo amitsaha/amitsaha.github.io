@@ -98,7 +98,7 @@ We will first add a few tags to our sorted set `tags` using the [ZADD](https://r
 ```
 
 Above, I used the command to update the score of `rust` and `python` twice to be 2 and 3 respectively. I could have used
-[ZINCRBY](https://redis.io/commands/zincrby) as well. Now, I will list all the keys using the [zrange]() command:
+[ZINCRBY](https://redis.io/commands/zincrby) as well. Now, I will list all the keys using the [zrange](https://redis.io/commands/zrange) command:
 
 ```
 127.0.0.1:6379> zrange tags 0 -1
@@ -117,7 +117,7 @@ Above, I used the command to update the score of `rust` and `python` twice to be
 Note how the last two keys are `rust` and `python` - as they have the highest scores (2 and 3 respectively). The others are
 sorted lexicographically. 
 
-To reverse the order, we will use the [zrevrange]() command:
+To reverse the order, we will use the [zrevrange](https://redis.io/commands/zrevrange) command:
 
 ```
 127.0.0.1:6379> ZREVRANGE tags 0 -1 withscores
