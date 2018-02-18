@@ -68,6 +68,8 @@ know what are the top 5 tags in our system.
 
 ## Implementation using `redis-cli`
 
+We will first add a few tags to our sorted set `tags` using the [ZADD](https://redis.io/commands/zadd) command:
+
 ```
 127.0.0.1:6379> ZADD tags 1 "python"
 (integer) 1
@@ -83,24 +85,41 @@ know what are the top 5 tags in our system.
 (integer) 0
 127.0.0.1:6379> ZADD tags 3 "python"
 (integer) 0
-127.0.0.1:6379> ZRANGE tags 0 -1
-1) "flask"
-2) "golang"
-3) "redis"
-4) "rust"
-5) "python"
-127.0.0.1:6379> ZREVRANGE tags 0 -1
-1) "python"
-2) "rust"
-3) "redis"
-4) "golang"
-5) "flask"
-127.0.0.1:6379> ZREVRANGE tags 0 -1
-1) "python"
-2) "rust"
-3) "redis"
-4) "golang"
-5) "flask"
+127.0.0.1:6379> ZADD tags 1 "docker"
+(integer) 1
+127.0.0.1:6379> ZADD tags 1 "linux"
+(integer) 1
+127.0.0.1:6379> ZADD tags 1 "c"
+(integer) 1
+127.0.0.1:6379> ZADD tags 1 "software"
+(integer) 1
+1
+
+```
+
+Above, I used the command to update the score of `rust` and `python` twice to be 2 and 3 respectively. I could have used
+[ZINCRBY](https://redis.io/commands/zincrby) as well. Now, I will list all the keys using the [zrange]() command:
+
+```
+127.0.0.1:6379> zrange tags 0 -1
+ 1) "c"
+ 2) "docker"
+ 3) "flask"
+ 4) "golang"
+ 5) "linux"
+ 6) "memcache"
+ 7) "redis"
+ 8) "software"
+ 9) "rust"
+10) "python"
+```
+
+Note how the last two keys are `rust` and `python` - as they have the highest scores (2 and 3 respectively). The others are
+sorted lexicographically. 
+
+To reverse the order, we will use the [zrevrange]() command:
+
+```
 127.0.0.1:6379> ZREVRANGE tags 0 -1 withscores
  1) "python"
  2) "3"
@@ -112,8 +131,14 @@ know what are the top 5 tags in our system.
  8) "1"
  9) "flask"
 10) "1"
-1
 
+```
+
+Above, we can see how with the `withscores` command, we also get the scores back.
+
+Now, to get the top 5 tags, we will do the following:
+
+```
 127.0.0.1:6379> ZREVRANGE tags 0 4 withscores
  1) "python"
  2) "3"
@@ -126,8 +151,8 @@ know what are the top 5 tags in our system.
  9) "memcache"
 10) "1"
 1
-
 ```
+
 
 
 ## Resources
