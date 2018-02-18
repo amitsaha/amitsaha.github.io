@@ -58,7 +58,7 @@ This allows us to perform the following operations easily:
 - Find the rank/position of a key in the set
 - The score of a key can be updated anytime while the set will be adjusted (if needed) based on the new score
 
-The section on [sorted sets](https://redis.io/topics/data-types-intro) in the Redis docs has more details on this.
+The section on [sorted sets](https://redis.io/topics/data-types#sorted-sets) in the Redis docs has more details on this.
 
 
 ## Resources
