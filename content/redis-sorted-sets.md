@@ -94,6 +94,8 @@ We will first add a few tags to our sorted set `tags` using the [ZADD](https://r
 127.0.0.1:6379> ZADD tags 1 "software"
 (integer) 1
 1
+127.0.0.1:6379> ZADD tags 1 "memcache"
+(integer) 1
 
 ```
 
