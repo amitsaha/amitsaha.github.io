@@ -5,6 +5,7 @@ Status: draft
 
 In this post, we will see a demo of *sorted sets* in [redis](https://redis.io/). I just learned about them and I think they are really cool! This post shows how we can play with sorted sets first via the `redis-cli`, then from Python and Golang.
 
+```
                                       ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
                                                                          │
                                       │
@@ -26,6 +27,7 @@ In this post, we will see a demo of *sorted sets* in [redis](https://redis.io/).
                                         (          Python           )
                                          `─────────────────────────'
 
+```
 We will first need a local redis server running. We will see how we do so on Fedora Linux next. If you are running 
 another operating system, please see the [download page](https://redis.io/download).
 
