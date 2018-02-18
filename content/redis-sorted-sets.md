@@ -1,5 +1,5 @@
 Title: Quickstart: Using Sorted Sets in Redis from CLI, Python and Golang
-Date: 2018-01-25 15:00
+Date: 2018-02-18 15:00
 Category: software
 Status: draft
 
