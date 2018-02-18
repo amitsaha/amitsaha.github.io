@@ -7,7 +7,7 @@ In this post, I will first install a [redis](https://redis.io/) server on Fedora
 [redis sorted sets](https://redis.io/topics/data-types-intro) and talk to the server using `redis-cli` and clients
 from Python and Golang. If you are running another operating system, please see the [download page](https://redis.io/download).
 
-## Installation and server setup
+## Installation and server setup on Fedora Linux
 
 We can install `redis` server using `dnf`, like so:
 
