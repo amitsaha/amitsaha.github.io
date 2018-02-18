@@ -38,14 +38,24 @@ Feb 18 00:08:22 fedora.home systemd[1]: Started Redis persistent key-value datab
 ..
 ```
 
-## Using `redis-cli`
 
-Once the server has started, let's check if our server is alive and well:
+Once the server has started, let's check if our server is up and running:
 
 ```
 $ redis-cli ping
 PONG
 ```
+
+## Sorted Sets
+
+Redis' sorted set is a set data structure but each element in the set is also associated with a `score`. The set is
+ordered based on this `score` value. This allows us to perform the following operations easily:
+
+- Retrieve the top or bottom 10 keys based on the score
+- Find the rank/position of a key in the set
+- The score of a key can be updated anytime
+
+The section on [sorted sets](https://redis.io/topics/data-types-intro) in the Redis docs has more details on this.
 
 
 ## Resources
