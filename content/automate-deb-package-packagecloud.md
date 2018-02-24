@@ -1,4 +1,4 @@
-Title: Automate building and publishing DEB packages to packagecloud.io for Golang applications 
+Title: Automatic building and publishing DEB packages for Golang applications 
 Date: 2018-02-24 23:00
 Category: golang
 Status: Draft
