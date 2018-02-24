@@ -6,6 +6,7 @@ In this post, we will learn about a quick and easy workflow for
 building and deploying your golang applications as Debian packages.
 The packages produced will not be official quality DEB packages.
 
+
 ## Assumptions
 
 I have been using [dep](https://golang.github.io/dep/) for dependency management, and I assume that
@@ -399,6 +400,10 @@ The most important files above are:
 These files are generic and should work for any golang application project once they are dropped in alongwith the application code. The
 assumptions in the beginning of course hold - the primary one being
 the use of [dep](https://github.com/jordansissel/fpm) as the package management tool.
+
+
+You may be interested in the extension of this post in [Automatic building and publishing DEB packages for Golang applications](http://echorand.me/automatic-building-and-publishing-deb-packages-for-golang-applications.html)
+
 
 ## Resources
 
