@@ -1,7 +1,6 @@
 Title: Automatic building and publishing DEB packages for Golang applications 
-Date: 2018-02-24 23:00
+Date: 2018-02-24 23:30
 Category: golang
-Status: Draft
 
 In my earlier post, [Quick and dirty debian packages for your Golang application](http://echorand.me/quick-and-dirty-debian-packages-for-your-golang-application.html)
 I shared a recipe building DEB packages for Golang applications. We are going to see the following things in this post building
