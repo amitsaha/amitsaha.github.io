@@ -93,6 +93,7 @@ Date: 2018-01-05 10:00
 - Delete all the contents: `gg` to go to the beginning + `dG`
 - Delete from current position to the end of line: `d$`
 - Delete entire file contents: `:%d`
+- Delete current work and enter insert mode: `cw`
 
 **Search**
 
