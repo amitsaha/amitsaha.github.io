@@ -10,3 +10,7 @@ Date: 2018-02-25 10:00
 
 - `dnf build-dep <spec>`
 
+## References
+
+- https://fedoraproject.org/wiki/How_to_create_an_RPM_package
+
