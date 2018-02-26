@@ -6,6 +6,8 @@ Status: Draft
 Consider the following scenario for N services running on their own AWS EC2 instances in
 a production setup:
 
+```
+
 
 
                        ┌───────────────────────────┐
@@ -29,10 +31,45 @@ a production setup:
      └────────────┘            └────────────┘            └────────────┘
 
        ◀─ ─ ─ ─ ─ ─ ─ ─ ─    AWS EC2 Instances   ─ ─ ─ ─ ─ ─ ─ ─▶
-
+```
 
 Now, consider the setup below for a developer environment for the above services:
+```
 
+                       ┌───────────────────────────┐
+                       │   Development AWS Setup   │
+                       └───────────────────────────┘
+
+
+
+
+ .───────────────────.      .───────────────────.    .───────────────────.
+(      S3Bucket1      )    (      S3Bucket2      )  (      S3Bucket3      )
+ `───────────────────'      `───────────────────'    `───────────────────'
+              ▲                      ▲                       ▲
+              │                      │                       │
+      ┌ ─ ─ ─ ┴ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─│─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─│─
+                            Access Denied                      │
+      └ ─ ─ ─ ┬ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─│─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─│─
+              │                 ┌ ─ ─ ─ ─ ─ ┐                │
+              └────────────────   IAM Role   ────────────────┘
+                                └ ─ ─ ─ ─ ─ ┘
+                                     ▲
+                                     │
+                               ┌────────────┐
+                               │ Service B  │
+                               └────────────┘
+                               ┌────────────┐
+                               │ Service A  │
+                               └────────────┘
+                               ┌────────────┐
+                               │ Service C  │
+                               └────────────┘
+
+
+                              AWS EC2 Instance
+
+```
 
 Instead of each service running on their own development EC2 instance, we run all the services
 on a single EC2 instance.
