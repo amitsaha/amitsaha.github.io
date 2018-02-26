@@ -77,7 +77,8 @@ on a single EC2 instance.
 ## The Problem
 
 ## Solution
-```
+
+```json
 resource "aws_iam_instance_profile" "iam_profile1" {
   name  = "test_profile1"
   role = "${aws_iam_role.role1.name}"
