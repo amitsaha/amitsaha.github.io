@@ -1,4 +1,4 @@
-Title: AWS EC2 assume role with Terraform
+Title: Setting up AWS EC2 Assume Role with Terraform
 Date: 2018-02-26 
 Category: infrastructure
 Status: Draft
