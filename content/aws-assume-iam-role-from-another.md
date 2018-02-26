@@ -3,7 +3,7 @@ Date: 2018-02-26
 Category: infrastructure
 Status: Draft
 
-Consider the following scenario for N services running on their own AWS EC2 instances in
+Consider the following scenario for 3 services running on their own AWS EC2 instances in
 a production setup:
 
 ```
@@ -32,6 +32,9 @@ a production setup:
 
        ◀─ ─ ─ ─ ─ ─ ─ ─ ─    AWS EC2 Instances   ─ ─ ─ ─ ─ ─ ─ ─▶
 ```
+
+Each service running on their own EC2 instance has their own AWS IAM profile which via 
+their role and role policy gives them access to the corresponding S3 bucket.
 
 Now, consider the setup below for a developer environment for the above services:
 ```
