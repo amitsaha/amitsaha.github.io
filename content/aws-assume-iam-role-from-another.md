@@ -88,10 +88,10 @@ are running in the production setup. There are two solutions to this problem:
 
 We are going to see how we can implement the second approach. 
 
-## Solution
+## Solution: Infrastructure setup
 
 There are two stages to implement this solution. The first stage is to setup the infrastructure to allow the
-assume role operation to succeed. This basically means that, if an IAM role, `role1` wants to assume another
+assume role operation to succeed. This basically means that if an IAM role, `role1` wants to assume another
 role, `role2`, then:
 
 - `role1` should be allowed to perform the `sts:AssumeRole` action on `role2`
@@ -141,6 +141,7 @@ resource "aws_iam_role_policy" "role1_assume_role2" {
   role = "${aws_iam_role.role1.name}"
   policy = "${data.aws_iam_policy_document.assume_role2_policy.json}"
 }
+
 resource "aws_iam_instance_profile" "iam_profile2" {
   name  = "test_profile2"
   role = "${aws_iam_role.role2.name}"
@@ -199,7 +200,9 @@ resource "aws_iam_role_policy" "conf_bucket_access_policy" {
 }
 ```
 
-## Implementation
+
+## Solution: How does it work?
+
 
 ## Demos using AWS CLI
 
