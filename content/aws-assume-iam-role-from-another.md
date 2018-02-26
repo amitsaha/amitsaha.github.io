@@ -5,7 +5,7 @@ Status: Draft
 
 Consider the following scenario for N services running on their own AWS EC2 instances in
 a production setup:
-```
+
 
 
                        ┌───────────────────────────┐
@@ -29,7 +29,7 @@ a production setup:
      └────────────┘            └────────────┘            └────────────┘
 
        ◀─ ─ ─ ─ ─ ─ ─ ─ ─    AWS EC2 Instances   ─ ─ ─ ─ ─ ─ ─ ─▶
-```
+
 
 Now, consider the setup below for a developer environment for the above services:
 
