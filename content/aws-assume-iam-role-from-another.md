@@ -79,9 +79,21 @@ on a single EC2 instance.
 
 ## The Problem
 
-## Solution
+As I note in the diagram above, the individual services will get an access denied error since
+the EC2 instance above is using a different IAM profile than the ones used when the services
+are running in the production setup. There are two solutions to this problem:
 
-```json
+- The first is to create an IAM profile which will have all the IAM policies of the constituent services
+- The second is to use [AssumeRole](https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRole.html)
+
+We are going to see how we can implement the second approach. 
+
+## Solution
+There are two stages to implement this solution. The first stage is to setup the infrastructure to allow the
+assume role operation to succeed.
+
+
+```
 resource "aws_iam_instance_profile" "iam_profile1" {
   name  = "test_profile1"
   role = "${aws_iam_role.role1.name}"
