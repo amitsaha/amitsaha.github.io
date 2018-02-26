@@ -89,8 +89,13 @@ are running in the production setup. There are two solutions to this problem:
 We are going to see how we can implement the second approach. 
 
 ## Solution
+
 There are two stages to implement this solution. The first stage is to setup the infrastructure to allow the
-assume role operation to succeed.
+assume role operation to succeed. This basically means that, if an IAM role, `role1` wants to assume another
+role, `role2`, then:
+
+- `role1` should be allowed to perform the `sts:AssumeRole` action on `role2`
+- `role2` should allow `role1` to assume itself
 
 
 ```
