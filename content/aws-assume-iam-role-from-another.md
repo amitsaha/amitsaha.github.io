@@ -254,9 +254,13 @@ of data back in the `Credentials` object:
 - SessionToken
 - AccessKeyId
 
+We then pass these as environment variables to the AWS CLI and try to perform the above operation on the S3 bucket:
+
 ```
 $ AWS_SESSION_TOKEN="<session-token-above>" AWS_ACCESS_KEY_ID=<key id above> AWS_SECRET_ACCESS_KEY=<secret key above> aws s3 ls s3://github-amitsaha-bucket/
 ```
+
+And it works!
 
 We can create an object as well:
 
@@ -270,7 +274,34 @@ $ AWS_SESSION_TOKEN="<session-token-above>" AWS_ACCESS_KEY_ID=<key id above> AWS
 
 ## Discussions of the solution
 
+When we discussed the necessary permissions for `role1` to be able to assume `role2`, we learned that:
+
+- `role1` needed to have the permission to perform the `sts:AssumeRole` action on `role2`, and
+- `role2` needed allow itself to be assumed by `role1`
+
+We explicitly specified `role1`'s ARN in the assume role policy of `role2`. This is okay for our demo setup, but
+it introduces perhaps an unnecessary dependency on `role1`. Since `role1` doesn't play any role in the production setup
+of the service which is only reliant on `role2`, it may be a good idea to remove this explicit dependency. Hence, we may
+be better off allowing *any* role in the current AWS account to assume `role2`. To implement this, we change the IAM configuration
+as follows:
+
+```
+60c60
+<                "AWS": "${aws_iam_role.role1.arn}"
+---
+>                "AWS": "arn:aws::iam::${data.aws_caller_identity.current.account_id}:root"
+```
+
+You can find the entire configuration in the 
+[solution_demo_root_user](https://github.com/amitsaha/aws-assume-role-demo/tree/master/terraform_configuration/solution_demo_root_user).
 
 ## AssumeRole in your applications
 
+Above we performed the assume role operation via the AWS CLI, but in your applications we will use the corresponding
+language's SDK function to do so. We will also need to check the expiry of the access key and secret key pair before
+we attempt to use it make an AWS API call with them.
+
 ## Related software
+
+
+
