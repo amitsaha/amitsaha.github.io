@@ -257,7 +257,9 @@ of data back in the `Credentials` object:
 We then pass these as environment variables to the AWS CLI and try to perform the above operation on the S3 bucket:
 
 ```
-$ AWS_SESSION_TOKEN="<session-token-above>" AWS_ACCESS_KEY_ID=<key id above> AWS_SECRET_ACCESS_KEY=<secret key above> aws s3 ls s3://github-amitsaha-bucket/
+$ AWS_SESSION_TOKEN="<session-token-above>" \
+  AWS_ACCESS_KEY_ID=<key id above> \
+  AWS_SECRET_ACCESS_KEY=<secret key above> aws s3 ls s3://github-amitsaha-bucket/
 ```
 
 And it works!
@@ -266,9 +268,13 @@ We can create an object as well:
 
 ```
 $ touch hello
-$ AWS_SESSION_TOKEN="<session-token-above>" AWS_ACCESS_KEY_ID=<key id above> AWS_SECRET_ACCESS_KEY=<secret key above> aws s3 cp hello  s3://github-amitsaha-bucket/
+$ AWS_SESSION_TOKEN="<session-token-above>" \
+  AWS_ACCESS_KEY_ID=<key id above> \
+  AWS_SECRET_ACCESS_KEY=<secret key above> aws s3 cp hello  s3://github-amitsaha-bucket/
 upload: ./hello to s3://github-amitsaha-bucket/hello             
-$ AWS_SESSION_TOKEN="<session-token-above>" AWS_ACCESS_KEY_ID=<key id above> AWS_SECRET_ACCESS_KEY=<secret key above> aws s3 ls s3://github-amitsaha-bucket/
+$ AWS_SESSION_TOKEN="<session-token-above>" \
+  AWS_ACCESS_KEY_ID=<key id above> \
+  AWS_SECRET_ACCESS_KEY=<secret key above> aws s3 ls s3://github-amitsaha-bucket/
 2018-02-25 12:38:32         12 hello
 ```
 
@@ -301,7 +307,17 @@ Above we performed the assume role operation via the AWS CLI, but in your applic
 language's SDK function to do so. We will also need to check the expiry of the access key and secret key pair before
 we attempt to use it make an AWS API call with them.
 
-## Related software
+## Alternatives to modifying your application
 
+[metadataproxy](https://github.com/lyft/metadataproxy) aims to provide a solution to this problem such that you
+don't have to modify your application code. This is great if you are using containers to deploy your application
+and should work out of the box when you combine the infrastructure setup that this post aims to help you with.
 
+[kube2iam](https://github.com/jtblin/kube2iam) again aims to provide a similar solution to `metadataproxy` for
+Kubernetes.
 
+## Conclusion
+
+The problem is generic enough and whether you have to modify your application or not depends on your deployment
+platform and choices. However, the infrastructure setup needed for these solutions are similar and hopefully my post
+will help you with that.
