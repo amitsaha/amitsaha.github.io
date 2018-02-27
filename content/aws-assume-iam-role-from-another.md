@@ -1,7 +1,6 @@
 Title: Setting up AWS EC2 Assume Role with Terraform
-Date: 2018-02-26 
+Date: 2018-02-27 
 Category: infrastructure
-Status: Draft
 
 In this post, we will see how we can implement the AWS `assume role` functionality which allows
 an IAM role to be able to obtain temporary credentials to access a resource otherwise only accessible
