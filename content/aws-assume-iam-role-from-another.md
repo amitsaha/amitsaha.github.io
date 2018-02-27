@@ -19,7 +19,6 @@ correctly, so here's my two config files:
 [profile dev]
 region=ap-southeast-2
 
-
 # ~/.aws/credentials
 
 [dev]
