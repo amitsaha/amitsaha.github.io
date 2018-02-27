@@ -116,11 +116,14 @@ are running in the production setup.
 
 Let's verify the problem for ourselves first by created a test infrastructure as follows:
 
-
 - Create a S3 bucket (`github-amitsaha-bucket`)
 - Create two IAM profiles, `role1` and `role2`
 - Add a policy to `role2` to be able to perform all operations on the S3 bucket
 - Spin up an EC2 instance using `role1`
+
+To see how this is representative of our problem, note that `role2` has access to the S3 bucket, but `role1` doesn't.
+The EC2 instance we will be running our experiment is setup to use `role1`, and hence we do not have access
+to the S3 bucket.
 
 The [terraform](https://terraform.io) configuration for setting up the above infrastructure can be found 
 [here](https://github.com/amitsaha/aws-assume-role-demo/tree/master/terraform_configuration/problem_demo). 
