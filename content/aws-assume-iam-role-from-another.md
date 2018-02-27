@@ -321,3 +321,9 @@ Kubernetes.
 The problem is generic enough and whether you have to modify your application or not depends on your deployment
 platform and choices. However, the infrastructure setup needed for these solutions are similar and hopefully my post
 will help you with that.
+
+## Resources
+
+- [Terraform configuration repo](https://github.com/amitsaha/aws-assume-role-demo)
+- [AWS Assume Role](https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRole.html)
+- [Terraform](https://www.terraform.io/)
