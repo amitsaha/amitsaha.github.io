@@ -3,13 +3,40 @@ Date: 2018-02-26
 Category: infrastructure
 Status: Draft
 
+In this post, we will see how we can implement the AWS `assume role` functionality which allows
+an IAM role to be able to obtain temporary credentials to access a resource otherwise only accessible
+by another IAM role. We will implement the infrastructure changes using [Terraform](terraform.io)
+and see how to obtain temporary credentials and access an AWS resource (a S3 bucket) that the corresponding
+IAM role doesn't have access to otherwise via the [AWS CLI](https://aws.amazon.com/documentation/cli/).
+
+If you want to follow along, please install `terraform` and setup AWS config so that it has a profile named
+`dev`. If you have a profile or want to use a different AWS profile, you can change it in the `aws.tf` file
+of the configuration you are applying. If you are like me, you may have trouble setting up the profile
+correctly, so here's my two config files:
+
+```
+# ~/.aws/config
+
+[profile dev]
+region=ap-southeast-2
+
+
+# ~/.aws/credentials
+
+[dev]
+aws_access_key_id=<Your access key>
+aws_secret_access_key=<Your secret key>
+```
+
+In each of the configuration directory, you will have to run `terraform init` 
+before you can run `terraform apply`. 
+
+## Problem Scenario
+
 Consider the following scenario for 3 services running on their own AWS EC2 instances in
 a production setup:
 
 ```
-
-
-
                        ┌───────────────────────────┐
                        │   Production AWS Setup    │
                        └───────────────────────────┘
@@ -95,7 +122,8 @@ infrastructure as follows:
 - Spin up an EC2 instance using `role1`
 
 The [terraform](https://terraform.io) configuration for setting up the above infrastructure can be found 
-[here](). If we now try to access the S3 bucket from the EC2 instance via the AWS CLI, we will get:
+[here](https://github.com/amitsaha/aws-assume-role-demo/tree/master/terraform_configuration/problem_demo). 
+If we now try to access the S3 bucket from the EC2 instance via the AWS CLI, we will get:
 
 ```
 $ ssh ec2-user@<Public-IP>
@@ -110,18 +138,20 @@ There are two solutions to this problem:
 - The first is to create an IAM profile which will have all the IAM policies of the constituent services
 - The second is to use [AssumeRole](https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRole.html)
 
-We are going to see how we can implement the second approach. 
-
-## Solution: Infrastructure setup
+The first solution, although simple has the main problem of duplicating your IAM policies and it doesn't
+feel clean. The second approach, although requires some work is a much cleaner approach.
 
 There are two stages to implement this solution. The first stage is to setup the infrastructure to allow the
 assume role operation to succeed. If an IAM role, `role1` wants to assume another
-role, `role2`, then:
+
+## Solution: Infrastructure setup
+
+If an IAM role, `role1` wants to assume another role, `role2`, then:
 
 - `role1` should be allowed to perform the `sts:AssumeRole` action on `role2`
 - `role2` should allow `role1` to assume itself
 
-The corresponding IAM configuration above will be changed as follows:
+The corresponding IAM configuration earlier will be updated as follows:
 
 
 ```
@@ -165,7 +195,8 @@ EOF
 }
 ```
 
-The updated terraform configuration can be found [here](). Let's apply the changes:
+The updated terraform configuration can be found [here](https://github.com/amitsaha/aws-assume-role-demo/tree/master/terraform_configuration/solution_demo).
+Let's apply the changes:
 
 
 
