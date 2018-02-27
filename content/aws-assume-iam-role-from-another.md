@@ -103,26 +103,31 @@ Now, consider the setup below for a developer environment for the above services
 ```
 
 Instead of each service running on their own development EC2 instance, we run all the services
-on a single EC2 instance. This will lead to access denied errors when `service A` tries to access
-`S3Bucket1` and similarly for the other services when they try to access their corresponding
-buckets.
-
-
-## Setting up test infrastructure
+on a single EC2 instance. 
 
 As I note in the diagram above, the individual services will get an access denied error since
 the EC2 instance above is using a different IAM profile than the ones used when the services
-are running in the production setup. Let's see that for ourselves first by created a test 
-infrastructure as follows:
+are running in the production setup. 
+
+## Setting up test infrastructure
+
+Let's verify the problem for ourselves first by created a test infrastructure as follows:
 
 
-- Create a S3 bucket
+- Create a S3 bucket (`github-amitsaha-bucket`)
 - Create two IAM profiles, `role1` and `role2`
 - Add a policy to `role2` to be able to perform all operations on the S3 bucket
 - Spin up an EC2 instance using `role1`
 
 The [terraform](https://terraform.io) configuration for setting up the above infrastructure can be found 
 [here](https://github.com/amitsaha/aws-assume-role-demo/tree/master/terraform_configuration/problem_demo). 
+
+```
+$ cd terraform_configuration/problem_demo
+$ terraform init
+$ terraform apply
+```
+
 If we now try to access the S3 bucket from the EC2 instance via the AWS CLI, we will get:
 
 ```
@@ -143,6 +148,9 @@ feel clean. The second approach, although requires some work is a much cleaner a
 
 There are two stages to implement this solution. The first stage is to setup the infrastructure to allow the
 assume role operation to succeed. If an IAM role, `role1` wants to assume another
+
+Before we move on, we will run `terraform destroy` here so that the next step succeeds. We are using a local
+`tfstate` file in each configuration directory for the demos which makes this step necessary.
 
 ## Solution: Infrastructure setup
 
@@ -196,26 +204,30 @@ EOF
 ```
 
 The updated terraform configuration can be found [here](https://github.com/amitsaha/aws-assume-role-demo/tree/master/terraform_configuration/solution_demo).
-Let's apply the changes:
+Let's create the new infrastructure:
 
+```
+$ cd terraform_configuration/solution_demo
+$ terraform init
+$ terraform apply
 
+```
 
-
-
+Now, if we `ssh` into the instance and try the same operation, we will get the same error:
 
 ```
 [ec2-user@ip-172-31-6-239 ~]$ aws s3 ls s3://github-amitsaha-bucket/*
 An error occurred (AccessDenied) when calling the ListObjects operation: Access Denied
 ```
 
+However, since the infrastructure is now setup to allow us to perform assume role, we can make use
+of that.
+
 ## Solution: Perform AssumeRole operation
 
+The AWS CLI is already installed in the EC2 instance we spun up, so let's see how we can perform `assume role` operation:
 
 ```
-[ec2-user@ip-172-31-6-239 ~]$ aws sts assume-role --role-arn arn:aws:iam::033145145979:role/test_profile2_role --role-session-name s3-example
-
-An error occurred (AccessDenied) when calling the AssumeRole operation: User: arn:aws:sts::033145145979:assumed-role/test_profile1_role/i-0b3f9c44566fbc260 is not authorized to perform: sts:AssumeRole on resource: arn:aws:iam::033145145979:role/test_profile2_role
-
 [ec2-user@ip-172-31-6-239 ~]$ aws sts assume-role --role-arn arn:aws:iam::033145145979:role/test_profile2_role --role-session-name s3-example
 {
     "AssumedRoleUser": {
@@ -226,27 +238,29 @@ An error occurred (AccessDenied) when calling the AssumeRole operation: User: ar
         "SecretAccessKey": "PzFA0bJxxeB+i4kWjowpM6VTQTQfIiejbRxXkZdo", 
         "SessionToken": "FQoDYXdzEI7//////////wEaDDqRJAWz11tovnatwSLuAUf1CIjLW0OI5dTCAh610HW7f3fBxglofbntqxCSJVyei1DafEjriLIskDzKoCdz6Y7F5Z/uyv/Ue7dCCCvXFpVYExwt82hE7yTGrYJB/oQl+bkMIzPhlHyegDa3/+vxdFu2kbcve8a1VlNhZE8fnpaRLGMoEr9/Ll+NQLjtRyysQ7DuN0GuMVIDiUzqOZHVDFDt4/c5LBHd2VZNfZ2t/rfPTkIwfkI9JQUVON+lcrk5W+FH16Onp1vuZXX4cmraMWQ1ROGf2x4fHGPIcMqaw674sgOnMSllyCUONLIaSPOeJLfOSDIrM/Xfv0PvslgotNrK1AU=", 
         "Expiration": "2018-02-25T13:33:56Z", 
-        "AccessKeyId": "ASIAI7JVCNUGFT6XGMAQ"
+    "AccessKeyId": "ASIAI7JVCNUGFT6XGMAQ"
     }
 }
-[ec2-user@ip-172-31-6-239 ~]$ date
-Sun Feb 25 12:34:03 UTC 2018
-[ec2-user@ip-172-31-6-239 ~]$ aws s3 ls s3://github-amitsaha-bucket/
 
-An error occurred (AccessDenied) when calling the ListObjects operation: Access Denied
-[ec2-user@ip-172-31-6-239 ~]$ AWS_ACCESS_KEY_ID=ASIAI7JVCNUGFT6XGMAQ AWS_SECRET_ACCESS_KEY=PzFA0bJxxeB+i4kWjowpM6VTQTQfIiejbRxXkZdo aws s3 ls s3://github-amitsaha-bucket/
+```
 
-An error occurred (InvalidAccessKeyId) when calling the ListObjects operation: The AWS Access Key Id you provided does not exist in our records.
-[ec2-user@ip-172-31-6-239 ~]$ AWS_ACCESS_KEY_ID=ASIAI7JVCNUGFT6XGMAQ AWS_SECRET_ACCESS_KEY=PzFA0bJxxeB+i4kWjowpM6VTQTQfIiejbRxXkZdo aws s3 ls s3://github-amitsaha-bucket/
+The `--role-arn` option specifies the ARN of the IAM profile we want to assume, give it a name via the `--role-session-name` and we get back three key pieces
+of data back in the `Credentials` object:
 
-An error occurred (InvalidAccessKeyId) when calling the ListObjects operation: The AWS Access Key Id you provided does not exist in our records.
-[ec2-user@ip-172-31-6-239 ~]$ AWS_SESSION_TOKEN="FQoDYXdzEI7//////////wEaDDqRJAWz11tovnatwSLuAUf1CIjLW0OI5dTCAh610HW7f3fBxglofbntqxCSJVyei1DafEjriLIskDzKoCdz6Y7F5Z/uyv/Ue7dCCCvXFpVYExwt82hE7yTGrYJB/oQl+bkMIzPhlHyegDa3/+vxdFu2kbcve8a1VlNhZE8fnpaRLGMoEr9/Ll+NQLjtRyysQ7DuN0GuMVIDiUzqOZHVDFDt4/c5LBHd2VZNfZ2t/rfPTkIwfkI9JQUVON+lcrk5W+FH16Onp1vuZXX4cmraMWQ1ROGf2x4fHGPIcMqaw674sgOnMSllyCUONLIaSPOeJLfOSDIrM/Xfv0PvslgotNrK1AU=" AWS_ACCESS_KEY_ID=ASIAI7JVCNUGFT6XGMAQ AWS_SECRET_ACCESS_KEY=PzFA0bJxxeB+i4kWjowpM6VTQTQfIiejbRxXkZdo aws s3 ls s3://github-amitsaha-bucket/
-[ec2-user@ip-172-31-6-239 ~]$ vim hello
+- SecretAccessKey
+- SessionToken
+- AccessKeyId
+
+```
+ec2-user@ip-172-31-6-239 ~]$ AWS_SESSION_TOKEN="FQoDYXdzEI7//////////wEaDDqRJAWz11tovnatwSLuAUf1CIjLW0OI5dTCAh610HW7f3fBxglofbntqxCSJVyei1DafEjriLIskDzKoCdz6Y7F5Z/uyv/Ue7dCCCvXFpVYExwt82hE7yTGrYJB/oQl+bkMIzPhlHyegDa3/+vxdFu2kbcve8a1VlNhZE8fnpaRLGMoEr9/Ll+NQLjtRyysQ7DuN0GuMVIDiUzqOZHVDFDt4/c5LBHd2VZNfZ2t/rfPTkIwfkI9JQUVON+lcrk5W+FH16Onp1vuZXX4cmraMWQ1ROGf2x4fHGPIcMqaw674sgOnMSllyCUONLIaSPOeJLfOSDIrM/Xfv0PvslgotNrK1AU=" AWS_ACCESS_KEY_ID=ASIAI7JVCNUGFT6XGMAQ AWS_SECRET_ACCESS_KEY=PzFA0bJxxeB+i4kWjowpM6VTQTQfIiejbRxXkZdo aws s3 ls s3://github-amitsaha-bucket/
+```
+
+We can create an object as well:
+
+```
+[ec2-user@ip-172-31-6-239 ~]$ touch hello
 [ec2-user@ip-172-31-6-239 ~]$ AWS_SESSION_TOKEN="FQoDYXdzEI7//////////wEaDDqRJAWz11tovnatwSLuAUf1CIjLW0OI5dTCAh610HW7f3fBxglofbntqxCSJVyei1DafEjriLIskDzKoCdz6Y7F5Z/uyv/Ue7dCCCvXFpVYExwt82hE7yTGrYJB/oQl+bkMIzPhlHyegDa3/+vxdFu2kbcve8a1VlNhZE8fnpaRLGMoEr9/Ll+NQLjtRyysQ7DuN0GuMVIDiUzqOZHVDFDt4/c5LBHd2VZNfZ2t/rfPTkIwfkI9JQUVON+lcrk5W+FH16Onp1vuZXX4cmraMWQ1ROGf2x4fHGPIcMqaw674sgOnMSllyCUONLIaSPOeJLfOSDIrM/Xfv0PvslgotNrK1AU=" AWS_ACCESS_KEY_ID=ASIAI7JVCNUGFT6XGMAQ AWS_SECRET_ACCESS_KEY=PzFA0bJxxeB+i4kWjowpM6VTQTQfIiejbRxXkZdo aws s3 cp hello  s3://github-amitsaha-bucket/
 upload: ./hello to s3://github-amitsaha-bucket/hello             
 [ec2-user@ip-172-31-6-239 ~]$ AWS_SESSION_TOKEN="FQoDYXdzEI7//////////wEaDDqRJAWz11tovnatwSLuAUf1CIjLW0OI5dTCAh610HW7f3fBxglofbntqxCSJVyei1DafEjriLIskDzKoCdz6Y7F5Z/uyv/Ue7dCCCvXFpVYExwt82hE7yTGrYJB/oQl+bkMIzPhlHyegDa3/+vxdFu2kbcve8a1VlNhZE8fnpaRLGMoEr9/Ll+NQLjtRyysQ7DuN0GuMVIDiUzqOZHVDFDt4/c5LBHd2VZNfZ2t/rfPTkIwfkI9JQUVON+lcrk5W+FH16Onp1vuZXX4cmraMWQ1ROGf2x4fHGPIcMqaw674sgOnMSllyCUONLIaSPOeJLfOSDIrM/Xfv0PvslgotNrK1AU=" AWS_ACCESS_KEY_ID=ASIAI7JVCNUGFT6XGMAQ AWS_SECRET_ACCESS_KEY=PzFA0bJxxeB+i4kWjowpM6VTQTQfIiejbRxXkZdo aws s3 ls s3://github-amitsaha-bucket/
 2018-02-25 12:38:32         12 hello
-[ec2-user@ip-172-31-6-239 ~]$ 
-
 ```
-
