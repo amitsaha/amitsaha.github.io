@@ -37,6 +37,7 @@ Each service running on their own EC2 instance has their own AWS IAM profile whi
 their role and role policy gives them access to the corresponding S3 bucket.
 
 Now, consider the setup below for a developer environment for the above services:
+
 ```
 
                        ┌───────────────────────────┐
@@ -75,13 +76,17 @@ Now, consider the setup below for a developer environment for the above services
 ```
 
 Instead of each service running on their own development EC2 instance, we run all the services
-on a single EC2 instance.
+on a single EC2 instance. This will lead to access denied errors when `service A` tries to access
+`S3Bucket1` and similarly for the other services when they try to access their corresponding
+buckets.
+
 
 ## Setting up test infrastructure
 
 As I note in the diagram above, the individual services will get an access denied error since
 the EC2 instance above is using a different IAM profile than the ones used when the services
-are running in the production setup. Let's demo that first by created a test infrastructure as follows:
+are running in the production setup. Let's see that for ourselves first by created a test 
+infrastructure as follows:
 
 
 - Create a S3 bucket
@@ -89,10 +94,14 @@ are running in the production setup. Let's demo that first by created a test inf
 - Add a policy to `role2` to be able to perform all operations on the S3 bucket
 - Spin up an EC2 instance using `role1`
 
-If we now try to access the S3 bucket from the EC2 instance via the AWS CLI, we will get:
+The [terraform](https://terraform.io) configuration for setting up the above infrastructure can be found 
+[here](). If we now try to access the S3 bucket from the EC2 instance via the AWS CLI, we will get:
 
 ```
-[ec2-user@ip-172-31-6-239 ~]$ aws s3 ls s3://github-amitsaha-bucket/*
+$ ssh ec2-user@<Public-IP>
+..
+
+$ aws s3 ls s3://github-amitsaha-bucket/*
 An error occurred (AccessDenied) when calling the ListObjects operation: Access Denied
 ```
 
@@ -106,40 +115,16 @@ We are going to see how we can implement the second approach.
 ## Solution: Infrastructure setup
 
 There are two stages to implement this solution. The first stage is to setup the infrastructure to allow the
-assume role operation to succeed. This basically means that if an IAM role, `role1` wants to assume another
+assume role operation to succeed. If an IAM role, `role1` wants to assume another
 role, `role2`, then:
 
 - `role1` should be allowed to perform the `sts:AssumeRole` action on `role2`
 - `role2` should allow `role1` to assume itself
 
+The corresponding IAM configuration above will be changed as follows:
+
 
 ```
-resource "aws_iam_instance_profile" "iam_profile1" {
-  name  = "test_profile1"
-  role = "${aws_iam_role.role1.name}"
-}
-
-resource "aws_iam_role" "role1" {
-  name = "test_profile1_role"
-  path = "/"
-
-  assume_role_policy = <<EOF
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Action": "sts:AssumeRole",
-            "Principal": {
-               "Service": "ec2.amazonaws.com"
-            },
-            "Effect": "Allow",
-            "Sid": ""
-        }
-    ]
-}
-EOF
-}
-
 data "aws_iam_policy_document" "assume_role2_policy" {
   statement {
     actions = [
@@ -155,11 +140,6 @@ resource "aws_iam_role_policy" "role1_assume_role2" {
   name   = "AssumeRole2"
   role = "${aws_iam_role.role1.name}"
   policy = "${data.aws_iam_policy_document.assume_role2_policy.json}"
-}
-
-resource "aws_iam_instance_profile" "iam_profile2" {
-  name  = "test_profile2"
-  role = "${aws_iam_role.role2.name}"
 }
 
 resource "aws_iam_role" "role2" {
@@ -183,37 +163,11 @@ resource "aws_iam_role" "role2" {
 }
 EOF
 }
-
-data "aws_iam_policy_document" "conf_bucket_access" {
-  statement {
-    actions = [
-      "s3:ListBucket",
-    ]
-
-    resources = [
-      "${aws_s3_bucket.conf_bucket.arn}",
-    ]
-
-  }
-
-  statement {
-    actions = [
-      "s3:*",
-    ]
-
-    resources = [
-      "${aws_s3_bucket.conf_bucket.arn}",
-      "${aws_s3_bucket.conf_bucket.arn}/*",
-    ]
-  }
-}
-
-resource "aws_iam_role_policy" "conf_bucket_access_policy" {
-  name   = "AccessConfigurationBucket"
-  role = "${aws_iam_role.role2.name}"
-  policy = "${data.aws_iam_policy_document.conf_bucket_access.json}"
-}
 ```
+
+The updated terraform configuration can be found [here](). Let's apply the changes:
+
+
 
 
 
@@ -223,7 +177,8 @@ resource "aws_iam_role_policy" "conf_bucket_access_policy" {
 An error occurred (AccessDenied) when calling the ListObjects operation: Access Denied
 ```
 
-## Solution: Setup the infrastructure
+## Solution: Perform AssumeRole operation
+
 
 ```
 [ec2-user@ip-172-31-6-239 ~]$ aws sts assume-role --role-arn arn:aws:iam::033145145979:role/test_profile2_role --role-session-name s3-example
