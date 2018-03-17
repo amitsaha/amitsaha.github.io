@@ -24,6 +24,8 @@ Data: 25-02-2018
 
 - [Nameko](https://nameko.readthedocs.io/en/stable/) and an [article](http://lucumr.pocoo.org/2015/4/8/microservices-with-nameko/)
   - [Nameko examples](https://github.com/nameko/nameko-examples)
+- [lymph](https://github.com/deliveryhero/lymph)
+- [alchemy-framework](https://github.com/LoyaltyNZ/alchemy-framework)
 
 ### Ideas/Thoughts
 
