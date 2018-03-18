@@ -484,4 +484,6 @@ of the module automatically.
 
 
  
+## Links
 
+- [Hiera - managing data from multiple sources](https://puppet.com/docs/puppet/5.0/hiera_merging.html)
