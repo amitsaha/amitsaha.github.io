@@ -6,5 +6,5 @@ Status: draft
 
 
 ```
-sudo dnf install python*-networkx scilab
+sudo dnf install python*-networkx scilab sagemath
 ```
