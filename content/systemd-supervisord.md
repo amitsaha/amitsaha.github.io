@@ -89,6 +89,8 @@ Wants=drain-connections.service
 
 This ensures that `drain-connections` service gets started when `supervisord` is started.
 
+## Discussion
+
 Let's see how the above fits in to our scenario:
 
 - `systemd` starts the shutdown process and tries to stop `supervisord`
@@ -97,3 +99,6 @@ Let's see how the above fits in to our scenario:
 - `drain-connections` finishes "stopping"
 - `systemd` stops `supervisord`
 - shutdown proceeds
+
+What if `drain-connections` is stopped first? That is okay, because that will execute the necessary commands
+we would want to be execute.
