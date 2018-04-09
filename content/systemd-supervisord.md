@@ -43,6 +43,8 @@ When you are using a software like [linkerd]() as your RPC proxy, even long-live
 The proposed solution is a systemd unit - let's call it `drain-connections` which is defined as follows:
 
 ```
+#  cat /etc/systemd/system/drain-connections.service
+
 [Unit]
 Description=Shutdown hook to run before supervisord is stopped
 After=supervisord.service networking.service
@@ -62,6 +64,21 @@ TimeoutSec=301
 WantedBy=multi-user.target
 ```
 
+Let's go over the key systemd directives used above in the `Unit` section:
+
+1. `After` ensures that `drain-connections` is started after `supervisord`, but stopped before `supervisord`
+2. `PartOf` ensures that `drain-connections` is stopped/restarted whenever `supervisord` is stopped/restarted
+
+The `Service` section has the following key directives:
+
+1. `Type=oneshot` (learn more about it [here](https://www.freedesktop.org/software/systemd/man/systemd.service.html#Type=))
+2. The first `ExecStop` first takes the service instance out of the pool by enabling `consul` maintenance mode
+3. The second `ExecStop` then gives our application 300 seconds to stop finishing what it is currently doing
+4. The `TimeoutSec` parameter override `systemd` default timeout of 90 seconds to 301 seconds so that the earlier sleep
+   of 300 seconds can finish
+
+
+
 In addition, we setup `supervisord` systemd unit override as follows:
 
 ```
@@ -70,3 +87,5 @@ In addition, we setup `supervisord` systemd unit override as follows:
 [Unit]
 Wants=drain-connections.service
 ```
+
+The above 
