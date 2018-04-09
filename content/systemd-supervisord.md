@@ -15,19 +15,20 @@ An example scenario to help us establish the utility for this post is as followw
 - `supervisord` stops your processes
 - You see in-flight requests being dropped
 
+## Solution
 
-What we want to do is **prevent** in-flight requests being dropped. We can do so in two ways:
+What we want to do is **prevent** in-flight requests being dropped when a system is shutting down as part of
+a power off cycle (AWS instance termination, for example). We can do so in two ways:
 
-1. Our server application is intelligent enough to not exit without ever exiting if a request is in progress
+1. Our server application is intelligent enough to not exit (and hence halt instance shutdown) if a request is in progress
 2. We hook into the shutdown process above so that we stop new requests from coming in once the shutdown process has started and give our application server enough time to finish doing what it is doing.
 
-The first appraoch has more theoretical "guarantee" around what we want, but can be hard to implement correctly. 
-What if your clients keep long lived connections? You can never know when it might start sending you a new request. What
-if you just can't do it right even after you have tried all sorts of signal handling tricks? 
+The first approach has more theoretical "guarantee" around what we want, but can be hard to implement correctly. In fact,
+I couldn't get it right even after trying all sorts of signal handling tricks. So, I went ahead with the very unclean
+second approach:
 
-The second approach is a less-pure way of doing it but it gives us a practical guarantee:
-
-- The service takes itself out of the healthy pool
+- Register a shutdown "hook" which gets invoked when `systemd` wants to stop `supervisord`
+- This hook takes the service instance out of the healthy pool
 - The proxy/load balancer detects the above event and stops sending traffic
 - As part of the "hook", after we have gotten ourself out of the healthy service pool, we sleep for an arbitary time so that
 existing requests can finish
@@ -35,9 +36,8 @@ existing requests can finish
 When you are using a software like [linkerd]() as your RPC proxy, even long-lived connections are not a problem since
 `linkerd` will see that your service instance is unhealthy, so it will not proxy any more requests to it.
 
-The second approach can be implemented as follows.
 
-## Proposed solution
+## Proposed solution implementation
 
 The proposed solution is a systemd unit - let's call it `drain-connections` which is defined as follows:
 
