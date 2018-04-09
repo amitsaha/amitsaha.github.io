@@ -15,7 +15,6 @@ An example scenario to help us establish the utility for this post is as followw
 - `supervisord` stops your processes
 - You see in-flight requests being dropped
 
-## Proposed solution
 
 What we want to do is **prevent** in-flight requests being dropped. We can do so in two ways:
 
@@ -36,16 +35,11 @@ existing requests can finish
 When you are using a software like [linkerd]() as your RPC proxy, even long-lived connections are not a problem since
 `linkerd` will see that your service instance is unhealthy, so it will not proxy any more requests to it.
 
+The second approach can be implemented as follows.
 
+## Proposed solution
 
-- essentially buy ourself sometime before `systemd` shuts the
-`supervisord` service down. The proposed solution is a systemd unit - let's call it `drain-connections` which works
-as follows:
-
-- 
-
-
-
+The proposed solution is a systemd unit - let's call it `drain-connections` which is defined as follows:
 
 ```
 [Unit]
