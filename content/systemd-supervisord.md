@@ -3,12 +3,12 @@ Date: 2018-01-12 12:00
 Category: fedora
 Status: Draft
 
-If you are running your server applications via [supervisord]() on a base distro running [systemd](), you may find 
+If you are running your server applications via [supervisord]() on a Linux distro running [systemd](), you may find 
 this post useful.
 
 ## Scenario
 
-An example scenario to help us establish the utility for this post is as followws:
+An example scenario to help us establish the utility for this post is as follows:
 
 - `systemd` starts the shutdown process
 - `systemd` stops `supervisord`
@@ -24,8 +24,9 @@ a power off cycle (AWS instance termination, for example). We can do so in two w
 2. We hook into the shutdown process above so that we stop new requests from coming in once the shutdown process has started and give our application server enough time to finish doing what it is doing.
 
 The first approach has more theoretical "guarantee" around what we want, but can be hard to implement correctly. In fact,
-I couldn't get it right even after trying all sorts of signal handling tricks. So, I went ahead with the very unclean
-second approach:
+I couldn't get it right even after trying all sorts of signal handling tricks. Your mileage may vary of course.
+
+So, I went ahead with the very unclean second approach:
 
 - Register a shutdown "hook" which gets invoked when `systemd` wants to stop `supervisord`
 - This hook takes the service instance out of the healthy pool
@@ -43,35 +44,20 @@ The proposed solution is a systemd unit - let's call it `drain-connections` whic
 
 ```
 [Unit]
-Description=Drain connections
-After=supervisord.service
-BindsTo=supervisord.service
+Description=Shutdown hook to run before supervisord is stopped
+After=supervisord.service networking.service
+PartOf=supervisord.service
 Conflicts=shutdown.target reboot.target halt.target
 
 [Service]
 Type=oneshot
 RemainAfterExit=true
 ExecStart=/bin/true
-ExecStop=/usr/local/bin/supervisorctl stop sheldon
+ExecStop=/usr/local/bin/consul maint -enable
 ExecStop=/bin/sleep 300
-TimeoutSec=300
+
+TimeoutSec=301
 
 [Install]
 WantedBy=multi-user.target
-```
-
-```
-[Unit]
-Description=Process Monitoring and Control Daemon
-After=rc-local.service
-BindsTo=drainconnections
-Before=drainconnections.service
-
-[Service]
-Type=forking
-ExecStart=/usr/bin/supervisord -c /etc/supervisord.conf
-
-[Install]
-WantedBy=multi-user.target
-
 ```
