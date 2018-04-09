@@ -61,3 +61,12 @@ TimeoutSec=301
 [Install]
 WantedBy=multi-user.target
 ```
+
+In addition, we setup `supervisord` systemd unit override as follows:
+
+```
+# /etc/systemd/system/supervisord.service.d/supervisord.conf
+
+[Unit]
+Wants=drain-connections.service
+```
