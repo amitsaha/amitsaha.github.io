@@ -101,4 +101,6 @@ Let's see how the above fits in to our scenario:
 - shutdown proceeds
 
 What if `drain-connections` is stopped first? That is okay, because that will execute the necessary commands
-we would want to be execute.
+we would want to be executed. Then, `supervisord` can be stopped which will stop our application server, but
+the `drain-connections` unit has already done its job by that time.
+
