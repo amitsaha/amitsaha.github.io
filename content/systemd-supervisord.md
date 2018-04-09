@@ -1,7 +1,6 @@
 Title: Doing something before systemd shuts your supervisord down
 Date: 2018-01-12 12:00
-Category: fedora
-Status: Draft
+Category: software
 
 If you are running your server applications via [supervisord](http://supervisord.org/) on a Linux distro running 
 [systemd](https://www.freedesktop.org/wiki/Software/systemd/), you may find this post useful.
