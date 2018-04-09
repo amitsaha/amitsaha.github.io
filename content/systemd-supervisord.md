@@ -1,7 +1,30 @@
-Title: Getting a chance before systemd shuts you down
+Title: Getting a chance before systemd shuts your supervisord down
 Date: 2018-01-12 12:00
 Category: fedora
 Status: Draft
+
+If you are running your server applications via [supervisord]() on a base distro running [systemd](), you may find 
+this post useful.
+
+## Scenario
+
+An example scenario to help us establish the utility for this post is as followws:
+
+- `systemd` starts the shutdown process
+- `systemd` stops `supervisord`
+- `supervisord` stops your processes
+- You see in-flight requests being dropped
+
+## Proposed solution
+
+What we want to do is prevent the last scenario - essentially buy ourself sometime before `systemd` shuts the
+`supervisord` service down. The proposed solution is a systemd unit - let's call it `drain-connections` which works
+as follows:
+
+- 
+
+
+
 
 ```
 [Unit]
