@@ -28,11 +28,14 @@ if you just can't do it right even after you have tried all sorts of signal hand
 
 The second approach is a less-pure way of doing it but it gives us a practical guarantee:
 
-- We signal that we are shutting down (say enable maintenance mode in consul) a specific service instance
-- Our proxy/load balancer detects the above event
-- The proxy/load balancer stops sending traffic
+- The service takes itself out of the healthy pool
+- The proxy/load balancer detects the above event and stops sending traffic
+- As part of the "hook", after we have gotten ourself out of the healthy service pool, we sleep for an arbitary time so that
+existing requests can finish
 
-When you are using a 
+When you are using a software like [linkerd]() as your RPC proxy, even long-lived connections are not a problem since
+`linkerd` will see that your service instance is unhealthy, so it will not proxy any more requests to it.
+
 
 
 - essentially buy ourself sometime before `systemd` shuts the
