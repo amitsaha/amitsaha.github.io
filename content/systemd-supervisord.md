@@ -3,10 +3,10 @@ Date: 2018-01-12 12:00
 Category: fedora
 Status: Draft
 
-If you are running your server applications via [supervisord]() on a Linux distro running [systemd](), you may find 
-this post useful.
+If you are running your server applications via [supervisord](http://supervisord.org/) on a Linux distro running 
+[systemd](https://www.freedesktop.org/wiki/Software/systemd/), you may find this post useful.
 
-## Scenario
+## Problem Scenario
 
 An example scenario to help us establish the utility for this post is as follows:
 
@@ -14,6 +14,7 @@ An example scenario to help us establish the utility for this post is as follows
 - `systemd` stops `supervisord`
 - `supervisord` stops your processes
 - You see in-flight requests being dropped
+
 
 ## Solution
 
@@ -24,7 +25,8 @@ a power off cycle (AWS instance termination, for example). We can do so in two w
 2. We hook into the shutdown process above so that we stop new requests from coming in once the shutdown process has started and give our application server enough time to finish doing what it is doing.
 
 The first approach has more theoretical "guarantee" around what we want, but can be hard to implement correctly. In fact,
-I couldn't get it right even after trying all sorts of signal handling tricks. Your mileage may vary of course.
+I couldn't get it right even after trying all sorts of signal handling tricks. Your mileage may vary of course and if you
+have an example you have, please let me know.
 
 So, I went ahead with the very unclean second approach:
 
@@ -34,7 +36,7 @@ So, I went ahead with the very unclean second approach:
 - As part of the "hook", after we have gotten ourself out of the healthy service pool, we sleep for an arbitary time so that
 existing requests can finish
 
-When you are using a software like [linkerd]() as your RPC proxy, even long-lived connections are not a problem since
+When you are using a software like [linkerd](https://linkerd.io/) as your RPC proxy, even long-lived connections are not a problem since
 `linkerd` will see that your service instance is unhealthy, so it will not proxy any more requests to it.
 
 
@@ -103,4 +105,3 @@ Let's see how the above fits in to our scenario:
 What if `drain-connections` is stopped first? That is okay, because that will execute the necessary commands
 we would want to be executed. Then, `supervisord` can be stopped which will stop our application server, but
 the `drain-connections` unit has already done its job by that time.
-
