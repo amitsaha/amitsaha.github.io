@@ -76,8 +76,7 @@ The `Service` section has the following key directives:
 3. The second `ExecStop` then gives our application 300 seconds to stop finishing what it is currently doing
 4. The `TimeoutSec` parameter override `systemd` default timeout of 90 seconds to 301 seconds so that the earlier sleep
    of 300 seconds can finish
-
-
+   
 
 In addition, we setup `supervisord` systemd unit override as follows:
 
@@ -88,4 +87,13 @@ In addition, we setup `supervisord` systemd unit override as follows:
 Wants=drain-connections.service
 ```
 
-The above 
+This ensures that `drain-connections` service gets started when `supervisord` is started.
+
+Let's see how the above fits in to our scenario:
+
+- `systemd` starts the shutdown process and tries to stop `supervisord`
+- This triggerd `drain-connections` to be stopped where we have the commands we want to be executed
+- The above commands will take the instance out of the pool and sleep for an arbitrary period of time
+- `drain-connections` finishes "stopping"
+- `systemd` stops `supervisord`
+- shutdown proceeds
