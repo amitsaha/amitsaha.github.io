@@ -1,4 +1,4 @@
-Title: Getting a chance before systemd shuts your supervisord down
+Title: Doing something before systemd shuts your supervisord down
 Date: 2018-01-12 12:00
 Category: fedora
 Status: Draft
