@@ -1,7 +1,6 @@
 Title: Notes on using Cloudflare DNS over HTTPS 
-Date: 2017-12-01 16:00
+Date: 2018-04-10 23:00
 Category: infrastructure
-Status: draft
 
 
 I recently learned about Cloudflare's [1.1.1.1](https://developers.cloudflare.com/1.1.1.1/) DNS service. One of the more
