@@ -57,7 +57,21 @@ DNS resolution by using the `cloudflared` client. This server sets up a local DN
 listening to your DNS queries and then proxying them over HTTPS to 1.1.1.1:
 
 ```
+$ sudo tcpdump -i lo0 udp port 53 -vvv22:41 $ sudo tcpdump -i lo0 udp port 53 -vvv
 
+22:41:20.170401 IP (tos 0x0, ttl 64, id 49987, offset 0, flags [none], proto UDP (17), length 67, bad cksum 0 (->b964)!)
+    localhost.49432 > localhost.domain: [bad udp cksum 0xfe42 -> 0xa134!] 39712+ [1au] A? hello1.com. ar: . OPT UDPsize=4096 (39)
+22:41:23.130960 IP (tos 0x0, ttl 64, id 6562, offset 0, flags [none], proto UDP (17), length 67, bad cksum 0 (->6306)!)
+    localhost.domain > localhost.49432: [bad udp cksum 0xfe42 -> 0x20dc!] 39712 ServFail q: A? hello1.com. 0/0/1 ar: . OPT UDPsize=1536 (39)
+^C
+6
+...
+```
+
+In another terminal session, `tcpdump` on traffic to/from 1.1.1.1 will show up as:
+
+
+```
 22:31 $ sudo tcpdump host 1.1.1.1
 tcpdump: data link type PKTAP
 tcpdump: verbose output suppressed, use -v or -vv for full protocol decode
