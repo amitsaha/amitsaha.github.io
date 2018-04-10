@@ -80,6 +80,34 @@ listening on pktap, link-type PKTAP (Apple DLT_PKTAP), capture size 262144 bytes
 ...
 ```
 
+The `cloudfared` server also exports prometheus metrics:
+
+```
+22:57 $ curl 127.0.0.1:64617/metrics | grep coredns | grep count
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100  9795  100  9795    0     0   797k      0 --:--:-- --:--:-- --:--:--  797k
+# HELP coredns_dns_request_count_total Counter of DNS requests made per zone, protocol and family.
+# TYPE coredns_dns_request_count_total counter
+coredns_dns_request_count_total{family="1",proto="udp",zone="."} 242
+coredns_dns_request_duration_seconds_count{zone="."} 242
+coredns_dns_request_size_bytes_count{proto="udp",zone="."} 242
+# HELP coredns_dns_request_type_count_total Counter of DNS requests per type, per zone.
+# TYPE coredns_dns_request_type_count_total counter
+coredns_dns_request_type_count_total{type="A",zone="."} 217
+coredns_dns_request_type_count_total{type="AAAA",zone="."} 25
+# HELP coredns_dns_response_rcode_count_total Counter of response status codes.
+# TYPE coredns_dns_response_rcode_count_total counter
+coredns_dns_response_rcode_count_total{rcode="NOERROR",zone="."} 236
+coredns_dns_response_rcode_count_total{rcode="NXDOMAIN",zone="."} 4
+coredns_dns_response_rcode_count_total{rcode="SERVFAIL",zone="."} 2
+coredns_dns_response_size_bytes_count{proto="udp",zone="."} 242
+..
+```
+
+
+## Firefox and Cloudflare
+
 Another interesting bit of information I learned about was Mozilla's plan to integrate DNS over HTTPS in their Firefox
 browser. This [article](https://www.ghacks.net/2018/03/20/firefox-dns-over-https-and-a-worrying-shield-study/) has the
 details.
