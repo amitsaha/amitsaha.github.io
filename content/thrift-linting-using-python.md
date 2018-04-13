@@ -13,3 +13,6 @@ developers and others.
 The first step to creating linting rules is to of course parse the Thrift IDL. The [ptsd](https://github.com/wickman/ptsd)
 Python package works great to parse thrift IDLs. Given a thrift definition file, you will get a `tree` object which then
 includes the various objects that your thrift IDL defines.
+
+
+https://secure.phabricator.com/book/phabricator/article/arcanist_lint_script_and_regex/
