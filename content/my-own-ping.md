@@ -33,3 +33,4 @@ asaha@asaha-desktop:~$ ./a.out
 ### Resources
 
 - [Stackoverflow](https://stackoverflow.com/questions/8290046/icmp-sockets-linux)
+- ["ping" socket](https://lwn.net/Articles/443051/)
