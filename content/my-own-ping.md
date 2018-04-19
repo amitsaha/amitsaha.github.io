@@ -1,9 +1,12 @@
-Title: My own ping
+Title: Roughly understanding how ping works over IPv4 on Linux
 Date: 2018-02-19 07:40
 Category: software
 Status: Draft
 
-## C
+https://lwn.net/Articles/443051/
+
+
+
 ```
 $ strace -f ping 127.0.0.1 -c 1 -4
 ```
