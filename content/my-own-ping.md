@@ -42,8 +42,12 @@ write(1, "64 bytes from 127.0.0.1: icmp_se"..., 5764 bytes from 127.0.0.1: icmp_
 
 ```
 
+http://www.galaxyvisions.com/pdf/white-papers/How_does_Ping_Work_Style_1_GV.pdf
+
 https://github.com/iputils/iputils/issues/125
 
+
+http://www.genetech.com.au/blog/?p=970
 
 
 ```
