@@ -20,3 +20,11 @@ includes the various objects that your thrift IDL defines:
 
 
 https://secure.phabricator.com/book/phabricator/article/arcanist_lint_script_and_regex/
+{
+  "linters": {
+    "thriftidl": {
+      "include": "(\\.thrift$)",
+      "script-and-regex.regex": "/^(?P<severity>warning|error):(?P<line>\\d+) (?P<message>.*)$/m",
+      "script-and-regex.script": "./linter.py",
+      "type": "script-and-regex"
+    },
