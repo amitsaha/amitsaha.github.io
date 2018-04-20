@@ -7,7 +7,7 @@ The `ping` program is one of the most common programs which is used to check the
 a typical execution looks as follows:
 
 ```
-$ ping 127.0.0.1 -c 1
+$ ping 127.0.0.1 -c 1 -4
 
 PING 127.0.0.1 (127.0.0.1) 56(84) bytes of data.
 64 bytes from 127.0.0.1: icmp_seq=1 ttl=64 time=0.062 ms
@@ -17,12 +17,13 @@ PING 127.0.0.1 (127.0.0.1) 56(84) bytes of data.
 rtt min/avg/max/mdev = 0.062/0.062/0.062/0.000 ms
 ```
 
-The `-c` switch indicates that we want to send a single "probe". It basically works by sending a special
-network packet to your destination host and waits for the host to reply back. Then, it prints if any packets
-were lost and the timing statistics.
+The `-c` switch indicates that we want to send a single "probe". The `-4` switch limits the `ping` program to stay
+confined to making network operations related to IPv4 only.
 
-I wanted to understand how the program works - what does it send? what does it receive? The final product ideally
-would be a C program which will be a basic version of `ping`.
+It basically works by sending a special network packet to your destination host and waits for the host to 
+reply back. Then, it prints if any packets were lost and the timing statistics. I wanted to understand 
+how the program works - what does it send? what does it receive? The final product ideally would be a 
+C program which will be a basic version of `ping`.
 
 ## Theory
 
@@ -36,12 +37,14 @@ that's not required.
 The post [here](http://www.genetech.com.au/blog/?p=970) describes the packet structure a bit more along with a graphical
 representation.
 
-## stracing ping
-
-With that basic theoretical idea above, let's see what is happening at the system call level using `strace`:
-
+With that bit of theory under our belt, let's look into what system calls are made as part of the above invocation
+of the `ping` program.
 
 
+## System calls made as part of ping
+
+With that basic theoretical idea above, let's see what is happening at the system call level using `strace`. If you don't
+have `strace` installed, please install it.
 
 
 ```
@@ -112,6 +115,13 @@ $ sudo sysctl -w net.ipv4.ping_group_range="0 1000"
 net.ipv4.ping_group_range = 0 2000
 asaha@asaha-desktop:~$ ./a.out
 ```
+
+## Implementation
+
+Next, we will look at the implementation of `ping` which is part of the [iputils](https://github.com/iputils/iputils) suite
+of programs. However, before that, let's first see which network related system calls are made as part of the ping program
+execution. 
+
 https://lwn.net/Articles/443051/
 
 ### Resources
