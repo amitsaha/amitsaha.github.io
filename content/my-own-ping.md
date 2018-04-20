@@ -33,9 +33,14 @@ ICMP packet embedded within a IP packet. The destination host doesn't have any u
 the "ping" packet. Each packet only has `header` information. You can embed specific data into the ICMP packet, but
 that's not required.
 
+The post [here](http://www.genetech.com.au/blog/?p=970) describes the packet structure a bit more along with a graphical
+representation.
+
+## stracing ping
+
+With that basic theoretical idea above, let's see what is happening at the system call level using `strace`:
 
 
-https://lwn.net/Articles/443051/
 
 
 
@@ -107,7 +112,7 @@ $ sudo sysctl -w net.ipv4.ping_group_range="0 1000"
 net.ipv4.ping_group_range = 0 2000
 asaha@asaha-desktop:~$ ./a.out
 ```
-
+https://lwn.net/Articles/443051/
 
 ### Resources
 
