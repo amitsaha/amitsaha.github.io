@@ -80,9 +80,12 @@ a
 
 Let's look at the first three lines of the trace:
 
-**socket(AF_INET, SOCK_DGRAM, IPPROTO_ICMP) = 3 **
+**socket(AF_INET, SOCK_DGRAM, IPPROTO_ICMP) = 3**
 
-**socket(AF_INET, SOCK_DGRAM, IPPROTO_IP) = 4 **
+The above creates a socket of type `SOCK_DGRAM` and the protocol as `IPPROTO_ICMP`. The IPPROTO_ICMP socket
+protocol was [added](https://lwn.net/Articles/443051/) to allow a friendlier way to create ICMP packets.
+
+**socket(AF_INET, SOCK_DGRAM, IPPROTO_IP) = 4**
 
 **connect(4, {sa_family=AF_INET, sin_port=htons(1025), sin_addr=inet_addr("127.0.0.1")}, 16) = 0**
 
