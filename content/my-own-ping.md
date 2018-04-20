@@ -3,6 +3,9 @@ Date: 2018-02-19 07:40
 Category: software
 Status: Draft
 
+The `ping` program is one of the most common programs which is used to check the "aliveness" of a host and
+a typical execution looks as follows:
+
 https://lwn.net/Articles/443051/
 
 
