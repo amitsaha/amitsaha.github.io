@@ -32,60 +32,61 @@ of the works. The non-detailed version is that we create a specially creafted IC
 packet and send it across to the destination. The destination Linux kernel receives the packet, and sends a reply
 ICMP packet embedded within a IP packet. The destination host doesn't have any user space program running to receive
 the "ping" packet. Each packet only has `header` information. You can embed specific data into the ICMP packet, but
-that's not required.
-
-The post [here](http://www.genetech.com.au/blog/?p=970) describes the packet structure a bit more along with a graphical
+that's not required. The post [here](http://www.genetech.com.au/blog/?p=970) describes the packet structure a bit more along with a graphical
 representation.
 
 With that bit of theory under our belt, let's look into what system calls are made as part of the above invocation
 of the `ping` program.
 
-
 ## System calls made as part of ping
 
 With that basic theoretical idea above, let's see what is happening at the system call level using `strace`. If you don't
-have `strace` installed, please install it.
+have `strace` installed, please install it using your package manager.
 
+Let's now execute the above `ping` program under `strace`:
 
 ```
 $ strace -f ping 127.0.0.1 -c 1 -4
 ```
 
+You will see the output of the above command similar to:
 
 ```
+$ strace -e trace=network ping 127.0.0.1 -c 1 -4
 socket(AF_INET, SOCK_DGRAM, IPPROTO_ICMP) = 3
-capget({version=_LINUX_CAPABILITY_VERSION_3, pid=0}, NULL) = 0
-capget({version=_LINUX_CAPABILITY_VERSION_3, pid=0}, {effective=0, permitted=0, inheritable=0}) = 0
 socket(AF_INET, SOCK_DGRAM, IPPROTO_IP) = 4
 connect(4, {sa_family=AF_INET, sin_port=htons(1025), sin_addr=inet_addr("127.0.0.1")}, 16) = 0
-getsockname(4, {sa_family=AF_INET, sin_port=htons(43365), sin_addr=inet_addr("127.0.0.1")}, [16]) = 0
-close(4)                                = 0
+getsockname(4, {sa_family=AF_INET, sin_port=htons(34117), sin_addr=inet_addr("127.0.0.1")}, [16]) = 0
 setsockopt(3, SOL_IP, IP_RECVERR, [1], 4) = 0
 setsockopt(3, SOL_IP, IP_RECVTTL, [1], 4) = 0
 setsockopt(3, SOL_IP, IP_RETOPTS, [1], 4) = 0
 setsockopt(3, SOL_SOCKET, SO_SNDBUF, [324], 4) = 0
 setsockopt(3, SOL_SOCKET, SO_RCVBUF, [65536], 4) = 0
 getsockopt(3, SOL_SOCKET, SO_RCVBUF, [131072], [4]) = 0
-fstat(1, {st_mode=S_IFCHR|0620, st_rdev=makedev(136, 2), ...}) = 0
-write(1, "PING 127.0.0.1 (127.0.0.1) 56(84"..., 49PING 127.0.0.1 (127.0.0.1) 56(84) bytes of data.
-) = 49
+PING 127.0.0.1 (127.0.0.1) 56(84) bytes of data.
 setsockopt(3, SOL_SOCKET, SO_TIMESTAMP, [1], 4) = 0
 setsockopt(3, SOL_SOCKET, SO_SNDTIMEO, "\1\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0", 16) = 0
 setsockopt(3, SOL_SOCKET, SO_RCVTIMEO, "\1\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0", 16) = 0
-rt_sigaction(SIGINT, {sa_handler=0x55e0c30fc440, sa_mask=[], sa_flags=SA_RESTORER|SA_INTERRUPT, sa_restorer=0x7fe01d753140}, NULL, 8) = 0
-rt_sigaction(SIGALRM, {sa_handler=0x55e0c30fc440, sa_mask=[], sa_flags=SA_RESTORER|SA_INTERRUPT, sa_restorer=0x7fe01d753140}, NULL, 8) = 0
-rt_sigaction(SIGQUIT, {sa_handler=0x55e0c30fc430, sa_mask=[], sa_flags=SA_RESTORER|SA_INTERRUPT, sa_restorer=0x7fe01d753140}, NULL, 8) = 0
-rt_sigprocmask(SIG_SETMASK, [], NULL, 8) = 0
-ioctl(1, TCGETS, {B38400 opost isig icanon echo ...}) = 0
-ioctl(1, TIOCGWINSZ, {ws_row=14, ws_col=115, ws_xpixel=0, ws_ypixel=0}) = 0
-sendto(3, "\10\0(l\0\0\0\1>,\330Z\0\0\0\0\3618\t\0\0\0\0\0\20\21\22\23\24\25\26\27"..., 64, 0, {sa_family=AF_INET, sin_port=htons(0), sin_addr=inet_addr("127.0.0.1")}, 16) = 64
-setitimer(ITIMER_REAL, {it_interval={tv_sec=0, tv_usec=0}, it_value={tv_sec=10, tv_usec=0}}, NULL) = 0
-recvmsg(3, {msg_name={sa_family=AF_INET, sin_port=htons(0), sin_addr=inet_addr("127.0.0.1")}, msg_namelen=128->16, msg_iov=[{iov_base="\0\0000\20\0\\\0\1>,\330Z\0\0\0\0\3618\t\0\0\0\0\0\20\21\22\23\24\25\26\27"..., iov_len=192}], msg_iovlen=1, msg_control=[{cmsg_len=32, cmsg_level=SOL_SOCKET, cmsg_type=0x1d /* SCM_??? */}, {cmsg_len=20, cmsg_level=SOL_IP, cmsg_type=IP_TTL, cmsg_data=[64]}], msg_controllen=56, msg_flags=0}, 0) = 64
-write(1, "64 bytes from 127.0.0.1: icmp_se"..., 5764 bytes from 127.0.0.1: icmp_seq=1 ttl=64 time=0.059 ms
+sendto(3, "\10\0q9\0\0\0\1\254k\331Z\0\0\0\0B,\0\0\0\0\0\0\20\21\22\23\24\25\26\27"..., 64, 0, {sa_family=AF_INET, sin_port=htons(0), sin_addr=inet_addr("127.0.0.1")}, 16) = 64
+recvmsg(3, {msg_name={sa_family=AF_INET, sin_port=htons(0), sin_addr=inet_addr("127.0.0.1")}, msg_namelen=128->16, msg_iov=[{iov_base="\0\0x\314\0m\0\1\254k\331Z\0\0\0\0B,\0\0\0\0\0\0\20\21\22\23\24\25\26\27"..., iov_len=192}], msg_iovlen=1, msg_control=[{cmsg_len=32, cmsg_level=SOL_SOCKET, cmsg_type=0x1d /* SCM_??? */}, {cmsg_len=20, cmsg_level=SOL_IP, cmsg_type=IP_TTL, cmsg_data=[64]}], msg_controllen=56, msg_flags=0}, 0) = 64
+64 bytes from 127.0.0.1: icmp_seq=1 ttl=64 time=0.188 ms
 
+--- 127.0.0.1 ping statistics ---
+1 packets transmitted, 1 received, 0% packet loss, time 0ms
+rtt min/avg/max/mdev = 0.188/0.188/0.188/0.000 ms
++++ exited with 0 +++
+a
 ```
 
-http://www.galaxyvisions.com/pdf/white-papers/How_does_Ping_Work_Style_1_GV.pdf
+Let's look at the first three lines of the trace:
+
+**socket(AF_INET, SOCK_DGRAM, IPPROTO_ICMP) = 3 **
+
+**socket(AF_INET, SOCK_DGRAM, IPPROTO_IP) = 4 **
+
+**connect(4, {sa_family=AF_INET, sin_port=htons(1025), sin_addr=inet_addr("127.0.0.1")}, 16) = 0**
+
+
 
 https://github.com/iputils/iputils/issues/125
 
