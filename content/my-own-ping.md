@@ -6,6 +6,30 @@ Status: Draft
 The `ping` program is one of the most common programs which is used to check the "aliveness" of a host and
 a typical execution looks as follows:
 
+```
+$ ping 127.0.0.1 -c 1
+
+PING 127.0.0.1 (127.0.0.1) 56(84) bytes of data.
+64 bytes from 127.0.0.1: icmp_seq=1 ttl=64 time=0.062 ms
+
+--- 127.0.0.1 ping statistics ---
+1 packets transmitted, 1 received, 0% packet loss, time 0ms
+rtt min/avg/max/mdev = 0.062/0.062/0.062/0.000 ms
+```
+
+The `-c` switch indicates that we want to send a single "probe". It basically works by sending a special
+network packet to your destination host and waits for the host to reply back. Then, it prints if any packets
+were lost and the timing statistics.
+
+I wanted to understand how the program works - what does it send? what does it receive? The final product ideally
+would be a C program which will be a basic version of `ping`.
+
+## Theory
+
+
+
+
+
 https://lwn.net/Articles/443051/
 
 
