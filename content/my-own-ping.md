@@ -1,4 +1,4 @@
-Title: Roughly understanding how ping works over IPv4 on Linux
+Title: How does ping (roughly) works over IPv4 on Linux?
 Date: 2018-02-19 07:40
 Category: software
 Status: Draft
