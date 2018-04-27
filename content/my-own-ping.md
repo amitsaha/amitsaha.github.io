@@ -43,13 +43,13 @@ of the `ping` program using `strace`.
 If you don't have `strace` installed, please install it using your package manager. Let's now execute the above `ping` program under `strace`:
 
 ```
-$ strace -f ping 127.0.0.1 -c 1 -4
+$ strace -e trace=network ping 127.0.0.1 -c 1 -4
 ```
 
 You will see the output of the above command similar to:
 
 ```
-$ strace -e trace=network ping 127.0.0.1 -c 1 -4
+..
 socket(AF_INET, SOCK_DGRAM, IPPROTO_ICMP) = 3
 socket(AF_INET, SOCK_DGRAM, IPPROTO_IP) = 4
 connect(4, {sa_family=AF_INET, sin_port=htons(1025), sin_addr=inet_addr("127.0.0.1")}, 16) = 0
@@ -75,7 +75,7 @@ rtt min/avg/max/mdev = 0.188/0.188/0.188/0.000 ms
 a
 ```
 
-Let's look at the first three lines of the trace:
+Let's look at the first four lines of the trace:
 
 _socket(AF_INET, SOCK_DGRAM, IPPROTO_ICMP) = 3_
 
@@ -122,9 +122,7 @@ asaha@asaha-desktop:~$ ./a.out
 
 ## Implementation
 
-Next, we will look at the implementation of `ping` which is part of the [iputils](https://github.com/iputils/iputils) suite
-of programs. However, before that, let's first see which network related system calls are made as part of the ping program
-execution. 
+
 
 https://lwn.net/Articles/443051/
 
