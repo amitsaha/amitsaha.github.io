@@ -27,7 +27,7 @@ C program which will be a basic version of `ping`.
 ## Theory
 
 This [pdf](http://www.galaxyvisions.com/pdf/white-papers/How_does_Ping_Work_Style_1_GV.pdf) here has a good description
-of the worksing of ping. The non-detailed version is that we create a special ICMP packet, package it up within a IP 
+of the working of ping. The non-detailed version is that we create a special ICMP packet, package it up within a IP 
 packet and send it across to the destination. The destination Linux kernel receives the packet, and sends a reply
 ICMP packet embedded within a IP packet. The destination host doesn't have any user space program running to receive
 the "ping" packet. Each packet only has `header` information. You can embed specific data into the ICMP packet, but
