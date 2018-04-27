@@ -1,4 +1,4 @@
-Title: How does ping (roughly) works over IPv4 on Linux?
+Title: How does ping roughly work over IPv4 on Linux?
 Date: 2018-02-19 07:40
 Category: software
 Status: Draft
@@ -87,15 +87,15 @@ returned is important to note here - `3`.
 
 _socket(AF_INET, SOCK_DGRAM, IPPROTO_IP) = 4_
 
-**connect(4, {sa_family=AF_INET, sin_port=htons(1025), sin_addr=inet_addr("127.0.0.1")}, 16) = 0**
+This creates another socket with `IPPROTO_IP` protocol and then uses it to connect to the UDP port 1025 on
+the target host:
 
+_connect(4, {sa_family=AF_INET, sin_port=htons(1025), sin_addr=inet_addr("127.0.0.1")}, 16) = 0_
 
+The above two steps are needed to figure out the IP address of the network interface that will be used
+to send the ICMP packets to the destination host. 
 
-https://github.com/iputils/iputils/issues/125
-
-
-http://www.genetech.com.au/blog/?p=970
-
+I am not quite sure why we need the new socket, hence I created an [issue] on the `iputils` project (https://github.com/iputils/iputils/issues/125) to request any clarification.
 
 ```
 $ ./a.out
