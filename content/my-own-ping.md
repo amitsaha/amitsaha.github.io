@@ -28,22 +28,19 @@ C program which will be a basic version of `ping`.
 ## Theory
 
 This [pdf](http://www.galaxyvisions.com/pdf/white-papers/How_does_Ping_Work_Style_1_GV.pdf) here has a good description
-of the works. The non-detailed version is that we create a specially creafted ICMP packet, package it up within a IP 
+of the worksing of ping. The non-detailed version is that we create a special ICMP packet, package it up within a IP 
 packet and send it across to the destination. The destination Linux kernel receives the packet, and sends a reply
 ICMP packet embedded within a IP packet. The destination host doesn't have any user space program running to receive
 the "ping" packet. Each packet only has `header` information. You can embed specific data into the ICMP packet, but
-that's not required. The post [here](http://www.genetech.com.au/blog/?p=970) describes the packet structure a bit more along with a graphical
-representation.
+that's not required. The post [here](http://www.genetech.com.au/blog/?p=970) describes the packet structure a bit 
+more along with a graphical representation.
 
 With that bit of theory under our belt, let's look into what system calls are made as part of the above invocation
-of the `ping` program.
+of the `ping` program using `strace`.
 
 ## System calls made as part of ping
 
-With that basic theoretical idea above, let's see what is happening at the system call level using `strace`. If you don't
-have `strace` installed, please install it using your package manager.
-
-Let's now execute the above `ping` program under `strace`:
+If you don't have `strace` installed, please install it using your package manager. Let's now execute the above `ping` program under `strace`:
 
 ```
 $ strace -f ping 127.0.0.1 -c 1 -4
@@ -80,12 +77,15 @@ a
 
 Let's look at the first three lines of the trace:
 
-**socket(AF_INET, SOCK_DGRAM, IPPROTO_ICMP) = 3**
+_socket(AF_INET, SOCK_DGRAM, IPPROTO_ICMP) = 3_
 
 The above creates a socket of type `SOCK_DGRAM` and the protocol as `IPPROTO_ICMP`. The IPPROTO_ICMP socket
-protocol was [added](https://lwn.net/Articles/443051/) to allow a friendlier way to create ICMP packets.
+protocol was [added](https://lwn.net/Articles/443051/) to allow a friendlier way to create ICMP packets. This
+eliminates the need to create "RAW" sockets which in turn eliminates the need to have the 
+[CAP_NET_RAW](http://man7.org/linux/man-pages/man7/capabilities.7.html) capability. The file descriptor
+returned is important to note here - `3`.
 
-**socket(AF_INET, SOCK_DGRAM, IPPROTO_IP) = 4**
+_socket(AF_INET, SOCK_DGRAM, IPPROTO_IP) = 4_
 
 **connect(4, {sa_family=AF_INET, sin_port=htons(1025), sin_addr=inet_addr("127.0.0.1")}, 16) = 0**
 
