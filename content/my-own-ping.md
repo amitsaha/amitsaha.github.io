@@ -114,7 +114,13 @@ receive the reply from the destination host respectively.
 We now know enough to copy bits and pieces from the `ping` implementation of the
 [iputils](https://github.com/iputils/iputils) project to transform our above understanding into code.
 The C implementation is in [ping.c](https://github.com/amitsaha/ping/blob/master/ping.c). It just sends a single
-ping and does a blockin read to read the reply. It has a number of inline comments to help understand what's going on. 
+ping and does a blocking read to read the reply. It has a number of inline comments to help understand what's going on. 
+
+One of the key comments there in is about the use of the ICMP identifier [RFC](http://www.networksorcery.com/enp/rfc/rfc792.txt). 
+When use a RAW socket, i.e. `IPPROTO_RAW` as the protocol type, we have to set the ICMP identifier when sending and 
+check if it's the same on receipt of an ICMP reply that whether it is meant for us or not. We don't need to do that 
+for `IPPROTOCOL_ICMP` since the Kernel automatically does that for us.
+
 You can compile it on a Linux system as:
 
 ```
@@ -166,8 +172,28 @@ Sent 64 bytes
 Reply of 64 bytes received
 icmp_seq = 1
 ```
+## Parting notes
+
+If you have been following along starting from `strace` at the beginning you can see that I could run `ping` without
+needed `sudo` or having to set the group sysctl parameter. What happened? The `ping` program has the [setuid](https://www.cyberciti.biz/faq/unix-bsd-linux-setuid-file/) bit set:
+
+```
+ $ ls -lrt /bin/ping
+-rwsr-xr-x 1 root root 64424 Mar  9  2017 /bin/ping
+```
+
+Hence, we could do the same for our `./a.out` file above:
+
+```
+05:30 $ sudo chown root:root ./a.out
+05:30 $ sudo chmod u+s ./a.out
+05:30 $ sudo chmod g+s ./a.out
+```
+
+Then, we would not need to change the sysctl parameter.
 
 ### Resources
 
 - [Stackoverflow](https://stackoverflow.com/questions/8290046/icmp-sockets-linux)
 - ["ping" socket](https://lwn.net/Articles/443051/)
+- [ping source](https://github.com/iputils/iputils)
