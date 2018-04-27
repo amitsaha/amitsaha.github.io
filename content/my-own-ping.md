@@ -75,7 +75,7 @@ rtt min/avg/max/mdev = 0.188/0.188/0.188/0.000 ms
 a
 ```
 
-Let's look at the first four lines of the trace:
+Let's first look at the first four lines of the trace:
 
 _socket(AF_INET, SOCK_DGRAM, IPPROTO_ICMP) = 3_
 
@@ -92,10 +92,24 @@ the target host:
 
 _connect(4, {sa_family=AF_INET, sin_port=htons(1025), sin_addr=inet_addr("127.0.0.1")}, 16) = 0_
 
-The above two steps are needed to figure out the IP address of the network interface that will be used
-to send the ICMP packets to the destination host. 
+And then, uses [getsockname](http://man7.org/linux/man-pages/man2/getsockname.2.html) to get the address
+the socket is bound to:
 
-I am not quite sure why we need the new socket, hence I created an [issue] on the `iputils` project (https://github.com/iputils/iputils/issues/125) to request any clarification.
+_getsockname(4, {sa_family=AF_INET, sin_port=htons(34117), sin_addr=inet_addr("127.0.0.1")}, [16]) = 0_
+
+The above three steps are needed to figure out the IP address of the network interface that will be used
+to send the ICMP packets to the destination host.  I am not quite sure why we need the new socket, hence 
+I created an [issue] on the `iputils` project (https://github.com/iputils/iputils/issues/125) to request a
+clarification.
+
+Let's now continue with the trace. We can see a bunch of [setsockopt](https://linux.die.net/man/2/setsockopt) system 
+calls, but they are all on the first socket that was created i.e. for `IPPROTO_ICMP` with the file descriptor, 3.
+
+Finally, we have the call to, [sendto](https://linux.die.net/man/2/sendto) and [recvmsg](https://linux.die.net/man/2/recvmsg) 
+system calls which are used to send the IP packet (with the ICMP packet embedded in it) to the destination host and then
+receive the reply from the destination host respectively.
+
+
 
 ```
 $ ./a.out
@@ -123,8 +137,6 @@ asaha@asaha-desktop:~$ ./a.out
 ## Implementation
 
 
-
-https://lwn.net/Articles/443051/
 
 ### Resources
 
