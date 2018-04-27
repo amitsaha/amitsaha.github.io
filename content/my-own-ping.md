@@ -1,5 +1,5 @@
 Title: How does ping roughly work over IPv4 on Linux?
-Date: 2018-02-19 07:40
+Date: 2018-04-27 16:40
 Category: software
 
 The `ping` program is one of the most common programs which is used to check the "aliveness" of a host and
