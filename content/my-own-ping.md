@@ -113,8 +113,9 @@ receive the reply from the destination host respectively.
 
 We now know enough to copy bits and pieces from the `ping` implementation of the
 [iputils](https://github.com/iputils/iputils) project to transform our above understanding into code.
-The C implementation is in [ping.c](https://github.com/amitsaha/ping/blob/master/ping.c). It has a number of
-inline comments to help understand what's going on. You can compile it on a Linux system as:
+The C implementation is in [ping.c](https://github.com/amitsaha/ping/blob/master/ping.c). It just sends a single
+ping and does a blockin read to read the reply. It has a number of inline comments to help understand what's going on. 
+You can compile it on a Linux system as:
 
 ```
 $ gcc ping.c
@@ -127,26 +128,44 @@ $ ./a.out 127.0.0.1
 Error creating socket: Permission denied
 ```
 
-That's because the IPPROTO_ICMP support was added to Linux along with a configurable parameter
+That's because the IPPROTO_ICMP support was added to Linux along with a configurable `sysctl` parameter: `ping_group_Range`.
+To print the current value of this:
 
 ```
 $ sudo sysctl net.ipv4.ping_group_range
 net.ipv4.ping_group_range = 1   0
 ```
 
+Now, we can update the parameter above to include our group ID:
+
 ```
 $ id -g
 1000
+$ sudo sysctl -w net.ipv4.ping_group_range="0 1000"
+net.ipv4.ping_group_range = 0 2000
 ```
 
 (If you are a member of multiple groups, the range has to include only one of the groups)
 
+Now, let's try sending a single ping:
+
 ```
-$ sudo sysctl -w net.ipv4.ping_group_range="0 1000"
-net.ipv4.ping_group_range = 0 2000
-asaha@asaha-desktop:~$ ./a.out
+$ ./a.out 127.0.0.1
+Sent 64 bytes
+127.0.0.1
+Reply of 64 bytes received
+icmp_seq = 1
 ```
 
+Or an external host:
+
+```
+04:48 $ ./a.out 8.8.8.8
+Sent 64 bytes
+8.8.8.8
+Reply of 64 bytes received
+icmp_seq = 1
+```
 
 ### Resources
 
