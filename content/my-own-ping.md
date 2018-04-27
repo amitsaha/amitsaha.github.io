@@ -99,7 +99,7 @@ _getsockname(4, {sa_family=AF_INET, sin_port=htons(34117), sin_addr=inet_addr("1
 
 The above three steps are needed to figure out the IP address of the network interface that will be used
 to send the ICMP packets to the destination host.  I am not quite sure why we need the new socket, hence 
-I created an [issue] on the `iputils` project (https://github.com/iputils/iputils/issues/125) to request a
+I created an [issue](https://github.com/iputils/iputils/issues/125)  on the `iputils` project  to request a
 clarification.
 
 Let's now continue with the trace. We can see a bunch of [setsockopt](https://linux.die.net/man/2/setsockopt) system 
@@ -109,12 +109,25 @@ Finally, we have the call to, [sendto](https://linux.die.net/man/2/sendto) and [
 system calls which are used to send the IP packet (with the ICMP packet embedded in it) to the destination host and then
 receive the reply from the destination host respectively.
 
+## Implementation
 
+We now know enough to copy bits and pieces from the `ping` implementation of the
+[iputils](https://github.com/iputils/iputils) project to transform our above understanding into code.
+The C implementation is in [ping.c](https://github.com/amitsaha/ping/blob/master/ping.c). It has a number of
+inline comments to help understand what's going on. You can compile it on a Linux system as:
 
 ```
-$ ./a.out
+$ gcc ping.c
+```
+
+If we now try to execute the created binary, we will likely get a permission denied error:
+
+```
+$ ./a.out 127.0.0.1
 Error creating socket: Permission denied
 ```
+
+That's because the IPPROTO_ICMP support was added to Linux along with a configurable parameter
 
 ```
 $ sudo sysctl net.ipv4.ping_group_range
@@ -133,9 +146,6 @@ $ sudo sysctl -w net.ipv4.ping_group_range="0 1000"
 net.ipv4.ping_group_range = 0 2000
 asaha@asaha-desktop:~$ ./a.out
 ```
-
-## Implementation
-
 
 
 ### Resources
