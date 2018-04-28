@@ -1,12 +1,12 @@
 About
 =====
 
-My name is Amit, I am interested in programming, software tools and infrastructure. 
-I like learning and sharing my learnings via my writings. I am the author of a couple
-of books (most recently of`Doing Math with Python <https://doingmathwithpython.github.io>`__).
-
-I live in Sydney, Australia. I currently work at RateSetter Australia (since April 2018).
-Previously, I have worked as a software engineer at Freelancer.com, Sydney and at Red Hat, Brisbane.
+My name is Amit, I am interested in programming, software tools and infrastructure. I
+like sharing what I learn and know via my writings and talks. I try and take time out
+to learn from first principles when learning something new. If I cannot do it then,
+I come back to it. A lot of what I explore in software makes it to my 
+GitHub profile (@echorand).
 
 You can contact me via `email <mailto:amitsaha.in@gmail.com>`__,  on `Twitter <http://twitter.com/echorand>`__
 and on `LinkedIn <https://au.linkedin.com/in/echorand>`__.
+
