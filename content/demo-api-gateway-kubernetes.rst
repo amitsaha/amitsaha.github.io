@@ -196,6 +196,7 @@ To create the deployment:
 
 
 .. code::
+
     $ cat kubernetes/service.yml
       apiVersion: v1
       kind: Service
