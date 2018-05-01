@@ -1,6 +1,7 @@
 :Title: Deploying a demo API gateway in a local Kubernetes cluster
 :Date: 2017-05-06 19:00
 :Category: kubernetes
+:Status: Draft
 
 I wrote up a demo `API Gateway <https://github.com/amitsaha/apigatewaydemo>`__ a while back which demonstrated how we can
 write an API gateway which would forward incoming requests to downstream services using HTTP and a gRPC service as
