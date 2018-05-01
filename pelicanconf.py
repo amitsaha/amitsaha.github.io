@@ -34,12 +34,12 @@ STATIC_PATHS = ['images']
 
 PLUGIN_PATHS = ['/tmp/pelican-plugins', 'plugins']
 PLUGINS = [
+    'extract_toc',
     'code_include',
     'pelican_youtube',
     'pelican_gist',
     'share_post',
-    'pelican_notes',
-    'extract_toc',
+    'pelican_notes',    
 ]
 
 MD_EXTENSIONS =  [ 'toc', 'codehilite','extra']
