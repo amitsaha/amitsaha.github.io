@@ -39,6 +39,7 @@ PLUGINS = [
     'pelican_gist',
     'share_post',
     'pelican_notes',
+    'extract_toc',
 ]
 
 MD_EXTENSIONS =  [ 'toc', 'codehilite','extra']
