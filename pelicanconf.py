@@ -33,8 +33,7 @@ STATIC_PATHS = ['images']
 
 
 PLUGIN_PATHS = ['/tmp/pelican-plugins', 'plugins']
-PLUGINS = [
-    'extract_toc',
+PLUGINS = [    
     'code_include',
     'pelican_youtube',
     'pelican_gist',
@@ -42,7 +41,7 @@ PLUGINS = [
     'pelican_notes',    
 ]
 
-MD_EXTENSIONS =  [ 'toc', 'codehilite','extra']
+MARKDOWN =  [ 'toc', 'codehilite','extra']
 
 NOTE_PATHS = 'notes'
 NOTE_SAVE_AS = 'notes/{slug}.html'
