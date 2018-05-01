@@ -41,6 +41,8 @@ PLUGINS = [
     'pelican_notes',
 ]
 
+MD_EXTENSIONS =  [ 'toc', 'codehilite','extra']
+
 NOTE_PATHS = 'notes'
 NOTE_SAVE_AS = 'notes/{slug}.html'
 NOTE_URL = 'notes/{slug}.html'
