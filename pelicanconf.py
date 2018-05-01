@@ -6,7 +6,7 @@ import os
 
 AUTHOR = u'Amit Saha'
 SITENAME = u'Exploring Software and Writing about it'
-SITEURL = 'http://echorand.me'
+SITEURL = 'https://echorand.me'
 PATH = 'content'
 TIMEZONE = 'Australia/Sydney'
 
