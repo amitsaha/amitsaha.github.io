@@ -41,7 +41,6 @@ PLUGINS = [
     'pelican_notes',    
 ]
 
-MARKDOWN =  [ 'toc', 'codehilite','extra']
 
 NOTE_PATHS = 'notes'
 NOTE_SAVE_AS = 'notes/{slug}.html'
