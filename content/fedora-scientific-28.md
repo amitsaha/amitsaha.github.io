@@ -1,7 +1,6 @@
 Title: Fedora Scientific 28 is here!
 Date: 2018-05-02 12:00
 Category: fedora
-Status: Draft
 
 Fedora 28 is [out](https://fedoramagazine.org/whats-new-fedora-28-workstation/) and I am happy
 to share that after a few releases of no [Fedora Scientific](https://labs.fedoraproject.org/en/scientific/), 
