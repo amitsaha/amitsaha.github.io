@@ -309,7 +309,7 @@ First, we will build the image:
 
 
 API gateway: Deploying the API gateway
-=====================================
+======================================
 
 Let's build the docker image first:
 
