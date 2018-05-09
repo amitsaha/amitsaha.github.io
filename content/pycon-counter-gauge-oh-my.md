@@ -1,7 +1,6 @@
 Title: PYCON US 2018 talk: Counter, Gauge, Upper 90 - Oh my! 
-Date: 2017-10-26 15:00
+Date: 2018-05-09 15:00
 Category: python
-Status: Draft
 
 In a couple of days, on Saturday, I will be delivering my PYCON US talk titled [Counter, Gauge, Upper 90 - Oh my!](https://us.pycon.org/2018/schedule/presentation/133/). 
 
