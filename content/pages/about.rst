@@ -9,3 +9,5 @@ and `GitHub repositories <https://github.com/amitsaha>`__.
 
 You can contact me via `email <mailto:amitsaha.in@gmail.com>`__,  on `Twitter <http://twitter.com/echorand>`__
 and on `LinkedIn <https://au.linkedin.com/in/echorand>`__.
+
+If you would like to get an email everytime I write something new, please subscribe to my `newsletter <https://buttondown.email/echorand.me>`__.
