@@ -60,7 +60,12 @@ Considerations
 - Aggregate results in the child
 - Use map/reduce
 
-[aiomultiprocess](https://github.com/jreese/aiomultiprocess)
+Projects
+
+- [aiomultiprocess](https://github.com/jreese/aiomultiprocess)
+
+Great tools make complex tasks simple
+
 
 # Code like an accountant: Designing data systems for accuracy, resilience and auditability
 
@@ -69,8 +74,6 @@ Considerations
 Friday 11:30 a.m.–noon in Global Center Ballroom AB
 
 ## Notes
-
-
 
 # The AST and Me
 
