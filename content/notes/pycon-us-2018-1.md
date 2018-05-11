@@ -4,19 +4,63 @@ Category: software
 
 # Keynote: Dan Callahan
 
-
 ## Notes
 
+- Platform detected the tool
+- Rust -> WASM -> Web
+- Rust -> DLL -> Python
+- The Birth and Death of Javascript, Gary Berhardt
 
 
 # Thinking Outside the GIL with AsyncIO and Multiprocessing
 
 [Talk overview](https://us.pycon.org/2018/schedule/presentation/103/)
 
-Friday 10:50 a.m.–11:20 a.m. in Global Center Ballroom AB
-
 
 ## Notes
+
+Previously:
+
+- Thread pool for I/O
+- Underutilized CPU
+- Memory usage
+
+Py3 switch:
+
+- ~45% memory savings
+- 20% runtime reduction
+
+Multiprocessing
+
+- CPU scaling
+- CPU utilization
+- Automatic IPC
+- Pool.map is really useful
+- One task per processor
+- Memory duplication (gc)
+
+AsyncIO
+
+- Based on futures
+- Faster than threads
+- Massive I/O concurrency
+- Still relyin on one process
+- Process still limited by GIL
+
+Ideally: Asyncio + multiprocessing
+
+- Event loop per process
+- Queues for work/results
+- asyncio.wait
+
+Considerations
+
+- Minimize what you pickle
+- Prechunk work items
+- Aggregate results in the child
+- Use map/reduce
+
+[aiomultiprocess](https://github.com/jreese/aiomultiprocess)
 
 # Code like an accountant: Designing data systems for accuracy, resilience and auditability
 
