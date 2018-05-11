@@ -67,13 +67,7 @@ Projects
 Great tools make complex tasks simple
 
 
-# Code like an accountant: Designing data systems for accuracy, resilience and auditability
 
-[Talk overview](https://us.pycon.org/2018/schedule/presentation/105/)
-
-Friday 11:30 a.m.–noon in Global Center Ballroom AB
-
-## Notes
 
 # The AST and Me
 
