@@ -140,3 +140,18 @@ Saturday 3:15 p.m.–4 p.m. in Grand Ballroom C
 
 
 https://us.pycon.org/2018/schedule/presentation/80/
+
+# How to write deployment friendly Python applications?
+
+[Talk overview](https://us.pycon.org/2018/schedule/presentation/70/)
+
+Saturday 4:15 p.m.–5 p.m. in Grand Ballroom A
+
+## Notes
+
+# The journey over the intermediate gap
+
+[Talk overview](https://us.pycon.org/2018/schedule/presentation/108/)
+
+## Notes
+
