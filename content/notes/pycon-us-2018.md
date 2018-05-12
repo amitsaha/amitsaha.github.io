@@ -1,4 +1,4 @@
-Title: PyCon US 2018 - Main conference Day 1
+Title: PyCon US 2018 - Main conference
 Date: 2018-05-11 12:00
 Category: software
 
@@ -100,4 +100,43 @@ Friday 5:10 p.m.–5:40 p.m. in Room 26A/B/C
 ## Notes
 
 
+# Inside the Cheeseshop: How Python Packaging Works
 
+[Talk overview](https://us.pycon.org/2018/schedule/presentation/148/)
+
+## Notes
+
+# HOWTO write a function
+
+[Talk overview](https://us.pycon.org/2018/schedule/presentation/157/)
+Saturday 12:10 p.m.–12:55 p.m. in Room 26A/B/C
+
+
+
+## Notes
+
+
+# Graph Databases
+
+[Talk overview](https://us.pycon.org/2018/schedule/presentation/124/)
+Saturday 1:40 p.m.–2:25 p.m. in Grand Ballroom A
+
+
+## Notes
+
+# You're an expert. Here's how to teach like one.
+
+[Talk overview](https://us.pycon.org/2018/schedule/presentation/80/
+
+Saturday 2:35 p.m.–3:05 p.m. in Grand Ballroom B
+
+## Notes
+
+# Dataclasses: The code generator to end all code generators
+
+[Talk overview](https://us.pycon.org/2018/schedule/presentation/94/)
+
+Saturday 3:15 p.m.–4 p.m. in Grand Ballroom C
+
+
+https://us.pycon.org/2018/schedule/presentation/80/
