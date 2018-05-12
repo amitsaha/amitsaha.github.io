@@ -6,8 +6,8 @@ Counter, Gauge, Upper 90 - Oh My! - PyCon US, 2018
 
 Coming up
 
-Counter, Gauge, Upper 90 - Oh My! - PyCon US, 2018
---------------------------------------------------
+Counter, Gauge, Upper 90 - Oh My! - Sydney Python Meetup, 2018
+--------------------------------------------------------------
 
 Slides are `here <https://github.com/amitsaha/python-monitoring-talk/blob/master/slides/sypy.pdf>`__ Materials
 are available in this `repo <https://github.com/amitsaha/python-monitoring-talk>`__.
@@ -26,7 +26,7 @@ Blog post on my talk with link to `slides <https://doingmathwithpython.github.io
 The video is available `here <https://doingmathwithpython.github.io/video-pyconau-dmwp.html>`__.
 
 Doing Math with Python - PyCon US Education Seminar, 2016
-----------------------------------------------------------------
+---------------------------------------------------------
 
 Blog post on my talk with link to `slides <https://doingmathwithpython.github.io/pycon-edu-summit-talk.html>`__ and related materials.
 
