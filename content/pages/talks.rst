@@ -6,6 +6,12 @@ Counter, Gauge, Upper 90 - Oh My! - PyCon US, 2018
 
 Coming up
 
+Counter, Gauge, Upper 90 - Oh My! - PyCon US, 2018
+--------------------------------------------------
+
+Slides are `here <https://github.com/amitsaha/python-monitoring-talk/blob/master/slides/sypy.pdf>`__ Materials
+are available in this `repo <https://github.com/amitsaha/python-monitoring-talk>`__.
+
 
 Setting up AWS Assume Role with Terraform - Sydney Infrastructure Coders Meetup, 2018
 -------------------------------------------------------------------------------------
