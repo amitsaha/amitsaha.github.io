@@ -82,9 +82,14 @@ Friday 3:15 p.m.–4 p.m. in Grand Ballroom B
 
 [Talk overview](https://us.pycon.org/2018/schedule/presentation/163/)
 
-Friday 4:30 p.m.–5 p.m. in Grand Ballroom C
+# Love your bugs
 
-## Notes
+[Talk overview](https://us.pycon.org/2018/schedule/presentation/156/)
+
+- Bitflips are real
+- Server side gating and feature flags
+- Debugging requires a growth mindset
+
 
 # Elegant Solutions For Everyday Python Problems
 
@@ -93,5 +98,6 @@ Friday 5:10 p.m.–5:40 p.m. in Room 26A/B/C
 [Talk overview](https://us.pycon.org/2018/schedule/presentation/164/)
 
 ## Notes
+
 
 
