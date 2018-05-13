@@ -187,9 +187,33 @@ nox > Session human_testing(python_version='3.6') was successful.
 
 The last three lines of the output is the result of running the checks implemented by the plugins.
 
+
+The `nox.py` file looks as follows:
+
+```
+import nox
+
+@nox.session
+@nox.parametrize('python_version', ['3.6'])
+def human_testing(session, python_version):
+    session.interpreter = 'python' + python_version
+    session.run('pip', 'install', '.')
+    session.run('pip', 'install', './example_plugins/py_analyser_class_capwords/')
+    session.run('pip', 'install', './example_plugins/py_analyser_class_docstring/')
+    session.run('python', 'analyser/main.py', './module_under_test.py')
+ 
+```
 ## Other learnings
 
-<class 'analyser.main.BaseClassCheck'> <class '__main__.BaseClassCheck'> False
-<class 'analyser.extensions.capwords.CheckCapwords'> <class '__main__.BaseClassCheck'> False
+Besides all the above things that I learned, I also learned something about the `issubclass` function.
+I was wondering why, the below comparisions was returning False:
+
+```
+issubclass(<class 'analyser.main.BaseClassCheck'>, <class '__main__.BaseClassCheck'>)
+issubclass(<class 'analyser.extensions.capwords.CheckCapwords'> <class '__main__.BaseClassCheck'>)
+```
+
+And so basically, I moved `BaseClassCheck` from `analyser/main.py` to `analyser/bases.py` which meant
+the namespace of `BaseClassCheck` was always going to be the same.
 
 
