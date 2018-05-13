@@ -1,4 +1,4 @@
-Title: Video: PYCON US 2018 - Counter, Gauge, Oh my!
+Title: Video: PYCON US 2018 Talk - Counter, Gauge, Oh my!
 Date: 2018-05-13 14:00
 Category: python
 
