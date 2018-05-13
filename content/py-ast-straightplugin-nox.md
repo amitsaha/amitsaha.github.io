@@ -18,6 +18,8 @@ the demo analyser, we will be focussed on Python classes. We will ignore everyth
 are concerned, they check if a certain condition or conditions are met by the class - in other words these are
 `checkers`.
 
+Please note that I am using Python 3.6 for everything.
+
 ## Core analyser engine
 
 The core analyser engine uses the [ast](https://docs.python.org/3/library/ast.html) module to create an AST node - 
@@ -78,9 +80,112 @@ The `load` function is called with two parameters:
 
 
 ```
-# 
+# analyser/bases.py
+class BaseClassCheck():
+
+    @classmethod
+    def check_violation(cls, node):
+        raise NotImplementedError('Method not implemented')
+    
+    @classmethod
+    def report_violation(cls, node, msg):
+        print('{0}: Class {1}: {2}'.format(node.lineno, node.name, msg))
+
 ```
 
+Any plugins for this engine is thus expected to subclass `BaseClassCheck` and implement the `check_violation`
+method.
+
+The `setup.py` for the core engine looks as follows:
+
+```
+from setuptools import setup
+
+
+setup(
+    name='analyser',
+    version='1.0',
+    description='',
+    long_description='',
+    author='Amit Saha',
+    author_email='a@a.com',
+    install_requires=['straight.plugin'],
+    packages=['analyser'],
+    zip_safe=False,
+)
+
+```
+
+## Writing plugins
+
+Our core engine is done, how do we write plugins? I was faced with this new thing called `namespace packages`.
+Looking at the [docs](https://packaging.python.org/guides/packaging-namespace-packages/), it made complete sense.
+Basically, you want your plugins to be able to shipped as different Python packages written by different people.
+
+So, let's do that now. There are two example plugins in the `example_plugins` sub-direcotry. Each is a Python package
+and has a directory structure as follows:
+
+```
+.
+├── py_analyser_class_capwords
+│   ├── analyser
+│   │   └── extensions
+│   │       └── capwords
+│   │           └── __init__.py
+│   └── setup.py
+```
+
+The only difference between the two is the final package name `capwords` for the above and `docstring` for the other.
+The key point above is the directory structure, `analyser/extensions/capwords`. The other plugin will have the directory
+structure `analyser/extensions/docstring`. This is what makes them both belong to the `analyser.extensions` namespace and
+hence discoverable by `straight.plugin`. The `setup.py` for the above plugin looks as follows:
+
+```
+from setuptools import setup
+
+
+setup(
+    name='analyser-class-capwords',
+    version='1.0',
+    description='',
+    long_description='',
+    author='Amit Saha',
+    author_email='a@a.com',
+    install_requires=['analyser'],
+    packages=['analyser.extensions.capwords'],
+    zip_safe=False,
+)
+
+```
+
+In a practical scenario, we will have these packages elsewhere and will just `pip install` them and the effect
+will be the same.
+
+## Trying it all out
+
+These are the things we will need to do:
+
+- Create a new virtual environment
+- Install `analyser`
+- Install both the above plugins
+- Run `$ python analyser/main.py ./module_under_test.py`
+
+
+But, that's all very boring and I found the tox that I love - [nox](http://nox.readthedocs.io/).
+So, there is a `nox.py` file, so if you install `nox`, you can just run `nox` from the root of the respository:
+
+```
+$ nox 
+...
+nox > python analyser/main.py ./module_under_test.py
+2: Class hello: Class name not in CapWords
+7: Class Nodocstring: No docstring found in class
+10: Class Alongdocstring: Docstring is greater than 100 characters
+nox > Session human_testing(python_version='3.6') was successful.
+...
+```
+
+The last three lines of the output is the result of running the checks implemented by the plugins.
 
 ## Other learnings
 
