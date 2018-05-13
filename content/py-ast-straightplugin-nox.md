@@ -13,6 +13,16 @@ Around the same time, I saw Nick Coghlan suggest [straight.plugin](http://straig
 else. So finally, I got around to sit with it and the result is this post and a plugin based
 Python code analyser with an accompanying [git repository](https://github.com/amitsaha/py_analyser).
 
+The final result is a program powered by two plugins which will parse a module and print any rule violations that
+has been configured by the plugins:
+
+```
+2: Class hello: Class name not in CapWords
+7: Class Nodocstring: No docstring found in class
+10: Class Alongdocstring: Docstring is greater than 100 characters
+```
+
+
 Our analyser has two parts - the core engine and the plugins which can do various things with the code being analysed. For
 the demo analyser, we will be focussed on Python classes. We will ignore everything else. And as far as the plugins
 are concerned, they check if a certain condition or conditions are met by the class - in other words these are
@@ -22,8 +32,10 @@ Please note that I am using Python 3.6 for everything.
 
 ## Core analyser engine
 
-The core analyser engine uses the [ast](https://docs.python.org/3/library/ast.html) module to create an AST node - 
-basically, we call the [parse()](https://docs.python.org/3/library/ast.html#ast.parse) function
+The core analyser engine uses the [ast](https://docs.python.org/3/library/ast.html) module to create an AST node. Checkout
+this PyCon 2018 talk - [The AST and Me](https://www.youtube.com/watch?v=XhWvz4dK4ng) if you want to learn more.
+
+Basically, we call the [parse()](https://docs.python.org/3/library/ast.html#ast.parse) function
 and we get back an AST Node object which we can then use to traverse through the various nodes using the
 [walk](https://docs.python.org/3/library/ast.html#ast.walk) function. Here's the code for the engine at the time of
 writing:
