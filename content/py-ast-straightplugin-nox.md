@@ -1,7 +1,6 @@
 Title: A demo plugin based Python code analyser
 Date: 2018-05-13 12:00
 Category: python
-Status: Draft
 
 A few weeks back I wrote a analyser for [Apache Thrift IDL](https://thrift.apache.org/) in Python. We used it to enforce
 some code review guidelines. When we hooked it onto [arcanist](https://secure.phabricator.com/book/phabricator/article/arcanist/) lint engine, we could give feedback to developers
@@ -228,4 +227,10 @@ issubclass(<class 'analyser.extensions.capwords.CheckCapwords'> <class '__main__
 And so basically, I moved `BaseClassCheck` from `analyser/main.py` to `analyser/bases.py` which meant
 the namespace of `BaseClassCheck` was always going to be the same.
 
+## Summary
+
+We saw how we can use `straight.plugin` to implement a plug-in architecture in  our programs. We also saw how
+we can use the `ast` module to parse Python source code and analyse them and finally we learned about `nox`.
+
+The [git repository](https://github.com/amitsaha/py_analyser) has all the code we discussed in this post.
 
