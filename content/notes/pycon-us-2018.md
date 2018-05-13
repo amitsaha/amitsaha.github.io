@@ -104,8 +104,7 @@ Friday 5:10 p.m.–5:40 p.m. in Room 26A/B/C
 
 [Talk overview](https://us.pycon.org/2018/schedule/presentation/148/)
 
-## Notes
-
+[Video](https://www.youtube.com/watch?v=AQsZsgJ30AE)
 
 
 # Dataclasses: The code generator to end all code generators
