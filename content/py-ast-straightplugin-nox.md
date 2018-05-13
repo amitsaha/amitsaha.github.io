@@ -9,8 +9,8 @@ at the time they were proposing a code change. The thrift parsing was done using
 The analyser was written as a single file which meant adding new rules meant changing the engine itself. I wanted to implement
 a plugin based architecture for it. However, I didn't get around to do that because of other reasons.
 
-Around the same time, I learned about [straight.plugin](http://straightplugin.readthedocs.io/en/latest/) from Nick Coghlan .
-So finally, I got around to sit with it and the result is this post and a plugin based
+Around the same time, I saw Nick Coghlan suggest [straight.plugin](http://straightplugin.readthedocs.io/en/latest/) to someone
+else. So finally, I got around to sit with it and the result is this post and a plugin based
 Python code analyser with an accompanying [git repository](https://github.com/amitsaha/py_analyser).
 
 Our analyser has two parts - the core engine and the plugins which can do various things with the code being analysed. For
