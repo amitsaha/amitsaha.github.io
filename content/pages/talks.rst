@@ -4,7 +4,8 @@ Talks
 Counter, Gauge, Upper 90 - Oh My! - PyCon US, 2018
 --------------------------------------------------
 
-Coming up
+The video is available `here <https://echorand.me/video-pycon-us-2018-talk-counter-gauge-oh-my.html>`__.
+The slides and all other resources are available in this `repo <https://github.com/amitsaha/python-monitoring-talk>`__.
 
 Counter, Gauge, Upper 90 - Oh My! - Sydney Python Meetup, 2018
 --------------------------------------------------------------
