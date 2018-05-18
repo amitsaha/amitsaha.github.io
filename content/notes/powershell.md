@@ -44,7 +44,18 @@ Learn all about it [here](https://kevinmarquette.github.io/2017-01-13-powershell
 
 The `Out-Host` pipe is required so as to not gobble up the output of your command.
 
+# Tail follow a file
 
+```
+> Get-Content -Path <file> -Wait
+```
+
+# Display first/last N lines of a file
+
+```
+> Get-Content -Path -Head 10
+> Get-Content -Path -Tail 10
+```
 
 
 
