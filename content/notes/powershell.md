@@ -42,6 +42,8 @@ Learn all about it [here](https://kevinmarquette.github.io/2017-01-13-powershell
 > Measure-Command { Get-ChildItem | Out-Host }
 ```
 
+The `Out-Host` pipe is required so as to not gobble up the output of your command.
+
 
 
 
