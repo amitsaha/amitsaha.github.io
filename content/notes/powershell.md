@@ -10,11 +10,7 @@ end up doing.
 
 # Environment variables
 
-Learn all about it [here](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_environment_variables?view=powershell-6)
-
-## Examples
-
-Set an evnvironment variable from the command line or script:
+Set an environment variable from the command line or script:
 
 ```
 $Env:AWS_PROFILE = "profilename"
@@ -26,10 +22,25 @@ Read an environment variable from the command line or script:
 "The AWS profile is $Env:AWS_PROFILE"
 ```
 
+Learn all about it [here](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_environment_variables?view=powershell-6)
+
+
+
 # Variable substitution
 
 Learn all about it [here](https://kevinmarquette.github.io/2017-01-13-powershell-variable-substitution-in-strings/)
 
+# Create an empty file
+
+```
+> New-Item <path>  -ItemType file
+```
+
+# Time a command
+
+```
+> Measure-Command { Get-ChildItem | Out-Host }
+```
 
 
 
