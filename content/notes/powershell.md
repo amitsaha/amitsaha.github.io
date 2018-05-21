@@ -57,6 +57,16 @@ The `Out-Host` pipe is required so as to not gobble up the output of your comman
 > Get-Content -Path -Tail 10
 ```
 
+# Where is my current command/program being invoked from?
+
+```
+> Get-Command <cmd>
+```
+
+It's also alised to `gcm`.
+
+
+Learn all about it [here](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/get-command?view=powershell-6)
 
 
 
