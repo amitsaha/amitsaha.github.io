@@ -68,5 +68,13 @@ It's also alised to `gcm`.
 
 Learn all about it [here](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/get-command?view=powershell-6)
 
+# Remove a file/directory
 
+```
+> Remove-Item <path>
+```
+
+To delete the contents of a directory as well recursively, use `-Recurse`
+
+Learn all about it [here](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/providers/filesystem-provider/remove-item-for-filesystem?view=powershell-6)
 
