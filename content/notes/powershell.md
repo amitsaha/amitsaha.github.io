@@ -117,3 +117,5 @@ Pop out:
 ```
 > Pop-Location
 ```
+
+Learn all about it [here](https://docs.microsoft.com/en-us/powershell/scripting/getting-started/cookbooks/managing-current-location?view=powershell-6).
