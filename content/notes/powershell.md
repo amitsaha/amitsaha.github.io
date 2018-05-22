@@ -84,10 +84,36 @@ Learn all about it [here](https://docs.microsoft.com/en-us/powershell/module/mic
 Get DNS settings:
 
 ```
- Get-DnsClientServerAddress
+> Get-DnsClientServerAddress
 
 InterfaceAlias               Interface Address ServerAddresses
                              Index     Family
 --------------               --------- ------- ---------------
 Ethernet 2                          11 IPv4    {172.34.0.2}
+```
+
+# Current location management
+
+Change to a `path`:
+
+```
+> Set-Location -Path <path>
+```
+
+Get current location:
+
+```
+> Get-Location
+```
+
+Push to a location temporarily:
+
+```
+> Push-Location -Path <path>
+```
+
+Pop out:
+
+```
+> Pop-Location
 ```
