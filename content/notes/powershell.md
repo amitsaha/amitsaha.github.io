@@ -152,3 +152,18 @@ Learn all about it [here](https://docs.microsoft.com/en-us/powershell/scripting/
 # Redirecting output
 
 Learn all about it [here](https://docs.microsoft.com/en-us/powershell/scripting/getting-started/cookbooks/redirecting-data-with-out---cmdlets?view=powershell-6).
+
+
+# Reading/parsing text/xml/json
+
+```
+> $lines = Get-Content <path>
+```
+
+`lines` is an array with each line of the file an array element
+
+See [this post](https://blog.stangroome.com/2014/02/10/powershell-select-xml-versus-get-content/) for parsing XML files
+and [this post](https://blogs.technet.microsoft.com/heyscriptingguy/2015/10/08/playing-with-json-and-powershell/) for parsing
+JSON files.
+
+
