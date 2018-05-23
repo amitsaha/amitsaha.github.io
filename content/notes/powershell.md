@@ -24,7 +24,11 @@ Read an environment variable from the command line or script:
 
 Learn all about it [here](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_environment_variables?view=powershell-6)
 
+Show all environment variables:
 
+```
+> Get-ChildItem Env:
+```
 
 # Variable substitution
 
@@ -68,6 +72,24 @@ It's also alised to `gcm`.
 
 Learn all about it [here](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/get-command?view=powershell-6)
 
+# Display directory contents
+
+```
+> Get-ChildItem
+```
+
+Show only directories:
+
+```
+> Get-ChildItem -Directory
+```
+
+Show only files:
+
+```
+> Get-ChildItem -File
+```
+
 # Remove a file/directory
 
 ```
@@ -78,6 +100,11 @@ To delete the contents of a directory as well recursively, use `-Recurse`
 
 Learn all about it [here](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/providers/filesystem-provider/remove-item-for-filesystem?view=powershell-6)
 
+# Run an external EXE and wait for it to finish
+
+```
+> <path to exe> | Out-Null
+```
 
 # System DNS
 
@@ -119,3 +146,5 @@ Pop out:
 ```
 
 Learn all about it [here](https://docs.microsoft.com/en-us/powershell/scripting/getting-started/cookbooks/managing-current-location?view=powershell-6).
+
+
