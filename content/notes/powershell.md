@@ -166,4 +166,11 @@ See [this post](https://blog.stangroome.com/2014/02/10/powershell-select-xml-ver
 and [this post](https://blogs.technet.microsoft.com/heyscriptingguy/2015/10/08/playing-with-json-and-powershell/) for parsing
 JSON files.
 
+# Write output
 
+```
+> Write-Host "Hello World"
+```
+
+See [this](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/write-host?view=powershell-6) 
+and [this](https://stackoverflow.com/questions/8755497/which-should-i-use-write-host-write-output-or-consolewriteline) to learn more.
