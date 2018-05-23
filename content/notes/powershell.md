@@ -106,6 +106,8 @@ Learn all about it [here](https://docs.microsoft.com/en-us/powershell/module/mic
 > <path to exe> | Out-Null
 ```
 
+Learn [more](https://stackoverflow.com/questions/1741490/how-to-tell-powershell-to-wait-for-each-command-to-end-before-starting-the-next)
+
 # System DNS
 
 Get DNS settings:
@@ -147,4 +149,6 @@ Pop out:
 
 Learn all about it [here](https://docs.microsoft.com/en-us/powershell/scripting/getting-started/cookbooks/managing-current-location?view=powershell-6).
 
+# Redirecting output
 
+Learn all about it [here](https://docs.microsoft.com/en-us/powershell/scripting/getting-started/cookbooks/redirecting-data-with-out---cmdlets?view=powershell-6).
