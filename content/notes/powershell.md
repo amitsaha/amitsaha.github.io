@@ -174,3 +174,9 @@ JSON files.
 
 See [this](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/write-host?view=powershell-6) 
 and [this](https://stackoverflow.com/questions/8755497/which-should-i-use-write-host-write-output-or-consolewriteline) to learn more.
+
+# TLS/SSL Error
+
+```
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+```
