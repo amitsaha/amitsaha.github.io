@@ -180,3 +180,11 @@ and [this](https://stackoverflow.com/questions/8755497/which-should-i-use-write-
 ```
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 ```
+
+# Extracting a ZIP archive
+
+```
+> Expand-Archive <path to zip>
+```
+
+Learn all about it [here](https://docs.microsoft.com/en-us/powershell/module/Microsoft.PowerShell.Archive/Expand-Archive?view=powershell-5.1)
