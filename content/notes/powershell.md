@@ -188,3 +188,16 @@ and [this](https://stackoverflow.com/questions/8755497/which-should-i-use-write-
 ```
 
 Learn all about it [here](https://docs.microsoft.com/en-us/powershell/module/Microsoft.PowerShell.Archive/Expand-Archive?view=powershell-5.1)
+
+# Find the hash value of a file
+
+Calculate the sha256 sum:
+
+```
+> Get-FileHash <path to file>
+```
+
+Also supports other algorithms and input stream. Learn all about it [here](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/get-filehash?view=powershell-6)
+
+
+
