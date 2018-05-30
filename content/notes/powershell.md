@@ -200,4 +200,14 @@ Calculate the sha256 sum:
 Also supports other algorithms and input stream. Learn all about it [here](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/get-filehash?view=powershell-6)
 
 
+# Sleep
+
+Sleep for n seconds:
+
+```
+> Start-Sleep -s n
+```
+Learn all about it [here](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/start-sleep?view=powershell-6)
+
+
 
