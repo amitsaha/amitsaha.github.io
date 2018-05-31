@@ -8,6 +8,10 @@ commands like `cat`, `ls`, `mkdir` and `cd` work. However, there's no point in c
 Powershell itself is an intellectually rewarding experience I think. Let's jump right in with the things I usually
 end up doing.
 
+# Static Analysis
+
+Use [PSScriptAnalyzer](https://github.com/PowerShell/PSScriptAnalyzer)
+
 # Environment variables
 
 Set an environment variable from the command line or script:
