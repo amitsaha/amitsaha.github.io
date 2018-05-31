@@ -30,6 +30,32 @@ Show all environment variables:
 > Get-ChildItem Env:
 ```
 
+# Strings
+
+A simple string:
+
+```
+> 'Hello'
+Hello
+```
+
+Substitute variable values:
+
+```
+> '{0}-{1}' -f "hello", "world"
+hello-world
+
+```
+
+Substitute the result of a command in a string:
+
+```
+> '{0}' -f $(Get-Location)
+...
+```
+
+Learn more [here](http://jon.netdork.net/2015/09/08/powershell-and-single-vs-double-quotes/)
+
 # Variable substitution
 
 Learn all about it [here](https://kevinmarquette.github.io/2017-01-13-powershell-variable-substitution-in-strings/)
