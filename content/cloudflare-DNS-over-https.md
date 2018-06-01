@@ -111,3 +111,7 @@ coredns_dns_response_size_bytes_count{proto="udp",zone="."} 242
 Another interesting bit of information I learned about was Mozilla's plan to integrate DNS over HTTPS in their Firefox
 browser. This [article](https://www.ghacks.net/2018/03/20/firefox-dns-over-https-and-a-worrying-shield-study/) has the
 details.
+
+Update: This is another [article](https://hacks.mozilla.org/2018/05/a-cartoon-intro-to-dns-over-https/) from Mozilla on DNS and their work with Cloudflare.
+
+
