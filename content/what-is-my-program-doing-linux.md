@@ -44,3 +44,25 @@ $  sudo perf trace -p 13419
  1509.877 ( 0.009 ms): close(fd: 3</home/vagrant/test.txt>                                   ) = 0
  ```
  
+ 
+ ```
+ vagrant@default-centos-7-latest:~$ sudo cat /proc/13419/wchan
+io_schedule
+```
+
+```
+vagrant@default-centos-7-latest:~$ sudo cat /proc/13419/stack
+[<ffffffffba6b3226>] io_schedule+0x16/0x40
+[<ffffffffba7b79c4>] wait_on_page_bit+0xf4/0x130
+[<ffffffffba7cdb5d>] truncate_inode_pages_range+0x56d/0x830
+[<ffffffffba7cdee8>] truncate_pagecache+0x48/0x70
+[<ffffffffba9079c8>] ext4_setattr+0x8f8/0x9e0
+[<ffffffffba872ca5>] notify_change+0x2e5/0x430
+[<ffffffffba84cf33>] do_truncate+0x73/0xc0
+[<ffffffffba861f28>] path_openat+0xf88/0x1630
+[<ffffffffba8638db>] do_filp_open+0x9b/0x110
+[<ffffffffba84f63b>] do_sys_open+0x1bb/0x2b0
+[<ffffffffba84f764>] SyS_openat+0x14/0x20
+[<ffffffffbaf0e8bb>] entry_SYSCALL_64_fastpath+0x1e/0xa9
+[<ffffffffffffffff>] 0xffffffffffffffff
+```
