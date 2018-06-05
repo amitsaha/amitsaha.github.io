@@ -1,4 +1,4 @@
-Title: User-defined networks in Docker for inter-container communication
+Title: User-defined networks in Docker for inter-container communication on Linux
 Date: 2017-10-26 15:00
 Category: infrastructure
 
