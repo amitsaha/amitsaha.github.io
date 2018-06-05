@@ -66,3 +66,41 @@ vagrant@default-centos-7-latest:~$ sudo cat /proc/13419/stack
 [<ffffffffbaf0e8bb>] entry_SYSCALL_64_fastpath+0x1e/0xa9
 [<ffffffffffffffff>] 0xffffffffffffffff
 ```
+
+
+```
+vagrant@default-centos-7-latest:~$ sudo cat /proc/13419/io
+rchar: 301204
+wchar: 47307880
+syscr: 103
+syscw: 9461576
+read_bytes: 0
+write_bytes: 38754615296
+cancelled_write_bytes: 0
+```
+
+```
+ sudo pidstat -dl 5
+Linux 4.13.0-21-generic (default-centos-7-latest)       06/05/2018      _x86_64_        (1 CPU)
+
+04:42:33 AM   UID       PID   kB_rd/s   kB_wr/s kB_ccwr/s iodelay  Command
+04:42:38 AM     0         7      0.00      0.00      0.00 177212488  ksoftirqd/0
+04:42:38 AM     0         8      0.00      0.00      0.00 3042546  rcu_sched
+04:42:38 AM     0       398      0.00      0.00      0.00    3001  /lib/systemd/systemd-journald
+04:42:38 AM   101       625      0.00      0.00      0.00  379856  /lib/systemd/systemd-networkd
+04:42:38 AM   102       629      0.00      0.00      0.00  379762  /lib/systemd/systemd-resolved
+04:42:38 AM  1000     13419      0.00  30433.80      0.00       0  python test.py
+04:42:38 AM     0     14456      0.00      0.00      0.00 1140099  pidstat -dl 5
+
+```
+
+```
+ sudo cat /proc/13419/stat
+13419 (python) D 1747 13419 1747 34816 14464 4194304 813 0 0 0 12855 60374 0 0 20 0 1 0 90880 26025984 1618 18446744073709551615 94865168269312 94865171395056 140732345993392 0 0 0 0 16781312 2 1 0 0 17 0 0 0 15 0 0 94865173492400 94865173981536 94865190379520 140732345997296 140732345997311 140732345997311 140732345999336 0
+```
+
+http://man7.org/linux/man-pages/man5/proc.5.html
+
+https://stackoverflow.com/questions/223644/what-is-an-uninterruptable-process
+
+
