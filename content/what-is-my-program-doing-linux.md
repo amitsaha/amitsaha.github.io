@@ -104,3 +104,10 @@ http://man7.org/linux/man-pages/man5/proc.5.html
 https://stackoverflow.com/questions/223644/what-is-an-uninterruptable-process
 
 
+```
+sudo pidstat -r -p 14797
+Linux 4.13.0-21-generic (default-centos-7-latest)       06/05/2018      _x86_64_        (1 CPU)
+
+05:23:39 AM   UID       PID  minflt/s  majflt/s     VSZ     RSS   %MEM  Command
+```
+05:23:39 AM  1000     14797      0.13      0.00   25416    6272   0.69  python
