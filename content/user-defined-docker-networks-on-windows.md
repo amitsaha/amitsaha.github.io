@@ -18,3 +18,4 @@ networks:
 
 The reason for the above is the default behavior of `docker-compose` is to create a new network for the services which will
 fail with an error: `Problem : Error response from daemon: HNS failed with error : The parameter is incorrect`.
+https://docs.microsoft.com/en-us/virtualization/windowscontainers/container-networking/network-drivers-topologies
