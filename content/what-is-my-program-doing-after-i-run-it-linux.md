@@ -215,3 +215,5 @@ Mems_allowed_list:      0
 voluntary_ctxt_switches:        725171                                                                                                                                                                                                       
 nonvoluntary_ctxt_switches:     5937                                                                                                                                                                                                         
 ```
+
+https://stackoverflow.com/questions/7880784/what-is-rss-and-vsz-in-linux-memory-management
