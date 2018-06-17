@@ -1,10 +1,43 @@
+Title: Fedora Scientific Vagrant Boxes
+Date: 2018-06-18 11.00
+Category: fedora
+Status: draft
+
+I am very excited to share that sometime back the Fedora project gave the go ahead on my [idea](https://fedoraproject.org/wiki/Changes/FedoraScientific_VagrantBox) of making Fedora Scientific
+available as [Vagrant](https://www.vagrantup.com/) boxes starting with Fedora 29. This basically means (I think) that using Fedora Scientific in a virtual
+machine is even easier. Instead of downloading the ISO and then going through the installation process, you can now basically
+do:
+
+- Download Fedora Scientific Vagrant box
+- <initialization step>
+- `vagrant up`
+    
+    
+## Trying it out
+
+As of a few days back, Fedora 29 rawhide vagrant boxes for Fedora Scientific are now being published. Thanks to release
+engineering for moving this forward. 
+
+If you are keen to try it out, here's what I did using VirtualBox on an OS X host. 
+
+First, install [vagrant](https://www.vagrantup.com/). Then:
+
+```
+# Add the box
 $ vagrant box add https://kojipkgs.fedoraproject.org//packages/Fedora-Scientific-Vagrant/Rawhide/20180613.n.0/images/Fedora-Scientific-Vagrant-Rawhide-20180613.n.0.x86_64.vagrant-virtualbox.box  --name Fedora-Scientific-Rawhide
 ==> box: Box file was not detected as metadata. Adding it directly...
 ==> box: Adding box 'Fedora-Scientific-Rawhide' (v0) for provider: 
     box: Downloading: https://kojipkgs.fedoraproject.org//packages/Fedora-Scientific-Vagrant/Rawhide/20180613.n.0/images/Fedora-Scientific-Vagrant-Rawhide-20180613.n.0.x86_64.vagrant-virtualbox.box
 ==> box: Box download is resuming from prior download progress
 ==> box: Successfully added box 'Fedora-Scientific-Rawhide' (v0) for 'virtualbox'!
-MacBook-Air:Downloads amit$ vagrant init Fedora-Scientific-Rawhide
+
+..
+```
+
+Now that the box has been downloaded:
+
+```
+$ vagrant init Fedora-Scientific-Rawhide
 A `Vagrantfile` has been placed in this directory. You are now
 ready to `vagrant up` your first virtual environment! Please read
 the comments in the Vagrantfile as well as documentation on
