@@ -1,5 +1,5 @@
 Title: Pre-release Fedora Scientific Vagrant Boxes
-Date: 2018-06-18 10.00
+Date: 2018-06-18
 Category: fedora
 
 I am very excited to share that sometime back the Fedora project gave the go ahead on my [idea](https://fedoraproject.org/wiki/Changes/FedoraScientific_VagrantBox) of making Fedora Scientific
