@@ -66,6 +66,29 @@ will change the above command to (please note I also needed to install [xquartz]
 $ vagrant ssh -- -X
 ```
 
+By default, the virtual machine is given 512 MB memory which is not enough for doing anything useful on your system. To change
+that, open the `Vagrantfile` that was created by the `vagrant init` step above. In that file, look for the block of code
+starting with `config.vm.provider "virtualbox"` and change the block to be:
+
+```
+config.vm.provider "virtualbox" do |vb|
+     # Display the VirtualBox GUI when booting the machine
+     #   vb.gui = true
+     #
+     # Customize the amount of memory on the VM:
+     vb.memory = "1024"
+  end
+```
+
+The key above is `vb.memory = "1024"` which gives our virtual machine 1024 MB. If you want or can provide more
+RAM, adjust the value accordingly. Once done, do:
+
+```
+$ vagrant reload
+```
+
+This will recreate the virtual machine.
+
 ## Windows hosts - VirtualBox
 
 To be done (If you end up doing it, please let me know - see for a link at the bottom of this post).
