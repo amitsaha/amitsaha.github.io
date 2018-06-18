@@ -9,7 +9,7 @@ means (I think) that using Fedora Scientific in a virtual machine is even easier
 the ISO and then going through the installation process, you can now basically do:
 
 - Download Fedora Scientific Vagrant box
-- <initialization step>
+- Initialize VM
 - `vagrant up`
     
     
