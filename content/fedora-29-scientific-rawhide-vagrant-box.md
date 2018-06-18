@@ -1,7 +1,6 @@
 Title: Pre-release Fedora Scientific Vagrant Boxes
 Date: 2018-06-18 11.00
 Category: fedora
-Status: draft
 
 I am very excited to share that sometime back the Fedora project gave the go ahead on my [idea](https://fedoraproject.org/wiki/Changes/FedoraScientific_VagrantBox) of making Fedora Scientific
 available as [Vagrant](https://www.vagrantup.com/) boxes starting with Fedora 29. This basically 
