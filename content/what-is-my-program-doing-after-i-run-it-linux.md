@@ -10,6 +10,9 @@ Consider the following program written in Python:
 #test.py
 
 while True:
+
+    for _ in range(1000000):
+        continue
     f = open('test.txt', 'w')
     f.write('Hello')
     f.close()
@@ -18,7 +21,8 @@ while True:
 The program has two characteristics:
 
 - The `while True` loop means it is continuously trying to run or get CPU time
-- Inside the loop, we create a file and write a string to it
+- Inside the loop, we create a file and write a string to it i.e. our program also performs Input/Output (in this case,
+Disk wries).
 
 Let's now run the program in the background:
 
