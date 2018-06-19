@@ -1,3 +1,11 @@
+
+Title: What is your program doing on Linux?
+Date: 2018-06-19
+Category: software
+Status: Draft
+
+Consider the following program written in Python:
+
 ```
 #test.py
 
@@ -7,9 +15,21 @@ while True:
     f.close()
 ```
 
+The program has two characteristics:
+
+- The `while True` loop means it is continuously trying to run or get CPU time
+- Inside the loop, we create a file and write a string to it
+
+Let's now run the program in the background:
+
 ```
 $ python test.py &
+[1] 10362
 ```
+
+## pidstat
+
+The first tool we will use is `pidstat`:
 
 ```
 vagrant@default-centos-7-latest:~$ sudo pidstat -p 13419 -d 1
