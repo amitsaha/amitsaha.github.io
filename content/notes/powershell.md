@@ -271,3 +271,26 @@ Add a DNS server to the existing addresses:
 ```
 
 
+# Working with list of things
+
+Samples script to go over a list of things and doing something:
+
+```
+$repositories = @(
+    "demo/repo1",
+    "demo/repo2"    
+)
+
+foreach ($repo in $repositories)
+{
+    aws ecr create-repository --repository-name $repo
+}
+```
+
+# Sourcing stuff from other files
+
+```
+. ./<path-to-ps1> file
+```
+
+
