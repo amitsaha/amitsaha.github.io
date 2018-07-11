@@ -293,4 +293,34 @@ foreach ($repo in $repositories)
 . ./<path-to-ps1> file
 ```
 
+# Update a AWS ECR policy using AWS CLI
+
+The reason I have it here is the escaping for the JSON policy for powershell:
+
+```
+# Create repository policy to allow public pulling
+# https://docs.aws.amazon.com/cli/latest/userguide/cli-using-param.html#quoting-strings
+$policy=@"
+{
+     \"Version\": \"2008-10-17\",
+     \"Statement\": [
+         {
+             \"Sid\": \"Allow public pulling of images\",
+             \"Effect\": \"Allow\",
+             \"Principal\": \"*\",
+             \"Action\": [
+                 \"ecr:GetDownloadUrlForLayer\",
+                 \"ecr:BatchGetImage\",
+                 \"ecr:BatchCheckLayerAvailability\"
+             ]
+         }
+     ]
+ }
+"@
+
+foreach ($repo in $repositories)
+{
+    aws ecr set-repository-policy --repository-name $repo --policy-text $policy
+}
+```
 
