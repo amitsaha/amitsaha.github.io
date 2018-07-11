@@ -239,5 +239,35 @@ Sleep for n seconds:
 ```
 Learn all about it [here](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/start-sleep?view=powershell-6)
 
+# Working with DNS clients/servers
+
+Clear DNS cache:
+
+```
+> Clear-DnsClientCache
+```
+
+Get current DNS servers:
+
+```
+> Get-DnsClientServerAddress
+```
+https://docs.microsoft.com/en-us/powershell/module/dnsclient/get-dnsclientserveraddress?view=win10-ps
+
+
+Set DNS address:
+
+```
+> Set-DnsClientServerAddress -InterfaceAlias ..
+```
+
+Learn all about it [here](https://docs.microsoft.com/en-us/powershell/module/dnsclient/set-dnsclientserveraddress?view=win10-ps)
+
+Add a DNS server to the existing addresses:
+
+```
+> $result = Get-DnsClientServerAddress -InterfaceAlias "vEthernet" # or InterfaceIndex
+> Set-DnsClientServerAddress -InterfaceAlias "vEthernet" -ServerAddresses ("172.34.0.2", $result.ServerAddresses)
+```
 
 
