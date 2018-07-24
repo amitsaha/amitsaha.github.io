@@ -64,6 +64,13 @@ Learn more [here](http://jon.netdork.net/2015/09/08/powershell-and-single-vs-dou
 
 Learn all about it [here](https://kevinmarquette.github.io/2017-01-13-powershell-variable-substitution-in-strings/)
 
+For property substitution:
+
+```
+$Results = Get-ChildItem  -Filter *.xml | Select-Object FullName
+Write-Output "Parsing:  $($result.FullName)"
+```
+
 # Create an empty file
 
 ```
