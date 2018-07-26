@@ -13,6 +13,8 @@ definitely 100x better (faster and reliable) on Windows Server than on Windows 1
 considering that this was for a CI environment, it was a good thing. I wish I had moved to Windows Server earlier 
 for my experimentation.
 
+# Notes 
+
 Next, I share some of my findings in the hope that it may be useful to others.
 
 ## Docker versions
@@ -89,6 +91,13 @@ fail with an error: `Problem : Error response from daemon: HNS failed with error
 See [here](https://docs.microsoft.com/en-us/virtualization/windowscontainers/container-networking/network-drivers-topologies)
 to learn more.
 
+## Using DNS for inter-container communication
+
+All the services running as part of a test cycle are running in the same `nat` network on Windows server, hence they
+can all use the container name as host names for the services. Combining it with runtime configuration updates, it
+worked great. One issue to be aware of is DNS Client caching, and it can be solved using `Clear-DNSClientCache` powershell
+command.
+
 ## `hcsshim::PrepareLayer failed in Win32`
 
 While building images and running containers, an error as follows appeared with varying frequency:
@@ -154,7 +163,27 @@ My solution was to basically:
 - Build within `C:\workspace`
 - Copy built assets back from `C:\workspace` to `C:\app`
 
-## Dockerizing a dotnet framework application
+## Karma test runner with PhantomJS inside a Windows container
+
+I couldn't get [phantomjs-prebuilt]() to work inside a Windows container for some reason. I decided to
+give a systemwide installation a try and it worked. The following `Dockerfile` worked for me:
+
+```
+# escape=`
+FROM microsoft/windowsservercore
+
+SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
+RUN Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+RUN choco install -y phantomjs git nodejs yarn
+
+ADD . C:/app
+WORKDIR C:/app
+RUN npm install
+CMD powershell -File .\RunTests.ps1
+```
+A complete example is [here](https://github.com/amitsaha/karma-phantomjs-demo).
+
+## Running a ASP.NET framework application in Docker
 
 The main application I was setting up the testing environment for was a DotNet framework web application with multiple sites
 configured in IIS. Coming from a Linux/Nginx/Python/Golang background, I found it quite challenging to find instructions
@@ -168,8 +197,8 @@ Write-Output "--- Setting up IIS websites"
 cp -r site1 C:\inetpub\wwwroot\
 cp -r site2 C:\inetpub\wwwroot\
 
-New-IISSite -Name 'site1' -PhysicalPath c:\inetpub\wwwroot\site1 -BindingInformation "*:51033:"
-New-IISSite -Name 'site2' -PhysicalPath c:\inetpub\wwwroot\site2 -BindingInformation "*:51034:"
+New-IISSite -Name 'site1' -PhysicalPath c:\inetpub\wwwroot\site1 -BindingInformation "*:8080:"
+New-IISSite -Name 'site2' -PhysicalPath c:\inetpub\wwwroot\site2 -BindingInformation "*:8081:"
 
 Set-Location C:\inetpub\wwwroot\site1
 C:\WebConfigTransformRunner.1.0.0.1\Tools\WebConfigTransformRunner.exe .\Configs\AppSetting.config .\Configs\AppSetting.Docker.config .\Configs\AppSetting.config
@@ -210,11 +239,18 @@ RUN nuget.exe install WebConfigTransformRunner -Version 1.0.0.1
 VOLUME C:\app
 EXPOSE 51033 51034 51035
 WORKDIR /app
-HEALTHCHECK --interval=30s --timeout=10s --retries=20 CMD powershell -Command Invoke-WebRequest -UseBasicParsing http://localhost:51033;Invoke-WebRequest -UseBasicParsing http://localhost:51034;Invoke-WebRequest -UseBasicParsing http://localhost:51035;
+HEALTHCHECK --interval=30s --timeout=10s --retries=20 CMD powershell -Command Invoke-WebRequest -UseBasicParsing http://localhost:8080;Invoke-WebRequest -UseBasicParsing http://localhost:8081
 ...
 ENTRYPOINT [".\StartApp.ps1"]
 ```
 
-
 The reason I use dotnet framework image above is so that I can share the same base image for a different docker image
 used to build the dotnet framework solution as well.
+
+## Running a ASP.NET core application in Docker
+
+I have nothing to add here, since Visual Studio's `Dockerfile` just works.
+
+# Document History
+
+This post was first published on July 26, 2018.
