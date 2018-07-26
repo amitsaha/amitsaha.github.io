@@ -10,8 +10,9 @@ needs access to for the integration tests (including selenium tets) are run on d
 same host.
 
 All docker features I was familiar with on Linux and needed access on Windows to just worked. The experience was 
-definitely 100x better on Windows Server than on Windows 10 (more on this soon). But, considering that this was for
-a CI environment, it was a good thing. I wish I had moved to Windows Server earlier for my experimentation.
+definitely 100x better (faster and reliable) on Windows Server than on Windows 10 (more on this soon). But, 
+considering that this was for a CI environment, it was a good thing. I wish I had moved to Windows Server earlier 
+for my experimentation.
 
 Next, I share some of my findings in the hope that it may be useful to others.
 
@@ -33,10 +34,28 @@ Install-Package -Name docker -ProviderName DockerMsftProvider -Force
 choco install docker-compose # this needs chocolatey installed
 ```
 
-## Isolation
+## Container Isolation
 
+On Windows 10, `docker` uses `hyperv` isolation:
 
-https://github.com/docker/for-win/issues/1822
+```
+> docker info -f '{{ .Isolation }}'
+hyperv
+```
+
+On Windows server, it uses `process` isolation:
+
+```
+> docker info -f '{{ .Isolation }}'
+process
+```
+
+(Please note, use `powershell` for the above command, not `cmd` [issue](https://github.com/moby/moby/issues/33959))
+
+This basically means that on Windows 10, a container is running within a tiny VM. I suspect this is a major reason for 
+the slow container startup and image build times on Windows 10.
+
+Relevant [issue](https://github.com/docker/for-win/issues/1822).
 
 ## Docker commit
 
