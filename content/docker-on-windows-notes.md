@@ -3,21 +3,40 @@ Date: 2017-10-26 15:00
 Category: infrastructure
 Status: draft
 
-I have been working with Windows docker containers running on Windows for the past three months. 
-The goal I have been working towards is to leverage docker containers in our continuous integration 
-pipeline to have isolated environments for each build. That is, each build happens on an exclusive 
-build host and every database and service the application needs access to for the integration
-tests (including selenium tets) are run on docker containers on the host itself.
+I have been working with Windows docker containers running on Windows for the past three months with
+the goal to have isolated environments for each build in a continuous integration pipeline. 
+That is, each build happens on an exclusive build host (AWS EC2 VM instance) and every database and service the application 
+needs access to for the integration tests (including selenium tets) are run on docker containers on the 
+same host.
 
 All docker features I was familiar with on Linux and needed access on Windows to just worked. The experience was 
 definitely 100x better on Windows Server than on Windows 10 (more on this soon). But, considering that this was for
-a CI environment, it didn't matter. I only wish, I had moved to Windows Server earlier for my experimentation.
+a CI environment, it was a good thing. I wish I had moved to Windows Server earlier for my experimentation.
 
-Next, I share some of my findings in detail that may be useful to others.
+Next, I share some of my findings in the hope that it may be useful to others.
 
 ## Docker versions
 
+On Windows 10, when we install docker from the [docker store](https://www.docker.com/docker-windows), we get the community
+version of docker. Once you install it, and run `docker version`, you will get the version stated as `18.03.1-ce` or similar.
+
+On Windows server, we have to use the docker enterprise version which can be installed as per [this page](https://docs.docker.com/install/windows/docker-ee/). When we run `docker version` on a Windows server host, you will 
+see the version stated as `18.03.1-ee-2` or simiar.
+
+The following `PowerShell` snippet will install docker engine and `docker-compose` on Windows server:
+
+```
+# docker engine and docker compose
+Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+Install-Module -Name DockerMsftProvider -Repository PSGallery -Force
+Install-Package -Name docker -ProviderName DockerMsftProvider -Force
+choco install docker-compose # this needs chocolatey installed
+```
+
 ## Isolation
+
+
+https://github.com/docker/for-win/issues/1822
 
 ## Docker commit
 
