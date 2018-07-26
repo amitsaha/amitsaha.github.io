@@ -1,5 +1,5 @@
 Title: Running Windows docker containers for isolated testing environments
-Date: 2018-07-26 15:00
+Date: 2018-07-26 16:00
 Category: infrastructure
 
 I have been working with Windows docker containers for the past three months with the goal to have isolated environments for 
