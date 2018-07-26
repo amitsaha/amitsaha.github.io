@@ -1,4 +1,4 @@
-Title: Notes on running Windows docker containers
+Title: Running Windows docker containers for isolated testing environments
 Date: 2017-10-26 15:00
 Category: infrastructure
 Status: draft
@@ -12,8 +12,6 @@ All docker features I was familiar with on Linux and needed access on Windows to
 definitely 100x better (faster and reliable) on Windows Server than on Windows 10 (more on this soon). But, 
 considering that this was for a CI environment, it was a good thing. I wish I had moved to Windows Server earlier 
 for my experimentation.
-
-# Notes 
 
 Next, I share some of my findings in the hope that it may be useful to others.
 
@@ -250,7 +248,3 @@ used to build the dotnet framework solution as well.
 ## Running a ASP.NET core application in Docker
 
 I have nothing to add here, since Visual Studio's `Dockerfile` just works.
-
-# Document History
-
-This post was first published on July 26, 2018.
