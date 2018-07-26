@@ -1,13 +1,12 @@
-Title: Notes on running Windows docker containers on Windows
+Title: Notes on running Windows docker containers
 Date: 2017-10-26 15:00
 Category: infrastructure
 Status: draft
 
-I have been working with Windows docker containers running on Windows for the past three months with
-the goal to have isolated environments for each build in a continuous integration pipeline. 
-That is, each build happens on an exclusive build host (AWS EC2 VM instance) and every database and service the application 
-needs access to for the integration tests (including selenium tets) are run on docker containers on the 
-same host.
+I have been working with Windows docker containers for the past three months with the goal to have isolated environments for 
+each build in a continuous integration pipeline. That is, each build happens on an exclusive build host (AWS EC2 VM instance) 
+and every database and service the application needs access to for the integration tests (including selenium tets) are run on
+docker containers on the same host.
 
 All docker features I was familiar with on Linux and needed access on Windows to just worked. The experience was 
 definitely 100x better (faster and reliable) on Windows Server than on Windows 10 (more on this soon). But, 
@@ -145,7 +144,7 @@ RUN powershell -command \
 
 ## Volume mounting in NodeJS applications
 
-Trying to do a `npm install` (for example) on a NojdeJS application inside a container with the directory
+Trying to do a `npm install` (for example) on a NodeJS application inside a container with the directory
 volume mounted from host wouldn't work. The issue is described [here](https://github.com/nodejs/node/issues/8897).
 
 My solution was to basically:
@@ -155,9 +154,41 @@ My solution was to basically:
 - Build within `C:\workspace`
 - Copy built assets back from `C:\workspace` to `C:\app`
 
-
-
 ## Dockerizing a dotnet framework application
+
+The main application I was setting up the testing environment for was a DotNet framework web application with multiple sites
+configured in IIS. Coming from a Linux/Nginx/Python/Golang background, I found it quite challenging to find instructions
+for manually configuring a IIS website without using GUI tools. However, thanks to a [particular blog post](https://blog.alexellis.io/run-iis-asp-net-on-windows-10-with-docker/) and other posts by the same author, things
+finally clicked. The following is a snippet of a script that I used:
+
+```
+Write-Output "--- Setting up IIS websites"
+
+# Copy built artifacts 
+cp -r site1 C:\inetpub\wwwroot\
+cp -r site2 C:\inetpub\wwwroot\
+
+New-IISSite -Name 'site1' -PhysicalPath c:\inetpub\wwwroot\site1 -BindingInformation "*:51033:"
+New-IISSite -Name 'site2' -PhysicalPath c:\inetpub\wwwroot\site2 -BindingInformation "*:51034:"
+
+Set-Location C:\inetpub\wwwroot\site1
+C:\WebConfigTransformRunner.1.0.0.1\Tools\WebConfigTransformRunner.exe .\Configs\AppSetting.config .\Configs\AppSetting.Docker.config .\Configs\AppSetting.config
+C:\app\UpdateConfigsDocker.ps1
+
+cat .\Configs\AppSetting.config
+
+Set-Location C:\inetpub\wwwroot\site2
+C:\WebConfigTransformRunner.1.0.0.1\Tools\WebConfigTransformRunner.exe .\Configs\AppSetting.config .\Configs\AppSetting.Docker.config .\Configs\AppSetting.config
+C:\app\UpdateConfigsDocker.ps1
+..
+```
+
+The web config transformation allows us to override/update configuration based on the environment at runtime. Thanks
+to [this post](https://anthonychu.ca/post/aspnet-web-config-transforms-windows-containers-revisited/). In addition,
+i found [this post](https://anthonychu.ca/post/overriding-web-config-settings-environment-variables-containerized-aspnet-apps/)
+by the same author useful too.
+
+The above script was an entrypoint to the following `Dockerfile` snippet:
 
 ```
 FROM microsoft/dotnet-framework:4.7.2-sdk
@@ -173,12 +204,6 @@ ADD https://download.microsoft.com/download/C/9/E/C9E8180D-4E51-40A6-A9BF-776990
 RUN Write-Host 'Installing URL Rewrite' ; `
     Start-Process msiexec.exe -ArgumentList '/i', 'rewrite_amd64.msi', '/quiet', '/norestart' -NoNewWindow -Wait
 
-# https://www.richard-banks.org/2017/02/debug-net-in-windows-container.html
-# https://docs.microsoft.com/en-us/visualstudio/debugger/remote-debugger-port-assignments
-EXPOSE 4022 4023
-ADD https://download.visualstudio.microsoft.com/download/pr/12210758/3732c1fb2e37696edab25c565695c1b0/VS_RemoteTools.exe rtools_setup.exe
-RUN & './rtools_setup.exe' /install /quiet
-
 WORKDIR C:\
 RUN nuget.exe install WebConfigTransformRunner -Version 1.0.0.1
 
@@ -186,38 +211,10 @@ VOLUME C:\app
 EXPOSE 51033 51034 51035
 WORKDIR /app
 HEALTHCHECK --interval=30s --timeout=10s --retries=20 CMD powershell -Command Invoke-WebRequest -UseBasicParsing http://localhost:51033;Invoke-WebRequest -UseBasicParsing http://localhost:51034;Invoke-WebRequest -UseBasicParsing http://localhost:51035;
+...
+ENTRYPOINT [".\StartApp.ps1"]
 ```
 
 
-```
-$ErrorActionPreference = "Stop"
-
-# Setup Venus websites
-
-Write-Output "--- Setting up IIS websites"
-
-cp -r RSAdmin C:\inetpub\wwwroot\
-cp -r RSMembers C:\inetpub\wwwroot\
-cp -r RSApi C:\inetpub\wwwroot\
-
-
-New-IISSite -Name 'site1' -PhysicalPath c:\inetpub\wwwroot\site1 -BindingInformation "*:51033:"
-New-IISSite -Name 'site2' -PhysicalPath c:\inetpub\wwwroot\site2 -BindingInformation "*:51034:"
-
-Set-Location C:\inetpub\wwwroot\site1
-C:\WebConfigTransformRunner.1.0.0.1\Tools\WebConfigTransformRunner.exe .\Configs\AppSetting.config .\Configs\AppSetting.Docker.config .\Configs\AppSetting.config
-C:\app\UpdateConfigsDocker.ps1
-
-cat .\Configs\AppSetting.config
-
-Set-Location C:\inetpub\wwwroot\site2
-C:\WebConfigTransformRunner.1.0.0.1\Tools\WebConfigTransformRunner.exe .\Configs\AppSetting.config .\Configs\AppSetting.Docker.config .\Configs\AppSetting.config
-C:\app\UpdateConfigsDocker.ps1
-
-..
-```
-
-https://docs.microsoft.com/en-us/virtualization/windowscontainers/manage-docker/manage-windows-dockerfile
-https://blog.alexellis.io/run-iis-asp-net-on-windows-10-with-docker/
-https://anthonychu.ca/post/aspnet-web-config-transforms-windows-containers-revisited/
-https://anthonychu.ca/post/overriding-web-config-settings-environment-variables-containerized-aspnet-apps/
+The reason I use dotnet framework image above is so that I can share the same base image for a different docker image
+used to build the dotnet framework solution as well.
