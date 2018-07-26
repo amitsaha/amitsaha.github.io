@@ -9,7 +9,7 @@ integration tests (including selenium tets) are run on docker containers on the 
 
 1. Build starts
 2. Spawn containers
-3. Perform setup - DB migrations for example
+3. Perform setup in the containers - DB migrations for example
 4. Run Tests
 5. Collect logs
 6. Clean up all containers
