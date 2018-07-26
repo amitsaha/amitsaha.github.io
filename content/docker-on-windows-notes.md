@@ -14,7 +14,10 @@ $ docker stop containerid
 $ docker commit containerid new_image
 ```
 
-    
+## Paths
+
+ADD . C:/app
+WORKDIR C:/app
 
 ## User-defined networks
 
@@ -112,3 +115,8 @@ C:\app\UpdateConfigsDocker.ps1
 
 ..
 ```
+
+https://docs.microsoft.com/en-us/virtualization/windowscontainers/manage-docker/manage-windows-dockerfile
+https://blog.alexellis.io/run-iis-asp-net-on-windows-10-with-docker/
+https://anthonychu.ca/post/aspnet-web-config-transforms-windows-containers-revisited/
+https://anthonychu.ca/post/overriding-web-config-settings-environment-variables-containerized-aspnet-apps/
