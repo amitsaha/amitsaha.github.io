@@ -1,4 +1,4 @@
-Title: Running Windows docker containers for isolated testing environments
+Title: On running Windows Docker containers
 Date: 2018-07-26 16:00
 Category: infrastructure
 
@@ -184,7 +184,7 @@ A complete example is [here](https://github.com/amitsaha/karma-phantomjs-demo).
 
 The main application I was setting up the testing environment for was a DotNet framework web application with multiple sites
 configured in IIS. Coming from a Linux/Nginx/Python/Golang background, I found it quite challenging to find instructions
-for manually configuring a IIS website without using GUI tools. However, thanks to a [particular blog post](https://blog.alexellis.io/run-iis-asp-net-on-windows-10-with-docker/) and other posts by the same author, things
+for manually configuring a IIS website without using GUI tools. Visual Studio's Dockerfile worked but I didn't succeed in work for my use-case. I think it will make more sense now. Anyway, thanks to a [particular blog post](https://blog.alexellis.io/run-iis-asp-net-on-windows-10-with-docker/) and other posts by the same author, things
 finally clicked. The following is a snippet of a script that I used:
 
 ```
@@ -243,7 +243,3 @@ ENTRYPOINT [".\StartApp.ps1"]
 
 The reason I use dotnet framework image above is so that I can share the same base image for a different docker image
 used to build the dotnet framework solution as well.
-
-## Running a ASP.NET core application in Docker
-
-I have nothing to add here, since Visual Studio's `Dockerfile` just works.
