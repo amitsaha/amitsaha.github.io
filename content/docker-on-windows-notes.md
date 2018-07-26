@@ -53,26 +53,28 @@ process
 (Please note, use `powershell` for the above command, not `cmd` [issue](https://github.com/moby/moby/issues/33959))
 
 This basically means that on Windows 10, a container is running within a tiny VM. I suspect this is a major reason for 
-the slow container startup and image build times on Windows 10.
-
-Relevant [issue](https://github.com/docker/for-win/issues/1822).
+the slow container startup and image build times on Windows 10. To learn more, see [here](https://docs.microsoft.com/en-us/virtualization/windowscontainers/manage-containers/hyperv-container) and a relevant [issue](https://github.com/docker/for-win/issues/1822).
 
 ## Docker commit
 
+`docker commit` allows us to create a image from a running container. However, on Windows we cannot do that:
+
 ```
-$ docker stop containerid
-$ docker commit containerid new_image
+> docker commit hopeful_clarke myimage
+Error response from daemon: windows does not support commit of a running container
 ```
 
-## Paths
+We will have to stop the container and then commit it. 
 
-ADD . C:/app
-WORKDIR C:/app
+```
+$ docker stop hopeful_clarke
+$ docker commit hopeful_clarke myimage
+```
 
 ## User-defined networks
 
-On Windows 10, multiple `nat` networks are supported, but on Windows Server with 17.06 EE docker engine, only one `nat` network
-is supported. Hence, when using `docker-compose`, we must specify the following:
+On Windows 10, multiple `nat` networks are supported, but on Windows Server with 17.06 EE docker engine, only 
+one `nat` network is supported. Hence, when using `docker-compose`, we must specify the following:
 
 ```
 networks:
@@ -84,7 +86,9 @@ networks:
 
 The reason for the above is the default behavior of `docker-compose` is to create a new network for the services which will
 fail with an error: `Problem : Error response from daemon: HNS failed with error : The parameter is incorrect`.
-https://docs.microsoft.com/en-us/virtualization/windowscontainers/container-networking/network-drivers-topologies
+
+See [here](https://docs.microsoft.com/en-us/virtualization/windowscontainers/container-networking/network-drivers-topologies)
+to learn more.
 
 # nodejs volume mounting issue
 
@@ -95,6 +99,12 @@ hcsshim::PrepareLayer failed in Win32: This operation returned because the timeo
 ```
 
 https://github.com/moby/moby/issues/27588
+
+
+## Paths
+
+ADD . C:/app
+WORKDIR C:/app
 
 ## Dockerfiles
 
