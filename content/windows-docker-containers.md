@@ -2,15 +2,20 @@ Title: On running Windows Docker containers
 Date: 2018-07-26 16:00
 Category: infrastructure
 
-I have been working with Windows docker containers for the past three months with the goal to have isolated environments for 
-each build in a continuous integration pipeline. That is, each build happens on an exclusive build host (AWS EC2 VM instance) 
-and every database and service the application needs access to for the integration tests (including selenium tets) are run on
-docker containers on the same host.
+I went into working with Windows docker containers after having been worked with docker on Linux exclusively. My goal was 
+to have isolated environments for each build in a continuous integration pipeline. That is, each build happens on an 
+exclusive build host (AWS EC2 VM instance) and every database and service the application needs access to for the 
+integration tests (including selenium tets) are run on docker containers on the same host. That is:
 
-All docker features I was familiar with on Linux and needed access on Windows to just worked. The experience was 
-definitely 100x better (faster and reliable) on Windows Server than on Windows 10 (more on this soon). But, 
-considering that this was for a CI environment, it was a good thing. I wish I had moved to Windows Server earlier 
-for my experimentation.
+1. Build starts
+2. Spawn containers
+3. Perform setup - DB migrations for example
+4. Run Tests
+5. Collect logs
+6. Clean up all containers
+7. Tear down
+
+# Findings
 
 Next, I share some of my findings in the hope that it may be useful to others.
 
@@ -110,6 +115,22 @@ the number of containers was around 10. However, the most common occurence for m
 images.
 
 A retry of the operation usually fixed it. Relevant project - [hccshim](https://github.com/Microsoft/hcsshim).
+
+
+## Docker compose and volume mounting
+
+I needed the following voume mount to work:
+
+```
+ db_setup:
+    image: <image>
+    volumes:
+      - type: bind
+        source: .
+        target: C:\app
+```
+
+For this, I [needed](https://github.com/docker/compose/issues/4763) to use `3.2` as the docker compose yaml version.
 
 ## Writing Dockerfiles for Windows containers
 
@@ -243,3 +264,22 @@ ENTRYPOINT [".\StartApp.ps1"]
 
 The reason I use dotnet framework image above is so that I can share the same base image for a different docker image
 used to build the dotnet framework solution as well.
+
+
+# Summary
+
+All docker features I was familiar with on Linux and needed access on Windows to just worked. The experience was 
+definitely 100x better (faster and reliable) on Windows Server than on Windows 10 (more on this soon). But, 
+considering that this was for a CI environment, it was a good thing. I wish I had moved to Windows Server earlier 
+for my experimentation.
+
+# Resources
+
+Besides the above blog posts, other blog posts and countless answers on StackOverflow and , I found it helpful to 
+ask questions on:
+
+- [dotnet-docker](https://github.com/dotnet/dotnet-docker) on GitHub 
+- [mssql-docker](https://github.com/Microsoft/mssql-docker) on GitHub
+
+Though I didn't work through it myself, the [labs](https://github.com/docker/labs/tree/master/windows) here may
+help as well.
