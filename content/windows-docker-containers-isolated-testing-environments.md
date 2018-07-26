@@ -1,7 +1,6 @@
 Title: Running Windows docker containers for isolated testing environments
-Date: 2017-10-26 15:00
+Date: 2018-07-26 15:00
 Category: infrastructure
-Status: draft
 
 I have been working with Windows docker containers for the past three months with the goal to have isolated environments for 
 each build in a continuous integration pipeline. That is, each build happens on an exclusive build host (AWS EC2 VM instance) 
