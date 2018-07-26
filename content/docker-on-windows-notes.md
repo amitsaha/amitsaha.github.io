@@ -9,10 +9,9 @@ pipeline to have isolated environments for each build. That is, each build happe
 build host and every database and service the application needs access to for the integration
 tests (including selenium tets) are run on docker containers on the host itself.
 
-I am overall very impressed with the docker experience on Windows. All docker features I am familiar with
-and needed access to just worked. The experience was definitely 100x better on Windows Server than
-on Windows 10 (more on this soon). But, considering that this was for a CI environment, it didn't matter. 
-I only wish, I had moved to Windows Server earlier for my experimentation.
+All docker features I was familiar with on Linux and needed access on Windows to just worked. The experience was 
+definitely 100x better on Windows Server than on Windows 10 (more on this soon). But, considering that this was for
+a CI environment, it didn't matter. I only wish, I had moved to Windows Server earlier for my experimentation.
 
 Next, I share some of my findings in detail that may be useful to others.
 
@@ -48,6 +47,8 @@ networks:
 The reason for the above is the default behavior of `docker-compose` is to create a new network for the services which will
 fail with an error: `Problem : Error response from daemon: HNS failed with error : The parameter is incorrect`.
 https://docs.microsoft.com/en-us/virtualization/windowscontainers/container-networking/network-drivers-topologies
+
+# nodejs volume mounting issue
 
 ## Miscellaneous
 
