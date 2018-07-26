@@ -3,6 +3,19 @@ Date: 2017-10-26 15:00
 Category: infrastructure
 Status: draft
 
+I have been working with Windows docker containers running on Windows for the past three months. 
+The goal I have been working towards is to leverage docker containers in our continuous integration 
+pipeline to have isolated environments for each build. That is, each build happens on an exclusive 
+build host and every database and service the application needs access to for the integration
+tests (including selenium tets) are run on docker containers on the host itself.
+
+I am overall very impressed with the docker experience on Windows. All docker features I am familiar with
+and needed access to just worked. The experience was definitely 100x better on Windows Server than
+on Windows 10 (more on this soon). But, considering that this was for a CI environment, it didn't matter. 
+I only wish, I had moved to Windows Server earlier for my experimentation.
+
+Next, I share some of my findings in detail that may be useful to others.
+
 ## Docker versions
 
 ## Isolation
