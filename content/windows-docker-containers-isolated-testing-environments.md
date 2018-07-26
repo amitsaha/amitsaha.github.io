@@ -162,8 +162,8 @@ My solution was to basically:
 
 ## Karma test runner with PhantomJS inside a Windows container
 
-I couldn't get [phantomjs-prebuilt]() to work inside a Windows container for some reason. I decided to
-give a systemwide installation a try and it worked. The following `Dockerfile` worked for me:
+I couldn't get [phantomjs-prebuilt](https://www.npmjs.com/package/phantomjs-prebuilt) to work inside a Windows container 
+for some reason. I decided to give a systemwide installation a try and it worked. The following `Dockerfile` worked for me:
 
 ```
 # escape=`
