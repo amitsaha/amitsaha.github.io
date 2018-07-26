@@ -90,50 +90,72 @@ fail with an error: `Problem : Error response from daemon: HNS failed with error
 See [here](https://docs.microsoft.com/en-us/virtualization/windowscontainers/container-networking/network-drivers-topologies)
 to learn more.
 
-# nodejs volume mounting issue
+## `hcsshim::PrepareLayer failed in Win32`
 
-## Miscellaneous
+While building images and running containers, an error as follows appeared with varying frequency:
 
 ```
 hcsshim::PrepareLayer failed in Win32: This operation returned because the timeout period expired. (0x5b4) layerId=ae8414f34fb31faea64b7bee078b295023db93c8505c67da686750843c853629 flavour=1
 ```
 
-https://github.com/moby/moby/issues/27588
+On Windows 10, it was very frequent. On Windows server, the frequency is almost never. A situation in which it 
+can happen as discussed in this [issue](https://github.com/moby/moby/issues/27588) is when
+an attempt is made to run a number of containers simulataneously. In my case, when I got the issue on Windows server,
+the number of containers was around 10. However, the most common occurence for me was on Windows 10 while building
+images.
 
+A retry of the operation usually fixed it. Relevant project - [hccshim](https://github.com/Microsoft/hcsshim).
 
-## Paths
+## Writing Dockerfiles for Windows containers
 
+One of the first things I had to tackle while writing a `Dockerfile` was that of which slash to use in Path names.
+Basically, for Dockerfile instructions such as `ADD`, `WORKDIR`, `COPY`, continue using the "Linux" style, "/".
+For example:
+
+```
 ADD . C:/app
 WORKDIR C:/app
+```
 
-## Dockerfiles
-
+For `RUN` instruction, you must specify any path using ":\", like so:
 
 ```
-FROM microsoft/windowsservercore
-SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
-RUN Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
-
-RUN choco install -y googlechrome phantomjs git nodejs yarn
-CMD [ "node.exe" ]
+RUN Expand-Archive -Path c:\mysql.zip -DestinationPath C:\
+..
 ```
+
+When writing multi-line instructions in a `Dockerfile`, you may be tempted to use "\", but, that can cause problems, since
+"\" is also a path separator in Windows, so declare a `escape` character as explained 
+[here](https://docs.microsoft.com/en-us/virtualization/windowscontainers/manage-docker/manage-windows-dockerfile#escape-character).
+
+However, I seemed to have success without it - the following snippet works just fine to build a mysql server Windows 
+container:
 
 ```
 FROM microsoft/nanoserver
-ADD https://dev.mysql.com/get/Downloads/MySQL-5.7/mysql-5.7.22-winx64.zip mysql.zip
-
-ADD mysql-init.txt C:/
+..
 RUN powershell -command \
     Expand-Archive -Path c:\mysql.zip -DestinationPath C:\ ; \
     ren C:\mysql-5.7.22-winx64 C:\MySQL ; \
     New-Item -Path C:\MySQL\data -ItemType directory ; \
     C:\MySQL\bin\mysqld.exe --initialize --init-file=C:\mysql-init.txt --console --explicit_defaults_for_timestamp ; \
     Remove-Item c:\mysql.zip -Force
-EXPOSE 3306
-HEALTHCHECK --interval=30s --timeout=10s --retries=20 CMD powershell -Command mysqladmin ping -uroot -ppassword
-RUN setx PATH /M %PATH%;C:\MySQL\bin
-CMD ["mysqld", "--console"]
+..
 ```
+
+## Volume mounting in NodeJS applications
+
+Trying to do a `npm install` (for example) on a NojdeJS application inside a container with the directory
+volume mounted from host wouldn't work. The issue is described [here](https://github.com/nodejs/node/issues/8897).
+
+My solution was to basically:
+
+- Volume mount host directory: `docker run -v ${pwd}:C:\app --name venus-legacy-front-end-builder ..`
+- Inside the container, copy the files to another directory - i.e. copy from `C:\app` to `C:\workspace`
+- Build within `C:\workspace`
+- Copy built assets back from `C:\workspace` to `C:\app`
+
+
 
 ## Dockerizing a dotnet framework application
 
