@@ -56,6 +56,23 @@ RUN choco install -y googlechrome phantomjs git nodejs yarn
 CMD [ "node.exe" ]
 ```
 
+```
+FROM microsoft/nanoserver
+ADD https://dev.mysql.com/get/Downloads/MySQL-5.7/mysql-5.7.22-winx64.zip mysql.zip
+
+ADD mysql-init.txt C:/
+RUN powershell -command \
+    Expand-Archive -Path c:\mysql.zip -DestinationPath C:\ ; \
+    ren C:\mysql-5.7.22-winx64 C:\MySQL ; \
+    New-Item -Path C:\MySQL\data -ItemType directory ; \
+    C:\MySQL\bin\mysqld.exe --initialize --init-file=C:\mysql-init.txt --console --explicit_defaults_for_timestamp ; \
+    Remove-Item c:\mysql.zip -Force
+EXPOSE 3306
+HEALTHCHECK --interval=30s --timeout=10s --retries=20 CMD powershell -Command mysqladmin ping -uroot -ppassword
+RUN setx PATH /M %PATH%;C:\MySQL\bin
+CMD ["mysqld", "--console"]
+```
+
 ## Dockerizing a dotnet framework application
 
 ```
