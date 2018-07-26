@@ -155,7 +155,7 @@ volume mounted from host wouldn't work. The issue is described [here](https://gi
 
 My solution was to basically:
 
-- Volume mount host directory: `docker run -v ${pwd}:C:\app --name venus-legacy-front-end-builder ..`
+- Volume mount host directory: `docker run -v ${pwd}:C:\app  ..`
 - Inside the container, copy the files to another directory - i.e. copy from `C:\app` to `C:\workspace`
 - Build within `C:\workspace`
 - Copy built assets back from `C:\workspace` to `C:\app`
