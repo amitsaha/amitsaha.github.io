@@ -275,7 +275,7 @@ used to build the dotnet framework solution as well.
 # Summary
 
 All docker features I was familiar with on Linux and needed access on Windows to just worked. The experience was 
-definitely 100x better (faster and reliable) on Windows Server than on Windows 10 (more on this soon). But, 
+definitely 100x better (faster and reliable) on Windows Server than on Windows 10. But, 
 considering that this was for a CI environment, it was a good thing. I wish I had moved to Windows Server earlier 
 for my experimentation.
 
