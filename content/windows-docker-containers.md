@@ -100,6 +100,11 @@ can all use the container name as host names for the services. Combining it with
 worked great. One issue to be aware of is DNS Client caching, and it can be solved using `Clear-DNSClientCache` powershell
 command.
 
+##  `failed to create endpoint <service> on network nat`
+
+I got this error only a couple of times in all my testing over 2 months. It is filed [here](https://github.com/docker/libnetwork/issues/1950).
+
+
 ## `hcsshim::PrepareLayer failed in Win32`
 
 While building images and running containers, an error as follows appeared with varying frequency:
@@ -115,6 +120,7 @@ the number of containers was around 10. However, the most common occurence for m
 images.
 
 A retry of the operation usually fixed it. Relevant project - [hccshim](https://github.com/Microsoft/hcsshim).
+
 
 
 ## Docker compose and volume mounting
