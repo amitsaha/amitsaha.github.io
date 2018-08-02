@@ -83,4 +83,6 @@ I would want to replace the above scripts by a small tool written in a proper pr
 
 ## Terraform source layout
 
+While working on the article I mentioned above, I also worked for the first time with structuring my terraform code
+with modules. Especially, how we can leverage modules to manage different environments for our infrastructure. 
 
