@@ -1,7 +1,6 @@
 Title: Managing AWS lambda functions from start to finish with Terraform
 Date: 2018-08-02 14:00
 Category: infrastructure
-Status: draft
 
 [AWS lambda](https://aws.amazon.com/lambda/) functions look deceptively simple. The devil is in the details though. Once you
 have written the code and have created a `.zip` file, there's a few more steps to go.
