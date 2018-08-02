@@ -15,7 +15,7 @@ code again. A lot of steps, all ripe for automation.
 
 One straight forward, no fuss approach is to use the [AWS CLI](https://docs.aws.amazon.com/cli/latest/reference/lambda/index.html).
 The main problem I think with this approach and using any of the serverless
-tools and frameworks out there like `apex`, `serverless` or `zappa` out there is that they treat the infrastructure of 
+tools and frameworks out there like `apex`, `serverless` or `zappa` is that they treat the infrastructure of 
 your lambda functions as islands, rather than being part of your broader AWS infrastructure. The same S3 bucket's contents 
 which you want your lambda function to be triggered in reaction to changes in may be the bucket some other non-lambda
 application writes to. You want to run your lambda function in the same VPC as your database RDS instance. Needless to say,
@@ -239,7 +239,8 @@ are a fact of life when it comes to infrastructure considering how quick they ar
 I would want to replace the above scripts by a small tool written in a proper programming language. The difference
 from the current tools out there would be that it would work with existing terraform code. 
 
-May be [apex](https://github.com/apex/apex) someday?
+May be [apex](https://github.com/apex/apex) someday? It uses `terraform` to manage your infrastructure, so may
+we could make it reuse your existing infrastructure as code.
 
 ## Summary
 
