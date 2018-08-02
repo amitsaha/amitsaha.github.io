@@ -214,6 +214,24 @@ module "health_event_handler" {
 Once again, we have another set of child modules. Here we only specify the environment specific variables which we
 then populate via `terraform.tfvars` and during application (in the scripts above).
 
+Coming back to our script I shared at the beginning, here's the key terraform specific bits reproduced which should
+make more sense now:
+
+```
+# Deploy to demo environment
+pushd ../../terraform/environments/demo
+terraform init
+terraform apply \
+    -var aws_region=ap-southeast-2 \
+    -var ec2_state_change_handler_version=$version \
+    -target=module.ec2_state_change_handler.module.ec2_state_change_handler.aws_lambda_function.lambda \
+    -target=module.ec2_state_change_handler.module.ec2_state_change_handler.aws_cloudwatch_event_rule.rule \
+    -target=module.ec2_state_change_handler.module.ec2_state_change_handler.aws_cloudwatch_event_target.target \
+    -target=module.ec2_state_change_handler.module.ec2_state_change_handler.aws_iam_role_policy.lambda_cloudwatch_logging \
+    -target=module.ec2_state_change_handler.module.ec2_state_change_handler.aws_lambda_permission.cloudwatch_lambda_execution
+popd
+```
+
 
 ## Replacing scripts
 
