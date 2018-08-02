@@ -78,14 +78,153 @@ but we can always download the terrraform configuration tarball or git clone it 
 to illustrate here is that your terraform configuration for the lambda function can and should co-exist with the rest of your infrastructure.
 
 
-## Scripting?
-
-Of course scripting is hard, and you run into all kinds of issues and then break in all kinds of ways, but they
-are a fact of life when it comes to infrastructure considering how quick they are to put together. 
-I would want to replace the above scripts by a small tool written in a proper programming langugage.
-
 ## Terraform source layout
 
 While working on the article I mentioned above, I also worked for the first time with structuring my terraform code
-with modules. Especially, how we can leverage modules to manage different environments for our infrastructure. 
+with modules. Especially, how we can leverage modules to manage different environments for our infrastructure. The above
+script relies on this behavior.
 
+My requirement was to manage two lambda functions. They would both have their own infrastructure, but in terms of terraform
+code, they would be more or less identical with the exception of the naming of the lambda functions, the AWS cloudwatch
+event they would be invoked on, and the environmnet variables.
+
+So, I created a root module, `cloudwatch_event_handlers` with a `main.tf` and defined a `variables.tf` file with all the configurable
+module parameters. This is where my first confusion with terraform modules was cleared. Before this, I somehow couldn't wrap my
+head around where my module definitions would go and and where would I be using it. In programming languages, you defined 
+the sharable code in a library of some form which isn't intended to be executed directly. The program which uses the sharable
+code is the one that has the executable code. I was expecting something similar with `terraform`. That is, the `resource`s would
+be defined in my "real" code. In terraform, the `resource` statements belong to the "module", and you actually define `module`
+in the code you plan to "execute".
+
+Using the `cloudwatch_event_handlers` module, I define another module to implement the lambda function that would handle
+EC2 state change events as follows:
+
+```
+variable "lambda_artifacts_bucket_name" {
+    type = "string"
+}
+
+variable "ec2_state_change_handler_version" {
+    type = "string"
+}
+
+module "ec2_state_change_handler" {
+
+    source = "../cloudwatch_event_handlers"
+
+    cloudwatch_event_rule_name = "ec2-state-change-event"
+    cloudwatch_event_rule_description = "Notify when there is a state change in EC2 instances"
+    cloudwatch_event_rule_pattern = <<PATTERN
+{
+  "source": [ "aws.ec2" ],
+  "detail-type": [ "EC2 Instance State-change Notification" ]
+}
+PATTERN
+     lambda_iam_role_name = "ec2_state_change_lambda_iam"
+     lambda_function_name = "ec2_state_change"
+     lambda_handler = "main.handler"
+     lambda_runtime = "python3.6"
+     
+     lambda_artifacts_bucket_name = "${var.lambda_artifacts_bucket_name}"
+     lambda_artifacts_bucket_key = "ec2-state-change/src.zip"
+     lambda_version = "${var.ec2_state_change_handler_version}"
+}
+
+```
+
+
+Similarly, the `health_event_handler` module is defined as:
+
+```
+variable "lambda_artifacts_bucket_name" {
+    type = "string"
+}
+
+variable "health_event_handler_version" {
+    type = "string"
+}
+
+variable "health_event_handler_environment" {
+  type = "map"
+}
+
+
+module "health_event_handler" {
+
+    source = "../cloudwatch_event_handlers"
+
+    cloudwatch_event_rule_name = "health-event"
+    cloudwatch_event_rule_description = "Invoke a lambda function when there is a scheduled health event"
+    cloudwatch_event_rule_pattern = <<PATTERN
+{
+  "source": [ "aws.health" ],
+  "detail-type": [ "AWS Health Event" ]
+}
+PATTERN
+
+    lambda_iam_role_name = "health_event_lambda"
+    lambda_function_name = "health_event"
+    lambda_handler = "main.handler"
+    lambda_runtime = "python3.6"
+
+    lambda_artifacts_bucket_name = "${var.lambda_artifacts_bucket_name}"
+    lambda_artifacts_bucket_key = "health-event/src.zip"
+    lambda_version = "${var.health_event_handler_version}"
+
+    lambda_environment = "${var.health_event_handler_environment}"
+}
+```
+
+Note how the implementations code here says it's `module`! Anyway, another thing I learned here is that the inputs to a module
+are it's variables. Thats' it. I found it hard to wrap my head around it, but I think i have got it now.
+
+Okay, now that we defined our "source" configuration, we next define `environments` for our infrastructure.
+
+Currently, the repository [here](https://github.com/amitsaha/cloudwatch-event-lambda/) has a `demo` environment defined under
+the `environments` sub-directory. The idea is to have one sub-directory per environment. Inside this `demo` environment,
+we have the bootstrap configuration where we create the bucket and dynamodb table for storing our terraform state remotely.
+We then define the `backend` created in `backend.tf`. With the setup done, we then bring in the modules we created above
+in the `main.tf` file:
+
+```
+provider "aws" {
+  region = "${var.aws_region}"
+}
+
+module "lambda_artifacts" {
+  source = "../../modules/deployment_artifacts"
+  artifacts_bucket_name = "${var.lambda_artifacts_bucket_name}"  
+}
+
+module "ec2_state_change_handler" {
+  source = "../../modules/ec2_state_change_handler"
+  lambda_artifacts_bucket_name = "${var.lambda_artifacts_bucket_name}"
+  ec2_state_change_handler_version = "${var.ec2_state_change_handler_lambda_version}"
+  
+}
+
+module "health_event_handler" {
+  source = "../../modules/health_event_handler"
+  lambda_artifacts_bucket_name = "${var.lambda_artifacts_bucket_name}"
+  health_event_handler_version = "${var.aws_health_event_handler_lambda_version}"
+  health_event_handler_environment = "${var.health_event_handler_lambda_environment}"
+}
+```
+
+Once again, we have another set of child modules. Here we only specify the environment specific variables which we
+then populate via `terraform.tfvars` and during application (in the scripts above).
+
+
+## Replacing scripts
+
+Of course scripting is hard, and you run into all kinds of issues and they break in all kinds of ways, but they
+are a fact of life when it comes to infrastructure considering how quick they are to put together. 
+I would want to replace the above scripts by a small tool written in a proper programming language. The difference
+from the current tools out there would be that it would work with existing terraform code. 
+
+May be [apex](https://github.com/apex/apex) someday?
+
+## Summary
+
+I plan to trial this setup out for managing lambda functions as I get a chance, what do you think? Is this something that could work
+better than managing lambda functions infrastructure as islands?
