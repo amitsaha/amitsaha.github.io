@@ -7,9 +7,12 @@ Status: draft
 have written the code and have created a `.zip` file, there's a few more steps to go.
 
 For starters, we need an IAM profile to be defined with appropriate policies allowing the function to access the AWS resources. 
-To setup the lambda function to be invoked automatically in reaction to another event, we need some more permissions. Then, we 
-have to create a lambda function in AWS infrastructure and point it to our `.zip` file that we have created above. Everytime, we 
-update this, `.zip`, we have to ask AWS lambda to update the code again. 
+To setup the lambda function to be invoked automatically in reaction to another event, we need some more permissions and 
+references to these resources. Then, we  have to create a lambda function in AWS infrastructure and point it to 
+our `.zip` file that we have created above. Everytime, we update this, `.zip`, we have to ask AWS lambda to update the 
+code again. A lot of steps, all ripe for automation.
+
+## Automation using AWS CLI/Serverless frameworks - Creating Lambda infrastructure islands
 
 One straight forward, no fuss approach is to use the [AWS CLI](https://docs.aws.amazon.com/cli/latest/reference/lambda/index.html).
 The main problem I think with this approach and using any of the serverless
@@ -22,7 +25,7 @@ there will cross-application infrastructure references.
 What follows is a non-production tested suggestion for managing your lambda functions and their infrastructure as part of
 your global infrastructure as code repository.
 
-## Example: Managing lambda functions using Terraform
+## Managing lambda functions using Terraform
 
 Consider a lambda function [ec2_state_change](https://github.com/amitsaha/cloudwatch-event-lambda/tree/master/functions/ec2_state_change).
 I wrote this for a recent [article](https://blog.codeship.com/cloudwatch-event-notifications-using-aws-lambda/). The `src` directory
