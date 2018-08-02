@@ -27,7 +27,7 @@ your global infrastructure as code repository.
 Consider a lambda function [ec2_state_change](https://github.com/amitsaha/cloudwatch-event-lambda/tree/master/functions/ec2_state_change).
 I wrote this for a recent [article](https://blog.codeship.com/cloudwatch-event-notifications-using-aws-lambda/). The `src` directory
 has the source of the lambda function which is written in Python. To create the lambda function (for the first time) and to
-deploy new versions of the code, the following BASH script is run:
+deploy new versions of the code, the following BASH script (there is a PowerShell script too) is run:
 
 ```
 !/usr/bin/env bash
@@ -67,12 +67,20 @@ The above script does the following main things:
 
 
 The first time, this script is run, it will create all the infrastructure that is needed by the lambda function
-to be run. On subsequent applications, only the lambda function's version will change.
+to be run. On subsequent applications, only the lambda function's version will change. We can even separate the script
+into two such that we can use different AWS credentials for first time creation and subsequent code updates.
 
-That's it. For every terraform environment, we can have a script which will do the same. We can run this script as part of a CI/CD
-pipeline. The repository pointed to above has the terraform configuration in it as well, but we can always download the terrraform
-configuration tarball or git clone it during a CI run. The key idea here is that, your terraform configuration for the lambda function
-can co-exist with the rest of your infrastructure.
+We can run this script as part of a CI/CD pipeline. The repository pointed to above has the terraform configuration in it as well,
+but we can always download the terrraform configuration tarball or git clone it during a CI run. The key idea here that I want 
+to illustrate here is that your terraform configuration for the lambda function can and should co-exist with the rest of your infrastructure.
 
 
-## 
+## Scripting?
+
+Of course scripting is hard, and you run into all kinds of issues and then break in all kinds of ways, but they
+are a fact of life when it comes to infrastructure considering how quick they are to put together. 
+I would want to replace the above scripts by a small tool written in a proper programming langugage.
+
+## Terraform source layout
+
+
