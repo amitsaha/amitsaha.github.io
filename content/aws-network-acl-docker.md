@@ -3,7 +3,7 @@ Date: 2018-07-26 16:00
 Category: infrastructure
 Status: Draft
 
-In this post, I share something that involves AWS Network ACLs, docker containers and ephermal port ranges.
+In this post, I share a problem I encountered while working with Network ACLs, docker containers and ephermal port ranges.
 
 # Infrastructure setup
 
@@ -56,12 +56,17 @@ ubuntu@ip-172-34-59-184:~$ sudo tcpdump -i eth0 port 10001
 `ip-172-34-59-184.51990` is the source hostname and `51990` is the ephermal port that has been chosen to talk to my
 service which is running on port `10001`.
 
-Once I saw the source port via `tcpdump`, I had found my problem. This port was not in the list of allowed outbound rules.
+# Problem
+
+Once I saw the source port via `tcpdump`, everything clicked. The source port hadn't even been in my radar when I was running
+my tests inside the container since i had fixed the same issue on the underlying VM instance just a day back. 
+NAT was as expected just masking the container IP address, the source port was still being preserved and wasn't 
+one in the list of allowed ranges in the Network ACL. This port was not in the list of allowed outbound rules 
 (Note that, the above port specifically is not the problem, another port was).
 
-Next up, the solution.
+# Solution
 
-# Solution 
+The solution is to basically set the ephermal range so that it matches the one allowed in the network ACL.
 
 ### Set the ephermal port range on a Linux VM
 
