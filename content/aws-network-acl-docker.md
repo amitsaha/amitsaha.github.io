@@ -3,41 +3,92 @@ Date: 2018-07-26 16:00
 Category: infrastructure
 Status: Draft
 
-Working with AWS VPC has given and continutes to give me a great opportunity to learn, revisit and relearn a lot of 
-computer networking theory. In this post, I share something that involves AWS Network ACLs, docker containers and ephermal 
-port ranges. I will try and put a bit of background in each section mainly so that it clears up things for me and may be
-others who may need a refresher.
+In this post, I share something that involves AWS Network ACLs, docker containers and ephermal port ranges.
+
+# Infrastructure setup
+
+A Linux EC2 instance with `docker` engine running in a VPC with inbound and outbound traffic controlled by Network ACLs.
+I was connecting to another hosted service running on a separate VM, `service1` running on port `10001` inside the same 
+subnet with security groups allowing traffic from the host IP (via CIDR).
+
+# Symptoms of the problem
+
+I could connect to the service from the host as well as from inside the `docker` container, but *occasionally* connectivity 
+from the same `docker` container would fail. It would also manifest as working in one container, but fail in another
+container. The connection attempt would just timeout. I thought, may be the container has lost its ability to talk to external
+hosts, but basic tests didn't reveal a problem there. Then, I thought may be security group is the issue, but of course
+that is not since I am using `docker` bridge network which by default will use the IP of the host as the source IP.
+
+So..what is going on?
+
+# Solution - Background
 
 ## Ephermal ports
 
-Communication over network sockets involves two parties - usually referred to as a client and a server.
+Communication over IP network sockets involves two parties - usually referred to as a client and a server with
+each end happening over a `socket`. A socket is composed of a pair - IP address and a port. The port for the
+server side is fixed - either one of the [well known port numbers](https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers#Well-known_ports) or an internally chosen port number for your services. What about the client side port? The client side port
+is chosen `dynamically` at run time and are referred to as [ephermal port](https://en.wikipedia.org/wiki/Ephemeral_port).
 
-## Ephermal ports range
-
-## Docker networks
-
-## NAT on the host
+Operating systems set a configurable range from which this ephermal port will be chosen. This brings us to AWS Network ACLs.
 
 ## AWS Network ACLs
 
+[AWS Network ACLs](https://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_ACLs.html) allow controlling/regulating traffic
+flow to and from subnets. Our topic of interest is the outbound rules via which we can specify source ports for our
+allow/deny rules.
 
+In other words, if our docker container above is selecting a ephermal port which is not in the allowed list of the outbound rules,
+the request is not going to go through.
 
-## Solutions
+## Docker networks
 
-### Set the ephermal port range on the host
+I mentioned in the symptoms above that I am using docker's default `docker0` a.ka. bridge network which means, any outgoing
+traffic from a docker container will have it's source IP as the host's IP. For example:
+
+```
+ubuntu@ip-172-34-59-184:~$ sudo tcpdump -i eth0 port 10001
+..
+07:32:49.696954 IP ip-172-34-59-184.51990 > 172.34.1.252.10001: Flags [S], seq 238158991, win 29200, options [mss 1460,sackOK,TS val 2420016438 ecr 0,nop,wscale 7], length 0
+..
+```
+
+`ip-172-34-59-184.51990` is the source hostname and `51990` is the ephermal port that has been chosen to talk to my
+service which is running on port `10001`.
+
+Once I saw the source port via `tcpdump`, I had found my problem. This port was not in the list of allowed outbound rules.
+(Note that, the above port specifically is not the problem, another port was).
+
+Next up, the solution.
+
+# Solution 
+
+### Set the ephermal port range on a Linux VM
+
+We will add an entry to `sysctl.conf`:
+
+```
+$ echo 'net.ipv4.ip_local_port_range=49152 65535' | sudo tee --append /etc/sysctl.conf
+```
+
+To effect the above change on a running system, `$sudo sysctl -p`.
+
 
 ### Set the ephermal port range in a Linux docker container
 
-https://docs.docker.com/engine/reference/commandline/run/#configure-namespaced-kernel-parameters-sysctls-at-runtime
-
-###  Set the ephermal port range in a Windows docker container
-
-https://support.microsoft.com/en-au/help/929851/the-default-dynamic-port-range-for-tcp-ip-has-changed-in-windows-vista
-https://forums.docker.com/t/able-to-set-ephermal-port-range-in-windows-containers-via-docker-run/56095
+Pass it at `docker run` time:
 
 ```
-PS C:\> netsh int ipv4 get dynamicport tcp
-The following command was not found: int ipv4 get dynamicport tcp.
+$ docker run --sysctl net.ipv4.ip_local_port_range="49152 65535" ...
+```
+
+Learn more about [sysctl for docker](https://docs.docker.com/engine/reference/commandline/run/#configure-namespaced-kernel-parameters-sysctls-at-runtime).
+
+###  Set the ephermal port range on Windows
+
+Use the `netsh` command:
+
+```
 PS C:\> netsh int ipv4 show dynamicport tcp
 
 Protocol tcp Dynamic Port Range
@@ -56,4 +107,11 @@ Start Port      : 50000
 Number of Ports : 1000
 ```
 
+The above works inside a Windows container as well. At this stage, there is no way to set this via `docker run`.
+So, I imagine, we will need do it either an entry point of the container or during build.
 
+# Learn more
+
+A very interesting post if you are on Linux is [Bind before connect](https://idea.popcount.org/2014-04-03-bind-before-connect/).
+Learn all about [AWS Network ACLs](https://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_ACLs.html) here. Learn all about
+[netsh](https://docs.microsoft.com/en-us/windows-server/networking/technologies/netsh/netsh) here and a lot about [sysctl](https://wiki.archlinux.org/index.php/sysctl) here.
