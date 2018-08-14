@@ -39,12 +39,13 @@ flow to and from subnets. Our topic of interest is the outbound rules via which 
 allow/deny rules.
 
 In other words, if our docker container above is selecting a ephermal port which is not in the allowed list of the outbound rules,
-the request is not going to go through.
+the request is not going to go through. This can happen when the Network ACLs range is different from the default range of your
+operating system.
 
 ## Docker networks
 
-I mentioned in the symptoms above that I am using docker's default `docker0` a.ka. bridge network which means, any outgoing
-traffic from a docker container will have it's source IP as the host's IP. For example:
+I mentioned in the symptoms above that I am using docker's default `docker0` which by default works in a NAT mode and
+hence any outgoing traffic from a docker container will have it's source IP as the host's IP. For example:
 
 ```
 ubuntu@ip-172-34-59-184:~$ sudo tcpdump -i eth0 port 10001
@@ -60,7 +61,7 @@ service which is running on port `10001`.
 
 Once I saw the source port via `tcpdump`, everything clicked. The source port hadn't even been in my radar when I was running
 my tests inside the container since i had fixed the same issue on the underlying VM instance just a day back. 
-NAT was as expected just masking the container IP address, the source port was still being preserved and wasn't 
+NAT was as expected just masking the container IP address, the source port was still being preserved however and wasn't 
 one in the list of allowed ranges in the Network ACL. This port was not in the list of allowed outbound rules 
 (Note that, the above port specifically is not the problem, another port was).
 
