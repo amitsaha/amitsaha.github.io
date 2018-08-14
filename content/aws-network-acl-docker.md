@@ -8,27 +8,29 @@ computer networking theory. In this post, I share something that involves AWS Ne
 port ranges. I will try and put a bit of background in each section mainly so that it clears up things for me and may be
 others who may need a refresher.
 
-# Ephermal ports
+## Ephermal ports
 
 Communication over network sockets involves two parties - usually referred to as a client and a server.
 
-# Ephermal ports range
+## Ephermal ports range
 
-# Docker networks
+## Docker networks
 
-# NAT on the host
+## NAT on the host
 
-# AWS Network ACLs
+## AWS Network ACLs
 
 
 
-# Solutions
+## Solutions
 
-## Set the ephermal port range on the host
+### Set the ephermal port range on the host
 
-## Set the ephermal port range in a Linux docker container
+### Set the ephermal port range in a Linux docker container
 
-##  Set the ephermal port range in a Windows docker container
+https://docs.docker.com/engine/reference/commandline/run/#configure-namespaced-kernel-parameters-sysctls-at-runtime
+
+###  Set the ephermal port range in a Windows docker container
 
 netsh int ipv4 set dynamicport tcp start=10000 num=1000
 
