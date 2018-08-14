@@ -68,7 +68,7 @@ one in the list of allowed ranges in the Network ACL. This port was not in the l
 
 The solution is to basically set the ephermal range so that it matches the one allowed in the network ACL.
 
-### Set the ephermal port range on a Linux VM
+## Set the ephermal port range on a Linux VM
 
 We will add an entry to `sysctl.conf`:
 
@@ -79,7 +79,7 @@ $ echo 'net.ipv4.ip_local_port_range=49152 65535' | sudo tee --append /etc/sysct
 To effect the above change on a running system, `$sudo sysctl -p`.
 
 
-### Set the ephermal port range in a Linux docker container
+## Set the ephermal port range in a Linux docker container
 
 Pass it at `docker run` time:
 
@@ -89,7 +89,7 @@ $ docker run --sysctl net.ipv4.ip_local_port_range="49152 65535" ...
 
 Learn more about [sysctl for docker](https://docs.docker.com/engine/reference/commandline/run/#configure-namespaced-kernel-parameters-sysctls-at-runtime).
 
-###  Set the ephermal port range on Windows
+##  Set the ephermal port range on Windows
 
 Use the `netsh` command:
 
