@@ -120,3 +120,10 @@ So, I imagine, we will need do it either an entry point of the container or duri
 A very interesting post if you are on Linux is [Bind before connect](https://idea.popcount.org/2014-04-03-bind-before-connect/).
 Learn all about [AWS Network ACLs](https://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_ACLs.html) here. Learn all about
 [netsh](https://docs.microsoft.com/en-us/windows-server/networking/technologies/netsh/netsh) here and a lot about [sysctl](https://wiki.archlinux.org/index.php/sysctl) here.
+
+While trying to figure out what's going wrong, I went into a bit of a rabbit hole and learned a few other things as well:
+
+- [Linux Network Namespaces](https://blog.scottlowe.org/2013/09/04/introducing-linux-network-namespaces/)
+- [Container networking deep dive](https://platform9.com/blog/container-namespaces-deep-dive-container-networking/)
+- [veth devices](http://man7.org/linux/man-pages/man4/veth.4.html)
+- [Linux bridge working](https://goyalankit.com/blog/linux-bridge)
