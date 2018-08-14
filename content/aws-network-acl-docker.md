@@ -1,4 +1,4 @@
-Title: AWS Network ACLs, docker containers and ephermal port range
+Title: AWS Network ACLs and ephermal port ranges
 Date: 2018-07-26 16:00
 Category: infrastructure
 Status: Draft
