@@ -2,9 +2,8 @@ Title: AWS Network ACLs and ephermal port ranges
 Date: 2018-08-14 20:00
 Category: infrastructure
 
-In this post, I share a problem I encountered while working with AWS (Amazon Web Services) Network ACLs, 
-docker containers and ephermal port ranges.
-
+In this post, I discuss a problem (and how I solved it) I encountered while working with AWS (Amazon Web Services) 
+Network ACLs, docker containers and ephermal port ranges.
 # Infrastructure setup
 
 A Linux EC2 instance with `docker` engine running in a VPC with inbound and outbound traffic controlled by Network ACLs.
@@ -115,6 +114,14 @@ Number of Ports : 1000
 
 The above works inside a Windows container as well. At this stage, there is no way to set this via `docker run`.
 So, I imagine, we will need do it either an entry point of the container or during build.
+
+
+# Conclusion
+
+This problem may come up when wortking with Network ACLs in a hybrid Operating System enviorment as it did for me. 
+I can't help but feel thankful to the problem as it allowed me to dig into some networking basics. Who would have
+thought ephermal ports can have any impact on your life?
+
 
 # Learn more
 
