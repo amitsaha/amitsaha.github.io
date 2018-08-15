@@ -1,5 +1,5 @@
 Title: AWS Private Route53 DNS and Docker containers
-Date: 2018-08-14 20:00
+Date: 2018-08-15 20:00
 Category: infrastructure
 
 AWS Route 53 [private hosted zones](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/hosted-zones-private.html) 
