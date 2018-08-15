@@ -2,7 +2,7 @@ Title: AWS Network ACLs and ephermal port ranges
 Date: 2018-08-14 20:00
 Category: infrastructure
 
-In this post, I discuss a problem (and how I solved it) I encountered while working with AWS (Amazon Web Services) 
+In this post, I discuss a problem (and its solution) I encountered while working with AWS (Amazon Web Services) 
 Network ACLs, docker containers and ephermal port ranges.
 # Infrastructure setup
 
@@ -118,7 +118,7 @@ So, I imagine, we will need do it either an entry point of the container or duri
 
 # Conclusion
 
-This problem may come up when wortking with Network ACLs in a hybrid Operating System enviorment as it did for me. 
+This problem may come up when working with Network ACLs in a hybrid Operating System enviorment as it did for me. 
 I can't help but feel thankful to the problem as it allowed me to dig into some networking basics. Who would have
 thought ephermal ports can have any impact on your life?
 
