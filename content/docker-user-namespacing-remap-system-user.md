@@ -30,7 +30,8 @@ Before we get into configuring `docker` engine, we have a bit to learn about Lin
 
 ## System users and entries in `/etc/subuid` and `/etc/subgid`
 
-
+On Linux, a `system` user is created with `-s` switch to `useradd`. A system user doesn't have shell access or a home
+directory and is most useful for 
 
 
 
