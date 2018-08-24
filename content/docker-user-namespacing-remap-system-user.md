@@ -65,20 +65,24 @@ entries don't automatically get created at user creation time.
 ## Adding a `subuid` and `subgid` entry for system users
 
 Since, we want the user inside the container to be the exact user as that outside the container, we have to set the
-`subuid` starting user ID to be the same as the user ID on the host. This is howe can go about doing so:
+`subuid` starting user ID to be the same as the user ID on the host. Thanks to [answer](https://stackoverflow.com/a/49600083). 
+This is howe can go about doing so:
 
 ```
-username="agent"
-uid=$(id -u "$username")
-gid=$(id -g "$username")
-lastuid=$(( uid + 65536 ))
-lastgid=$(( gid + 65536 ))
+$ username="agent"
+$ uid=$(id -u "$username")
+$ gid=$(id -g "$username")
+$ lastuid=$(( uid + 65536 ))
+$ lastgid=$(( gid + 65536 ))
 
-sudo usermod --add-subuids "$uid"-"$lastuid" "$username"
-sudo usermod --add-subgids "$gid"-"$lastgid" "$username"
+$ sudo usermod --add-subuids "$uid"-"$lastuid" "$username"
+$ sudo usermod --add-subgids "$gid"-"$lastgid" "$username"
 ```
 
-We are now ready to enable `userns-remap` and specify `docker` to use the `agent` user.
+We are now ready to enable `userns-remap` and specify `docker` to use the `agent` user. 
+
+Note that, if you are trying to use this feature with a non-system user, you will have to manually modify the `subuid`
+and `subgid` entries so that your starting subuid is the same as the host User ID.
 
 ## Enabling `docker's` userns-remap
 
@@ -121,21 +125,15 @@ this means.
 
 ## Using third party images
 
-root@735b8dd78674:~#  find / \( -uid 1004 \)  -ls 2>/dev/null | head -1
-   772345      4 drwxr-xr-x   1 1004     sudo         4096 Aug 15 02:29 /usr/share/dotnet
-
-https://circleci.com/docs/2.0/high-uid-error/
-
-
-
-
-https://github.com/moby/moby/pull/21266/commits/c18e7f3a0419e35aeab4eefa51f3c17fbd72381f
-
-
-https://success.docker.com/article/introduction-to-user-namespaces-in-docker-engine
+One of the interesting issues I faced while using `userns-remap` was an error when doing a `docker pull` of the form:
+`failed to register layer: Error processing tar file (exit status 1): container id xxx cannot be mapped to a host id`.
+Once `userns-remap` is enabled, all `docker` operations are carried out as the user specified. If an image you are pulling
+has files with user ID `1000`, and if your `subuid` file entry doesn't have space for `1000` users, it is going to fail.
 
 
 ## Learn more
 
 - [User namespacing on Linux](http://man7.org/linux/man-pages/man7/user_namespaces.7.html)
+- [User namespaces in Docker](https://success.docker.com/article/introduction-to-user-namespaces-in-docker-engine)
+- [Initial commit in docker related to dockremap implementation](https://github.com/moby/moby/pull/21266/commits/c18e7f3a0419e35aeab4eefa51f3c17fbd72381f)
 
