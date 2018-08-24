@@ -3,8 +3,8 @@ Date: 2018-08-24
 Category: infrastructure
 
 In this post, we learn how we can make use of `docker`'s user namespacing feature on Linux in a CI/build environment
-to avoid running into permission issues. Using user namespacing also keeping things a bit sane without sub-optimal
-alternatives.
+to avoid running into permission issues. Using user namespacing also keeping things a bit sane without adopting
+sub-optimal alternatives.
 
 # Introduction
 
@@ -54,11 +54,13 @@ However, for `system` users, this is not done. I am not sure why though.
 
 ## docker `userns-remap` with system users
 
-docker's `userns-remap` feature allows us to use a default `dockremap` user when it creates a new user on the host
+docker's `userns-remap` feature allows us to use a default `dockremap` user. In this scenario, docker engine creates a new user on the host
 and maps the `root` user inside a container to this user. This is useful when we want to avoid privilege escalation.
 This doesn't work however when we want that any operation inside a container is performed as the same user as the one
-spawning the container - for example, the `agent` user. For an existing user, `docker` also needs to have entries for
-the user to be set in `/etc/subuid` and `/etc/subgid`. We learned in the previous paragraph that for system users 
+spawning the container - for example, the `agent` user. 
+
+Hence, we need to specify another user. For such an user, `docker` also needs to have entries 
+on the host's `/etc/subuid` and `/etc/subgid` files. We learned in the previous paragraph that for system users 
 entries don't automatically get created at user creation time. For the `dockremap` user, `docker engine` takes
 does this itself. Next, we see how we can do for an existing system user.
 
