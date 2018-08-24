@@ -1,7 +1,6 @@
-Title: Using Docker `userns-remap` with a system user on Linux
+Title: Docker `userns-remap` and system users
 Date: 2018-08-24 20:00
 Category: infrastructure
-Status: Draft
 
 In this post, we learn how we can make use of `docker`'s user namespacing feature on Linux in a CI/build environment
 to avoid running into permission issues. Using user namespacing also keeping things a bit sane without sub-optimal
