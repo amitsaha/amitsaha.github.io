@@ -59,7 +59,8 @@ and maps the `root` user inside a container to this user. This is useful when we
 This doesn't work however when we want that any operation inside a container is performed as the same user as the one
 spawning the container - for example, the `agent` user. For an existing user, `docker` also needs to have entries for
 the user to be set in `/etc/subuid` and `/etc/subgid`. We learned in the previous paragraph that for system users 
-entries don't automatically get created at user creation time.
+entries don't automatically get created at user creation time. For the `dockremap` user, `docker engine` takes
+does this itself. Next, we see how we can do for an existing system user.
 
 ## Adding a `subuid` and `subgid` entry for system users
 
