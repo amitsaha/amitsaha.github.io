@@ -49,6 +49,8 @@ sudo cat /etc/subuid
 sudo cat /etc/subgid
 ```
 
+https://stackoverflow.com/a/49600083
+
 ## Enabling `docker's` userns-remap
 
 sudo mkdir -p /etc/systemd/system/docker.service.d
@@ -61,6 +63,16 @@ echo "ExecStart=/usr/bin/dockerd -H fd:// --userns-remap=\"buildkite-agent:build
 sudo systemctl daemon-reload
 sudo systemctl restart docker
 
+
+## User namespace in action
+
+ubuntu@ip-172-34-54-228:~$ cat /proc/18407/uid_map
+         0        999      65537
+         
+
+root@028c3d79babd:/# cat /proc/1/uid_map
+         0        999      65537
+ 
 
 ## Using third party images
 
