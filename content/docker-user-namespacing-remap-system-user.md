@@ -127,9 +127,10 @@ this means.
 
 One of the interesting issues I faced while using `userns-remap` was an error when doing a `docker pull` of the form:
 `failed to register layer: Error processing tar file (exit status 1): container id xxx cannot be mapped to a host id`.
-Once `userns-remap` is enabled, all `docker` operations are carried out as the user specified. If an image you are pulling
-has files with user ID `1000`, and if your `subuid` file entry doesn't have space for `1000` users, it is going to fail.
-
+Once `userns-remap` is enabled, all `docker engine` operations are carried out as the user specified - not the user
+executing the docker client command. If an image you are pulling has files with user ID `1000`, and if your `subuid` 
+file entry doesn't have space for `1000` users, it is going to fail. The solution is to have a decent enough range
+of users in your `subuid` entry.
 
 ## Learn more
 
