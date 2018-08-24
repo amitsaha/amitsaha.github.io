@@ -66,9 +66,9 @@ does this itself. Next, we see how we can do for an existing system user.
 
 ## Adding a `subuid` and `subgid` entry for system users
 
-Since, we want the user inside the container to be the exact user as that outside the container, we have to set the
-`subuid` starting user ID to be the same as the user ID on the host. Thanks to [answer](https://stackoverflow.com/a/49600083). 
-This is howe can go about doing so:
+Since, we want the user inside the container to be the same user as that outside the container, we have to set the
+`subuid` starting user ID to be the same as the user ID on the host. Thanks to this [answer](https://stackoverflow.com/a/49600083). 
+This is how we can go about doing so:
 
 ```
 $ username="agent"
@@ -83,8 +83,8 @@ $ sudo usermod --add-subgids "$gid"-"$lastgid" "$username"
 
 We are now ready to enable `userns-remap` and specify `docker` to use the `agent` user. 
 
-Note that, if you are trying to use this feature with a non-system user, you will have to manually modify the `subuid`
-and `subgid` entries so that your starting subuid is the same as the host User ID.
+Note that if you are trying to use this feature with a non-system user, you will have to manually modify the `subuid`
+and `subgid` entries so that your starting subuid is the same as the User ID.
 
 ## Enabling `docker's` userns-remap
 
