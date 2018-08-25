@@ -34,17 +34,17 @@ Before we get into configuring `docker` engine, we have a bit to learn about Lin
 On Linux, a `system` user is created with `-s` switch to `useradd`. A [system user](http://www.linuxfromscratch.org/blfs/view/svn/postlfs/users.html) doesn't have shell access or a home
 directory and is most useful for running daemons and other processes, like a CI slave for example.
 
-`/etc/subuid` is explained in the [subuid(5)](http://man7.org/linux/man-pages/man5/subuid.5.html) manual page. Basically,
-it is a file whose lines are similar to:
+`/etc/subuid` is explained in the [subuid(5)](http://man7.org/linux/man-pages/man5/subuid.5.html) manual page. 
+Basically, it is a file whose lines are similar to:
 
 ```
 root:100000:65536
 ubuntu:165536:65536
 ```
 
-The first column is a username, the second column is the starting "sub" user ID that this user is allowed to use in a user 
-namespace upto a maximum number of user IDs given by the third column. You can also see that, the starting sub user ID of
-the second row is calculated as: `Previous Starting Sub UID + the number of user IDs allowed`.
+The first column is a username, the second column is the starting _subordinate_ user ID that this user is allowed 
+to use in a user namespace upto a maximum number of user IDs given by the third column. You can also see that 
+the starting sub user ID of the second row is calculated as: `Previous Starting Sub UID + the number of user IDs allowed`.
 
 The `/etc/subgid` is similar, but for group IDs.
 
@@ -54,20 +54,23 @@ However, for `system` users, this is not done. I am not sure why though.
 
 ## docker `userns-remap` with system users
 
-docker's `userns-remap` feature allows us to use a default `dockremap` user. In this scenario, docker engine creates a new user on the host
-and maps the `root` user inside a container to this user. This is useful when we want to avoid privilege escalation.
-This doesn't work however when we want that any operation inside a container is performed as the same user as the one
-spawning the container - for example, the `agent` user. 
+docker's `userns-remap` feature allows us to use a default `dockremap` user. In this scenario, docker engine creates 
+the user `dockremap` on the host and maps the `root` user inside a container to this user. For this user, `docker` also 
+needs to have entries on the host's `/etc/subuid` and `/etc/subgid` files. We learned in the previous paragraph that 
+for system users entries don't automatically get created at user creation time. Hence, the `docker engine` 
+does this itself (initial commit)[https://github.com/moby/moby/pull/21266/commits/c18e7f3a0419e35aeab4eefa51f3c17fbd72381f]). 
 
-Hence, we need to specify another user. For such an user, `docker` also needs to have entries 
-on the host's `/etc/subuid` and `/etc/subgid` files. We learned in the previous paragraph that for system users 
-entries don't automatically get created at user creation time. For the `dockremap` user, `docker engine` takes
-does this itself. Next, we see how we can do for an existing system user.
+This is useful when we want to avoid privilege escalation. This doesn't work however when we want that any operation 
+inside a container is performed as the same user as the one spawning the container - for example, the `agent` user. Hence,
+we want to specify another user on the host that the root user inside the container should map to.
+
 
 ## Adding a `subuid` and `subgid` entry for system users
 
 Since, we want the user inside the container to be the same user as that outside the container, we have to set the
-`subuid` starting user ID to be the same as the user ID on the host. Thanks to this [answer](https://stackoverflow.com/a/49600083). 
+`subuid` starting user ID to be the same as the user ID on the host. If we don't do this, any changes to the volume
+mounted directory will have a different owner/group associated with them. 
+
 This is how we can go about doing so:
 
 ```
@@ -81,7 +84,7 @@ $ sudo usermod --add-subuids "$uid"-"$lastuid" "$username"
 $ sudo usermod --add-subgids "$gid"-"$lastgid" "$username"
 ```
 
-We are now ready to enable `userns-remap` and specify `docker` to use the `agent` user. 
+We are now ready to enable `userns-remap` and specify `docker engine` to use the `agent` user. 
 
 Note that if you are trying to use this feature with a non-system user, you will have to manually modify the `subuid`
 and `subgid` entries so that your starting subuid is the same as the User ID.
@@ -121,8 +124,7 @@ root@028c3d79babd:/# cat /proc/1/uid_map
          0        999      65537
 ```
 
-Please see [user_namespaces(7)](http://man7.org/linux/man-pages/man7/user_namespaces.7.html) to understand in detail what
-this means.
+Please see [user_namespaces(7)](http://man7.org/linux/man-pages/man7/user_namespaces.7.html) for description of these files.
 
 
 ## Using third party images
