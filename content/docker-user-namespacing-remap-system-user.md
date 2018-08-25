@@ -124,7 +124,8 @@ root@028c3d79babd:/# cat /proc/1/uid_map
          0        999      65537
 ```
 
-Please see [user_namespaces(7)](http://man7.org/linux/man-pages/man7/user_namespaces.7.html) for description of these files.
+Please see [user_namespaces(7)](http://man7.org/linux/man-pages/man7/user_namespaces.7.html) for description of these 
+files.
 
 
 ## Using third party images
@@ -135,6 +136,12 @@ Once `userns-remap` is enabled, all `docker engine` operations are carried out a
 executing the docker client command. If an image you are pulling has files with user ID `1000`, and if your `subuid` 
 file entry doesn't have space for `1000` users, it is going to fail. The solution is to have a decent enough range
 of users in your `subuid` entry.
+
+## Problem with the above
+
+Since we have manually set the sub ordinate user IDs to start at the same ID (say, A) as the user ID, a sub-ordinate 
+user ID B inside the container, such that B=A+N, may map to an existing user ID, C on the host and hence any changes
+to the volume mounted directory by a user B, will be mapped back on the host as being modified by user C.
 
 ## Learn more
 
