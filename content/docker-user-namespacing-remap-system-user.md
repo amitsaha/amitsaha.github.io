@@ -58,7 +58,7 @@ docker's `userns-remap` feature allows us to use a default `dockremap` user. In 
 the user `dockremap` on the host and maps the `root` user inside a container to this user. For this user, `docker` also 
 needs to have entries on the host's `/etc/subuid` and `/etc/subgid` files. We learned in the previous paragraph that 
 for system users entries don't automatically get created at user creation time. Hence, the `docker engine` 
-does this itself (initial commit)[https://github.com/moby/moby/pull/21266/commits/c18e7f3a0419e35aeab4eefa51f3c17fbd72381f]). 
+does this itself - [initial commit](https://github.com/moby/moby/pull/21266/commits/c18e7f3a0419e35aeab4eefa51f3c17fbd72381f). 
 
 This is useful when we want to avoid privilege escalation. This doesn't work however when we want that any operation 
 inside a container is performed as the same user as the one spawning the container - for example, the `agent` user. Hence,
