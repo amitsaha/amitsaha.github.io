@@ -1,5 +1,5 @@
 
-Title: What is your program doing on Linux?
+Title: What is my program doing on Linux? 
 Date: 2018-06-19
 Category: software
 Status: Draft
@@ -21,42 +21,141 @@ while True:
 The program has two characteristics:
 
 - The `while True` loop means it is continuously trying to run or get CPU time
-- Inside the loop, we create a file and write a string to it i.e. our program also performs Input/Output (in this case,
-Disk wries).
+- Inside the loop, we create a file and write a string to it i.e. our program also performs Input/Output 
+  (in this case, disk writes).
 
 Let's now run the program in the background:
 
 ```
-$ python test.py &
-[1] 10362
+$ python3 test.py &
+[1] 2114
 ```
 
-## pidstat
+The first tool we will explore is `pidstat`. On most distributions, you will find it in the `sysstat` package. 
 
-The first tool we will use is `pidstat`:
+# pidstat
+
+## CPU 
+
+Let's run `pidstat` specifying the process ID via `-p` option:
 
 ```
-vagrant@default-centos-7-latest:~$ sudo pidstat -p 13419 -d 1
-Linux 4.13.0-21-generic (default-centos-7-latest)       06/05/2018      _x86_64_        (1 CPU)
+$ pidstat -p 2114
+Linux 4.15.0-1020-aws (ip-172-31-7-75) 	08/26/18 	_x86_64_	(1 CPU)
 
-04:02:48 AM   UID       PID   kB_rd/s   kB_wr/s kB_ccwr/s iodelay  Command
-04:02:49 AM  1000     13419      0.00  31845.83      0.00       0  python
-04:02:50 AM  1000     13419      0.00  29121.65      0.00       0  python
+09:37:07      UID       PID    %usr %system  %guest   %wait    %CPU   CPU  Command
+09:37:07     1000      2114   86.10    0.09    0.00    0.03   86.19     0  python3
+
+```
+
+The first line reports the current kernel version, the IP address associated with the first non-loopback network 
+interface, the current date, the CPU architecture and the number of CPUs on the system.
+
+The first column of the second line prints the time of the statistics reported. The other fields are described below:
+
+**UID**
+
+The user ID of the user the process is running as.
+
+**PID**
+
+Process ID of the user
+
+**%usr**
+
+The percentage of the time the process has spent in _user space_. We have a infinite loop in our program,
+so we expect a very high percentage of the time being spent completely in this space.
+
+**%system**
+
+The percentage of the time the process has spent in _kernel space_. We are writing to a disk file in our program which
+involves _system calls_. This accounts for the very tiny fraction of the time spent in kernel space.
+
+
+**%wait**
+
+The percentage of the time the process is waiting to run. This could be waiting for I/O or the processor just
+being busy serving other higher priority tasks.
+
+
+**%CPU**
+
+This is the total percentage of the CPU used by the task. Since, the current system is a single processor system,
+we can say that our process is using the reported percentage of the total CPU power. If however, this is a multi-processor
+environment, the number displayed here will be total CPU usage of the process divided by the number of CPUs
+on the system.
+
+**Command**
+
+This is the command (without the arguments) that created the process.
+
+
+If we specified a `1` at the end of our command above, `pidstat` would report the same statistics for the process
+at 1 second intervals unless you press a Ctrl+C:
+
+```
+$ pidstat -p 2114 1
+Linux 4.15.0-1020-aws (ip-172-31-7-75) 	08/26/18 	_x86_64_	(1 CPU)
+
+09:20:29      UID       PID    %usr %system  %guest   %wait    %CPU   CPU  Command
+09:20:30     1000      2114  100.00    0.00    0.00    0.00  100.00     0  python3
+09:20:31     1000      2114  100.00    0.00    0.00    0.00  100.00     0  python3
+09:20:32     1000      2114  100.00    0.00    0.00    1.00  100.00     0  python3
+09:20:33     1000      2114  100.00    1.00    0.00    0.00  100.00     0  python3
+..
+09:51:02     1000      2114   98.02    0.00    0.00    0.00   98.02     0  python3
 ^C
-Average:     1000     13419      0.00  30476.68      0.00       0  python
-```
+Average:     1000      2114   99.50    0.00    0.00    0.00   99.50     -  python3
 
 ```
-vagrant@default-centos-7-latest:~$ sudo pidstat -p 13419 1
-Linux 4.13.0-21-generic (default-centos-7-latest)       06/05/2018      _x86_64_        (1 CPU)
 
-04:02:53 AM   UID       PID    %usr %system  %guest   %wait    %CPU   CPU  Command
-04:02:54 AM  1000     13419    3.03   22.22    0.00    4.04   25.25     0  python
-04:02:55 AM  1000     13419    3.19   23.40    0.00    3.19   26.60     0  python
-04:02:56 AM  1000     13419    2.11   23.16    0.00    3.16   25.26     0  python
+When you pressed a Ctrl + C, a summary is printed at the end. If you added a `5` at the end of the previous
+command, it would print the above data for a total of 5 counts and exit. Try it out. 
+
+
+## Disk
+
+Let's now monitor our process' disk activity:
+
+
+
+```
+$ pidstat -p 2114 -d 1
+Linux 4.15.0-1020-aws (ip-172-31-7-75) 	08/26/18 	_x86_64_	(1 CPU)
+
+10:02:35      UID       PID   kB_rd/s   kB_wr/s kB_ccwr/s iodelay  Command
+10:02:36     1000      2114      0.00     60.00      0.00       0  python3
+10:02:37     1000      2114      0.00      2.68      0.00       0  python3
+10:02:38     1000      2114      0.00     40.00      0.00       0  python3
+10:02:39     1000      2114      0.00     60.00      0.00       0  python3
+10:02:40     1000      2114      0.00     40.00      0.00       0  python3
+10:02:41     1000      2114      0.00     60.00      0.00       0  python3
 ^C
-Average:     1000     13419    2.78   22.92    0.00    3.47   25.69     -  python
+Average:     1000      2114      0.00     15.04      0.00       0  python3
 ```
+
+
+## Memory
+
+```
+$ pidstat -p 2114 -r 1
+Linux 4.15.0-1020-aws (ip-172-31-7-75) 	08/26/18 	_x86_64_	(1 CPU)
+
+10:03:46      UID       PID  minflt/s  majflt/s     VSZ     RSS   %MEM  Command
+10:03:47     1000      2114      0.00      0.00   30196    9004   0.89  python3
+10:03:48     1000      2114      0.00      0.00   30196    9004   0.89  python3
+10:03:49     1000      2114      0.00      0.00   30196    9004   0.89  python3
+10:03:50     1000      2114      0.00      0.00   30196    9004   0.89  python3
+10:03:51     1000      2114      0.00      0.00   30196    9004   0.89  python3
+10:03:52     1000      2114      0.00      0.00   30196    9004   0.89  python3
+^C
+Average:     1000      2114      0.00      0.00   30196    9004   0.89  python3
+```
+
+
+
+# `perf` tools
+
 
 ```
 $  sudo perf trace -p 13419
@@ -67,6 +166,9 @@ $  sudo perf trace -p 13419
  1509.792 ( 0.029 ms): write(fd: 3</home/vagrant/test.txt>, buf: 0x564785fcf800, count: 5    ) = 5
  1509.877 ( 0.009 ms): close(fd: 3</home/vagrant/test.txt>                                   ) = 0
  ```
+ 
+ 
+ ## /proc
  
  
  ```
@@ -103,20 +205,7 @@ write_bytes: 38754615296
 cancelled_write_bytes: 0
 ```
 
-```
- sudo pidstat -dl 5
-Linux 4.13.0-21-generic (default-centos-7-latest)       06/05/2018      _x86_64_        (1 CPU)
 
-04:42:33 AM   UID       PID   kB_rd/s   kB_wr/s kB_ccwr/s iodelay  Command
-04:42:38 AM     0         7      0.00      0.00      0.00 177212488  ksoftirqd/0
-04:42:38 AM     0         8      0.00      0.00      0.00 3042546  rcu_sched
-04:42:38 AM     0       398      0.00      0.00      0.00    3001  /lib/systemd/systemd-journald
-04:42:38 AM   101       625      0.00      0.00      0.00  379856  /lib/systemd/systemd-networkd
-04:42:38 AM   102       629      0.00      0.00      0.00  379762  /lib/systemd/systemd-resolved
-04:42:38 AM  1000     13419      0.00  30433.80      0.00       0  python test.py
-04:42:38 AM     0     14456      0.00      0.00      0.00 1140099  pidstat -dl 5
-
-```
 
 ```
  sudo cat /proc/13419/stat
@@ -128,14 +217,7 @@ http://man7.org/linux/man-pages/man5/proc.5.html
 https://stackoverflow.com/questions/223644/what-is-an-uninterruptable-process
 
 
-```
-sudo pidstat -r -p 14797
-Linux 4.13.0-21-generic (default-centos-7-latest)       06/05/2018      _x86_64_        (1 CPU)
 
-05:23:39 AM   UID       PID  minflt/s  majflt/s     VSZ     RSS   %MEM  Command
-
-05:23:39 AM  1000     14797      0.13      0.00   25416    6272   0.69  python
-```
 
 ```
  cat /proc/25502/smaps | more
