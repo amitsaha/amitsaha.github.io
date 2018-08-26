@@ -117,8 +117,6 @@ command, it would print the above data for a total of 5 counts and exit. Try it 
 
 Let's now monitor our process' disk activity:
 
-
-
 ```
 $ pidstat -p 2114 -d 1
 Linux 4.15.0-1020-aws (ip-172-31-7-75) 	08/26/18 	_x86_64_	(1 CPU)
@@ -133,6 +131,18 @@ Linux 4.15.0-1020-aws (ip-172-31-7-75) 	08/26/18 	_x86_64_	(1 CPU)
 ^C
 Average:     1000      2114      0.00     15.04      0.00       0  python3
 ```
+
+
+The first three and the last columns (starting from the second line) are the same as our earlier report.
+The new fields are desribed below:
+
+**kB_rd/s**
+
+**kB_wr/s**
+
+**kB_ccwr/s**
+
+**iodelay**
 
 
 ## Memory
@@ -172,25 +182,16 @@ $  sudo perf trace -p 13419
  
  
  ```
- vagrant@default-centos-7-latest:~$ sudo cat /proc/13419/wchan
+$ sudo cat /proc/13419/wchan
 io_schedule
 ```
 
 ```
-vagrant@default-centos-7-latest:~$ sudo cat /proc/13419/stack
-[<ffffffffba6b3226>] io_schedule+0x16/0x40
-[<ffffffffba7b79c4>] wait_on_page_bit+0xf4/0x130
-[<ffffffffba7cdb5d>] truncate_inode_pages_range+0x56d/0x830
-[<ffffffffba7cdee8>] truncate_pagecache+0x48/0x70
-[<ffffffffba9079c8>] ext4_setattr+0x8f8/0x9e0
-[<ffffffffba872ca5>] notify_change+0x2e5/0x430
-[<ffffffffba84cf33>] do_truncate+0x73/0xc0
-[<ffffffffba861f28>] path_openat+0xf88/0x1630
-[<ffffffffba8638db>] do_filp_open+0x9b/0x110
-[<ffffffffba84f63b>] do_sys_open+0x1bb/0x2b0
-[<ffffffffba84f764>] SyS_openat+0x14/0x20
-[<ffffffffbaf0e8bb>] entry_SYSCALL_64_fastpath+0x1e/0xa9
-[<ffffffffffffffff>] 0xffffffffffffffff
+ubuntu@ip-172-31-7-75:~$ sudo cat /proc/2114/stack 
+[<0>] exit_to_usermode_loop+0x59/0xd0
+[<0>] prepare_exit_to_usermode+0x77/0x80
+[<0>] retint_user+0x8/0x8
+[<0>] 0xffffffffffffffff
 ```
 
 
@@ -220,7 +221,7 @@ https://stackoverflow.com/questions/223644/what-is-an-uninterruptable-process
 
 
 ```
- cat /proc/25502/smaps | more
+$ cat /proc/25502/smaps | more
 55b79e08e000-55b79e38a000 r-xp 00000000 fd:00 664330                     /usr/bin/python2.7
 Size:               3056 kB
 Rss:                1624 kB
