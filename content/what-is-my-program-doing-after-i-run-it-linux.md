@@ -115,7 +115,7 @@ command, it would print the above data for a total of 5 counts and exit. Try it 
 
 ## Disk
 
-Let's now monitor our process' disk activity:
+Let's now monitor our process' disk activity using the `-d` switch:
 
 ```
 $ pidstat -p 2114 -d 1
@@ -131,7 +131,6 @@ Linux 4.15.0-1020-aws (ip-172-31-7-75) 	08/26/18 	_x86_64_	(1 CPU)
 ^C
 Average:     1000      2114      0.00     15.04      0.00       0  python3
 ```
-
 
 The first three and the last columns (starting from the second line) are the same as our earlier report.
 The new fields are desribed below:
