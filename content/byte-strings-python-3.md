@@ -8,3 +8,11 @@ https://eli.thegreenplace.net/2012/01/30/the-bytesstr-dichotomy-in-python-3
 https://docs.python.org/3/library/functions.html#open
 https://docs.python.org/3/library/locale.html#locale.getpreferredencoding
 
+import gzip
+with open('textfile') as f:
+    data = f.read()
+    print(type(data))
+
+with gzip.open('sample.gz') as f:
+    data = f.read()
+    print(type(data))
