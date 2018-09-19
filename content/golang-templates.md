@@ -1,11 +1,13 @@
-Title: Simple arrays in Golang templates
+Title: Arrays in Golang templates
 Date: 2018-09-18
 Category: golang
 Status: Draft
 
 
 While working on creating a template file for a Golang project, I wanted to better understand how to work
-with arrays in Golang templates as available via the `html/template` package. 
+with arrays in Golang templates as available via the `html/template` package.
+
+## Access the entire array
 
 Let's consider our first program:
 
@@ -56,6 +58,8 @@ Anything within `{{ }}` inside the template string is where we do _something_ wi
 when executing the template. The `.` (dot) refers to the data that is passed in. In the above example, the 
 entire array contents of `names` is the value of `.`. Hence, the output has the entire array including the surrounding
 `[]`.
+
+## Do something with individual array elements
 
 
 ## Learn more
