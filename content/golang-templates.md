@@ -5,7 +5,7 @@ Status: Draft
 
 While working on creating a template file for a Golang project, I wanted to better understand how to work
 with data in Golang templates as available via the `html/template` package. In this post, I discuss
-some common use cases that may arise.
+a few use cases that may arise.
 
 ## Access a variable
 
@@ -38,8 +38,6 @@ func main() {
 	}
 }
 
-
-
 ```
 
 When we run the above program [Go playground link](https://play.golang.org/p/St0g-6_G8_1), the output we get is:
@@ -48,26 +46,22 @@ When we run the above program [Go playground link](https://play.golang.org/p/St0
 Array contents: [Tabby Jill]
 ```
 
-There are three main stages in the above program:
+There are three main stages to working with templates in general that we see in the program above:
 
 - Create a new `Template` object: `tmpl := template.New("test")`
 - Parse a template string: `tmpl, err := tmpl.Parse("Array contents: {{.}}")`
 - Execute the template: `err1 := tmpl.Execute(os.Stdout, names)` passing data in the `names` variable
 
 Anything within `{{ }}` inside the template string is where we do _something_ with the data that we pass in 
-when executing the template. The `.` (dot) refers to the data that is passed in. In the above example, the 
+when executing the template. This _something_ can be just displaying the data, or performing certain operations
+with it. 
+
+The `.` (dot) refers to the data that is passed in. In the above example, the 
 entire array contents of `names` is the value of `.`. Hence, the output has the entire array including the surrounding
-`[]`. This also means that `names` could have been of another type - a struct for [example](https://play.golang.org/p/vAmNzNFg8LR)
-and our program above would have worked:
+`[]`. This also means that `names` could have been of another type - a struct for [example](https://play.golang.org/p/vAmNzNFg8LR) like so:
 
 ```
-package main
-
-import (
-	"html/template"
-	"log"
-	"os"
-)
+..
 
 type Test struct {
 	name string
@@ -75,9 +69,7 @@ type Test struct {
 
 func main() {
 
-	t := Test{name: "Tabby"}
-
-	tmpl := template.New("test")
+	..
 
 	//parse some content and generate a template
 	tmpl, err := tmpl.Parse("Variable contents: {{.}}")
@@ -85,16 +77,12 @@ func main() {
 		log.Fatal("Error Parsing template: ", err)
 		return
 	}
-	err1 := tmpl.Execute(os.Stdout, t)
-	if err1 != nil {
-		log.Fatal("Error executing template: ", err1)
-
-	}
+	..
 }
 
 ```
 
-The output now is:
+The output now would be:
 
 ```
 Variable contents: {Tabby}
@@ -160,14 +148,42 @@ tmpl, err := tmpl.Parse("{{range .}}Hello {{.}}\n{{end}} ")
 I find it easy when I read the above template string as:
 
 ```
-for _, item := range names { // {{range .}}
-    fmt.Printf("Hello %s\n", item) // Hello {{.}}\n
-} // {{end}}
+for _, item := range names {       // corresponding to {{range .}}
+    fmt.Printf("Hello %s\n", item) // corresponding to Hello {{.}}\n
+}                                 // corresponding to {{end}}
 ```
+`range` can be used to iterate over arrays, slice, map or a channel. 
 
 ## Arrays of structure objects
 
-## Values from files
+Combining the two previous examples, we can access array elements which are structure objects, like so:
+
+```
+...
+var names = []Person{
+		Person{Name: "Tabby", Age: 21},
+		Person{Name: "Jill", Age: 19},
+}
+
+tmpl := template.New("test")
+
+tmpl, err := tmpl.Parse("{{range .}}{{.Name}} is {{.Age}} years old\n{{end}} ")
+err1 := tmpl.Execute(os.Stdout, names)
+...
+```
+
+The complete program is [here](https://play.golang.org/p/NseTCXCyjF7) and the output from this program is:
+
+```
+Tabby is 21 years old
+Jill is 19 years old
+
+```
+
+
+## Chaining actions
+
+https://play.golang.org/p/dGc8gvDJXnO
 
 
 ## Learn more
