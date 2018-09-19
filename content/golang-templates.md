@@ -3,12 +3,11 @@ Date: 2018-09-18
 Category: golang
 Status: Draft
 
-
 While working on creating a template file for a Golang project, I wanted to better understand how to work
 with data in Golang templates as available via the `html/template` package. In this post, I discuss
 some common use cases that may arise.
 
-## Access the entire array
+## Access a variable
 
 Let's consider our first program:
 
@@ -58,9 +57,10 @@ There are three main stages in the above program:
 Anything within `{{ }}` inside the template string is where we do _something_ with the data that we pass in 
 when executing the template. The `.` (dot) refers to the data that is passed in. In the above example, the 
 entire array contents of `names` is the value of `.`. Hence, the output has the entire array including the surrounding
-`[]`.
+`[]`. This also means that `names` could have been of another type - a struct for [example](https://play.golang.org/p/vAmNzNFg8LR)
+and our program above would have worked.
 
-## Do something with individual array elements
+## Do something with array elements
 
 ## Arrays of structure objects
 
