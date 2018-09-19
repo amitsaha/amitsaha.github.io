@@ -1,11 +1,12 @@
-Title: Arrays in Golang templates
+Title: Examples of consuming data in Golang templates
 Date: 2018-09-18
 Category: golang
 Status: Draft
 
 
 While working on creating a template file for a Golang project, I wanted to better understand how to work
-with arrays in Golang templates as available via the `html/template` package.
+with data in Golang templates as available via the `html/template` package. In this post, I discuss
+some common use cases that may arise.
 
 ## Access the entire array
 
@@ -60,6 +61,10 @@ entire array contents of `names` is the value of `.`. Hence, the output has the 
 `[]`.
 
 ## Do something with individual array elements
+
+## Arrays of structure objects
+
+## Values from files
 
 
 ## Learn more
