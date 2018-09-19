@@ -52,10 +52,12 @@ There are three main stages in the above program:
 - Parse a template string: `tmpl, err := tmpl.Parse("Array contents: {{.}}")`
 - Execute the template: `err1 := tmpl.Execute(os.Stdout, names)` passing data in the `names` variable
 
-## Parsing the template string
+Anything within `{{ }}` inside the template string is where we do _something_ with the data that we pass in 
+when executing the template. The `.` (dot) refers to the data that is passed in. In the above example, the 
+entire array contents of `names` is the value of `.`. Hence, the output has the entire array including the surrounding
+`[]`.
 
-Anything within `{{ }}` is an _action_ to be performed on the the data structure that you pass to the template in 
-the execute stage. The `.` above  
+
 ## Learn more
 
 - [Golang documentation on template](https://golang.org/pkg/text/template/)
