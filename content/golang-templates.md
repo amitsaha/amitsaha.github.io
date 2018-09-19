@@ -148,6 +148,23 @@ Tabby is 21 years old
 
 ## Do something with array elements
 
+Going back to our first example, how do we access the individual array elements? Let's see how we can do so. 
+
+The complete example can be found [here](https://play.golang.org/p/v2qP49qaJp5), but the only change is in the template
+string:
+
+```
+tmpl, err := tmpl.Parse("{{range .}}Hello {{.}}\n{{end}} ")
+```
+
+I find it easy when I read the above template string as:
+
+```
+for _, item := range names { // {{range .}}
+    fmt.Printf("Hello %s\n", item) // Hello {{.}}\n
+} // {{end}}
+```
+
 ## Arrays of structure objects
 
 ## Values from files
