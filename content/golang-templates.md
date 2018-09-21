@@ -226,6 +226,7 @@ My first encounter with Golang templates was when working with [docker](https://
 formatting which allowed controlling what I get as output. Let's see how we can implement something like that
 for our program.
 
+## Rendering an arbitrary template file using arbitrary values
 
 
 
