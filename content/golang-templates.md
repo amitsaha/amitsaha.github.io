@@ -7,7 +7,7 @@ While working on creating a template file for a Golang project, I wanted to bett
 with data in Golang templates as available via the `html/template` package. In this post, I discuss
 a few use cases that may arise.
 
-## Access a variable
+## Accessing a variable
 
 Let's consider our first program:
 
@@ -179,12 +179,46 @@ Tabby is 21 years old
 Jill is 19 years old
 
 ```
+## Calling user defined functions and Chaining
 
+Our next example demonstrates two new things:
 
-## Chaining actions
+- Invoking user-defined functions
+- Chaining
 
-https://play.golang.org/p/dGc8gvDJXnO
+The complete example is available [here](https://play.golang.org/p/cksPYVt3RUg) and the output is:
 
+```
+Tabby has an odd name 
+Jill has an even name 
+```
+
+The two main changes from our previous program are:
+
+### Adding a `FuncMap`
+
+```
+funcMap := template.FuncMap{  
+    "oddOrEven": oddOrEven,
+}
+
+tmpl := template.New("test").Funcs(funcMap)
+```
+
+A `FuncMap` is how we add our functions to a template's "context" and then invoke them. There are few
+rules around the semantics of functions we can add which you can learn [here](https://golang.org/pkg/text/template/#FuncMap).
+My favorite is if I return a non-nil error, the template execution will halt without me having to do any
+extra checks.
+
+### Chaining
+
+Chaining is how we perform an action and feed it's output to another action via the `|` (pipe) operator:
+
+```
+tmpl, err := tmpl.Parse("{{range .}}{{.Name}} has an {{len .Name | oddOrEven}} name \n{{end}}")
+```
+
+Here, we invoke the in-built `len` function to calculate the length of `Name` and then call the `oddOrEven` function.
 
 ## Learn more
 
