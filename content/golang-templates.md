@@ -273,6 +273,8 @@ We can of course define any arbitrary functions and make them available to be in
 
 ## Rendering an arbitrary template file using arbitrary values
 
+https://github.com/ghodss/yaml
+
 https://play.golang.org/p/OJwrithCjVD
 
 ```
