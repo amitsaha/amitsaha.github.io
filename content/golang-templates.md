@@ -267,10 +267,12 @@ func getFormatString() string {
         } else {
                 return fmt.Sprintf(placeHolderFormat, defaultFormatString)
         }
+}
 ```
-
+We can of course define any arbitrary functions and make them available to be invoked in the context of our templates.
 
 ## Rendering an arbitrary template file using arbitrary values
+
 
 
 
