@@ -323,5 +323,10 @@ func main() {
 - [Golang documentation on template](https://golang.org/pkg/text/template/)
 - Check out [sprig](http://masterminds.github.io/sprig/)
 
+## Acknowlegements
+
+- https://stackoverflow.com/questions/26152088/access-a-map-value-using-a-variable-key-in-a-go-template
+
+
 
 
