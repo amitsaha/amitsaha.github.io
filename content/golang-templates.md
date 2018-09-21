@@ -1,7 +1,6 @@
 Title: Examples of consuming data in Golang templates
 Date: 2018-09-18
 Category: golang
-Status: Draft
 
 While working on creating a template file for a Golang project, I wanted to better understand how to work
 with data in Golang templates as available via the `html/template` package. In this post, I discuss
