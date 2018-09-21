@@ -220,6 +220,19 @@ tmpl, err := tmpl.Parse("{{range .}}{{.Name}} has an {{len .Name | oddOrEven}} n
 
 Here, we invoke the in-built `len` function to calculate the length of `Name` and then call the `oddOrEven` function.
 
-## Learn more
+## Controlling output using template strings
+
+My first encounter with Golang templates was when working with [docker](https://docs.docker.com/config/formatting/) output
+formatting which allowed controlling what I get as output. Let's see how we can implement something like that
+for our program.
+
+
+
+
+## Explore
 
 - [Golang documentation on template](https://golang.org/pkg/text/template/)
+- Check out [sprig](http://masterminds.github.io/sprig/)
+
+
+
