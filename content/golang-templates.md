@@ -224,7 +224,7 @@ Here, we invoke the in-built `len` function to calculate the length of `Name` an
 
 My first encounter with Golang templates was when working with [docker](https://docs.docker.com/config/formatting/) output
 formatting which allowed controlling what I get as output. Let's see how we can implement something like that
-for our program. The entire program is [here](https://gist.github.com/amitsaha/0306012e84d6c8185807a5469d571a94). 
+for our program. The entire program is [here](https://github.com/amitsaha/golang-templates-demo/blob/master/format-output/test.go). 
 
 When we run it without passing any arguments:
 
@@ -273,76 +273,59 @@ We can of course define any arbitrary functions and make them available to be in
 
 ## Rendering an arbitrary template file using arbitrary values
 
-asaha@DESKTOP-KBVL52S:~/go/src/github.com/amitsaha/golang-templates-demo/render-arbitrary-template$ cat cluster.tmpl
+Our next program will take a template string in a file, like so:
+
+```
+$ cat cluster.tmpl
 Cluster Name: {{.clusterName}}
 Max Nodes: {{.maxNodes}}
 Nodes: {{range .nodeNames}}
 - {{.}}
 {{- end}}
-asaha@DESKTOP-KBVL52S:~/go/src/github.com/amitsaha/golang-templates-demo/render-arbitrary-template$ cat values.yml
+```
+
+The data will be provided as an YAML file, like so:
+
+```
+$ cat values.yml
 clusterName: "test.local"
 maxNodes: 10
 nodeNames:
 - Node 1
 - Node 2
+```
 
-
-https://github.com/ghodss/yaml
-
-https://play.golang.org/p/OJwrithCjVD
+And our program will print:
 
 ```
-package main
+Cluster Name: test.local
+Max Nodes: 10
+Nodes:
+- Node 1
+- Node 2
+```
 
-import (
-	"html/template"
-	"log"
-	"os"
-)
+We will take advantage of a third-party package [ghodss/yaml](https://github.com/ghodss/yaml) to parse our YAML
+file and the complete program is [here](https://github.com/amitsaha/golang-templates-demo/blob/master/render-arbitrary-template/main.go).
 
-func getFormatString() string {
-	defaultFormatString := `Cluster Name: {{index . "clusterName"}}
-Max Nodes: {{index . "maxNodes"}}
-Nodes: {{range index . "nodeNames"}} 
-- {{.}} 
-{{- end}}`
-	return defaultFormatString
-}
-
-func main() {
-
-	data := map[string]interface{}{
-		"clusterName": "test.local",
-		"maxNodes":    2,
-		"nodeNames":   []string{"Node1", "Node2"},
-	}
-
-	formatString := getFormatString()
-
-	tmpl := template.New("test")
-	tmpl, err := tmpl.Parse(formatString)
-	if err != nil {
-		log.Fatal("Error Parsing template: ", err)
-		return
-	}
-	err1 := tmpl.Execute(os.Stdout, data)
-	if err1 != nil {
-		log.Fatal("Error executing template: ", err1)
-
-	}
-}
+The key bit in the program was to create a map of type `[string]interface` from the provided YAML file. We will run
+the program as:
 
 ```
+$ go run main.go cluster.tmpl values.yml
+Cluster Name: test.local
+Max Nodes: 10
+Nodes:
+- Node 1
+- Node 2
+```
+
+As a side note, note the dash in `{{- end}}`? That is to prevent newlines and spaces. I still don't quite get it,
+but it seems like a hit and trial thing!
 
 ## Explore
 
+There's a lot more to explore in Golang templates. Check out:
+
 - [Golang documentation on template](https://golang.org/pkg/text/template/)
-- Check out [sprig](http://masterminds.github.io/sprig/)
-
-## Acknowlegements
-
-- https://stackoverflow.com/questions/26152088/access-a-map-value-using-a-variable-key-in-a-go-template
-
-
-
-
+- [sprig](http://masterminds.github.io/sprig/)
