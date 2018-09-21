@@ -224,7 +224,51 @@ Here, we invoke the in-built `len` function to calculate the length of `Name` an
 
 My first encounter with Golang templates was when working with [docker](https://docs.docker.com/config/formatting/) output
 formatting which allowed controlling what I get as output. Let's see how we can implement something like that
-for our program.
+for our program. The entire program is [here](https://gist.github.com/amitsaha/0306012e84d6c8185807a5469d571a94). 
+
+When we run it without passing any arguments:
+
+```
+$ go run test.go
+Tabby 21 odd
+Jill 19 even
+```
+
+If however we pass it a format string as the first command line argument, we can control the output:
+
+```
+$ go run test.go "{{ .Age }} {{ OddOrEven .Name}}"
+21 odd
+19 even
+```
+
+The two main changes are:
+
+```
+func OddOrEven(s string) string {
+
+        if len(s)%2 == 0 {
+                return "even"
+        } else {
+                return "odd"
+        }
+
+}
+```
+
+The format string is now obtained via a function call:
+
+```
+func getFormatString() string {
+        placeHolderFormat := "{{range .}}%s\n{{end}}"
+        defaultFormatString := "{{.Name}} {{.Age}} {{ OddOrEven .Name}}"
+        if len(os.Args) == 2 {
+                return fmt.Sprintf(placeHolderFormat, os.Args[1])
+        } else {
+                return fmt.Sprintf(placeHolderFormat, defaultFormatString)
+        }
+```
+
 
 ## Rendering an arbitrary template file using arbitrary values
 
