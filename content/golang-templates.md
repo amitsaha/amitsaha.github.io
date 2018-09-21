@@ -273,8 +273,50 @@ We can of course define any arbitrary functions and make them available to be in
 
 ## Rendering an arbitrary template file using arbitrary values
 
+https://play.golang.org/p/OJwrithCjVD
 
+```
+package main
 
+import (
+	"html/template"
+	"log"
+	"os"
+)
+
+func getFormatString() string {
+	defaultFormatString := `Cluster Name: {{index . "clusterName"}}
+Max Nodes: {{index . "maxNodes"}}
+Nodes: {{range index . "nodeNames"}} 
+- {{.}} 
+{{- end}}`
+	return defaultFormatString
+}
+
+func main() {
+
+	data := map[string]interface{}{
+		"clusterName": "test.local",
+		"maxNodes":    2,
+		"nodeNames":   []string{"Node1", "Node2"},
+	}
+
+	formatString := getFormatString()
+
+	tmpl := template.New("test")
+	tmpl, err := tmpl.Parse(formatString)
+	if err != nil {
+		log.Fatal("Error Parsing template: ", err)
+		return
+	}
+	err1 := tmpl.Execute(os.Stdout, data)
+	if err1 != nil {
+		log.Fatal("Error executing template: ", err1)
+
+	}
+}
+
+```
 
 ## Explore
 
