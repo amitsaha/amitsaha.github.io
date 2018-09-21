@@ -273,6 +273,20 @@ We can of course define any arbitrary functions and make them available to be in
 
 ## Rendering an arbitrary template file using arbitrary values
 
+asaha@DESKTOP-KBVL52S:~/go/src/github.com/amitsaha/golang-templates-demo/render-arbitrary-template$ cat cluster.tmpl
+Cluster Name: {{.clusterName}}
+Max Nodes: {{.maxNodes}}
+Nodes: {{range .nodeNames}}
+- {{.}}
+{{- end}}
+asaha@DESKTOP-KBVL52S:~/go/src/github.com/amitsaha/golang-templates-demo/render-arbitrary-template$ cat values.yml
+clusterName: "test.local"
+maxNodes: 10
+nodeNames:
+- Node 1
+- Node 2
+
+
 https://github.com/ghodss/yaml
 
 https://play.golang.org/p/OJwrithCjVD
