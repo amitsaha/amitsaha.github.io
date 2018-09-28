@@ -9,4 +9,6 @@ No luck!
 
 Okay, let's try cleaning it - a destructive process potentially, but the risks were low in my case. So, did a `flyway clean`
 and what do I see? There were some [SQL server assemblies](https://docs.microsoft.com/en-us/sql/relational-databases/clr-integration/assemblies-database-engine?view=sql-server-2017).
-Apparently they are "global" in nature. Removing those unused assemblies fixed the issue with flyway migration!
+Apparently they are "global" in nature. 
+
+Removing those unused assemblies fixed the issue with flyway migration.
