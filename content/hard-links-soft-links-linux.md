@@ -1,7 +1,9 @@
 
-Much has been written and I have read much on the topic of hard links and soft links on Linux. However, I end up getting
-confused between the two, specifically the differences between the two. So, here's my post on the topic with the hope
-that I will stop getting confused ever again.
+[Much](https://medium.com/@wendymayorgasegura/what-is-the-difference-between-a-hard-link-and-a-symbolic-link-8c0493041b62) [has](https://medium.com/@meghamohan/hard-link-and-symbolic-link-3cad74e5b5dc) [been](https://medium.com/meatandmachines/explaining-the-difference-between-hard-links-symbolic-links-using-bruce-lee-32828832e8d3) written (and [asked](https://stackoverflow.com/questions/185899/what-is-the-difference-between-a-symbolic-link-and-a-hard-link)) on the topic of hard links and soft links on Linux. I have read a few of those more than once . 
+
+However, I end up getting confused between the two, specifically the differences between the two. So, here's 
+my post on the topic as I experiment with the same topic - with the hope that I will stop getting confused 
+ever again.
 
 ## Our setup
 
