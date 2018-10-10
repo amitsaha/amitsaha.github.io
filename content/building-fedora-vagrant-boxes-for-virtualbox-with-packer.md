@@ -3,7 +3,7 @@ Date: 2018-10-10
 Category: fedora
 
 In a [previous post](https://echorand.me/pre-release-fedora-scientific-vagrant-boxes.html), I shared that we are going to have Fedora Scientific Vagrant boxes with the upcoming Fedora 29 release.
-Few weeks back, I wanted to try out a more recent build to script some of the testing I do on Fedora Scientific boxes
+Few weeks back, I wanted to try out a more recent build to [script](https://github.com/FedoraScientific/scientific_spin_tests/blob/master/run_tests_vagrant.py) some of the testing I do on Fedora Scientific boxes
 to make sure that the expected libraries/programs are installed. Unexpectedly, `vagrant ssh` would not succeed.  
 I filed a issue with [rel-eng](https://pagure.io/releng/issue/7814) where I was suggested to see if a package in
 Fedora Scientific was mucking around with the SSH config. To do so, I had to find a way to manually build Vagrant
