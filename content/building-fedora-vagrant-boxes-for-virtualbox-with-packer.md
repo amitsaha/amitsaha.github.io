@@ -1,4 +1,3 @@
-
 Title: Building Fedora Vagrant boxes for VirtualBox using Packer
 Date: 2018-10-10
 Category: fedora
