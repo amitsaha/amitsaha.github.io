@@ -1,5 +1,5 @@
 Title: Git: Staging partial changes in a file
-Date: 2016-02-17 11:00
+Date: 2018-10-11 11:00
 Category: software
 
 Let's say you have made a few changes to a file and only want to stage only some of those changes for commit.
