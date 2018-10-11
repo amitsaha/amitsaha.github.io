@@ -23,7 +23,7 @@ Stage this hunk [y,n,q,a,d,/,j,J,g,e,?]? y
 
 ```
 
-For each hunk, git will ask you if you want to stage it or not. If you want to, press, 'y', else 'n'.
+For each hunk, git will ask you if you want to stage it or not. If you want to, press, 'y', else 'n':
 ..
 ```
 @@ -185,7 +196,7 @@ else
