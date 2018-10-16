@@ -1,7 +1,6 @@
 Title: AWS VPC subnets and Internet connectivity over IPv4
 Date: 2018-10-15 20:00
 Category: infrastructure
-Status: Draft
 
 We can have two kinds of subnets inside a AWS VPC - __private__ and __public__. A public subnet is one which is 
 attached to an [Internet Gateway](https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Internet_Gateway.html). This essentially adds a routing table entry to the subnet's routing table sending all Internet traffic to an **Internet Gateway**. On the other hand, 
@@ -98,11 +97,7 @@ IP address from itself to that of the private IP address of the instance.
 G -> (Routing) -> NAT -> (Change source IP to public IP of NAT) -> J -> NAT -> (Change dest IP to private IP of G) -> G
 ```
 
-
-## VPC Flow logs
-
 ## Learn more
 
 - [VPC Internet Gateway](https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Internet_Gateway.html)
 - [Network Address Translations](https://www.paloaltonetworks.com/documentation/71/pan-os/pan-os/networking/source-nat-and-destination-nat)
-
