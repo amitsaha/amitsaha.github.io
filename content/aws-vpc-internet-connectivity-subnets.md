@@ -21,12 +21,20 @@ Consider a EC2 instance, E in a public subnet having a public IP.
 
 ### Ingress
 
-Internet resource, device A talks to our device E using the public IP. E sees it gets a request from A,
+Internet resource, device A talks to our instance E using the public IP. E sees it gets a request from A,
 responds accordingly. The response goes via Internet Gateway configured for the subnet. The Internet Gateway
 perfroms a Source Network Address translation where it changes the source IP address of the response packet
-to match the public IP address of E, so that A gets the response from E, and not a random IP address.
+to match the public IP address of E, so that A gets the response from E, and not E's internal IP address.
 
 ### Egress
+
+Instance E tries to access an Internet resource, B. The traffic goes via the Internet Gateway where a network 
+address translation takes place - the source IP address is changed from the internal IP to the public facing
+IP. When the response is received, the destination IP is changed from the public IP of instance E to the private
+IP.
+
+## Public subnet - No Public IP
+
 
 
 ## VPC Flow logs
