@@ -35,13 +35,33 @@ E to the private IP.
 
 ## Public subnet - No Public IP
 
-Considering the above address translation, AWS will not prevent you from having an instance with no public IP,
-but you will not be able to talk to any "Internet" resource and of course, vice-versa.
-
+Considering the above address translation, AWS will *not* prevent you from having an instance with no public IP,
+but you will not be able to talk to any "Internet" resource and of course, vice-versa - i.e. no ingress or egress
+from/to Internet resource(s).
 
 ## Private subnet - Public IP
 
+Consider a EC2 instance, F in a private subnet having a public IP.
+
+### Ingress
+
+Internet resource, device B can talk to instance, F using the public IP. F gets the connection request, sends
+back an acknowledgement. This acknowledgement needs to go to B via either a NAT instance or a AWS managed NAT device.
+The NAT device performs a Source address translation replacing the private IP of the instance, F by the NAT's public
+IP address. The acknowledgement makes it way back to the device B's "edge" device (firewall for example) and doesn't recognize
+the public NAT IP as part of an ongoing connection and just drops it. Hence, although, device B can attempt to
+initiate connection to F, it never actually succeeds.
+
+## Egress
+
+
 ## Private subnet - No Public IP
+
+## Ingress
+
+## Egress
+
+
 
 
 ## VPC Flow logs
