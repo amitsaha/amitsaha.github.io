@@ -30,11 +30,18 @@ to match the public IP address of E, so that A gets the response from E, and not
 
 Instance E tries to access an Internet resource, B. The traffic goes via the Internet Gateway where a network 
 address translation takes place - the source IP address is changed from the internal IP to the public facing
-IP. When the response is received, the destination IP is changed from the public IP of instance E to the private
-IP.
+IP. When the response is received by the Internet Gateway, the destination IP is changed from the public IP of instance 
+E to the private IP.
 
 ## Public subnet - No Public IP
 
+Considering the above address translation, AWS will not prevent you from having an instance with no public IP,
+but you will not be able to talk to any "Internet" resource and of course, vice-versa.
+
+
+## Private subnet - Public IP
+
+## Private subnet - No Public IP
 
 
 ## VPC Flow logs
