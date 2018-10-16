@@ -104,5 +104,5 @@ G -> (Routing) -> NAT -> (Change source IP to public IP of NAT) -> J -> NAT -> (
 ## Learn more
 
 - [VPC Internet Gateway](https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Internet_Gateway.html)
-- 
+- [Network Address Translations](https://www.paloaltonetworks.com/documentation/71/pan-os/pan-os/networking/source-nat-and-destination-nat)
 
