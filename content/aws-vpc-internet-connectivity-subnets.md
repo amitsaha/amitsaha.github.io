@@ -1,4 +1,4 @@
-Title: AWS VPC subnets and Internet connectivity
+Title: AWS VPC subnets and Internet connectivity over IPv4
 Date: 2018-10-15 20:00
 Category: infrastructure
 Status: Draft
@@ -54,13 +54,26 @@ initiate connection to F, it never actually succeeds.
 
 ## Egress
 
+F tries to talk an Internet resource. The routing table forwards the request to the NAT instance/device. This device
+then replaces the source IP of the request which currently is the private IP by the NAT device's Public IP addres and
+forwards the request to the destination resource. When the response is received, the NAT device changes the destination
+IP address from itself to that of the private IP address of the instance.
+
 
 ## Private subnet - No Public IP
 
+Consider a EC2 instance, G in a private subnet having no public IP
+
 ## Ingress
+
+In this case, there is no Ingress traffic to the instance, since there is no public IP. 
 
 ## Egress
 
+G tries to talk an Internet resource. The routing table forwards the request to the NAT instance/device. This device
+then replaces the source IP of the request which currently is the private IP by the NAT device's Public IP addres and
+forwards the request to the destination resource. When the response is received, the NAT device changes the destination
+IP address from itself to that of the private IP address of the instance.
 
 
 
