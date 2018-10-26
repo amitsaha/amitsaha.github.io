@@ -62,12 +62,16 @@ Alright, so what is going on? I get a "unable to connect to the remote server" f
 that same request works from inside the container. On top of that, accessing the application externally worked on the
 build host. So it is not a issue with the application not binding to all the interfaces and such.
 
-What gives? I chased a lot of false tails. One of the key tail I chased was a step in my Docker startup script, I was
-performing a couple of configuration transformations where I was overriding default AppSetting and ConnectionStrings
-values with environment specific ones. Eventually, at the end it turned out to be a configuration switch which
-the application was using to force a redirect to a SSL connection if the client request was not coming from localhost.
-This makes sense, because on the deployment host, the IIS logs were showing a 301 in case of the request coming from
-outside the container - done in the application.
+I chased a lot of false tails - all of them outside the application code itself. One of the key tail I chased 
+was a step in my Docker startup script, I was performing a couple of configuration transformations where I was 
+overriding default AppSetting and ConnectionStrings values with environment specific ones. Numerous attempts
+revelaed that it was one of these transformations that was causing the issue on **host2**. Eventually, at the end 
+it turned out that in that transformation, a configuration value that was being set which the application was 
+using to force a redirect to a HTTPS connection if the client request was not coming from localhost.
+Since my IIS site was not actually configured to recieve HTTPS connections, it was bailing out.
+
+This also makes sense, because on the deployment host, the IIS logs were showing a 301 in case of the request coming from
+outside the container - done in the application. If only, my client would be tell me about the redirect.
 
 ## On Sane defaults
 
@@ -82,8 +86,11 @@ PS C:\Users\Administrator\work\curl> .\curl-7.61.1-win64-mingw\bin\curl.exe  172
 ```
 
 See what I see above? I see that there is a redirect being issued to `https://`. That's a sane default I am talking about.
-Dont' redirect me automatically, tell me  I am being redirected.
+Dont' redirect me automatically, tell me  I am being redirected. That would have been sufficient for me to investigate
+into the issue I was having.
 
+(Ignore the "localhost" above, that was my fault in the configuration - that doesn't change the error I get from
+fake "curl")
 
 It turns out "fake" curl has a `MaximumRedirection` parameter which when set to 0 gives me the same behavior as real curl:
 
@@ -122,5 +129,10 @@ At line:1 char:1
     + FullyQualifiedErrorId : MaximumRedirectExceeded,Microsoft.PowerShell.Commands.InvokeWebRequestCommand
 ```
 
-
 Good bye fake curl. I am switching to real curl the first time I see such a weird issue next time.
+
+## Sumary of the problem
+
+On **host1**, since the application was not able to talk to the external services, the application was returning
+an error before it had reached the point to force the HTTPS redirect.  On **host2**, since it could talk to these
+services, it reached the code where it was forcing the HTTPS redirect.
