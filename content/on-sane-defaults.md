@@ -136,4 +136,6 @@ Good bye fake curl. I am switching to real curl the first time I see such a weir
 On **host1**, since the application was not able to talk to the external services, the application was returning
 an error before it had reached the point to force the HTTPS redirect. On **host2**, since it could talk to these
 services, it reached the code where it was forcing the HTTPS redirect and things took its own course from there.
+Why the application server was doing the job of forcing HTTPS instead of in IIS is a whole other question.
+
 
