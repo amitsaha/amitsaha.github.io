@@ -1,4 +1,4 @@
-Title: On sane defaults or, PowerShell's curl is not curl
+Title: On sane defaults, or better error messages
 Date: 2018-10-26 16:00
 Category: infrastructure
 
