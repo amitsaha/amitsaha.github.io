@@ -1,4 +1,4 @@
-Title: On sane defaults in sofware tools - Part I
+Title: On sane defaults in sofware tools
 Date: 2018-10-26 16:00
 Category: infrastructure
 
@@ -137,4 +137,3 @@ On **host1**, since the application was not able to talk to the external service
 an error before it had reached the point to force the HTTPS redirect. On **host2**, since it could talk to these
 services, it reached the code where it was forcing the HTTPS redirect and things took its own course from there.
 
-May be there will be a part 2.
