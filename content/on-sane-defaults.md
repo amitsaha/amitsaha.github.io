@@ -1,5 +1,45 @@
+Title: On sane defaults
+Date: 2018-07-26 16:00
+Category: infrastructure
+Status: Draft
 
-I spent around 16 hours
+My task at hand was simple. Build a Docker image of a ASP.NET application (full framework) hosted in IIS on
+a build host (**host1**) and move it to a deployment host (**host2**) and run it. This is a story of how I spent close to two full working days
+trying to debug a simple issue which sane default behavior of a tool would have cut it to seconds.
+
+## Key details
+
+The key details that are important to my story are:
+
+- **host1** and **host2** lives in two different AWS VPC subnets
+- **host2** has access to some external services that the web application communicates with when the 
+  homepage is hit
+
+
+## Observations on build host
+
+I built the image on build host, and ran it in a docker container, like so:
+
+```
+$ docker run -d test/image
+```
+
+My web application is configured to run on port 51034. From the host, I find out the container IP using `docker inspect`
+and make a GET request using PowerShell's `Invoke-WebRequest`:
+
+```
+$ Invoke-WebRequest -UseBasicParsing http://ip:51034
+```
+
+I get back errors saying there was a error in connecting to the external services. This is expected, since
+**host1** doesn't have connectivity to these services.
+
+Great, so I push the docker image to AWS ECR.
+
+## Observations on deployment host
+
+
+I spent around 16 hours trying to debug a issue 
 > curl 172.29.170.207:51034
 curl : Unable to connect to the remote server
 At line:1 char:1
