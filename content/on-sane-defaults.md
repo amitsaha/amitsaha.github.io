@@ -1,4 +1,4 @@
-Title: On sane defaults, or error messages may be lying to you
+Title: On sane defaults in sofware tools - Part I
 Date: 2018-10-26 16:00
 Category: infrastructure
 
@@ -136,3 +136,5 @@ Good bye fake curl. I am switching to real curl the first time I see such a weir
 On **host1**, since the application was not able to talk to the external services, the application was returning
 an error before it had reached the point to force the HTTPS redirect. On **host2**, since it could talk to these
 services, it reached the code where it was forcing the HTTPS redirect and things took its own course from there.
+
+May be there will be a part 2.
