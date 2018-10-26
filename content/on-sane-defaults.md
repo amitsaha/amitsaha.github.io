@@ -1,11 +1,11 @@
-Title: On sane defaults
-Date: 2018-07-26 16:00
+Title: On sane defaults or, PowerShell's curl is not curl
+Date: 2018-10-26 16:00
 Category: infrastructure
-Status: Draft
 
 My task at hand was simple. Build a Docker image of a ASP.NET application (full framework) hosted in IIS on
-a build host (**host1**) and move it to a deployment host (**host2**) and run it. This is a story of how I spent close to two full working days
-trying to debug a simple issue which sane default behavior of a tool would have cut it to seconds.
+a build host (**host1**) and move it to a deployment host (**host2**) and run it. This is a story of how I spent 
+close to two full working days trying to debug a simple issue which sane default behavior of a tool would have cut it to 
+seconds.
 
 ## Key details
 
@@ -90,7 +90,7 @@ Dont' redirect me automatically, tell me  I am being redirected. That would have
 into the issue I was having.
 
 (Ignore the "localhost" above, that was my fault in the configuration - that doesn't change the error I get from
-fake "curl")
+"fake" curl)
 
 It turns out "fake" curl has a `MaximumRedirection` parameter which when set to 0 gives me the same behavior as real curl:
 
@@ -131,8 +131,8 @@ At line:1 char:1
 
 Good bye fake curl. I am switching to real curl the first time I see such a weird issue next time.
 
-## Sumary of the problem
+## Summary of the problem
 
 On **host1**, since the application was not able to talk to the external services, the application was returning
-an error before it had reached the point to force the HTTPS redirect.  On **host2**, since it could talk to these
-services, it reached the code where it was forcing the HTTPS redirect.
+an error before it had reached the point to force the HTTPS redirect. On **host2**, since it could talk to these
+services, it reached the code where it was forcing the HTTPS redirect and things took its own course from there.
