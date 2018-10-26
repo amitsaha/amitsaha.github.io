@@ -71,8 +71,8 @@ outside the container - done in the application.
 
 ## On Sane defaults
 
-So, let's talk about what could have helped me debug this in seconds. When I replace the "fake" curl by actual
-curl:
+So, let's talk about what could have helped me debug this in seconds. When I replace the "fake" curl by the [real
+curl](https://curl.haxx.se/windows/):
 
 ```
 PS C:\Users\Administrator\work\curl> .\curl-7.61.1-win64-mingw\bin\curl.exe  172.29.170.207:51034
@@ -121,3 +121,6 @@ At line:1 char:1
     + CategoryInfo          : InvalidOperation: (System.Net.HttpWebRequest:HttpWebRequest) [Invoke-WebRequest], InvalidOperationException
     + FullyQualifiedErrorId : MaximumRedirectExceeded,Microsoft.PowerShell.Commands.InvokeWebRequestCommand
 ```
+
+
+Good bye fake curl. I am switching to real curl the first time I see such a weird issue next time.
