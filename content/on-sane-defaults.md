@@ -1,4 +1,4 @@
-Title: On sane defaults, or better error messages
+Title: On sane defaults, or error messages may be lying to you
 Date: 2018-10-26 16:00
 Category: infrastructure
 
