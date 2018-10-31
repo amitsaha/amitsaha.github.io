@@ -1,6 +1,6 @@
 Title: On sane defaults in sofware tools
 Date: 2018-10-26 16:00
-Category: infrastructure
+Category: software
 
 My task at hand was simple. Build a Docker image of a ASP.NET application (full framework) hosted in IIS on
 a build host (**host1**) and move it to a deployment host (**host2**) and run it. This is a story of how I spent 
