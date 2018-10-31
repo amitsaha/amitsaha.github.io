@@ -51,3 +51,4 @@ ubuntu@ip-172-34-59-184:~$
 - https://wiki.archlinux.org/index.php/Network_bridge
 - http://man7.org/linux/man-pages/man4/veth.4.html
 - https://goyalankit.com/blog/linux-bridge
+- https://developers.redhat.com/blog/2018/10/22/introduction-to-linux-interfaces-for-virtual-networking/
