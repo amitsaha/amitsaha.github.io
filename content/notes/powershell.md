@@ -331,3 +331,35 @@ foreach ($repo in $repositories)
 }
 ```
 
+# Data Structures
+
+## Lists
+
+```
+$repositories = @(
+    "repo1",
+    "repo2"
+    
+)
+
+foreach ($repo in $repositories)
+{
+  Write-Host "Pulling ${repo}"  
+}
+```
+
+## Hash table
+
+```
+RepositoriesBuiltDirMap = @{
+    "repo1" = "dir1"
+    "repo2" = "dir2"    
+}
+
+$RepositoriesDockerfileMap.keys | ForEach-Object{
+    echo "Key: ${_}"
+    echo "Value: ${RepositoriesDockerfileMap[$_]}"
+}
+```
+
+Learn all about them [here](https://kevinmarquette.github.io/2016-11-06-powershell-hashtable-everything-you-wanted-to-know-about/?utm_source=blog&utm_medium=blog&utm_content=index)
