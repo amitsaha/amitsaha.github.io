@@ -70,4 +70,7 @@ Verifying - Enter Export Password:
 The resultant file will be certificate.pfx. Now, copy the `certificate.pfx` file to the target IIS box and import
 it using this handy [guide](https://www.digicert.com/ssl-support/pfx-import-export-iis-7.htm).
 
-The next step is to attempt to automate at least the certificate generation process using `lego`.
+## Automating
+
+The next step is to attempt to automate the certificate generation process using `lego` and perhaps some Powershell [glue](https://docs.microsoft.com/en-us/powershell/module/pkiclient/?view=win10-ps) to import the certificate and change/setup
+IIS site binding with the new certificate.
