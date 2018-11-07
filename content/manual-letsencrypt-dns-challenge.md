@@ -9,7 +9,9 @@ make this post relevant to you are:
 - DNS provider: GoDaddy
 - Target web server: IIS
 - Target operating system: Windows
+- Local operating environment/system: Linux (including Windows Subsystem for Linux).
 - Software used: `certbot` and `openssl`
+
 
 
 ## Why certbot?
