@@ -1,5 +1,5 @@
-Title: Manual Let's Encrypt, GoDadday DNS and IIS
-Date: 2018-11-07
+Title: Let's Encrypt, GoDadday DNS and IIS server
+Date: 2018-11-08
 Category: infrastructure
 
 I wanted to create a new SSL certificate for IIS hosted ASP.NET framework application. The key data that may
@@ -10,17 +10,22 @@ make this post relevant to you are:
 - Target web server: IIS
 - Target operating system: Windows
 - Local operating environment/system: Linux (including Windows Subsystem for Linux).
-- Software used: `certbot` and `openssl`
 
+## Why I chose certbot?
 
+I decided to use [certbot](https://certbot.eff.org/) since it allowed me do create the DNS TXT entries manually. This
+was the first time I was doing this and I just wanted to get an idea of what's involved. To me it seemed like a two
+step approach:
 
-## Why certbot?
+- Place a request to Let's Encrypt for a SSL certification for a domain
+- Validate via DNS challenge that I own the domain
 
-I decided to use [certbot](https://certbot.eff.org/) since it allowed me do create the DNX TXT entries manually. Two other
-projects I looked at were [lego](https://github.com/xenolf/lego) and [win-acme](https://github.com/PKISharp/win-acme). While
-writing this post, I found out that `lego` has inbuilt support for `godadday` (:facepalm:), so I could have used it to create
-the DNS TXT record automatically. Anyway, `win-acme` needed hooks to be provided for the DNS challenge, which seemed like
-another thing to do at the moment.
+I wanted to do the second step manually.
+
+Two other projects I looked at were [lego](https://github.com/xenolf/lego) and [win-acme](https://github.com/PKISharp/win-acme). While writing this post, I found out that `lego` has inbuilt support for `godadday` DNS, 
+so I could have used it to create the DNS TXT record automatically. However, it didn't seem to have the "manual" mode
+I was after. `win-acme` needed hooks to be provided for the DNS challenge, which seemed like another thing to do 
+at the moment - meaning, writing the hooks.
 
 ## Generating the certificate
 
