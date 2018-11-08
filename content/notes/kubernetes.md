@@ -1,6 +1,8 @@
 Title: Kubernetes
 Date: 2018-10-01 10:00
 
+Similar approach: https://medium.com/bench-engineering/deploying-kubernetes-clusters-with-kops-and-terraform-832b89250e8e
+
 # Problem exposing a service via internal AWS ELB
 
 I see this issue about 10% of the time I have tried to create a service an expose it via an internal ELB.
