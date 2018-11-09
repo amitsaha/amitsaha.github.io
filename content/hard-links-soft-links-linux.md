@@ -6,7 +6,6 @@ Status: Draft
 [Much](https://medium.com/@wendymayorgasegura/what-is-the-difference-between-a-hard-link-and-a-symbolic-link-8c0493041b62) 
 [has](https://medium.com/@meghamohan/hard-link-and-symbolic-link-3cad74e5b5dc) [been](https://medium.com/meatandmachines/explaining-the-difference-between-hard-links-symbolic-links-using-bruce-lee-32828832e8d3) written (and [asked](https://stackoverflow.com/questions/185899/what-is-the-difference-between-a-symbolic-link-and-a-hard-link)) 
 on the topic of hard links and soft links (a.k.a symbolic links) on Linux. I have read a few of those more than once.
-
 However, I end up getting confused between the two, specifically the differences between the two. So, here's 
 my post on the topic with the hope that I will stop getting confused ever again.
 
@@ -47,12 +46,33 @@ Hello, I am file1
 
 ## Investigation: Inodes
 
-asaha@DESKTOP-KBVL52S:~/links-demo$ ls -i
-15481123719144131 file1  15481123719144131 file1-hlink  29836347531381846 file1-slink  65583669573645372 file2
-asaha@DESKTOP-KBVL52S:~/links-demo$ ls -il
-total 0
+One of the key differences between soft links and hard links is with respect to how they are represented
+in the filesystem. If we run `ls` with the `i` switch, it will show the [inode](https://en.wikipedia.org/wiki/Inode)
+number of each of the above files:
+
+
+```
+$ ls -il
+
 15481123719144131 -rw-rw-rw- 2 asaha asaha 18 Nov  9 13:52 file1
 15481123719144131 -rw-rw-rw- 2 asaha asaha 18 Nov  9 13:52 file1-hlink
 29836347531381846 lrwxrwxrwx 1 asaha asaha  5 Nov  9 13:54 file1-slink -> file1
-65583669573645372 -rw-rw-rw- 1 asaha asaha 18 Nov  9 13:52 file2
-asaha@DESKTOP-KBVL52S:~/links-demo$ rm file2
+```
+
+We can see that:
+
+- The hardlink `file1-hlink` has the same Inode number as the original file itself (`file1`)
+- The softlink `file1-slink` has a different Inode number
+
+This tells us two things straightaway:
+
+When we create a soft link, it is equivalent to creating a new file with its own filename. In the filesystem, 
+it is a separate file, with the special property that its contents are the same as that of the original file, 
+`file1`.
+
+```
+            Soft link ->   FILE CONTENTS <- Original file
+```
+
+A hard link on the other hand is a reference to the original file. It exists on the filesystem, but only as another
+reference.
