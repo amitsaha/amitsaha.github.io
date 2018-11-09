@@ -42,14 +42,11 @@ Hello, I am file1
 $ cat file1-slink
 Hello, I am file1
 ```
-
-
 ## Investigation: Inodes
 
 One of the key differences between soft links and hard links is with respect to how they are represented
 in the filesystem. If we run `ls` with the `i` switch, it will show the [inode](https://en.wikipedia.org/wiki/Inode)
 number of each of the above files:
-
 
 ```
 $ ls -il
@@ -179,6 +176,25 @@ What happens if we modify the original file contents? They will be reflected in 
 
 ## Investigation: Directories and Links
 
+We cannot create hardlinks to directories. This [link](https://askubuntu.com/questions/210741/why-are-hard-links-not-allowed-for-directories) is a good resource to learn why. Soft links doesn't have such a limitation.
+
+Mildly related to this topic is the number of "default" links for a directory on Linux:
+
+```
+$ ls -lrta
+total 12
+drwxr-xr-x 6 ubuntu ubuntu 4096 Nov  9 05:38 ..
+drwxrwxr-x 2 ubuntu ubuntu 4096 Nov  9 05:41 dir2
+drwxrwxr-x 3 ubuntu ubuntu 4096 Nov  9 05:41 .
+```
+
+The above is a directory listing which has another sub-directory, `dir2` inside it. Note the `.` and `..` entries? The `.` is
+a hard link to the current directory, `..` is a hard link to the parent directory. Each directory by default will have these
+additional entries. Where do we get the two links by default?
+
+- The first is the `.` inside the directory itself
+- The other is each directory will have a link to the sub-directory, hence 2 links
+
 ## Miscellaneous
 
 ### Is it a symbolic link or a hard link?
@@ -192,6 +208,12 @@ A hard link - since it points to the same Inode cannot span a filesystem boundar
 to a file which resides in a different filesystem. Soft links have no such limitations.
 
 ## Using links to solve a problem
+
+What are links useful for? One main reason you may want to use links is to not have duplicate data in multiple files.
+Let's say, we have a bunch of files lying around in our file-system and we want to keep only a single copy of any duplicate
+data, and replace the others by links. Since hard links cannot span more than one filesystem, symbolic links may seem more
+attractive. However, one caveat to keep in mind with symbolic links is, if we accidentally delete the original file, we end up losing
+the data. So, it depends on the use-case. 
 
 ## Learning more
 
