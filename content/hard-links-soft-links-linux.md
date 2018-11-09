@@ -158,3 +158,14 @@ For the soft link though:
 $ cat file1-slink
 cat: file1-slink: No such file or directory
 ```
+
+What the above error really says is I am trying to look for a file, `file1`, but it doesn't exist.
+
+## Investigation: Is it a symbolic link or a hard link?
+
+As a program how do I know if a file is a "regular" file, symbolic link or a hard link? The answer lies in the
+data that the `stat()` system call returns. Specifically, the `st_mode` field as described [here](http://man7.org/linux/man-pages/man7/inode.7.html).
+
+## Learning more
+
+- [inode man page](http://man7.org/linux/man-pages/man7/inode.7.html)
