@@ -177,6 +177,8 @@ data that the `stat()` system call returns. Specifically, the `st_mode` field as
 
 ## Investigation: Directories and Links
 
+## Links and Filesystem Boundaries
+
 ## Using links to solve a problem
 
 
