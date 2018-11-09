@@ -67,12 +67,94 @@ We can see that:
 This tells us two things straightaway:
 
 When we create a soft link, it is equivalent to creating a new file with its own filename. In the filesystem, 
-it is a separate file, with the special property that its contents are the same as that of the original file, 
-`file1`.
+it is a separate file, with the special property that its contents is the `path` to the real file `file1`.
+
+Graphically:
 
 ```
-            Soft link ->   FILE CONTENTS <- Original file
+            Soft link ->   FILE CONTENTS -> Path of original file -> FILE CONTENTS -> "Hello, I am file1"
 ```
 
 A hard link on the other hand is a reference to the original file. It exists on the filesystem, but only as another
-reference.
+reference or a link. Let's explore a bit into what it means. If we execute `ls` with the `-l` (small `L`) switch, the
+second column gives the number of `link` counts of a file:
+
+```
+$ ls -l file1
+-rw-rw-rw- 2 asaha asaha 18 Nov  9 13:52 file1
+```
+
+We have created a hard link above, so, the link count now is 2. If we create another hard link, the link count will be 3:
+
+```
+$ ln file1 file1-hlink-2
+$ ls -l file1
+-rw-rw-rw- 3 asaha asaha 18 Nov  9 13:52 file1
+```
+
+Graphically:
+
+```
+file1-hlink  -----> FILE CONTENTS ("Hello, I am file1") <------ file1
+                         /|\ 
+                          |
+                     file1-hlink-2
+```
+
+## Investigation: Size of hard links and soft links
+
+Let's go back to one of the previous output of `ls -l`:
+
+```
+$ ls -il
+
+15481123719144131 -rw-rw-rw- 2 asaha asaha 18 Nov  9 13:52 file1
+15481123719144131 -rw-rw-rw- 2 asaha asaha 18 Nov  9 13:52 file1-hlink
+29836347531381846 lrwxrwxrwx 1 asaha asaha  5 Nov  9 13:54 file1-slink -> file1
+```
+
+The sixt column above of the output shows the number of bytes in each of the files. We see `18` as the size
+of the original file, `file1` and the hardlink, `file1-hlink`. 18 is the number of characters in `"Hello, I am a file1"`
+and a new line character. What are the five bytes in `file1-slink`? The `readlink` command will help us:
+
+```
+$ readlink file1-slink
+file1
+```
+It is the "relative" path to the original file.
+
+
+## Investigation: Deleting the original file
+
+What happens to each kind of link when we delete the original file? From the graphics above, we expect that the symbolic
+link will basically be a "dangling" link and hence, we will lose access to the file contents. In the case of hard link, the contents will still continue to be accessible, since all we are doing is deleting one of the links. Even though it is the original file,
+it doesn't matter. Other links continue to exist and point to the data.
+
+Let's validate our theory:
+
+```
+$ rm file1
+
+$ ls -lrt
+total 0
+-rw-rw-rw- 2 asaha asaha 18 Nov  9 13:52 file1-hlink-2
+-rw-rw-rw- 2 asaha asaha 18 Nov  9 13:52 file1-hlink
+lrwxrwxrwx 1 asaha asaha  5 Nov  9 13:54 file1-slink -> file1
+```
+
+We delete the original file above. Now the link count of `file1-hlink` and `file-hlink-2` has decreased by 1 and
+is now 2.
+
+If we try to display the contents of a hard link:
+
+```
+$ cat file1-hlink
+Hello, I am file1
+```
+
+For the soft link though:
+
+```
+$ cat file1-slink
+cat: file1-slink: No such file or directory
+```
