@@ -113,16 +113,19 @@ $ ls -il
 29836347531381846 lrwxrwxrwx 1 asaha asaha  5 Nov  9 13:54 file1-slink -> file1
 ```
 
-The sixt column above of the output shows the number of bytes in each of the files. We see `18` as the size
+The sixth column above of the output shows the number of bytes in each of the files. We see `18` as the size
 of the original file, `file1` and the hardlink, `file1-hlink`. 18 is the number of characters in `"Hello, I am a file1"`
-and a new line character. What are the five bytes in `file1-slink`? The `readlink` command will help us:
+and a new line character. This doesn't mean that each hard link takes up 18 bytes on the disk. Each link is effectively
+a [directory entry](https://ext4.wiki.kernel.org/index.php/Ext4_Disk_Layout#Directory_Entries).
+
+What are the five bytes in `file1-slink`? The `readlink` command will help us:
 
 ```
 $ readlink file1-slink
 file1
 ```
-It is the "relative" path to the original file.
-
+It is the "relative" path to the original file. Contrary to a hard link, a soft link actually takes up some space of it's
+own.
 
 ## Investigation: Deleting the original file
 
@@ -170,17 +173,25 @@ Hello, I am a different file1
 
 I wonder what kind of security risk this may post - may be we need symbolic links with checksums?
 
-## Investigation: Is it a symbolic link or a hard link?
+## Investigation: Modifying original file contents
+
+What happens if we modify the original file contents? They will be reflected in both types of links
+
+## Investigation: Directories and Links
+
+## Miscellaneous
+
+### Is it a symbolic link or a hard link?
 
 As a program how do I know if a file is a "regular" file, symbolic link or a hard link? The answer lies in the
 data that the `stat()` system call returns. Specifically, the `st_mode` field as described [here](http://man7.org/linux/man-pages/man7/inode.7.html).
 
-## Investigation: Directories and Links
+### Links and Filesystem Boundaries
 
-## Links and Filesystem Boundaries
+A hard link - since it points to the same Inode cannot span a filesystem boundary. That is, we cannot create a hard link
+to a file which resides in a different filesystem. Soft links have no such limitations.
 
 ## Using links to solve a problem
-
 
 ## Learning more
 
