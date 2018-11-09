@@ -1,7 +1,6 @@
 Title: Hard Links and Soft/Symbolic Links on Linux
 Date: 2018-11-09
 Category: software
-Status: Draft
 
 [Much](https://medium.com/@wendymayorgasegura/what-is-the-difference-between-a-hard-link-and-a-symbolic-link-8c0493041b62) 
 [has](https://medium.com/@meghamohan/hard-link-and-symbolic-link-3cad74e5b5dc) [been](https://medium.com/meatandmachines/explaining-the-difference-between-hard-links-symbolic-links-using-bruce-lee-32828832e8d3) written (and [asked](https://stackoverflow.com/questions/185899/what-is-the-difference-between-a-symbolic-link-and-a-hard-link)) 
@@ -209,11 +208,11 @@ to a file which resides in a different filesystem. Soft links have no such limit
 
 ## Using links to solve a problem
 
-What are links useful for? One main reason you may want to use links is to not have duplicate data in multiple files.
+What are links useful for? One reason you may want to use links is to not have duplicate data in multiple files.
 Let's say, we have a bunch of files lying around in our file-system and we want to keep only a single copy of any duplicate
 data, and replace the others by links. Since hard links cannot span more than one filesystem, symbolic links may seem more
-attractive. However, one caveat to keep in mind with symbolic links is, if we accidentally delete the original file, we end up losing
-the data. So, it depends on the use-case. 
+attractive. However, one caveat to keep in mind with symbolic links is, if we accidentally delete the original file, we end up 
+losing the data. So, it depends on the use-case. 
 
 ## Learning more
 
