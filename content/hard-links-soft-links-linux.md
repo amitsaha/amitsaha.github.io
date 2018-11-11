@@ -97,6 +97,9 @@ file1-hlink  -----> FILE CONTENTS ("Hello, I am file1") <------ file1
                      file1-hlink-2
 ```
 
+Perhaps, this post [here](https://linuxgazette.net/35/tag/links.html) best describes how hard links defer from
+soft links.
+
 ## Investigation: Size of hard links and soft links
 
 Let's go back to one of the previous output of `ls -l`:
