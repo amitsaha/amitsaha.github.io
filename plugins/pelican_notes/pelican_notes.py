@@ -23,6 +23,7 @@ class Note(Content):
 
 class NoteHome(Content):
     default_template = 'notes_home_template'
+    default_status = 'published'
 
 
 class NotesGenerator(CachingGenerator):
