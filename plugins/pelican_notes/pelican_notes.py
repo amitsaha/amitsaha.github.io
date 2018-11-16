@@ -68,7 +68,7 @@ class NotesGenerator(CachingGenerator):
 
         self.notes, self.translations = process_translations(
             all_notes,
-            order_by=self.settings['PAGE_ORDER_BY'])
+         )
 
         self._update_context(('notes',))
 
