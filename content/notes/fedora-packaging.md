@@ -1,5 +1,6 @@
 Title: Fedora Packaging Notes
 Date: 2018-02-25 10:00
+Status: Published
 
 
 ## Package source
