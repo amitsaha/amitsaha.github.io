@@ -72,7 +72,9 @@ $ aws deploy get-deployment-group --application-name MyService --deployment-grou
    }
 ```
 
-We see that our deployment group has been created, has been associated with the autoscaling group, and we have a hook associated with it. Next, let's see what this hook does using the AWS CLI:
+We see that our deployment group has been created, has been associated with the autoscaling group, and we have a hook associated with it which was implicitly created for us. 
+
+Next, let's see what this hook does using the AWS CLI:
 
 ```
 $ aws autoscaling describe-lifecycle-hooks \
@@ -102,6 +104,6 @@ The above tells us the following about the lifecycle hook:
 
 So, I imagine this is how it all works:
 
-- EC2 instance launches
-- A message is published to the SQS razorbill queue - which is AWS managed
-- The consumer sees the message and the metadata and creates a deployment in the corresponding deploment group
+1. EC2 instance launches
+2. A message is published to the SQS razorbill queue - which is AWS managed
+3. The consumer sees the message and the metadata and creates a deployment in the corresponding deploment group
