@@ -53,7 +53,7 @@ The above infrastructure changes are all explicit and they map to what we have i
 the deployment group we created above:
 
 ```
-$ aws deploy get-deployment-group --application-name FinancialReportingService --deployment-group-name FinancialReportingService-DeploymentGroupProduction
+$ aws deploy get-deployment-group --application-name MyService --deployment-group-name MyService-DeploymentGroup
 {
     "deploymentGroupInfo": {
         "applicationName": "MyService",
@@ -64,7 +64,7 @@ $ aws deploy get-deployment-group --application-name FinancialReportingService -
         "onPremisesInstanceTagFilters": [],
         "autoScalingGroups": [
             {
-                "name": "MyServiceAutoscalingGroup20181218054948246300000002",
+                "name": "MyServiceAutoscalingGroup",
                 "hook": "CodeDeploy-managed-automatic-launch-deployment-hook-myservice-a2d358c8-3525-452c-b76e-978f1746ae74"
             }
         ],
@@ -72,4 +72,36 @@ $ aws deploy get-deployment-group --application-name FinancialReportingService -
    }
 ```
 
-We see that our deployment group has been created, has been associated with the autoscaling group, and we have a hook associated with it.
+We see that our deployment group has been created, has been associated with the autoscaling group, and we have a hook associated with it. Next, let's see what this hook does using the AWS CLI:
+
+```
+$ aws autoscaling describe-lifecycle-hooks \
+    --auto-scaling-group-name "MyServiceAutoscalingGroup" \
+    --lifecycle-hook-names "CodeDeploy-managed-automatic-launch-deployment-hook-myservice-a2d358c8-3525-452c-b76e-978f1746ae74"
+{
+    "LifecycleHooks": [
+        {
+            "LifecycleHookName": ""CodeDeploy-managed-automatic-launch-deployment-hook-myservice-a2d358c8-3525-452c-b76e-978f1746ae74",
+            "AutoScalingGroupName": MyServiceAutoscalingGroup",
+            "LifecycleTransition": "autoscaling:EC2_INSTANCE_LAUNCHING",
+            "NotificationTargetARN": "arn:aws:sqs:ap-southeast-2:062506839004:razorbill-ap-southeast-2-prod-default-autoscaling-lifecycle-hook",
+            "NotificationMetadata": "b7a6653a-407d-47d8-b9ff-3e0a10b028b3",
+            "HeartbeatTimeout": 600,
+            "GlobalTimeout": 60000,
+            "DefaultResult": "ABANDON"
+        }
+    ]
+}
+```
+
+The above tells us the following about the lifecycle hook:
+
+- It is set to fire when a EC2 instance is launched
+- The action is going to be that it is going to publish a message to some "razorbill" SQS queue specified via `NotificationTargetARN`
+- The most important bit here though is the `NotificationMetadata` which has the Code Deployment Group's `deploymentGroupId`
+
+So, I imagine this is how it all works:
+
+- EC2 instance launches
+- A message is published to the SQS razorbill queue - which is AWS managed
+- The consumer sees the message and the metadata and creates a deployment in the corresponding deploment group
