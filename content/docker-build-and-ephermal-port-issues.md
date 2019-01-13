@@ -14,12 +14,29 @@ RUN apt-get -y update
 ..
 ```
 
-The instruction `RUN apt-get -y update`  will make network requests to download resources from the Internet over HTTP. This means, it will select a certain source port to make these HTTP requests. 
+The instruction `RUN apt-get -y update`  will make network requests to download resources from the Internet over HTTP. This means, it will select a certain source port to make these HTTP requests. However, in a controlled environment, we want to explicitly state the range of ephermal ports that should be use. Let's see howe can do that.
+
+## Background
 
 How does a docker build happen? Inside containers. What do we do if we want to configure the ephermal port range for these builder containers? We can’t seem to be able to run sysctl in this scenario. We could use `docker build --host` to share the host’s network namespace. And that will ensure that out host’s ephermal port range will be used. However, we also had user namespacing turned on in our setup since this is a [sensible](https://echorand.me/docker-userns-remap-and-system-users-on-linux.html) thing to do. However, we cannot use a user namespace while using the host network. So, what do we do?
 
-Enter iptables. Could we have a iptables rule to perform a source port translation so that anything that is going out of our host always uses a source port from the specified port range? Yes, the following rule will do it:
+
+## Solution
+
+Could we have a iptables rule to perform a source port translation so that anything that is going out of our host always uses a source port from the specified port range? Yes, the following rule will do it:
 
 ```
 $ sudo iptables -t nat -I POSTROUTING -p tcp -m tcp --sport 32768:61000 -j MASQUERADE --to-ports 49152-61000
 ```
+
+https://www.frozentux.net/iptables-tutorial/iptables-tutorial.html#TABLE.MASQUERADETARGET
+
+Here's what the above rule does:
+
+1. We are adding this rule to the `nat` table (`-t nat`) in the `POSTROUTING`(`-I POSTROUTING`) chain
+2. We want this rule to be applied for `TCP` (`-p tcp`) packets which has a source port in the range 32768-61000 (`--sport 32768-61000`)
+3. If a packet matches our rule, forward it to the `MASQUERADE` target (`-j MASQUERADE`)
+4. Once in the `MASQUERADE` target, change the source port to be in the range 49152-61000 (`--to-ports 49152-61000`)
+
+
+The POSTROUTING table For all outgoing packets, just before the packet is sent out of your computer
