@@ -1,5 +1,5 @@
-Title: Ephermal Port Ranges and Docker build
-Date: 2018-08-14 20:00
+Title: Ephermal source port ranges and docker build
+Date: 2019-01-14 20:00
 Category: infrastructure
 Status: Draft
 
@@ -23,13 +23,11 @@ How does a docker build happen? Inside containers. What do we do if we want to c
 
 ## Solution
 
-Could we have a iptables rule to perform a source port translation so that anything that is going out of our host always uses a source port from the specified port range? Yes, the following rule will do it:
+Could we have a iptables rule to perform a source port translation so that anything that is going out of our host always uses a source port from the specified port range? Generally speaking, we will need to perform a variation of Source NAT. However, we will only change the source port and leave the IP address alone. The following rule will do it:
 
 ```
 $ sudo iptables -t nat -I POSTROUTING -p tcp -m tcp --sport 32768:61000 -j MASQUERADE --to-ports 49152-61000
 ```
-
-https://www.frozentux.net/iptables-tutorial/iptables-tutorial.html#TABLE.MASQUERADETARGET
 
 Here's what the above rule does:
 
@@ -38,10 +36,9 @@ Here's what the above rule does:
 3. If a packet matches our rule, forward it to the `MASQUERADE` target (`-j MASQUERADE`)
 4. Once in the `MASQUERADE` target, change the source port to be in the range 49152-61000 (`--to-ports 49152-61000`)
 
+There's much to learn about [iptables](https://www.frozentux.net/iptables-tutorial/iptables-tutorial.html). The most relevant
+ones to be familiar with are:
 
-The POSTROUTING table For all outgoing packets, just before the packet is sent out of your computer
-
-## Learn more
-
-- [MASQUERADE](https://www.frozentux.net/iptables-tutorial/iptables-tutorial.html#MASQUERADETARGET)
-
+- [Chains](https://www.booleanworld.com/depth-guide-iptables-linux-firewall/#Chains)
+- [Masquerade target](https://www.frozentux.net/iptables-tutorial/chunkyhtml/x4422.html)
+- [Iptables matches](https://www.frozentux.net/iptables-tutorial/iptables-tutorial.html#MATCHES)
