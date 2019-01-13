@@ -40,3 +40,8 @@ Here's what the above rule does:
 
 
 The POSTROUTING table For all outgoing packets, just before the packet is sent out of your computer
+
+## Learn more
+
+- [MASQUERADE](https://www.frozentux.net/iptables-tutorial/iptables-tutorial.html#MASQUERADETARGET)
+
