@@ -1,7 +1,6 @@
 Title: Ephermal source port ranges and docker build
 Date: 2019-01-14 20:00
 Category: infrastructure
-Status: Draft
 
 TLDR; If you are having trouble with `docker build` and ephermal port ranges, we can use `iptables` to solve the issue:
 
@@ -47,11 +46,31 @@ Here's what the above rule does:
 ## Gotchas
 
 Okay, so where/when do you add this `iptables` rule? We have to add this *after* docker engine has started. `docker` creates
-its own firewall rules which seems to be like "drop everything else and add my own". So, here's how I am doing it:
+its own firewall rules which seems to be like "drop everything else and add my own". So, here's how I am doing it in AWS EC2 user
+data:
 
 1. EC2 instance initialization
 2. docker daemon starts
 3. Add iptables rule
+
+An a real code snippet:
+
+```
+
+# Add VPC DNS server as an additional DNS server
+# https://github.com/amitsaha/aws-vpc-dns-address
+vpc_dns=$(aws-vpc-dns-address)
+echo '{"dns":["'"$vpc_dns"'", "8.8.8.8"]}' > /etc/docker/daemon.json
+cat /etc/docker/daemon.json
+systemctl restart docker
+
+..
+# This helps us workaround NACLs in place so that all traffic originating traffic source port is mapped to 
+# the allowed ephermal port range
+# We carefully do it after we have restarted docker engine, since it inserts inserts
+# its own iptables rules which flushes ours
+iptables -t nat -I POSTROUTING -p tcp -m tcp --sport 32768:61000 -j MASQUERADE --to-ports 49152-61000
+```
 
 A more full proof appraoch would be to perhaps write a systemd unit file so that it will always run a program/script to insert
 the above firewall rule when `docker` engine is started/restarted.
