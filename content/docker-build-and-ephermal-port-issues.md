@@ -44,6 +44,19 @@ Here's what the above rule does:
 3. If a packet matches our rule, forward it to the `MASQUERADE` target (`-j MASQUERADE`)
 4. Once in the `MASQUERADE` target, change the source port to be in the range 49152-61000 (`--to-ports 49152-61000`)
 
+## Gotchas
+
+Okay, so where/when do you add this `iptables` rule? We have to add this *after* docker engine has started. `docker` creates
+its own firewall rules which seems to be like "drop everything else and add my own". So, here's how I am doing it:
+
+1. EC2 instance initialization
+2. docker daemon starts
+3. Add iptables rule
+
+A more full proof appraoch would be to perhaps write a systemd unit file so that it will always run a program/script to insert
+the above firewall rule when `docker` engine is started/restarted.
+
+Know about a better idea? Please let me know.
 
 ## Learn more
 
