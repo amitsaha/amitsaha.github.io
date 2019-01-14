@@ -53,7 +53,7 @@ data:
 2. docker daemon starts
 3. Add iptables rule
 
-An a real code snippet:
+And a real code snippet:
 
 ```
 
