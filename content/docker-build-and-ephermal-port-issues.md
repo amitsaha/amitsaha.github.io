@@ -3,6 +3,13 @@ Date: 2019-01-14 20:00
 Category: infrastructure
 Status: Draft
 
+TLDR; If you are having trouble with `docker build` and ephermal port ranges, we can use `iptables` to solve the issue:
+
+```
+$ sudo iptables -t nat -I POSTROUTING -p tcp -m tcp --sport 32768:61000 -j MASQUERADE --to-ports 49152-61000
+```
+
+
 I have written [previously](https://echorand.me/aws-network-acls-and-ephermal-port-ranges.html) about how things get interesting with ephermal port ranges in a Windows and Linux environment and AWS network acls. Today’s post is related to the same topic but specifically relevant if you are building docker images in such an environment.
 
 Let’s start with the Dockerfile:
@@ -37,8 +44,11 @@ Here's what the above rule does:
 3. If a packet matches our rule, forward it to the `MASQUERADE` target (`-j MASQUERADE`)
 4. Once in the `MASQUERADE` target, change the source port to be in the range 49152-61000 (`--to-ports 49152-61000`)
 
+
+## Learn more
+
 There's much to learn about [iptables](https://www.frozentux.net/iptables-tutorial/iptables-tutorial.html). The most relevant
-ones to be familiar with are:
+ones for this post to be familiar with are:
 
 - [Chains](https://www.booleanworld.com/depth-guide-iptables-linux-firewall/#Chains)
 - [Masquerade target](https://www.frozentux.net/iptables-tutorial/chunkyhtml/x4422.html)
