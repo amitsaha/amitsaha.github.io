@@ -67,7 +67,7 @@ services:
     labels:
       - "traefik.frontend.rule=Host:whoami.docker.localhost"
       - "traefik.site1.backend=backendsite1"
-  ```
+```
 
 Run `docker-compose up` and go to `http://localhost:8080/api/providers/docker/backends`, we will get the three 
 backends that's configured:
