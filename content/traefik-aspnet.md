@@ -148,6 +148,6 @@ approach would be to store the previous version that was deployed and use that.
 
 ## Conclusion
 
-The above approach currently seems to be working fairly well for the setup I have - ASP.NET framework application on Windows Server 1809
+The above approach currently seems to be working fairly well for the setup I have - ASP.NET framework application on Windows Server 1803
 and our requirements. It basically allows one to have a deployment setup without any downtime which is especially useful when 
 we want to use a single VM and without using any third party services/tools.
