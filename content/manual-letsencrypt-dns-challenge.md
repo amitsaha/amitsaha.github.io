@@ -44,10 +44,12 @@ random$string
 Before continuing, verify the record is deployed.
 ```
 
-Now, go to your GoDaddy DNS management page, and create the TXT record with the specified string. Once you 
-have verified that the domain entry has propagated, press ENTER to continue. To verify, use `nslookup -q=TXT <domain>`
-on Windows, or `dig -t` on Linux.
+Now, go to your GoDaddy DNS management page, and create the TXT record with the specified string. Be sure not to enter
+the entire domain name as the record if you are doing this for a sub-domain. For example, if you are doing this for
+`api.<your-domain>`, the record should just be `_acme-challenge.api`.  
 
+Once you  have verified that the domain entry has propagated, press ENTER to continue. To verify, use `nslookup -q=TXT <domain>`
+on Windows, or `dig -t` on Linux.
 
 Once the record has propagated, certbot will try to find it, and if successful continue and eventually give an 
 output like this:
@@ -74,6 +76,11 @@ Verifying - Enter Export Password:
 
 The resultant file will be certificate.pfx. Now, copy the `certificate.pfx` file to the target IIS box and import
 it using this handy [guide](https://www.digicert.com/ssl-support/pfx-import-export-iis-7.htm).
+
+## Using with `traefik`
+
+If you are generating the certificates manually for `traefik` reverse proxy, the `cert.pem` file is the public
+certificate and the `privkey.pem` file is the private key.
 
 ## Automating
 
