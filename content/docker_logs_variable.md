@@ -35,3 +35,15 @@ I echoed to stdout
 In the second `docker logs` command, we redirect the host's `stderr` to `/dev/null`. So, if you are looking to
 get only the output that was written `stdout` inside the container, we will need to make sure, we pipe
 the stderr to `/dev/null` on the host.
+
+## Assigning the output of docker logs
+
+Coming back to the primary use case which triggered this post, if we wanted just the standard output of the
+container to be assigned to a variable in bash, here's what we should do:
+
+```
+data="$(sudo docker logs test 2> /dev/null)
+```
+
+If we don't do the above `stderr` redirection, we will still see that output on the host system and that may be
+surprising behavior since we are assigning all the output of `docker logs` to a variable.
