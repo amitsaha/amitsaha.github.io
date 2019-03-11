@@ -42,8 +42,9 @@ Coming back to the primary use case which triggered this post, if we wanted just
 container to be assigned to a variable in bash, here's what we should do:
 
 ```
-data="$(sudo docker logs test 2> /dev/null)
+data="$(sudo docker logs test 2> /dev/null)"
 ```
 
-If we don't do the above `stderr` redirection, we will still see that output on the host system and that may be
-surprising behavior since we are assigning all the output of `docker logs` to a variable.
+If we don't do the above `stderr` redirection, we will still see that container's `stderr` output on the host system.
+That may leave you scratching your head, as it did to me, since we think we are assigning all the output of `docker logs` 
+to a variable.
