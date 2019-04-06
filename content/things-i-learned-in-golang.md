@@ -70,3 +70,62 @@ if _, ok := flatMap[tblName]; !ok {
 }
 ```
 
+
+## Reading data from a database into structs
+
+The following snippet can be used to read the rows of a table from a SQL db into structure variables:
+
+```
+package main
+
+import "fmt"
+
+type Node struct {
+	data1 string
+	data2 string
+}
+
+func main() {
+
+	//..
+
+	rows, err := db.Query(q)
+	var results []Node
+
+	if err != nil {
+		fmt.Printf("Error querying: %v\n", err.Error())
+	} else {
+		defer rows.Close()
+
+		for rows.Next() {
+			var n Node
+			err = rows.Scan(&n.data1, &n.data2)
+			if err != nil {
+				fmt.Printf("Error serializing data into variable: %v\n", err)
+			}
+			results = append(results, n)
+		}
+	}
+}
+
+```
+
+## Check if a string starts with another string
+
+```
+// Does the value in `variable` start with "prefix"
+strings.HasPrefix(variable, "prefix")
+```
+
+
+## Genearate a random integer in [0,n)
+
+```
+fmt.Printf("Random integer between 0-100: %v\n", rand.Intn(100))
+```
+
+## Quotient and Modulus
+
+```
+fmt.Printf("1/2 - Modulus: %v Quotient: %v", 1%2, 1/2)
+```
