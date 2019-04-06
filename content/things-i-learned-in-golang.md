@@ -31,7 +31,7 @@ and 'single quotes'`
 ```
 
 
-## Maps with values as Maps
+## Maps with values as maps
 
 First, we define the map:
 
@@ -54,5 +54,19 @@ We can then modify the map defined as the value, like so:
 
 ```
 clusters[1]["a"] = 5
+```
+
+## Check if a key is present in a map
+
+Here we can make use of the multiple return value from the map query statement:
+
+```
+// The ok variable will be true if key present
+// else false
+if _, ok := flatMap[tblName]; !ok {
+     // not present
+} else {
+    // present
+}
 ```
 
