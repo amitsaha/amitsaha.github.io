@@ -129,3 +129,45 @@ fmt.Printf("Random integer between 0-100: %v\n", rand.Intn(100))
 ```
 fmt.Printf("1/2 - Modulus: %v Quotient: %v", 1%2, 1/2)
 ```
+
+
+## Walking a directory tree
+
+Let's say we want to walk a directory tree and only list/perform operation on files of a certain extension:
+
+```
+package main
+
+import (
+	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
+)
+
+func main() {
+
+	// Walk the directory tree starting at os.Args[1]
+	err := filepath.Walk(os.Args[1], func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			panic(err)
+		}
+		if info.IsDir() {
+			return nil
+		}
+		if filepath.Ext(path) == ".go" {
+			// Extract just the "filename" part of "filename.go"
+			fName := filepath.Base(path)
+			filename := strings.TrimSuffix(fName, filepath.Ext(path))
+			fmt.Printf("path: %s filename: %s\n", path, filename)
+
+		}
+		return nil
+	})
+	if err != nil {
+		panic(err)
+	}
+
+}
+
+```
