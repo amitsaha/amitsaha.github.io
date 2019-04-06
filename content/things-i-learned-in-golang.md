@@ -171,3 +171,41 @@ func main() {
 }
 
 ```
+
+## Reading structure tags
+
+```
+package main
+
+import (
+	"fmt"
+	"reflect"
+)
+
+type node struct {
+	Rule string `metadata1:"value1" metadata2:"value2"`
+	Name string `metadata2:"value3"`
+}
+
+func main() {
+
+	n := node{
+		Rule: "A rule",
+		Name: "A name",
+	}
+	// Reflect example  code from 
+	// https://gist.github.com/drewolson/4771479
+	val := reflect.ValueOf(&n).Elem()
+	for i := 0; i < val.NumField(); i++ {
+		valueField := val.Field(i)
+		typeField := val.Type().Field(i)
+		tag := typeField.Tag
+		metadataOneAttribute := tag.Get("metadata1")
+		metadataTwoAttribute := tag.Get("metadata2")
+
+		fmt.Printf("%v (metadata1: %v metadata2: %v)\n", valueField.Interface(), metadataOneAttribute, metadataTwoAttribute)
+
+	}
+}
+
+```
