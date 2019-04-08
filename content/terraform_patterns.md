@@ -1,9 +1,10 @@
 Title: Creating multiple instances of a resource in Terraform
 Date: 2019-04-04 16:00
 Category: infrastructure
-Status: Draft
 
-In this post, we will use [Golang](https://golang.org/) to generate Terraform configuration from a TOML specification.
+In this post, we will see how we can use [Golang](https://golang.org/) to generate Terraform configuration from a TOML specification.
+We will specifically be using AWS Network ACL rules as an example, but the solution for the problem discussed is likely
+extrpolable to other cloud resources.
 
 ## Background on `count`
 
@@ -110,7 +111,7 @@ subnet_name = "SubnetA"
 
 rules = [
     {rule_no=101, egress = false, protocol = "tcp", rule_action = "allow", cidr_block = "127.0.0.1/32", from_port = 22, to_port = 30},
-    {rule_no=102, egress = false, protocol = "tcp", rule_action = "allow", cidr_block = "127.0.0.1/32", from_port = 22, to_port = 30}
+    {rule_no=102, egress = true, protocol = "tcp", rule_action = "allow", cidr_block = "127.0.0.1/32", from_port = 22, to_port = 30}
 ]
 ```
 The assumption here is that, we will have a Network ACL rules specification file per Network ACL and the network ACL ID 
@@ -168,11 +169,77 @@ if _, err := toml.DecodeFile(naclSpecPath, &naclRules); err != nil {
 subnetName = naclRules.SubnetName
 ```
 
+At this stage, we have all the network ACL rules in `naclRules.Rules`. Let's say we would want to run some validation on the
+rules specified - is the rule number valid? Is the CIDR a valid CIDR? and any other custom criteria we can think of. We can do
+so before we generate the Terraform code. It's also worth noting that the above serialization step will also assist in catching
+data type mismatch errors.
+
+Here's how we can run validation on the specified rules and generate Terraform code if all the rules are valid:
+
+```
+// We use the index only pattern here so that
+// we can modify the array elements to insert the
+// static value for NetworkAclID
+for i := range naclRules.Rules {
+	if result, err := naclRules.Rules[i].Validate(); !result {
+		log.Fatalf("Invalid rule specification: %#v\n%v\n", naclRules.Rules[i], err)
+	}
+	// This is static terraform code which looks up the Network ACL id from a map
+	// created in Terraform
+	naclRules.Rules[i].NetworkACLID = fmt.Sprintf(`${lookup(local.network_acl_ids_map, "%s")}`, subnetName)
+}
+generateTfNaclRules(naclRules.Rules)
+```
+
+The `generateTfNaclRules` function makes use of Golang templates to create the Terraform configuration. 
+
+## Demo
+
+If we build the [code](https://github.com/amitsaha/toml_to_tf/tree/master/nacl), and run it:
+
+```
+$ ./nacl ./nacl_example.toml
+```
+
+A file `SubnetA_nacls.tf` will be created as follows:
+
+```
+
+# This is a generated file, do not hand edit. See README at the
+# root of the repository
+
+resource "aws_network_acl_rule" "rule_SubnetA_ingress_101" {
+
+    network_acl_id = "${lookup(local.network_acl_ids_map, "SubnetA")}"
+    egress = false
+    rule_number = 101
+    rule_action = "allow"
+    cidr_block = "127.0.0.1/32"
+    protocol = "tcp"
+    from_port = 22
+    to_port = 30
 
 
+}
+resource "aws_network_acl_rule" "rule_SubnetA_egress_102" {
+
+    network_acl_id = "${lookup(local.network_acl_ids_map, "SubnetA")}"
+    egress = true
+    rule_number = 102
+    rule_action = "allow"
+    cidr_block = "127.0.0.1/32"
+    protocol = "tcp"
+    from_port = 22
+    to_port = 30
 
 
+}
+```
 
+Couple of things to note here:
 
+- The Terraform configuration file is named as `<subnet name>_nacls.tf`
+- The rule resources are named as `rule_<subnet name>_<egress/ingress>_<rule no>`
 
-https://github.com/hashicorp/terraform/issues/17144
+This basically means that if we delete a rule, `rule_no` from the rules spefication, only a single resource
+will be deleted. 
