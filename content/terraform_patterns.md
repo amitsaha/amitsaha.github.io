@@ -120,14 +120,21 @@ will be derived from the Subnet's name specified in `subnet_name`.
 
 Now that we have a specification for our network acl rules, we will now write our program which will generate Terraform code 
 from it. I will be using [burntsushi/toml](https://github.com/BurntSushi/toml) to parse the TOML file and serialize
-it into a Golang structure. The key bit here is the Golang struct:
+it into a Golang structure. 
+
+The key bit here is the Golang struct which we will serialize the rules into:
 
 ```
 type naclRulesSpec struct {
-	SubnetName string `toml:"subnet_name"`
-	Rules      []naclRule
+	SubnetName string     `toml:"subnet_name"`
+	Rules      []naclRule `toml:"rules"`
 }
+```
 
+
+We define `naclRule` as a struct as follows:
+
+```
 type naclRule struct {
 	NetworkACLID string `tf:"network_acl_id"`
 	Egress       bool   `toml:"egress" tf:"egress" tf_type:"bool"`
@@ -138,11 +145,28 @@ type naclRule struct {
 	FromPort     int64  `toml:"from_port" tf:"from_port" tf_type:"int"`
 	ToPort       int64  `toml:"to_port" tf:"to_port" tf_type:"int"`
 }
-
 ```
 
+From the rules specification above, you can see that we are not specifying the network acl ID, since in this case
+we will be generating Terraform code to look it up based on the subnet name. For all the other fields, we specify
+the struct tag `toml:xxx` corresponding to the TOML table key we specify in the rules specification. The other
+struct tags we specify, `tf` and `tf_type` are used in generating the Terraform code:
+
+- `tf`: This specifies the Terraform attribute the structure field corresponds to in the [aws_network_acl_rule](https://www.terraform.io/docs/providers/aws/r/network_acl_rule.html) resource.
+- `tf_type`: We use this to determine if the attribute value is a string or another data type understood by terraform
 
 
+The following code will then read a Network ACL rules specification and serialize it into Golang objects:
+
+```
+naclSpecPath := os.Args[1]
+var naclRules naclRulesSpec
+if _, err := toml.DecodeFile(naclSpecPath, &naclRules); err != nil {
+    fmt.Println("Error", err)
+    return
+}
+subnetName = naclRules.SubnetName
+```
 
 
 
