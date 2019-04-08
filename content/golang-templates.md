@@ -322,6 +322,12 @@ Nodes:
 As a side note, note the dash in `{{- end}}`? That is to prevent newlines and spaces. I still don't quite get it,
 but it seems like a hit and trial thing!
 
+## Accessing a map object
+
+Complete example [here](https://play.golang.org/p/4kz3Ji_56s9). You will see that by default `range .` iterates
+over the map's values, rather than keys (opposite of what we see in the Golang language).
+
+
 ## Explore
 
 There's a lot more to explore in Golang templates. Check out:
