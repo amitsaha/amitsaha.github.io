@@ -118,7 +118,31 @@ will be derived from the Subnet's name specified in `subnet_name`.
 
 ## Generating Terraform configuration
 
-Now that we have a specification for our network acl rules, we will 
+Now that we have a specification for our network acl rules, we will now write our program which will generate Terraform code 
+from it. I will be using [burntsushi/toml](https://github.com/BurntSushi/toml) to parse the TOML file and serialize
+it into a Golang structure. The key bit here is the Golang struct:
+
+```
+type naclRulesSpec struct {
+	SubnetName string `toml:"subnet_name"`
+	Rules      []naclRule
+}
+
+type naclRule struct {
+	NetworkACLID string `tf:"network_acl_id"`
+	Egress       bool   `toml:"egress" tf:"egress" tf_type:"bool"`
+	RuleNo       int64  `toml:"rule_no" tf:"rule_number" tf_type:"int"`
+	RuleAction   string `toml:"rule_action" tf:"rule_action"`
+	CidrBlock    string `toml:"cidr_block" tf:"cidr_block"`
+	Protocol     string `toml:"protocol" tf:"protocol"`
+	FromPort     int64  `toml:"from_port" tf:"from_port" tf_type:"int"`
+	ToPort       int64  `toml:"to_port" tf:"to_port" tf_type:"int"`
+}
+
+```
+
+
+
 
 
 
