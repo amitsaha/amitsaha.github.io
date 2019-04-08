@@ -3,6 +3,37 @@ Date: 2019-04-04 16:00
 Category: infrastructure
 
 In this post, we will see how we can use [Golang](https://golang.org/) to generate Terraform configuration from a TOML specification.
+That is, given a TOML file, like:
+
+```
+subnet_name = "SubnetA"
+
+rules = [
+    {rule_no=101, egress = false, protocol = "tcp", rule_action = "allow", cidr_block = "127.0.0.1/32", from_port = 22, to_port = 30},   
+]
+```
+
+We will  generate:
+
+```
+# This is a generated file, do not hand edit. See README at the
+# root of the repository
+
+resource "aws_network_acl_rule" "rule_SubnetA_ingress_101" {
+
+    network_acl_id = "${lookup(local.network_acl_ids_map, "SubnetA")}"
+    egress = false
+    rule_number = 101
+    rule_action = "allow"
+    cidr_block = "127.0.0.1/32"
+    protocol = "tcp"
+    from_port = 22
+    to_port = 30
+
+
+}
+```
+
 We will specifically be using AWS Network ACL rules as an example, but the solution for the problem discussed is likely
 extrpolable to other cloud resources.
 
