@@ -1,4 +1,4 @@
-Title: Creating multiple instances of a resource in Terraform
+Title: Generate yourself some Terraform code from TOML
 Date: 2019-04-04 16:00
 Category: infrastructure
 
