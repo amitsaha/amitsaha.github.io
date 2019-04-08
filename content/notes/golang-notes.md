@@ -1,11 +1,11 @@
-Title: Things I learned in Golang recently
+Title: Golang
 Date: 2019-04-09
 
 ## Repeating the same argument to Printf
 
 If we wanted to repeat the same argument to a call to `fmt.Printf()`, we can make use of "indexed" arguments.
 That is, instead of writing `fmt.Printf("%s %s", "Hello", "Hello")`, we can write `fmt.Printf("%[1]s %[1]s", "Hello")`.
-Learn about it in the [docs](https://golang.org/pkg/fmt/). 
+Learn about it in the [docs](https://golang.org/pkg/fmt/).
 
 ## Multi-line strings
 
@@ -192,7 +192,7 @@ func main() {
 		Rule: "A rule",
 		Name: "A name",
 	}
-	// Reflect example  code from 
+	// Reflect example  code from
 	// https://gist.github.com/drewolson/4771479
 	val := reflect.ValueOf(&n).Elem()
 	for i := 0; i < val.NumField(); i++ {
