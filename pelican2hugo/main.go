@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-func convert2Hugo(articles []string) {
+func convert2Hugo(articles []string, targetDir string) {
 	for _, article := range articles {
 		log.Printf("Converting %v to hugo\n", article)
 		file, err := os.Open(article)
@@ -17,7 +17,11 @@ func convert2Hugo(articles []string) {
 		}
 		defer file.Close()
 
-		f, err := os.Create(article + ".hugo")
+		fName := filepath.Base(article)
+		fileExtension := filepath.Ext(article)
+		filename := strings.TrimSuffix(fName, fileExtension)
+
+		f, err := os.Create(filepath.Join(targetDir, filename+"_hugo"+fileExtension))
 		defer f.Close()
 		if err != nil {
 			log.Fatal(err)
@@ -96,6 +100,6 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	convert2Hugo(articles)
+	convert2Hugo(articles, os.Args[2])
 
 }
