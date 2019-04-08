@@ -1,0 +1,31 @@
+---
+title:  Linux Conf AU 2018 Notes - Day 5
+date:  2018-01-23 12
+categories:  software
+---
+
+
+# Keynote: Containers aka crazy userspace fun
+
+[Talk overview](https://rego.linux.conf.au/schedule/presentation/221/)
+
+## Notes
+
+- [Slides](https://docs.google.com/presentation/d/1UuHvR_kvZ3BF1pSXyv4mMKX9vmGr7GXm97USx7mzTXY/edit)
+- [contained.af](https://contained.af/)
+- `seccomp`, `apparmor`, `selinux` etc
+- Make containers small
+- Shared namespaces: `strace` another container (shared PID namespace)
+- Intel clear containers are really VMs
+- [rootless containers](https://www.cloudfoundry.org/blog/route-rootless-containers/)
+- What if we could apply the security principles for secure containers to programming languges?
+- Syscall profiling at build time rather than runtime (for golang) [Relevant](https://golang.org/doc/asm)
+- [metaparticle.io](https://metaparticle.io/)
+
+# nftables - from a users perspective
+
+## Notes
+
+- Replacement for iptables
+- `iptables-translate`
+- [nftables](https://wiki.nftables.org/wiki-nftables/index.php/What_is_nftables%3F)

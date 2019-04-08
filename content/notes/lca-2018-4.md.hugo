@@ -1,0 +1,352 @@
+---
+title:  Linux Conf AU 2018 Notes - Day 4
+date:  2018-01-23 12
+categories:  software
+---
+
+# The Meson Build System - 4+ years of work to become an overnight success
+
+[Talk overview](https://rego.linux.conf.au/schedule/presentation/39/)
+
+## Notes
+
+- [Meson](http://mesonbuild.com/)
+- Build system for multiple languages
+- One specification, multiple languages
+- Modern OSs and toolchains
+- Scales to thousands of source files
+- Minimizes the time developers have to interact with the build system
+
+Example:
+
+```
+$ ./meson.py init ..
+```
+- [Tutorial](http://mesonbuild.com/Tutorial.html)
+- Conforms to distro layout requirements
+- Cross compilation
+- Users: `Gstreamer`, `systemd`, GNOME projects, NetworkManager, Wayland
+- Why - when we already have `cmake`, `autotools`?
+- Until you have your first major customer, you have nothing
+- [WrapDB](http://mesonbuild.com/Using-the-WrapDB.html)
+
+# micro-Linux init (PID1) in Golang
+
+[Talk overview](https://rego.linux.conf.au/schedule/presentation/134/)
+
+- Container inspired microLinux
+- Smaller security footprint
+- Faster boot possibilities
+- Simpler for users to reason about
+- A way to explore immutable concepts
+- [RancherOS](https://rancher.com/rancher-os/)
+- User session in a docker container
+- `user-docker` session
+- `system-docker`
+- Switch between docker engines: `ros engine list`
+- Switch between user shells: `ros console list`
+- [cloud-config](https://rancher.com/docs/os/v1.1/en/configuration/#cloud-config) to orchestrate ROS based systems
+- customisation happens using `cloud-init` at first boot
+- RancherOS `init/init.go`
+- [LinuxKit](https://github.com/linuxkit/linuxkit) micro linux distro
+- [RancherOS built using LinuxKit](https://www.slideshare.net/mobyproject/using-linuxkit-to-build-custom-rancheros-systems)
+- [u-root](http://u-root.tk/)
+- Intel's clear containers
+
+
+# Rust programming techniques
+
+[Talk overview](https://rego.linux.conf.au/schedule/presentation/22/)
+
+## Notes
+
+- Safe and fast
+- ergonomic
+
+**Programming in the small**
+
+Data types
+
+- `Option`
+- `Result`
+- `Iterator`
+
+C++ code:
+
+```
+void f(Foo* ptr)
+{
+    if (!ptr)
+     { return;
+     } 
+     ptr->g();
+}
+```
+
+What could go wrong:
+
+- forget the null check
+- pointer could be mutated
+
+Rust:
+
+```
+fn f(ptr: Option<&Foo>) {
+    match ptr {
+        Some(ptr) => ptr.g(),
+        None => {}
+        }
+}
+```
+
+- Enum - [associate values](https://doc.rust-lang.org/book/first-edition/enums.html)
+
+```
+enum Option<T> {
+    Some(T),
+    None,
+}
+```
+
+Result:
+
+```
+enum Result<T, E> {
+    Ok(T),
+    Err(E),
+}
+```
+
+```
+fn h(i: i32) -> Result<i32, String> {
+    match i {
+        i if i>=0 => Ok(i+10),
+        _ => err(format!("Input less than 0, found: {}", i))
+    }
+}
+
+fn main() {
+    let input: i32 = ...;
+    match h(input) {
+         Ok(result) => println!("result: {}", result),
+         Err(e) => println!("Error: {}", e),
+    }
+}
+```
+
+`!` means a macro usage, not a function. A `macro` can hide a return.
+
+`Result` is essential to Rust error handling:
+
+``` 
+-> Result<T, ErrType> 
+    .. -> T throws ErrType
+```
+
+**if let**
+
+```
+if let Ok(i) = h() {
+    // do something with it
+}
+```
+Alternative:
+
+```
+match h() {
+    Ok(i) => {
+     // do something with i
+    },
+    err => return err,
+}
+```
+Alternative:
+
+```
+match h() {
+    Ok(i) => i, 
+    err => return err,
+};
+
+// Do something with i
+```
+Alternative:
+```
+let i = h()?;
+
+// do something with i
+```
+
+Alternative:
+
+```
+let i = h()?.foo()?.bar;
+```
+
+**Methods on Option and Result types**
+
+`Option`: `map`, `and`, `or`, `and_then`, `or_else`, `ok_or` (convert `Option` to `Result`), `iter`
+
+Example of `map`:
+
+```
+fn maybe_add_four(y: Option<i32>) -> Option<i32> {
+    y.map(|x| x + 4)
+}
+```
+
+**Iterators**
+
+C version:
+
+```
+void ping_all(Foo[] foos, int c_foo) {
+    for (int i=0; i< c_foo; ++i){
+        foos[i].ping();
+    }
+}
+```
+
+What can go wrong:
+
+- c_foo may be incorrect
+- foos could be mutated inside the loop
+- i could be mutated inside the loop
+- foos could be null or invalid
+
+Rust:
+
+```
+fn ping_all(foos: &[Foo]) {
+    for f in foos {
+        f.ping();
+    }
+}
+```
+
+```
+fn ping_all(foos: &[Foo]) {
+    foos.iter().for_each(|f| f.ping());
+}
+```
+
+- count is a property
+
+**Iterator methods**
+
+- `Iterator` is a trait (inteface with multple implementations)
+- `map`, `filter`, `for_each`
+- `vec`: resizable array
+
+```
+let vec = vec![0, 1, 2, 3];
+vec.iter()
+    .map(|x| x+1)
+    .filter(|x| x>1)
+    .println!(x)
+```
+- `chain`, `enumerate`, `collect`, lazy iterators
+
+
+`vec.iter()` is equivalent to:
+
+```
+for v in &vec {
+..
+
+}
+```
+
+
+
+**Test project**
+
+Install:
+
+```
+$ curl https://sh.rustup.rs -sSf | sh
+...
+$ source ..
+ 
+```
+
+Check:
+
+```
+$ rustc --version
+rustc 1.23.0 (766bd11c8 2018-01-01)
+```
+
+Create a new project:
+
+```
+$ cargo new helloworld --bin
+Created binary (application) `helloworld` project
+$ tree helloworld/
+helloworld/
+├── Cargo.toml
+└── src
+    └── main.rs
+```
+
+Run:
+
+```
+$ cargo run
+   Compiling helloworld v0.1.0 (file:///home/asaha/work/github.com/amitsaha/lca-rust/helloworld)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.40 secs
+     Running `target/debug/helloworld`
+Hello, world!
+```
+
+**Error handling**
+
+- Architectural concern, Design process
+
+When we get an error:
+
+- Recover
+- Re-throw
+- Panic
+- [Docs](https://doc.rust-lang.org/book/second-edition/ch09-00-error-handling.html)
+- Error modules
+
+
+**Ownership**
+
+**Traits**
+
+### Learn more
+
+- [Rust gentle introduction](https://stevedonovan.github.io/rust-gentle-intro/readme.html)
+
+
+# Linux: the first second
+
+[Talk overview](https://rego.linux.conf.au/schedule/presentation/16/)
+
+- [Analyzing the Linux boot process](https://opensource.com/article/18/1/analyzing-linux-boot-process)
+- x-86_64: Never genuinely off, Wake on LAN, IPMI
+- Kernel's address book: ACPI or device tree
+- The kernel is an ELF binary
+- `vmlinuz` is a compressed ELF binary
+- Practicing with u-boot sandbox is comparatively relaxing
+- [Demo code](https://github.com/chaiken/LCA2018-Demo-Code)
+
+
+# Let's write a Debugger
+
+[Talk overview](https://rego.linux.conf.au/schedule/presentation/91/)
+
+- `gdb`, `lldb`, and `adb`
+- `ptrace()`
+- Signals
+- [Project](https://github.com/levex/debugger-talk)
+
+Steps:
+
+- Enable tracing (PTRACE_TRACEME)
+- Run until system call: PTRACE_SYSCALL, PTRACE_SYSEMU
+- Monitoring registers: PTRACE_PEEKUSER, PTRACE_POKEUSER, PTRACE_GETREGS, PTRACE_SETREGS
+- Single stepping
+- Memory manipulation

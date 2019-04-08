@@ -1,0 +1,8 @@
+---
+title:  More Sorted Sets in Redis from CLI, Python and Golang
+date:  2018-02-19 07
+categories:  software
+---
+Status: Draft
+
+Prefix based search based on https://redis.io/commands/zrangebylex

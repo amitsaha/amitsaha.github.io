@@ -1,0 +1,23 @@
+---
+title:  Linux Conf AU 2018 Notes - Day 3
+date:  2018-01-23 12
+categories:  software
+---
+
+
+# Next Generation Config Mgmt: Reactive Systems
+
+[Talk overview](https://rego.linux.conf.au/schedule/presentation/48/)
+
+- Infrastructure is not static
+- Language: safe, powerful, reason about
+- Hysteresis
+- Reactive variables
+- [Automatic grouping of resources](https://ttboj.wordpress.com/2016/01/18/next-generation-configuration-mgmt/)
+- [Automatic edges](https://ttboj.wordpress.com/2016/03/14/automatic-edges-in-mgmt/)
+- [Key ideas](https://ttboj.wordpress.com/2016/01/18/next-generation-configuration-mgmt/)
+
+
+Learn more:
+
+- [Blog posts](https://ttboj.wordpress.com/tag/mgmtconfig/)

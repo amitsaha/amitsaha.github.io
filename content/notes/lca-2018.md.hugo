@@ -1,0 +1,193 @@
+---
+title:  Linux Conf AU 2018 Notes - Day 1
+date:  2018-01-22 12
+categories:  software
+---
+
+# You Can't Unit Test C, Right?
+
+[Talk Overview](https://rego.linux.conf.au/schedule/presentation/114/)
+
+## Notes
+
+- Unit test
+  - test my code, not somebody else's
+  - Dependency injection, mock
+- C mocking and stubbing
+- Coverage analysis
+- framework - [check](https://libcheck.github.io/check/), [tutorial](https://libcheck.github.io/check/doc/check_html/check_3.html)
+- framework - [atf](https://github.com/jmmv/atf) and [kyua](https://github.com/jmmv/kyua/)
+  - kyua - list tests
+  - generate html reports
+- Tests for functions such as malloc:
+  - Write a new implementation of malloc() - look up the real malloc using dlsym()
+  ```
+  void *malloc(size_t size) {
+      return real_malloc(..)
+  }
+  ```
+- `--coverage` and [gcov](https://gcc.gnu.org/onlinedocs/gcc/Gcov.html) flag to generate coverage data
+- Testing `main()`
+  - override main() to something else using preprocessor directives
+  - actually execute it
+  - Or keep main() as small as possible
+
+Some related projects:
+
+- [cwrap](https://cwrap.org/)
+- [cmocka](https://cmocka.org/)
+
+# Understanding git, even the scary parts
+
+[Talk overview](https://rego.linux.conf.au/schedule/presentation/117/)
+
+## Notes
+
+- Blob object
+  - Git's representation of the version of a file
+- Tree object
+  - Lists contents of directory
+  - Stores which filenames
+  - Points to blobs
+- Commit object
+  - Contains commit metadata
+  - Points to corrresponding tree object
+  - Points to previous commit
+  - Can have two parents - for a merge commit
+- Branches
+  - lightweight movable pointer to a commit
+  - adding a commit, pointer moves
+- Rebase and merge
+  - Fast forward merge
+  - Merge commit
+  - Rebase commit
+  - Both achieve the samething
+    - rebase: linear history
+    - merge: stitching pattern
+- `git log --graph --oneline --all`
+- [git reflog](https://www.atlassian.com/git/tutorials/rewriting-history/git-reflog)
+- git diff styles: `diff3`
+- [git rerere](https://git-scm.com/blog/2010/03/08/rerere.html)
+
+**Learning to read git conflicts**
+
+I often have difficulty in understanding conflicts in files when I do a `rebase`.
+They usually look like this:
+
+```
+Hello World
+Edit from master
+<<<<<<< HEAD
+Second edit from master
+||||||| merged common ancestors
+=======
+Edit from branch1
+>>>>>>> edit from branch1
+```
+
+I am using [diff3](https://stackoverflow.com/questions/27417656/should-diff3-be-default-conflictstyle-on-git)
+as the merge conflictstyle here (thanks to the speaker) for this one! Then I read
+this [article](https://help.github.com/articles/resolving-a-merge-conflict-using-the-command-line/)
+and now I think it finally makes sense. The `HEAD` here really refers to the commit I am rebasing my
+changes on `top of`. That is, when I do `git rebase master`, the HEAD above refers to the commit
+of the master branch. The text above `====` refers to the changes in that branch and below to the
+changes in mine.
+
+**Interesting links**
+
+- [Recovering lost commits](http://www.programblings.com/2008/06/07/the-illustrated-guide-to-recovering-lost-commits-with-git/)
+
+# Source Code Generation: How I Learned to Stop Worrying and Love the Boilerplate
+
+[Talk overview](https://rego.linux.conf.au/schedule/presentation/119/)
+
+- Code generation
+  - Few developer mistakes
+  - Saves developer time
+  - Introduce your favorite idioms or patterns project-wide
+  - Laziness-induced anti-patterns can be avoided
+  - Automatically write code generators for different languages
+- OpenAPI/Swagger
+- GNU Autogen
+- Generated code is stateless
+  - Avoid committing generated code
+  - Code generation is part of the build process
+  - Schema needs to be versioned
+
+# In from the cold: Finally making Linux and .NET get along
+
+[Talk overview](https://rego.linux.conf.au/schedule/presentation/121/)
+
+- `kestrel`
+- systemd + asp.net core web applications
+- `Tmds.DBus` + C# to interact with system DBus
+- Always target `netstandard*`
+- Test on multiple distros
+- Be aware of logging
+- Do cross platform CI/CD
+
+# Next Generation Config Mgmt: Resources
+
+[Talk overview](https://rego.linux.conf.au/schedule/presentation/182/)
+
+- Don't Re-invent the wheel
+- [mgmtconfig](https://github.com/purpleidea/mgmt)
+  - reactive
+  - parallel execution
+  - Language: safe, easy to reason about, reactive
+  - hysteresis (perform an action as response to event)
+
+# Manage All Your Tasks With Taskwarrior
+
+[Talk overvew](https://rego.linux.conf.au/schedule/presentation/115/)
+
+[Taskwarrior](https://taskwarrior.org/)
+
+Examples:
+
+```
+$ task add "task 1"
+$ task add "task 2"
+$ task.
+..
+$ task 1 done
+```
+
+- Tasks renumber
+- Tags
+- Automatic meta tags:`YEAR, MONTH`
+- Projects
+- Contexts
+- Autotimestamp
+- Relative dates
+- Taskopen (annotations)
+- Related: [bugwarrior](https://github.com/ralphbean/bugwarrior)
+- Bash integration
+- Graphical reports
+- Online sync: inthe.am
+
+
+# Love thy future self: making your systems ops-friendly (Ops-Friendly System Development)
+
+[Talk overview](https://rego.linux.conf.au/schedule/presentation/183/)
+
+- [The first four things you measure](https://honeycomb.io/blog/2017/01/instrumentation-the-first-four-things-you-measure/)
+- Instrumenting incoming requests
+  - How many requests we've received
+  - How many response we've given (success/error)
+  - How long it took (success/error)
+  - How many requests we're handling right now
+- Instrumenting outgoing requests
+  - For each downstream component:
+    - How many requests we've sent
+    - Responses received
+    - latency
+    - outstanding requests
+- Logging errors
+  - Full stacktraces
+  - Add info, don't replace it
+  - Capture all relevant variables, environment,etc
+  - Structure log data
+- Debug logging
+  - Allow selective activation at runtime
+  - feature flags, signals

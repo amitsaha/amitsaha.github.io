@@ -1,0 +1,60 @@
+---
+title:  Linux Conf AU 2018 Notes - Day 2
+date:  2018-01-23 12
+categories:  software
+---
+
+# Operations with Containers: Myth vs. Reality
+
+[Talk overview](https://rego.linux.conf.au/schedule/presentation/108/)
+
+## Notes
+
+- You no longer have a single server with everything running on it
+- Focus on standards-based implementations: OCI, CNI
+
+
+# Becoming the Admiral: mastering Docker orchestration
+
+[Talk overview](https://rego.linux.conf.au/schedule/presentation/167/)
+
+## Notes
+
+- [dockly](https://github.com/lirantal/dockly)
+- [ctop](https://github.com/bcicen/ctop)
+- `docker top`
+- [falco](https://www.sysdig.org/falco/)
+- [capsule8](https://github.com/capsule8/capsule8)
+
+
+# Puppet in the cloud
+
+[Talk overview](https://rego.linux.conf.au/schedule/presentation/163/)
+
+## Notes
+
+- Why config management?
+- Even in the age of k8s and containers, config management matters!
+- Puppet has CA and cert model for authenticating clients (in server model)  - Not cloud scalable
+- Use `roles` (via EC2 tags)
+- server boots -> Ask puppet to sign cert -> .. : exposes a attack vector
+- Autosigning is very dangeorous - if you get it wrong
+- Policy based autosigners
+- Use single use token to sign initially
+- [github.com/carnivalmobile/carnival-autosign-aws-puppet]
+- Untrusted facts are dangerous
+- Trusted facts
+- [r10k](github.com/puppetlabs/r10k)
+- High availability
+- Bake AMI using puppet - don't rely on applying puppet manifests at provision time
+- Masterless puppet - pupistry
+
+# MQTT 
+
+[Talk overview](https://rego.linux.conf.au/schedule/presentation/168/)
+
+
+## Notes
+
+- [mqtt](http://mqtt.org/)
+- [mosquitto](https://mosquitto.org/)
