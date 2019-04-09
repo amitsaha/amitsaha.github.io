@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -46,11 +47,13 @@ func convert2Hugo(articles []string, targetDir string) {
 
 			if strings.HasPrefix(line, "Date:") {
 				date := strings.Split(line, ":")
-				line = "date: " + date[1]
+				date[1] = strings.TrimPrefix(date[1], " ")
+				line = "date: \"" + strings.Split(date[1], "")[0] + "\""
 			}
 			if strings.HasPrefix(line, ":Date:") {
 				date := strings.Split(line, ":")
-				line = "date: " + date[2]
+				date[2] = strings.TrimPrefix(date[2], " ")
+				line = "date: \"" + strings.Split(date[2], " ")[0] + "\""
 			}
 
 			if strings.HasPrefix(line, "Category:") {
@@ -87,19 +90,20 @@ func convert2Hugo(articles []string, targetDir string) {
 }
 
 func main() {
+
+	postsDir := os.Args[1]
+
+	// todo: pages, notes, etc
 	var articles []string
-	err := filepath.Walk(os.Args[1], func(path string, info os.FileInfo, err error) error {
-		if info.IsDir() {
-			return nil
-		}
-		if filepath.Ext(path) == ".rst" || filepath.Ext(path) == ".md" {
-			articles = append(articles, path)
-		}
-		return nil
-	})
+	files, err := ioutil.ReadDir(postsDir)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
+	}
+
+	for _, file := range files {
+		if filepath.Ext(file.Name()) == ".rst" || filepath.Ext(file.Name()) == ".md" {
+			articles = append(articles, filepath.Join(postsDir, file.Name()))
+		}
 	}
 	convert2Hugo(articles, os.Args[2])
-
 }

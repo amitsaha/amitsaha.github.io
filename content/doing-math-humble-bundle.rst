@@ -1,11 +1,10 @@
-Doing Math with Python Humble Bundle
-====================================
-:date: 2017-04-06 08:20
-:category: python
-:slug: humble-bundle
-:summary: Humble bundle
+:Title: Doing Math with Python Humble Bundle
+:Date: 2017-04-06 08:20
+:Category: python
+:Slug: humble-bundle
+:Summary: Humble bundle
 
-No Starch Press has launched a "Pay what you want" `Python Humble Bundle <https://www.humblebundle.com/books/python-book-bundle>`__ running from April 5th - April 19th! 
+No Starch Press has launched a "Pay what you want" `Python Humble Bundle <https://www.humblebundle.com/books/python-book-bundle>`__ running from April 5th - April 19th!
 Your purchases will help support the Python Software Foundation and I am excited to announce that Doing Math with Python is part of it.
 
 .. figure:: {filename}/images/humble-bundle.png
