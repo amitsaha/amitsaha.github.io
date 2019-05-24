@@ -1,4 +1,4 @@
-Title: Nginx and geoip2 on CentOS 7
+Title: Nginx and geoip2
 Date: 2019-05-24
 Category: infrastructure
 
@@ -14,8 +14,23 @@ helped tremendously.
 
 ## mmdblookup
 
-`mmdblookup` can be used to read a MaxMind DB file for an IP address and query various information. We need to give it
-a path to the DB file and the IP address and it spits out all that it finds out. For example:
+`mmdblookup` can be used to read a MaxMind DB file for an IP address and query various information. To build and install:
+
+```
+# yum install wget gcc make -y
+# wget http://geolite.maxmind.com/download/geoip/database/GeoLite2-City.mmdb.gz && \
+    wget http://geolite.maxmind.com/download/geoip/database/GeoLite2-Country.mmdb.gz && \
+    gzip -d GeoLite2-City.mmdb.gz && \
+    gzip -d GeoLite2-Country.mmdb.gz
+
+# cd /tmp
+# wget https://github.com/maxmind/libmaxminddb/releases/download/1.3.2/libmaxminddb-1.3.2.tar.gz && \
+    tar -zxvf libmaxminddb-1.3.2.tar.gz && \
+    cd libmaxminddb-1.3.2 && \
+    ./configure && make && make install && cd bin/ && make install
+```
+
+We need to give it a path to the DB file and the IP address and it spits out all that it finds out. For example:
 
 ```
 $ mmdblookup --file /etc/GeoLite2-City.mmdb --ip 49.255.14.118 
@@ -174,3 +189,46 @@ $ mmdblookup --file /etc/GeoLite2-City.mmdb --ip 49.255.14.118 city names en
 
 If you look at the first "object" in the output above, you will see that the above three arguments, `city names en` is almost
 like accessing a nested key inside a dictionary. I say almost, becomes it's not a JSON format. Anyway, this was the key thing
+I needed to learn to be able to write the right things in my nginx configuration. 
+
+## Logging the GeoIP decoded data
+
+This is how the relevant nginx configuration for GeoIP2 lookup looked like:
+
+```
+...
+http {
+
+    geoip2 /etc/GeoLite2-Country.mmdb {
+        auto_reload 5m;
+        $geoip2_metadata_country_build metadata build_epoch;
+        $geoip2_data_country_code default=US source=$http_x_forwarded_for country iso_code;
+        $geoip2_data_country_name source=$http_x_forwarded_for country names en;
+    }
+
+    geoip2 /etc/GeoLite2-City.mmdb {
+        $geoip2_data_city_name source=$http_x_forwarded_for city names en;
+        $geoip2_data_time_zone source=$http_x_forwarded_for location time_zone;
+    }
+
+  ..
+```
+  
+If you look at the two `geoip2` sections, you can see how I am feeding the value in the `http_x_forwarded_for` variable
+as the source for the IP lookup. This is how I understand how the above is working with inline comments:
+
+```
+# this is similar to specfying --file /etc/GeoLite2-City.mmdb
+geoip2 /etc/GeoLite2-City.mmdb {
+        # This is assigning a variable $geoip2_data_city_name to the value of:
+        # mmdblookup --file /etc/GeoLite2-City.mmdb --ip $http_x_forwarded_for city names en
+        $geoip2_data_city_name source=$http_x_forwarded_for city names en;
+        
+        # This is assigning a variable $geoip2_data_time_zone to the value of:
+        # mmdblookup --file /etc/GeoLite2-City.mmdb --ip $http_x_forwarded_for location time_zone
+        $geoip2_data_time_zone source=$http_x_forwarded_for location time_zone;
+    }
+```
+
+The explanations for the `GeoLite2-Country` DB is similar. Then later on in the nginx configuration, we log the 
+value of this variables in JSON format. A complete nginx.conf is [here](https://gist.github.com/amitsaha/f43e9397e5f84903e5d1bffaf8b4b9d9).
