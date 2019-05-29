@@ -1,3 +1,10 @@
+What happens when you press `<your favorite Linux command> <TAB>`? You get a bunch of suggestions with one of them
+just the one you had in mind you were going to type, or did not. Auto completions in shells are super helpful and that's
+probably the most boring sales pitch. Anyway, as you will see, quite a bit goes on behind the scenes. In this post, we will
+find out about the minions that gets to work when we press the `<TAB>` key on a popular Linux shell, `BASH`.
+
+## Setting up
+
 Let's get a fresh Fedora 30 VM in a Vagrant box and set it up:
 
 ```
