@@ -9,10 +9,19 @@ Let's get a fresh Fedora 30 VM in a Vagrant box and set it up:
 
 ```
 $ vagrant up
-$ sudo dnf remove bash-completion
-$ sudo dnf install bpftrace
-$ curl https://raw.githubusercontent.com/iovisor/bpftrace/master/tools/execsnoop.bt -o execsnoop.bt
+...
+$ vagrant ssh
+ $ sudo dnf remove bash-completion
+ $ sudo dnf install bpftrace
+ $ curl https://raw.githubusercontent.com/iovisor/bpftrace/master/tools/execsnoop.bt -o execsnoop.bt
 ```
+
+## Look, no bash completion
+
+On a terminal, (Terminal 1), type in `$ git <TAB>`. The only suggestions you get will be the files in the
+directory you are in. Not very helpful suggestions, you say. I know - and that's because we uninstalled a 
+RPM package which would have magically done that for us. (`bash-completion`). Let's keep it that way for us now.
+
 
 External program invocations for auto complete suggestions
 
