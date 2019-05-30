@@ -34,12 +34,15 @@ and `checkout`. Let's aim for achieving that.
 First, create a file, `/tmp/git_suggestions`, put in the following and make it executeable (`chmod +x /tmp/git_suggestions`):
 
 ```
+
 #!/bin/bash
 
 echo "status"
 echo "checkout"
 echo "clone"
 echo "branch"
+printenv COMP_KEY COMP_LINE COMP_POINT COMP_TYPE
+
 ```
 
 This script prints four git subcommands - one on each line. Now, execute the command from Terminal 1:
