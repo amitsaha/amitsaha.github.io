@@ -42,7 +42,20 @@ echo "clone"
 echo "branch"
 ```
 
-This script prints four git subcommands - one on each line. 
+This script prints four git subcommands - one on each line. Then, execute the command from your Terminal 1:
+
+```
+$  complete -C "/tmp/git_suggestions" git
+```
+
+Now, type in `git <TAB>`, you will see suggestions:
+
+```
+[vagrant@ip-10-0-2-15 temp]$ git  <TAB>
+branch    checkout  clone     status    
+[vagrant@ip-10-0-2-15 temp]$ git 
+
+```
 
 
 External program invocations for auto complete suggestions
