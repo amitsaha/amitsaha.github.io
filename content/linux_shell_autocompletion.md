@@ -1,7 +1,12 @@
 What happens when you press `<your favorite Linux command> <TAB>`? You get a bunch of suggestions with one of them
 just the one you had in mind you were going to type. Auto completions in shells are super helpful and that's
-probably the most boring sales pitch. Anyway, as we will find out, quite a bit goes on behind the scenes. Let's learn more
-about the minions that gets to work when we press the `<TAB>` key on a popular Linux shell, `BASH`.
+probably the most boring sales pitch. Anyway, as we will find out, quite a bit goes on behind the scenes. 
+
+Before we go too further into my investigations and findings, I  must credit the author of this [blog post](https://www.joshmcguigan.com/blog/shell-completions-pure-rust/) - it triggered
+my curiosity and made me find time out to learn more about something I use everyday, but don't know much about how
+it worked.
+
+Let's learn more about the minions that gets to work when we press the `<TAB>` key on a popular Linux shell, `BASH`.
 
 ## Setting up
 
@@ -24,9 +29,20 @@ us now.
 ## DIY bash completion
 
 When we type in `$git <TAB>`, we expect to see suggestions of the git sub-commands, such as `status`, `clone`,
-and `checkout`. Let's do that:
+and `checkout`. Let's aim for achieving that.
 
+First, create a file, `/tmp/git_suggestions`, put in the following and make it executeable (`chmod +x /tmp/git_suggestions`):
 
+```
+#!/bin/bash
+
+echo "status"
+echo "checkout"
+echo "clone"
+echo "branch"
+```
+
+This script prints four git subcommands - one on each line. 
 
 
 External program invocations for auto complete suggestions
