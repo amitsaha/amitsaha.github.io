@@ -1,7 +1,7 @@
 What happens when you press `<your favorite Linux command> <TAB>`? You get a bunch of suggestions with one of them
-just the one you had in mind you were going to type, or did not. Auto completions in shells are super helpful and that's
-probably the most boring sales pitch. Anyway, as you will see, quite a bit goes on behind the scenes. In this post, we will
-find out about the minions that gets to work when we press the `<TAB>` key on a popular Linux shell, `BASH`.
+just the one you had in mind you were going to type. Auto completions in shells are super helpful and that's
+probably the most boring sales pitch. Anyway, as we will find out, quite a bit goes on behind the scenes. Let's learn more
+about the minions that gets to work when we press the `<TAB>` key on a popular Linux shell, `BASH`.
 
 ## Setting up
 
@@ -16,11 +16,17 @@ $ vagrant ssh
  $ curl https://raw.githubusercontent.com/iovisor/bpftrace/master/tools/execsnoop.bt -o execsnoop.bt
 ```
 
-## Look, no bash completion
-
 On a terminal, (Terminal 1), type in `$ git <TAB>`. The only suggestions you get will be the files in the
 directory you are in. Not very helpful suggestions, you say. I know - and that's because we uninstalled a 
-RPM package which would have magically done that for us. (`bash-completion`). Let's keep it that way for us now.
+RPM package which would have magically done that for us. (`bash-completion`). Let's keep it that way for 
+us now.
+
+## DIY bash completion
+
+When we type in `$git <TAB>`, we expect to see suggestions of the git sub-commands, such as `status`, `clone`,
+and `checkout`. Let's do that:
+
+
 
 
 External program invocations for auto complete suggestions
@@ -75,3 +81,4 @@ On Terminal 2:
 
 
 
+https://www.joshmcguigan.com/blog/shell-completions-pure-rust/
