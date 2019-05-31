@@ -62,12 +62,28 @@ branch    checkout  clone     status
 
 Note that each of the suggestion is a line printed by the above script. Let's delve further into this.
 
-External program invocations for auto complete suggestions
+## Exec snooping 
 
-Terminal 1:
+Open a new terminal (Terminal 2) and execute the following:
 
+
+```
 $ sudo bpftrace ./execnsoop.bt
+```
 
+Now, go back to Terminal 1, and type `$git <TAB>`. 
+
+On Terminal 2, you will see something like:
+
+```
+49916      15949 /tmp/git_suggestions git
+```
+
+Let's break this down:
+
+Ignore the first column, which is how long the external program executed for. The second column gives us
+the process ID and the third column shows us the external program along with the arguments it was executed it.
+We can see that the script `/tmp/git_suggestions` is supplied
 
 
 Terminal 2:
