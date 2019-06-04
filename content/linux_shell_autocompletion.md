@@ -104,16 +104,14 @@ We see that the script `/tmp/git_suggestions` is now being called with three arg
 
 
 
-$ git <TAB>
 
-On Terminal 1, we will see nothing. The suggestions we get in Terminal 2 are the boring current files (which seem
-to be some sort of built-bash default) and not the git sub-commands we are so used to.
+## Getting BASH completion back
 
-
-Now, on Terminal 2, let's install the `bash-completion` package and then exec bash and type, in `$ git <TAB>`
+Now, on Terminal 1, let's install the `bash-completion` package and then exec bash and type, in `$ git <TAB>`
 
 
-On Terminal 1, now we will see something like:
+
+On Terminal 2, now we will see something like:
 
 ```
 95607      1470  git --list-cmds=list-mainporcelain,others,nohelpers,alias,list-complete,config
