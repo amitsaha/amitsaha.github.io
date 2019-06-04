@@ -81,7 +81,7 @@ On Terminal 2, you will see something like:
 
 Let's break this down:
 
-The first column is how long the external program executed for in milliseconds (the numbers seem weird to me, but that's
+The first column is how long the external program executed for in milliseconds (the number seem weird to me, but that's
 a different problem). The second column gives us the process ID and the third column shows us the external program 
 along with the arguments it was executed it. We can see that the script `/tmp/git_suggestions` is executed and the
 command for which the auto-completion suggestions are being shown is provided as the first argument.
@@ -102,8 +102,12 @@ On Terminal 2, we will see:
 We see that the script `/tmp/git_suggestions` is now being called with three arguments:
 
 - `git`: The command we are trying to ask BASH to suggest auto-completions for
-- `chec`: The word we are asking for completions
+- `chec`: The word we are asking for completions for
 - `git`: The word before the word we are asking for completions for
+
+Let's discuss this a bit. When we press `TAB`, bash tries to find out a matching auto-completion "handler" for the command 
+and if it finds one, invokes the handler. The output of the handler is then parsed by bash and each separate line in
+the output is suggested as possible candidates for the auto-completion.
 
 
 ## `complete` and `compgen`
