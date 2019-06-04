@@ -1,6 +1,6 @@
 What happens when you press `<your favorite Linux command> <TAB>`? You get a bunch of suggestions with one of them
-just the one you had in mind you were going to type. Auto completions in shells are super helpful and that's
-probably the most boring sales pitch. Anyway, as we will find out, quite a bit goes on behind the scenes. 
+just the one you had in mind you were going to type. Auto completions in shells are super helpful and as we will find
+out, quite a bit goes on behind the scenes. 
 
 Before we go too further into my investigations and findings, I  must credit the author of this [blog post](https://www.joshmcguigan.com/blog/shell-completions-pure-rust/) - it triggered
 my curiosity and made me find time out to learn more about something I use everyday, but don't know much about how
@@ -41,8 +41,6 @@ echo "status"
 echo "checkout"
 echo "clone"
 echo "branch"
-printenv COMP_KEY COMP_LINE COMP_POINT COMP_TYPE
-
 ```
 
 This script prints four git subcommands - one on each line. Now, execute the command from Terminal 1:
@@ -66,7 +64,6 @@ Note that each of the suggestion is a line printed by the above script. Let's de
 
 Open a new terminal (Terminal 2) and execute the following:
 
-
 ```
 $ sudo bpftrace ./execnsoop.bt
 ```
@@ -81,12 +78,31 @@ On Terminal 2, you will see something like:
 
 Let's break this down:
 
-Ignore the first column, which is how long the external program executed for. The second column gives us
-the process ID and the third column shows us the external program along with the arguments it was executed it.
-We can see that the script `/tmp/git_suggestions` is supplied
+The first column is how long the external program executed for in milliseconds (the numbers seem weird to me, but that's
+a different problem). The second column gives us the process ID and the third column shows us the external program 
+along with the arguments it was executed it. We can see that the script `/tmp/git_suggestions` is executed and the
+command for which the auto-completion suggestions are being shown is provided as the first argument.
 
 
-Terminal 2:
+Now, go back to Terminal 1, and type:
+
+```
+$ git chec<TAB>
+```
+
+On Terminal 2, we will see:
+
+```
+189064     16701/tmp/git_suggestions git chec git
+```
+
+We see that the script `/tmp/git_suggestions` is now being called with three arguments:
+
+- `git`: The command we are trying to ask BASH to suggest auto-completions for
+- `chec`: The word we are asking for completions
+- `git`: The word before the word we are asking for completions for
+
+
 
 $ git <TAB>
 
