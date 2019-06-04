@@ -104,8 +104,9 @@ We see that the script `/tmp/git_suggestions` is now being called with three arg
 
 
 
+## `complete` and `compgen`
 
-## Getting BASH completion back
+## Getting good old BASH completion back
 
 Now, on Terminal 1, let's install the `bash-completion` package and then exec bash and type, in `$ git <TAB>`
 
@@ -139,6 +140,8 @@ On Terminal 2:
 134571     2529  systemctl list-units --full --all
 134776     2536  awk $1 ~ /\.service$/ { sub("\\.service$", "", $1); print $1 }
 134780     2535  systemctl list-units --full --all
+
+
 
 
 
