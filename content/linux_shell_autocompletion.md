@@ -21,17 +21,19 @@ $ vagrant ssh
  $ curl https://raw.githubusercontent.com/iovisor/bpftrace/master/tools/execsnoop.bt -o execsnoop.bt
 ```
 
-On a terminal, (Terminal 1), type in `$ git <TAB>`. The only suggestions you get will be the files in the
+On a terminal, (Terminal 1), type in `$ git <TAB>` (the space between `git` and `<TAB>` is important). 
+The only suggestions you get will be the files in the
 directory you are in. Not very helpful suggestions, you say. I know - and that's because we uninstalled a 
-RPM package which would have magically done that for us. (`bash-completion`). Let's keep it that way for 
-us now.
+package which would have magically done that for us. (`bash-completion`). Let's keep it that way for 
+now.
 
 ## DIY bash completion
 
 When we type in `$git <TAB>`, we expect to see suggestions of the git sub-commands, such as `status`, `clone`,
-and `checkout`. Let's aim for achieving that.
+and `checkout`. Let's aim to achieve that.
 
-First, create a file, `/tmp/git_suggestions`, put in the following and make it executeable (`chmod +x /tmp/git_suggestions`):
+First, create a file, `/tmp/git_suggestions`, put in the following snippet and make it executeable 
+(`chmod +x /tmp/git_suggestions`):
 
 ```
 
@@ -50,14 +52,14 @@ $  complete -C "/tmp/git_suggestions" git
 ```
 
 The `complete` bash built-in is a way to tell bash what we want it to do when we ask for completing a command.
-The `-C` option asks it to call a specified external program.
+The `-C` option asks it to call a specified external program. There are various other options some of which we
+will learn later on in this post.
 
 Next, type in `git <TAB>`, you will see that you are now suggested four options for your next command/option:
 
 ```
 [vagrant@ip-10-0-2-15 temp]$ git  <TAB>
 branch    checkout  clone     status    
-[vagrant@ip-10-0-2-15 temp]$ git 
 
 ```
 
@@ -78,8 +80,6 @@ On Terminal 2, you will see something like:
 ```
 49916      15949 /tmp/git_suggestions git
 ```
-
-Let's break this down:
 
 The first column is how long the external program executed for in milliseconds (the number seem weird to me, but that's
 a different problem). The second column gives us the process ID and the third column shows us the external program 
@@ -106,11 +106,17 @@ We see that the script `/tmp/git_suggestions` is now being called with three arg
 - `git`: The word before the word we are asking for completions for
 
 Let's discuss this a bit. When we press `TAB`, bash tries to find out a matching auto-completion "handler" for the command 
-and if it finds one, invokes the handler. The output of the handler is then parsed by bash and each separate line in
-the output is suggested as possible candidates for the auto-completion.
+and if it finds one, invokes the handler. When invoking the handler, it calls the handler providing data about the command
+it is attempting to provide auto-completion suggestions for. The output of the handler is then parsed by bash and each separate 
+line in the output is suggested as possible candidates for the auto-completion.
+
+## Data provided to completion handlers
 
 
-## `complete` and `compgen`
+## `complete` built-in command
+
+## `compgen` built-in command
+
 
 ## Getting good old BASH completion back
 
@@ -145,6 +151,8 @@ On Terminal 2:
 134571     2529  systemctl list-units --full --all
 134776     2536  awk $1 ~ /\.service$/ { sub("\\.service$", "", $1); print $1 }
 134780     2535  systemctl list-units --full --all
+
+## Putting the pieces together
 
 
 
