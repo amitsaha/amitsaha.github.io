@@ -49,6 +49,9 @@ This script prints four git subcommands - one on each line. Now, execute the com
 $  complete -C "/tmp/git_suggestions" git
 ```
 
+The `complete` bash built-in is a way to tell bash what we want it to do when we ask for completing a command.
+The `-C` option asks it to call a specified external program.
+
 Next, type in `git <TAB>`, you will see that you are now suggested four options for your next command/option:
 
 ```
@@ -103,13 +106,11 @@ We see that the script `/tmp/git_suggestions` is now being called with three arg
 - `git`: The word before the word we are asking for completions for
 
 
-
 ## `complete` and `compgen`
 
 ## Getting good old BASH completion back
 
 Now, on Terminal 1, let's install the `bash-completion` package and then exec bash and type, in `$ git <TAB>`
-
 
 
 On Terminal 2, now we will see something like:
