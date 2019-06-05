@@ -110,7 +110,35 @@ and if it finds one, invokes the handler. When invoking the handler, it calls th
 it is attempting to provide auto-completion suggestions for. The output of the handler is then parsed by bash and each separate 
 line in the output is suggested as possible candidates for the auto-completion.
 
+Let's discuss more about the data provided to completion handlers.
+
 ## Data provided to completion handlers
+
+Let's now update our `/tmp/git_suggestions` script to be as follows:
+
+```
+#!/bin/bash
+
+echo "status"
+echo "checkout"
+echo "clone"
+echo "branch"
+
+# Print the envrionment variables relevant to bash autocompletion
+env | grep COMP
+```
+
+We add a line at the end to print all environment variables having COMP in them. Now, if we go back to Terminal 1,
+and type `$git checkout <TAB>`, we will see:
+
+```
+
+$ git checkout <TAB>
+branch                   clone                    COMP_LINE=git checkout   COMP_TYPE=63             
+checkout                 COMP_KEY=9               COMP_POINT=13            status 
+
+```
+
 
 
 ## `complete` built-in command
