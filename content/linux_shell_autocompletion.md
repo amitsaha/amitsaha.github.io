@@ -205,3 +205,9 @@ On Terminal 2:
 
 
 https://www.joshmcguigan.com/blog/shell-completions-pure-rust/
+
+https://spin.atomicobject.com/2016/02/14/bash-programmable-completion/
+
+https://unix.stackexchange.com/questions/261687/is-it-possible-to-configure-bash-to-autocomplete-with-one-tab-like-zsh/461079
+
+https://stackoverflow.com/questions/12044574/getting-complete-and-menu-complete-to-work-together
