@@ -1,3 +1,5 @@
+If you are using Bash in default, `vi mode`, this post aims to shed some light on how auto-completions work.
+
 What happens when you press `<command> <TAB>` or `<command> <TAB><TAB>`? You get a bunch of suggestions with one of them
 just the one you had in mind you were going to type. Auto completions in shells are super helpful and as we will find
 out, quite a bit goes on behind the scenes. Before we go too further into my investigations and findings, I  must credit the author of 
@@ -124,21 +126,32 @@ echo "clone"
 echo "branch"
 
 # Print the envrionment variables relevant to bash autocompletion
-env | grep COMP
+env | grep COMP > /tmp/log
 ```
 
-We add a line at the end to print all environment variables having COMP in them. Now, if we go back to Terminal 1,
-and type `$git checkout <TAB><TAB>`, we will see:
-
-```
-
-$ git checkout <TAB>
-branch                   clone                    COMP_LINE=git checkout   COMP_TYPE=63             
-checkout                 COMP_KEY=9               COMP_POINT=13            status 
+We add a line at the end to print all environment variables having COMP in them and log it to
+a file. Now, if we go back to Terminal 1, and type `$git checkout <TAB><TAB>`, we will again see:
 
 ```
 
-Besides the earlier four suggestions, we have some new ones:
+$ git checkout <TAB><TAB>
+branch                   clone                    checkout                 status 
+
+```
+
+Let's display the contents of `/tmp/log` on Terminal 2:
+
+```
+$ cat /tmp/log 
+COMP_POINT=4
+COMP_LINE=git 
+COMP_TYPE=63
+COMP_KEY=9
+```
+
+
+
+These environment variables are related to Bash autocompletion:
 
 - `COMP_LINE`: This is the entire line of the command we pressed `<TAB><TAB>` on
 - `COMP_TYPE`: This is the type of completion that is being done, `63` is the ASCII code for `?`. According to the Bash programmable completion manual,
@@ -153,25 +166,137 @@ https://www.gnu.org/software/bash/manual/html_node/Bash-Variables.html#Bash-Vari
 
 ## Single `<TAB>` and double `<TAB><TAB>`
 
-It's only while working on this article, I realized, that a double `<TAB><TAB>` was necessary to display all the possible
-auto-completions in most cases. Let's look into that. A single `<TAB>` by default 
+It's only while working on this article, I realized that a double `<TAB><TAB>` was necessary to display all the possible
+auto-completions in most cases. Let's look into that. A single `<TAB>` will aim to complete (not list) the current command
+with the largest common prefix among all the suggestions. If there is no common prefix, it will not do anything. 
 
+Let's verify that by changing the `/tmp/git_suggestions` script to be as follows:
 
-## `complete` built-in command
+```
+#!/bin/bash
 
-## `compgen` built-in command
+echo "status"
+# Print the envrionment variables relevant to bash autocompletion
+env | grep COMP > /tmp/log
+
+```
+
+Since the script will now print only one value as the suggestion for auto-completion, it will complete
+the `git` command by inserting `status`.
+
+Now, if we go to Terminal 1, we will see the following when we press `$ git <TAB>`:
+
+```
+$ git status
+```
+
+Now, let's go back to Terminal 2, and do:
+
+```
+$ cat /tmp/log
+
+COMP_POINT=4
+COMP_LINE=git 
+COMP_TYPE=9
+COMP_KEY=9
+```
+
+Let's compare the values of these variables to the previous double `<TAB>` suggestion:
+
+- The values of COMP_POINT and COMP_LINE are different are the same as the previous example
+- The value of COMP_KEY is the same, 9 corresponding to the TAB key
+- The value of COMP_TYPE is 9 which corresponds to the ASCII code of the TAB key and 
+  the Bash manual refers to this as "normal" completion.
+
+Update the `/tmp/git_suggestions` script to be as follows:
+
+```
+#!/bin/bash
+
+echo "checkout"
+echo "check"
+
+# Print the envrionment variables relevant to bash autocompletion
+env | grep COMP > /tmp/log
+```
+
+Now, let's go back to Terminal 1, and type in: `$ git <TAB>`, we will now see this:
+
+```
+$ git check
+```
+
+`checkout` and `check` share the common prefix, `check` and hence is inserted at the cursor upon
+pressing a single `<TAB>`.
+
+Let's now update the `/tmp/git_suggestions` script as follows:
+
+```
+#!/bin/bash
+
+echo "checkout"
+echo "branch"
+
+# Print the envrionment variables relevant to bash autocompletion
+env | grep COMP > /tmp/log
+
+```
+
+Now, if we go back to Terminal 1 and type in `$git <TAB>`, we will not see any completion since
+there is no common prefix between the two words "checkout" and "branch". 
+
+Fun fact: If you have your terminal bell turned on and your computer's speaker switched on, you should hear a bell 
+when this happens.
 
 
 ## Getting good old BASH completion back
 
-Now, on Terminal 1, let's install the `bash-completion` package and then exec bash and type, in `$ git <TAB>`
+Now, on Terminal 2, let's install the `bash-completion` package and then exec bash to get a new
+shell. On Terminal 1, run:
+
+```
+$ sudo bpftrace execnsnoop.bt
+
+```
+On Terminal 2, type, in `$ git <TAB>`, we will not see any auto-completion being performed. 
 
 
-On Terminal 2, now we will see something like:
+On Terminal 1, now we will see something like:
 
 ```
 95607      1470  git --list-cmds=list-mainporcelain,others,nohelpers,alias,list-complete,config
 ```
+
+While trying to make auto-completion suggestions, the above command is being executed. However, it
+seems like the suggestions do not have any common prefix, hence no completion is being performed. Let's
+verify that.
+
+
+`commonprefix.py` is a Python program, which we will use to verify this:
+
+```
+# thanks to https://stackoverflow.com/a/6718435
+import fileinput
+import os
+
+suggestions = []
+for line in fileinput.input():
+    suggestions.append(line.rstrip('\n'))
+
+print(os.path.commonprefix(suggestions))
+
+```
+
+Now, let's see if the suggestions had a common prefix:
+
+```
+$ git --list-cmds=list-mainporcelain,others,nohelpers,alias,list-complete,config | python3 commonprefix.py
+```
+
+None, as we can see.
+
+
+
 
 Let's try another command:
 
@@ -195,6 +320,13 @@ On Terminal 2:
 134571     2529  systemctl list-units --full --all
 134776     2536  awk $1 ~ /\.service$/ { sub("\\.service$", "", $1); print $1 }
 134780     2535  systemctl list-units --full --all
+
+
+## `complete` built-in command
+
+## `compgen` built-in command
+
+
 
 ## Putting the pieces together
 
