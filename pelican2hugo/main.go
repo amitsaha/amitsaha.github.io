@@ -48,12 +48,26 @@ func convert2Hugo(articles []string, targetDir string) {
 			if strings.HasPrefix(line, "Date:") {
 				date := strings.Split(line, ":")
 				date[1] = strings.TrimPrefix(date[1], " ")
-				line = "date: \"" + strings.Split(date[1], "")[0] + "\""
+				// date[1] can either be 2018-11-09 hh:mm or 2018-11-09
+				dateSplit := strings.Split(date[1], " ")
+				if len(dateSplit) == 1 {
+					line = "date: " + date[1]
+				}
+				if len(dateSplit) == 2 {
+					line = "date: " + dateSplit[0]
+				}
 			}
 			if strings.HasPrefix(line, ":Date:") {
 				date := strings.Split(line, ":")
 				date[2] = strings.TrimPrefix(date[2], " ")
-				line = "date: \"" + strings.Split(date[2], " ")[0] + "\""
+				// date[2] can either be 2018-11-09 hh:mm or 2018-11-09
+				dateSplit := strings.Split(date[2], " ")
+				if len(dateSplit) == 1 {
+					line = "date: " + date[2]
+				}
+				if len(dateSplit) == 2 {
+					line = "date: " + dateSplit[0]
+				}
 			}
 
 			if strings.HasPrefix(line, "Category:") {
