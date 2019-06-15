@@ -58,13 +58,13 @@ func convert2Hugo(articles []string, targetDir string) {
 
 			if strings.HasPrefix(line, "Category:") {
 				category := strings.Split(line, ":")
-				line = "categories: " + category[1]
+				line = "categories:\n- " + category[1]
 				metadataEnd = true
 			}
 
 			if strings.HasPrefix(line, ":Category:") {
 				category := strings.Split(line, ":")
-				line = "categories: " + category[2]
+				line = "categories:\n- " + category[2]
 				metadataEnd = true
 			}
 
