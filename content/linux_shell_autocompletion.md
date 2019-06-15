@@ -1,3 +1,7 @@
+Title: Notes on Bash auto-completion on Linux
+Date: 2019-06-14
+Category: software
+
 If you are using Bash in default, `vi mode`, this post aims to shed some light on how auto-completions work.
 
 What happens when you press `<command> <TAB>` or `<command> <TAB><TAB>`? You get a bunch of suggestions with one of them
@@ -14,6 +18,9 @@ Let's learn more about the minions that gets to work when we press `<TAB>` or `<
 Let's get a fresh Fedora 30 VM in a Vagrant box and set it up:
 
 ```
+$ # Get fedora vagrant box
+$ # vagrant init
+$ # ..
 $ vagrant up
 ...
 $ vagrant ssh
@@ -154,15 +161,13 @@ COMP_KEY=9
 These environment variables are related to Bash autocompletion:
 
 - `COMP_LINE`: This is the entire line of the command we pressed `<TAB><TAB>` on
-- `COMP_TYPE`: This is the type of completion that is being done, `63` is the ASCII code for `?`. According to the Bash programmable completion manual,
+- `COMP_TYPE`: This is the type of completion that is being done, `63` is the ASCII code for `?`. According to the [manual](https://www.gnu.org/software/bash/manual/html_node/Bash-Variables.html#Bash-Variables),
 this is the operation which will list completions after successive tabs
 - `COMP_KEY`: This is the ASCII code of the key which triggered the auto-completion. 9 [stands for](https://en.wikipedia.org/wiki/Tab_key#Tab_characters)
 the TAB key
 - `COMP_POINT`: This is the cursor position where the `<TAB><TAB>` was pressed
 
-https://www.gnu.org/software/bash/manual/html_node/Bash-Variables.html#Bash-Variables
-
-([show-key](https://linux.die.net/man/1/showkey)) is pretty cool.
+(As an aside, ([show-key](https://linux.die.net/man/1/showkey)) is pretty cool. It shoes you the ASCII code of a presssed key).
 
 ## Single `<TAB>` and double `<TAB><TAB>`
 
@@ -245,7 +250,7 @@ env | grep COMP > /tmp/log
 Now, if we go back to Terminal 1 and type in `$git <TAB>`, we will not see any completion since
 there is no common prefix between the two words "checkout" and "branch". 
 
-Fun fact: If you have your terminal bell turned on and your computer's speaker switched on, you should hear a bell 
+If you have your terminal bell turned on and your computer's speaker switched on, you should hear a bell 
 when this happens.
 
 
@@ -293,42 +298,29 @@ Now, let's see if the suggestions had a common prefix:
 $ git --list-cmds=list-mainporcelain,others,nohelpers,alias,list-complete,config | python3 commonprefix.py
 ```
 
-None, as we can see.
+This verifies that there were no common prefix among all the suggestions and hence <TAB> didn't
+bring up any suggestion.
 
-
-
-
-Let's try another command:
-
-$ systemctl status <TAB>
-
-Terminal 2:
-
-143342     1479  systemctl --system --full --no-legend --no-pager list-unit-files *
-143607     1480  systemctl --system --full --no-legend --no-pager list-units --all *
-
-
-
-And a third command om terminal 1:
-
-$ service <TAB>
-
-On Terminal 2:
-
-
-134569     2530  awk $1 ~ /\.service$/ { sub("\\.service$", "", $1); print $1 }
-134571     2529  systemctl list-units --full --all
-134776     2536  awk $1 ~ /\.service$/ { sub("\\.service$", "", $1); print $1 }
-134780     2535  systemctl list-units --full --all
 
 
 ## `complete` built-in command
 
+Let's revisit the `complete` built-in. Previously, we used `complete -C` to specify a command to be executed
+when an auto-completion is attempted for the `git` command. The next switch we will explore is `complete -p`:
+
+```
+
+```
+
 ## `compgen` built-in command
 
 
+## Other COMP_TYPE values and readline variables
+
 
 ## Putting the pieces together
+
+What does bash-completion package do?
 
 
 
