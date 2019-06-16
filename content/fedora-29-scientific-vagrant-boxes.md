@@ -1,5 +1,5 @@
 Title: Fedora Scientific Vagrant boxes are here!
-Date: 2018-11-1
+Date: 2018-11-01
 Category: fedora
 
 [Fedora Scientific](https://labs.fedoraproject.org/en/scientific/) brings together the most useful open source scientific 

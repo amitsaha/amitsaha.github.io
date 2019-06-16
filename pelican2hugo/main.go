@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -22,7 +23,7 @@ func convert2Hugo(articles []string, targetDir string) {
 		fileExtension := filepath.Ext(article)
 		filename := strings.TrimSuffix(fName, fileExtension)
 
-		f, err := os.Create(filepath.Join(targetDir, filename+"_hugo"+fileExtension))
+		f, err := os.Create(filepath.Join(targetDir, filename+fileExtension))
 		defer f.Close()
 		if err != nil {
 			log.Fatal(err)
@@ -33,16 +34,28 @@ func convert2Hugo(articles []string, targetDir string) {
 
 		scanner := bufio.NewScanner(file)
 		var line string
+		var postTitle string
+
 		for scanner.Scan() {
 			line = string(scanner.Text())
 
 			if strings.HasPrefix(line, "Title:") {
 				title := strings.Split(line, ":")
-				line = "title: " + title[1]
+				line = "title: "
+				postTitle = ""
+				for _, t := range title[1:len(title)] {
+					postTitle += t
+				}
+				line += postTitle
 			}
 			if strings.HasPrefix(line, ":Title:") {
 				title := strings.Split(line, ":")
-				line = "title: " + title[2]
+				line = "title: "
+				postTitle = ""
+				for _, t := range title[2:len(title)] {
+					postTitle += t
+				}
+				line += postTitle
 			}
 
 			if strings.HasPrefix(line, "Date:") {
@@ -86,12 +99,58 @@ func convert2Hugo(articles []string, targetDir string) {
 				log.Fatal(err)
 			}
 
-			_, err := f.WriteString(line + "\n")
-			if err != nil {
-				log.Fatal(err)
+			if strings.HasPrefix(line, ".. code-include::") {
+				f.WriteString(".. code::\n\n")
+				filePath := strings.Split(line, "::")[1]
+				filePath = strings.TrimPrefix(filePath, " ")
+				filePath = strings.TrimRight(filePath, "\n")
+
+				f1, err := os.Open(filePath)
+				if err != nil {
+					log.Fatal(err)
+				}
+				defer f1.Close()
+
+				scanner := bufio.NewScanner(f1)
+
+				for scanner.Scan() {
+					l := "   " + string(scanner.Text()) + "\n"
+					_, err := f.WriteString(l)
+					if err != nil {
+						log.Fatal(err)
+					}
+				}
+			} else if strings.HasPrefix(line, ":lexer:") {
+				continue
+			} else {
+
+				_, err := f.WriteString(line + "\n")
+				if err != nil {
+					log.Fatal(err)
+				}
 			}
 
 			if metadataEnd {
+				_, err := f.WriteString("aliases:\n")
+				if err != nil {
+					log.Fatal(err)
+				}
+
+				postTitle = strings.TrimPrefix(postTitle, " ")
+
+				dashed := strings.ReplaceAll(postTitle, " ", "-")
+				dashedLower := strings.ToLower(dashed)
+
+				specialChars := []string{".", "'", "+", "`", ":", "/", "!", ",", "(", ")", "?"}
+				transformedString := dashedLower
+				for _, c := range specialChars {
+					transformedString = strings.ReplaceAll(transformedString, c, "")
+				}
+
+				_, err = f.WriteString(fmt.Sprintf("- /%s\n", transformedString+".html"))
+				if err != nil {
+					log.Fatal(err)
+				}
 				f.WriteString("---\n")
 				metadataEnd = false
 			}
