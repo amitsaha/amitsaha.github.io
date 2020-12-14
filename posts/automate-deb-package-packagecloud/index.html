@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title> Automatic building and publishing DEB packages for Golang applications | Exploring Software</title>
+  <meta name="description" content="echo $RANDOM. Exploring Software and writing about it.">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="all,follow">
+  <meta name="googlebot" content="index,follow,snippet,archive">
+  <meta property="og:title" content="Automatic building and publishing DEB packages for Golang applications" />
+<meta property="og:description" content="In my earlier post, Quick and dirty debian packages for your Golang application I shared a recipe building DEB packages for Golang applications. We are going to see the following things in this post building upon our recipe in that post:
+ Building the DEB packages in Travis CI Publishing the DEB package to packagecloud.io  The primary assumption in my first post was using dep for dependency management. That still holds here." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://echorand.me/posts/automate-deb-package-packagecloud/" />
+<meta property="article:published_time" content="2018-02-24T00:00:00+00:00" />
+<meta property="article:modified_time" content="2019-07-11T16:52:00+10:00" />
+
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Automatic building and publishing DEB packages for Golang applications"/>
+<meta name="twitter:description" content="In my earlier post, Quick and dirty debian packages for your Golang application I shared a recipe building DEB packages for Golang applications. We are going to see the following things in this post building upon our recipe in that post:
+ Building the DEB packages in Travis CI Publishing the DEB package to packagecloud.io  The primary assumption in my first post was using dep for dependency management. That still holds here."/>
+
+  
+  
+  
+  <link rel="stylesheet" href="https://echorand.me/css/style-white.css">
+  
+  
+  
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  
+
+  
+<link rel="icon" type="image/png" href="https://echorand.me/images/favicon.ico" />
+
+  
+  
+  
+  
+  
+    
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-108901610-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+  
+  
+</head>
+
+<body class="max-width mx-auto px3 ltr">
+  <div class="content index py4">
+
+  <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+        <li><a href="/about">About</a></li>
+         
+        <li><a href="/articles">Articles</a></li>
+         
+        <li><a href="/books">Books</a></li>
+         
+        <li><a href="/posts">Posts</a></li>
+         
+        <li><a href="/talks">Talks</a></li>
+         
+        <li><a href="/categories/">Categories</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li>
+          <a class="icon" href=" https://echorand.me/posts/python-rlo/">
+            <i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i>
+          </a>
+        </li>
+        
+        
+        <li>
+          <a class="icon" href="https://echorand.me/posts/aws-assume-iam-role-from-another/">
+            <i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i>
+          </a>
+        </li>
+        
+        <li>
+          <a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');">
+            <i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i>
+          </a>
+        </li>
+        <li>
+          <a class="icon" href="#">
+            <i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i>
+          </a>
+        </li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      
+      <ul>
+  
+  
+    
+  
+  
+  <li>
+    <a class="icon" href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fechorand.me%2fposts%2fautomate-deb-package-packagecloud%2f">
+      <i class="fab fa-facebook " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://twitter.com/share?url=https%3a%2f%2fechorand.me%2fposts%2fautomate-deb-package-packagecloud%2f&text=Automatic%20building%20and%20publishing%20DEB%20packages%20for%20Golang%20applications">
+      <i class="fab fa-twitter " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fechorand.me%2fposts%2fautomate-deb-package-packagecloud%2f&title=Automatic%20building%20and%20publishing%20DEB%20packages%20for%20Golang%20applications">
+      <i class="fab fa-linkedin " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fechorand.me%2fposts%2fautomate-deb-package-packagecloud%2f&is_video=false&description=Automatic%20building%20and%20publishing%20DEB%20packages%20for%20Golang%20applications">
+      <i class="fab fa-pinterest " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="mailto:?subject=Automatic%20building%20and%20publishing%20DEB%20packages%20for%20Golang%20applications&body=Check out this article: https%3a%2f%2fechorand.me%2fposts%2fautomate-deb-package-packagecloud%2f">
+      <i class="fas fa-envelope " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://getpocket.com/save?url=https%3a%2f%2fechorand.me%2fposts%2fautomate-deb-package-packagecloud%2f&title=Automatic%20building%20and%20publishing%20DEB%20packages%20for%20Golang%20applications">
+      <i class="fab fa-get-pocket " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://reddit.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fautomate-deb-package-packagecloud%2f&title=Automatic%20building%20and%20publishing%20DEB%20packages%20for%20Golang%20applications">
+      <i class="fab fa-reddit " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.stumbleupon.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fautomate-deb-package-packagecloud%2f&title=Automatic%20building%20and%20publishing%20DEB%20packages%20for%20Golang%20applications">
+      <i class="fab fa-stumbleupon " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://digg.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fautomate-deb-package-packagecloud%2f&title=Automatic%20building%20and%20publishing%20DEB%20packages%20for%20Golang%20applications">
+      <i class="fab fa-digg " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.tumblr.com/share/link?url=https%3a%2f%2fechorand.me%2fposts%2fautomate-deb-package-packagecloud%2f&name=Automatic%20building%20and%20publishing%20DEB%20packages%20for%20Golang%20applications&description=In%20my%20earlier%20post%2c%20Quick%20and%20dirty%20debian%20packages%20for%20your%20Golang%20application%20I%20shared%20a%20recipe%20building%20DEB%20packages%20for%20Golang%20applications.%20We%20are%20going%20to%20see%20the%20following%20things%20in%20this%20post%20building%20upon%20our%20recipe%20in%20that%20post%3a%0a%20Building%20the%20DEB%20packages%20in%20Travis%20CI%20Publishing%20the%20DEB%20package%20to%20packagecloud.io%20%20The%20primary%20assumption%20in%20my%20first%20post%20was%20using%20dep%20for%20dependency%20management.%20That%20still%20holds%20here.">
+      <i class="fab fa-tumblr " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fechorand.me%2fposts%2fautomate-deb-package-packagecloud%2f&t=Automatic%20building%20and%20publishing%20DEB%20packages%20for%20Golang%20applications">
+      <i class="fab fa-hacker-news " aria-hidden="true"></i>
+    </a>
+  </li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <nav id="TableOfContents"></nav>
+    </div>
+  </span>
+</div>
+
+
+  <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+    <header>
+      <h1 class="posttitle" itemprop="name headline">
+        Automatic building and publishing DEB packages for Golang applications
+      </h1>
+      <div class="meta">
+        
+        <div class="postdate">
+          
+          <time datetime="2018-02-24 00:00:00 &#43;0000 UTC" itemprop="datePublished">2018-02-24</time>
+          
+        </div>
+        
+        <div class="article-category">
+            <i class="fas fa-archive"></i>
+            
+            
+            <a class="category-link" href="/categories/golang">golang</a>
+            
+        </div>
+        
+        
+      </div>
+    </header>
+
+  
+    <div class="content" itemprop="articleBody">
+      <p>In my earlier post, <a href="http://echorand.me/quick-and-dirty-debian-packages-for-your-golang-application.html">Quick and dirty debian packages for your Golang application</a>
+I shared a recipe building DEB packages for Golang applications. We are going to see the following things in this post building
+upon our recipe in that post:</p>
+<ul>
+<li>Building the DEB packages in <a href="https://travis-ci.org/amitsaha/golang-packaging-demo">Travis CI</a></li>
+<li>Publishing the DEB package to <a href="https://packagecloud.io">packagecloud.io</a></li>
+</ul>
+<p>The primary assumption in my first post was using <a href="https://golang.github.io/dep/">dep</a> for dependency management.
+That still holds here.</p>
+<h1 id="building-the-deb-packages-in-travis-ci">Building the DEB packages in Travis CI</h1>
+<p>To let Travis build the DEB package, we add a <code>.travis.yml</code> file to our <a href="https://github.com/amitsaha/golang-packaging-demo">git repository</a>
+with the following contents:</p>
+<pre><code># This gives us full control over what we intend to do
+# in the job
+language: minimal
+sudo: required
+services:
+  - docker
+addons:
+  apt:
+    packages:
+      - docker-ce
+script:
+  - make build-deb DEB_PACKAGE_DESCRIPTION=&quot;Logrus Demo&quot; DEB_PACKAGE_NAME=demo BINARY_NAME=demo
+
+</code></pre><p>The recipe I shared in my earlier post used a script, <code>build-deb-docker.sh</code> to build the DEB package. We invoked
+it via the <code>Makefile</code> targte, <code>build-deb</code>. We do the same here in the <code>.travis.yml</code> file&rsquo;s script section. However,
+as opposed to the first post where I was using two separate dockerfiles, I switched to using docker&rsquo;s
+<a href="https://docs.docker.com/develop/develop-images/multistage-build/">multi stage builds</a> feature and hence used
+a single Dockerfile. To use this docker feature, I update the <code>docker</code> engine to the latest release via the following
+above:</p>
+<pre><code>addons:
+  apt:
+    ...
+</code></pre><p>The above creates the DEB package and places it in the <code>artifacts</code> directory.</p>
+<h1 id="publishing-deb-package-to-packagecloudio">Publishing DEB package to packagecloud.io</h1>
+<p>We have built our package now and we are going to push it to a repository created on <a href="https://packagecloud.io">pacakagecloud.io</a>. The first step is to create a repostiory by logging in - let&rsquo;s call it <code>logrus-demo</code>'
+and update our <code>.travis.yml</code> as follows:</p>
+<pre><code>deploy:
+  provider: packagecloud
+  repository: logrus-demo 
+  username: amitsaha
+  token: &quot;${PACKAGECLOUD_TOKEN}&quot;
+  dist: &quot;ubuntu/xenial&quot;   
+  local-dir: &quot;./artifacts&quot;
+  package_glob: &quot;*.deb&quot;
+  skip_cleanup: true
+  on:
+    branch: master
+</code></pre><p>In the above configuration, we specify the packagecloud.io <code>username</code>, the API <code>token</code>, the <code>dist</code> we are publishing
+the package for. See <a href="https://packagecloud.io/docs#anchor-debian">here</a> and <a href="https://packagecloud.io/docs#anchor-ubuntu">here</a>
+to learn more about this. <code>local-dir</code> specifies where the packages are and <code>package_glob</code> allows us to specify what
+file patterns we want to push to the repository. <code>skip_cleanup</code> ensures we don&rsquo;t cleanup the working directory
+and we restrict the deploy to only happen on pushes to the <code>master</code> branch.</p>
+<p>We will have add an environment variable, <code>PACKAGECLOUD_TOKEN</code> in the Travis CI&rsquo;s repository
+settings (<a href="https://travis-ci.org/">https://travis-ci.org/</a><!-- raw HTML omitted -->settings) and set it&rsquo;s value to the packagecloud.io API token.
+The value of your API token can be found by going to your <a href="https://packagecloud.io/api_token">packagecloud API token</a>
+page.</p>
+<p>At this stage we are all set. If we trigger a new build, it should build the DEB and deploy the package to your
+packagecloud.io repository. You should see your package in your repo similar to <a href="https://packagecloud.io/amitsaha/logrus-demo">mine</a>.</p>
+<h1 id="installing-the-package">Installing the package</h1>
+<p>Once the package is pushed, let&rsquo;s try installing it from our packagecloud.io repository. Helpful instructions
+are provided on how you can add the repository to your distribution:</p>
+<p><img src="%7Bfilename%7D/images/package_cloud1.png" alt="Repository setup" title="Repository setup instructions"></p>
+<p>Let&rsquo;s try the manual step:</p>
+<pre><code>root@c9b3de968621:/# curl -s https://packagecloud.io/install/repositories/amitsaha/logrus-demo/script.deb.sh | bash
+Detected operating system as Ubuntu/xenial.
+Checking for curl...
+Detected curl...
+Checking for gpg...
+Detected gpg...
+Running apt-get update... done.
+Installing apt-transport-https... done.
+Installing /etc/apt/sources.list.d/amitsaha_logrus-demo.list...done.
+Importing packagecloud gpg key... done.
+Running apt-get update... done.
+
+The repository is setup! You can now install packages.
+</code></pre><p>Our package is called <code>demo</code>, so let&rsquo;s install it:</p>
+<pre><code>root@c9b3de968621:/# apt install demo
+Reading package lists... Done
+Building dependency tree
+Reading state information... Done
+The following NEW packages will be installed:
+  demo
+0 upgraded, 1 newly installed, 0 to remove and 20 not upgraded.
+Need to get 842 kB of archives.
+After this operation, 2483 kB of additional disk space will be used.
+Get:1 https://packagecloud.io/amitsaha/logrus-demo/ubuntu xenial/main amd64 demo amd64 0.1-e7b1650 [842 kB]
+Fetched 842 kB in 5s (143 kB/s)
+debconf: delaying package configuration, since apt-utils is not installed
+Selecting previously unselected package demo.
+(Reading database ... 5291 files and directories currently installed.)
+Preparing to unpack .../demo_0.1-e7b1650_amd64.deb ...
+Unpacking demo (0.1-e7b1650) ...
+Setting up demo (0.1-e7b1650) ...
+
+</code></pre><p>And let&rsquo;s run it now:</p>
+<pre><code>$ demo
+INFO[0000] I love logrus!
+
+</code></pre><h1 id="references">References</h1>
+<ul>
+<li><a href="https://docs.travis-ci.com/user/getting-started">Get started with Travis CI</a></li>
+<li><a href="http://echorand.me/quick-and-dirty-debian-packages-for-your-golang-application.html">Quick and dirty debian packages for your Golang application
+</a></li>
+<li><a href="https://github.com/amitsaha/golang-packaging-demo">Example repo</a></li>
+</ul>
+<h1 id="acknowledegements">Acknowledegements</h1>
+<p>Thanks <a href="https://packagecloud.io">packagecloud.io</a> for setting me up with their open source plan!</p>
+
+    </div>
+  </article>
+
+  
+  
+
+
+
+
+
+  <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/about">About</a></li>
+         
+          <li><a href="/articles">Articles</a></li>
+         
+          <li><a href="/books">Books</a></li>
+         
+          <li><a href="/posts">Posts</a></li>
+         
+          <li><a href="/talks">Talks</a></li>
+         
+          <li><a href="/categories/">Categories</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <nav id="TableOfContents"></nav>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      
+      <ul>
+  
+  
+    
+  
+  
+  <li>
+    <a class="icon" href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fechorand.me%2fposts%2fautomate-deb-package-packagecloud%2f">
+      <i class="fab fa-facebook fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://twitter.com/share?url=https%3a%2f%2fechorand.me%2fposts%2fautomate-deb-package-packagecloud%2f&text=Automatic%20building%20and%20publishing%20DEB%20packages%20for%20Golang%20applications">
+      <i class="fab fa-twitter fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fechorand.me%2fposts%2fautomate-deb-package-packagecloud%2f&title=Automatic%20building%20and%20publishing%20DEB%20packages%20for%20Golang%20applications">
+      <i class="fab fa-linkedin fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fechorand.me%2fposts%2fautomate-deb-package-packagecloud%2f&is_video=false&description=Automatic%20building%20and%20publishing%20DEB%20packages%20for%20Golang%20applications">
+      <i class="fab fa-pinterest fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="mailto:?subject=Automatic%20building%20and%20publishing%20DEB%20packages%20for%20Golang%20applications&body=Check out this article: https%3a%2f%2fechorand.me%2fposts%2fautomate-deb-package-packagecloud%2f">
+      <i class="fas fa-envelope fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://getpocket.com/save?url=https%3a%2f%2fechorand.me%2fposts%2fautomate-deb-package-packagecloud%2f&title=Automatic%20building%20and%20publishing%20DEB%20packages%20for%20Golang%20applications">
+      <i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://reddit.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fautomate-deb-package-packagecloud%2f&title=Automatic%20building%20and%20publishing%20DEB%20packages%20for%20Golang%20applications">
+      <i class="fab fa-reddit fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.stumbleupon.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fautomate-deb-package-packagecloud%2f&title=Automatic%20building%20and%20publishing%20DEB%20packages%20for%20Golang%20applications">
+      <i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://digg.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fautomate-deb-package-packagecloud%2f&title=Automatic%20building%20and%20publishing%20DEB%20packages%20for%20Golang%20applications">
+      <i class="fab fa-digg fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.tumblr.com/share/link?url=https%3a%2f%2fechorand.me%2fposts%2fautomate-deb-package-packagecloud%2f&name=Automatic%20building%20and%20publishing%20DEB%20packages%20for%20Golang%20applications&description=In%20my%20earlier%20post%2c%20Quick%20and%20dirty%20debian%20packages%20for%20your%20Golang%20application%20I%20shared%20a%20recipe%20building%20DEB%20packages%20for%20Golang%20applications.%20We%20are%20going%20to%20see%20the%20following%20things%20in%20this%20post%20building%20upon%20our%20recipe%20in%20that%20post%3a%0a%20Building%20the%20DEB%20packages%20in%20Travis%20CI%20Publishing%20the%20DEB%20package%20to%20packagecloud.io%20%20The%20primary%20assumption%20in%20my%20first%20post%20was%20using%20dep%20for%20dependency%20management.%20That%20still%20holds%20here.">
+      <i class="fab fa-tumblr fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fechorand.me%2fposts%2fautomate-deb-package-packagecloud%2f&t=Automatic%20building%20and%20publishing%20DEB%20packages%20for%20Golang%20applications">
+      <i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+      
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;">
+          <i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;">
+          <i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;">
+          <i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');">
+          <i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+
+  <footer id="footer">
+  <div class="footer-left">
+    Copyright  &copy; 2020  Exploring Software 
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+        <li><a href="/about">About</a></li>
+         
+        <li><a href="/articles">Articles</a></li>
+         
+        <li><a href="/books">Books</a></li>
+         
+        <li><a href="/posts">Posts</a></li>
+         
+        <li><a href="/talks">Talks</a></li>
+         
+        <li><a href="/categories/">Categories</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+
+  </div>
+</body>
+
+<link rel="stylesheet" href=/lib/font-awesome/css/all.min.css>
+<script src=/lib/jquery/jquery.min.js></script>
+<script src=/js/main.js></script>
+
+
+
+</html>

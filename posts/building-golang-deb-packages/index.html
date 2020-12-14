@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title> Quick and dirty debian packages for your Golang application | Exploring Software</title>
+  <meta name="description" content="echo $RANDOM. Exploring Software and writing about it.">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="all,follow">
+  <meta name="googlebot" content="index,follow,snippet,archive">
+  <meta property="og:title" content="Quick and dirty debian packages for your Golang application" />
+<meta property="og:description" content="In this post, we will learn about a quick and easy workflow for building and deploying your golang applications as Debian packages. The packages produced will not be official quality DEB packages.
+Assumptions I have been using dep for dependency management, and I assume that you are doing the same. Other dependency management solutions should work with only the specific bits of the workflow swapped out to suit the one you may be using." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://echorand.me/posts/building-golang-deb-packages/" />
+<meta property="article:published_time" content="2018-01-25T00:00:00+00:00" />
+<meta property="article:modified_time" content="2019-07-11T16:52:00+10:00" />
+
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Quick and dirty debian packages for your Golang application"/>
+<meta name="twitter:description" content="In this post, we will learn about a quick and easy workflow for building and deploying your golang applications as Debian packages. The packages produced will not be official quality DEB packages.
+Assumptions I have been using dep for dependency management, and I assume that you are doing the same. Other dependency management solutions should work with only the specific bits of the workflow swapped out to suit the one you may be using."/>
+
+  
+  
+  
+  <link rel="stylesheet" href="https://echorand.me/css/style-white.css">
+  
+  
+  
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  
+
+  
+<link rel="icon" type="image/png" href="https://echorand.me/images/favicon.ico" />
+
+  
+  
+  
+  
+  
+    
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-108901610-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+  
+  
+</head>
+
+<body class="max-width mx-auto px3 ltr">
+  <div class="content index py4">
+
+  <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+        <li><a href="/about">About</a></li>
+         
+        <li><a href="/articles">Articles</a></li>
+         
+        <li><a href="/books">Books</a></li>
+         
+        <li><a href="/posts">Posts</a></li>
+         
+        <li><a href="/talks">Talks</a></li>
+         
+        <li><a href="/categories/">Categories</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li>
+          <a class="icon" href=" https://echorand.me/posts/python-prometheus-monitoring-options/">
+            <i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i>
+          </a>
+        </li>
+        
+        
+        <li>
+          <a class="icon" href="https://echorand.me/posts/clean_up_variable_attribute/">
+            <i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i>
+          </a>
+        </li>
+        
+        <li>
+          <a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');">
+            <i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i>
+          </a>
+        </li>
+        <li>
+          <a class="icon" href="#">
+            <i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i>
+          </a>
+        </li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      
+      <ul>
+  
+  
+    
+  
+  
+  <li>
+    <a class="icon" href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fechorand.me%2fposts%2fbuilding-golang-deb-packages%2f">
+      <i class="fab fa-facebook " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://twitter.com/share?url=https%3a%2f%2fechorand.me%2fposts%2fbuilding-golang-deb-packages%2f&text=Quick%20and%20dirty%20debian%20packages%20for%20your%20Golang%20application">
+      <i class="fab fa-twitter " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fechorand.me%2fposts%2fbuilding-golang-deb-packages%2f&title=Quick%20and%20dirty%20debian%20packages%20for%20your%20Golang%20application">
+      <i class="fab fa-linkedin " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fechorand.me%2fposts%2fbuilding-golang-deb-packages%2f&is_video=false&description=Quick%20and%20dirty%20debian%20packages%20for%20your%20Golang%20application">
+      <i class="fab fa-pinterest " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="mailto:?subject=Quick%20and%20dirty%20debian%20packages%20for%20your%20Golang%20application&body=Check out this article: https%3a%2f%2fechorand.me%2fposts%2fbuilding-golang-deb-packages%2f">
+      <i class="fas fa-envelope " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://getpocket.com/save?url=https%3a%2f%2fechorand.me%2fposts%2fbuilding-golang-deb-packages%2f&title=Quick%20and%20dirty%20debian%20packages%20for%20your%20Golang%20application">
+      <i class="fab fa-get-pocket " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://reddit.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fbuilding-golang-deb-packages%2f&title=Quick%20and%20dirty%20debian%20packages%20for%20your%20Golang%20application">
+      <i class="fab fa-reddit " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.stumbleupon.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fbuilding-golang-deb-packages%2f&title=Quick%20and%20dirty%20debian%20packages%20for%20your%20Golang%20application">
+      <i class="fab fa-stumbleupon " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://digg.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fbuilding-golang-deb-packages%2f&title=Quick%20and%20dirty%20debian%20packages%20for%20your%20Golang%20application">
+      <i class="fab fa-digg " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.tumblr.com/share/link?url=https%3a%2f%2fechorand.me%2fposts%2fbuilding-golang-deb-packages%2f&name=Quick%20and%20dirty%20debian%20packages%20for%20your%20Golang%20application&description=In%20this%20post%2c%20we%20will%20learn%20about%20a%20quick%20and%20easy%20workflow%20for%20building%20and%20deploying%20your%20golang%20applications%20as%20Debian%20packages.%20The%20packages%20produced%20will%20not%20be%20official%20quality%20DEB%20packages.%0aAssumptions%20I%20have%20been%20using%20dep%20for%20dependency%20management%2c%20and%20I%20assume%20that%20you%20are%20doing%20the%20same.%20Other%20dependency%20management%20solutions%20should%20work%20with%20only%20the%20specific%20bits%20of%20the%20workflow%20swapped%20out%20to%20suit%20the%20one%20you%20may%20be%20using.">
+      <i class="fab fa-tumblr " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fechorand.me%2fposts%2fbuilding-golang-deb-packages%2f&t=Quick%20and%20dirty%20debian%20packages%20for%20your%20Golang%20application">
+      <i class="fab fa-hacker-news " aria-hidden="true"></i>
+    </a>
+  </li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <nav id="TableOfContents"></nav>
+    </div>
+  </span>
+</div>
+
+
+  <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+    <header>
+      <h1 class="posttitle" itemprop="name headline">
+        Quick and dirty debian packages for your Golang application
+      </h1>
+      <div class="meta">
+        
+        <div class="postdate">
+          
+          <time datetime="2018-01-25 00:00:00 &#43;0000 UTC" itemprop="datePublished">2018-01-25</time>
+          
+        </div>
+        
+        <div class="article-category">
+            <i class="fas fa-archive"></i>
+            
+            
+            <a class="category-link" href="/categories/golang">golang</a>
+            
+        </div>
+        
+        
+      </div>
+    </header>
+
+  
+    <div class="content" itemprop="articleBody">
+      <p>In this post, we will learn about a quick and easy workflow for
+building and deploying your golang applications as Debian packages.
+The packages produced will not be official quality DEB packages.</p>
+<h1 id="assumptions">Assumptions</h1>
+<p>I have been using <a href="https://golang.github.io/dep/">dep</a> for dependency management, and I assume that
+you are doing the same. Other dependency management solutions should
+work with only the specific bits of the workflow swapped out to suit
+the one you may be using. I also assume that you have <code>make</code> and
+a recent <code>golang</code> toolset installed, and use <code>git</code> as your
+version control.</p>
+<p>If you want to integrate my workflow into an existing project,
+please skip ahead to the second use case and then read back.</p>
+<h1 id="use-case-1-new-golang-application-project">Use case #1: New golang application project</h1>
+<p>Create a new directory which will be the home of our new project.
+Since we are going to use <a href="https://golang.github.io/dep/">dep</a>, it has to be somewhere in our
+<code>GOPATH</code>. In my case, I will assume it is in
+<code>$GOPATH/src/github.com/amitsaha/packaging-demo</code>. The first file,
+I will create is a <code>main.go</code> which looks like this:</p>
+<pre><code>package main
+
+import (
+	log &quot;github.com/sirupsen/logrus&quot;
+)
+
+func main() {
+	log.Info(&quot;I love logrus!&quot;)
+}
+</code></pre><p>This is a simple program, but it uses a thirdy party package
+<a href="https://github.com/sirupsen/logrus">logrus</a> (which is awesome btw).</p>
+<p><strong>Workflow - Step #1</strong></p>
+<p>Now, we come to the first step of our workflow - create a file
+called <code>Makefile</code> with the following contents:</p>
+<pre><code>GOPATH := $(shell go env GOPATH)
+GODEP_BIN := $(GOPATH)/bin/dep
+GOLINT := $(GOPATH)/bin/golint
+VERSION := $(shell cat VERSION)-$(shell git rev-parse --short HEAD)
+
+packages = $$(go list ./... | egrep -v '/vendor/')
+files = $$(find . -name '*.go' | egrep -v '/vendor/')
+
+ifeq &quot;$(HOST_BUILD)&quot; &quot;yes&quot;
+	# Use host system for building
+	BUILD_SCRIPT =./build-deb-host.sh
+else
+	# Use docker for building
+	BUILD_SCRIPT = ./build-deb-docker.sh
+endif
+
+
+.PHONY: all
+all: lint vet test build 
+
+$(GODEP):
+	go get -u github.com/golang/dep/cmd/dep
+
+Gopkg.toml: $(GODEP)
+	$(GODEP_BIN) init
+
+vendor:         # Vendor the packages using dep
+vendor: $(GODEP) Gopkg.toml Gopkg.lock
+	@ echo &quot;No vendor dir found. Fetching dependencies now...&quot;
+	GOPATH=$(GOPATH):. $(GODEP_BIN) ensure
+
+version:
+	@ echo $(VERSION)
+
+build:          # Build the binary
+build: vendor
+	test $(BINARY_NAME)
+	go build -o $(BINARY_NAME) -ldflags &quot;-X main.Version=$(VERSION)&quot; 
+
+build-deb:      # Build DEB package (needs other tools)
+	test $(BINARY_NAME)
+	test $(DEB_PACKAGE_NAME)
+	test &quot;$(DEB_PACKAGE_DESCRIPTION)&quot;
+	exec ${BUILD_SCRIPT}
+	
+test: vendor
+	go test -race $(packages)
+
+vet:            # Run go vet
+vet: vendor
+	go tool vet -printfuncs=Debug,Debugf,Debugln,Info,Infof,Infoln,Error,Errorf,Errorln $(files)
+
+lint:           # Run go lint
+lint: vendor $(GOLINT)
+	$(GOLINT) -set_exit_status $(packages)
+$(GOLINT):
+	go get -u github.com/golang/lint/golint
+
+clean:
+	test $(BINARY_NAME)
+	rm -f $(BINARY_NAME) 
+
+help:           # Show this help
+	@fgrep -h &quot;#&quot; $(MAKEFILE_LIST) | fgrep -v fgrep | sed -e 's/\\$$//' | sed -e 's/#//'
+</code></pre><p><strong>Workflow - Step #2</strong></p>
+<p>Next, we will create a file called <code>VERSION</code> in the project
+directory and write a string such as <code>0.1</code> into it:</p>
+<pre><code>$ echo &quot;0.1&quot; &gt; VERSION
+</code></pre><p>This will be our major version.</p>
+<p><strong>Workflow - Step #3</strong></p>
+<p>Initialize a git repository in the application directory:</p>
+<pre><code>$ git init
+</code></pre><p>And we will make a first commit:</p>
+<pre><code>$ git add -A .
+$ git commit -m &quot;Initial commit&quot;
+</code></pre><p><strong>Workflow - Step #4</strong></p>
+<p>Let&rsquo;s first try and see what our <code>Makefile</code> allows us to do:</p>
+<pre><code>$ make help
+vendor:          Vendor the packages using dep
+build:           Build the binary
+build-deb:       Build DEB package (needs other tools)
+vet:             Run go vet
+lint:            Run go lint
+help:            Show this help
+</code></pre><p>Let&rsquo;s now use the <code>build</code> target to build a binary of our application:</p>
+<pre><code>$ make build BINARY_NAME=demo
+/home/asaha/go/bin/dep init
+  Using ^1.0.4 as constraint for direct dep github.com/sirupsen/logrus
+  Locking in v1.0.4 (d682213) for direct dep github.com/sirupsen/logrus
+  Locking in master (3d37316) for transitive dep golang.org/x/crypto
+  Locking in master (af9a212) for transitive dep golang.org/x/sys
+No vendor dir found. Fetching dependencies now...
+GOPATH=/home/asaha/go:. /home/asaha/go/bin/dep ensure
+test demo
+go build -o demo -ldflags &quot;-X main.Version=0.1-c3c6990&quot;
+</code></pre><p>Let&rsquo;s now run the <code>demo</code> binary that was created for us:</p>
+<pre><code>$ ./demo
+INFO[0000] I love logrus!
+</code></pre><p>Great! We have built a binary of our application and since it is
+a statically linked binary, we are ready to deploy it to our
+servers - after one last step.</p>
+<p><strong>Workflow - Step #5</strong></p>
+<p>To package the application binary as a debian package, we will
+use <a href="https://github.com/jordansissel/fpm">fpm</a>. At this stage, my workflow supports any of the
+following approaches:</p>
+<ul>
+<li>Install <code>fpm</code> on our host system</li>
+<li>Use <code>docker</code></li>
+</ul>
+<p>The second approach has the advantage that it will work the same
+anywhere once you have <code>docker</code> engine installed and running.</p>
+<p>If you don&rsquo;t care about using <code>docker</code>, create a file, <code>build-deb-host.sh</code> with the following contents and mark it as executable:</p>
+<pre><code>#!/bin/bash
+set -xe
+
+BUILD_ARTIFACTS_DIR=&quot;artifacts&quot;
+version=`git rev-parse --short HEAD`
+VERSION_STRING=&quot;$(cat VERSION)-${version}&quot;
+
+
+# check all the required environment variables are supplied
+[ -z &quot;$BINARY_NAME&quot; ] &amp;&amp; echo &quot;Need to set BINARY_NAME&quot; &amp;&amp; exit 1;
+[ -z &quot;$DEB_PACKAGE_NAME&quot; ] &amp;&amp; echo &quot;Need to set DEB_PACKAGE_NAME&quot; &amp;&amp; exit 1;
+[ -z &quot;$DEB_PACKAGE_DESCRIPTION&quot; ] &amp;&amp; echo &quot;Need to set DEB_PACKAGE_DESCRIPTION&quot; &amp;&amp; exit 1;
+
+if which go; then
+    make build BINARY_NAME=${BINARY_NAME}
+    echo &quot;Binary built. Building DEB now.&quot;
+else
+    echo &quot;golang not installed or not reachable&quot;
+    exit 1
+fi
+
+mkdir -p $BUILD_ARTIFACTS_DIR &amp;&amp; cp $BINARY_NAME $BUILD_ARTIFACTS_DIR
+if which fpm; then
+    fpm --output-type deb \
+      --input-type dir --chdir /$BUILD_ARTIFACTS_DIR \
+      --prefix /usr/bin --name $BINARY_NAME \
+      --version $VERSION_STRING \
+      --description '${DEB_PACKAGE_DESCRIPTION}' \
+      -p ${DEB_PACKAGE_NAME}-${VERSION_STRING}.deb \
+      $BINARY_NAME &amp;&amp; cp *.deb /$BUILD_ARTIFACTS_DIR/
+    rm -f $BUILD_ARTIFACTS_DIR/$BINARY_NAME
+else
+    echo &quot;fpm not installed or not reachable&quot;
+    exit 1
+fi
+</code></pre><p>Now, we can build a debian package as follows:</p>
+<pre><code>$ make build-deb DEB_PACKAGE_DESCRIPTION=&quot;Logrus Demo&quot; DEB_PACKAGE_NA
+ME=demo BINARY_NAME=demo HOST_BUILD=yes
+...
+</code></pre><p>You will see the resulting debian package in <code>ARTIFCATS</code> sub-directory.</p>
+<p>In addition or to have a way to build debians where you don&rsquo;t
+want to worry about having to install golang toolchain or fpm
+manually, <code>docker</code> comes to the rescue. We will create the following
+additional files:</p>
+<p><code>Dockerfile-go</code>:</p>
+<pre><code>FROM golang:1.9
+RUN go get -u github.com/golang/dep/cmd/dep
+ENV PACKAGE_PATH $GOPATH/src/git.host/mypackage
+RUN mkdir -p  $PACKAGE_PATH
+COPY . $PACKAGE_PATH
+WORKDIR $PACKAGE_PATH
+ARG version_string
+ARG binary_name
+RUN dep ensure &amp;&amp; go build -o $GOPATH/bin/${binary_name} -ldflags &quot;-X main.Version=${version_string}&quot; &amp;&amp; cp $GOPATH/bin/${binary_name} /${binary_name}
+ENTRYPOINT &quot;/${binary_name}&quot;
+</code></pre><p><code>Dockerfile-fpm</code>:</p>
+<pre><code>FROM ruby:2.3
+RUN  gem install --quiet --no-document fpm
+
+ARG binary_name
+ARG deb_package_name
+ARG version_string
+ARG deb_package_description
+
+RUN mkdir /deb-package
+ADD $binary_name /deb-package/
+RUN mkdir dpkg-source
+WORKDIR dpkg-source
+RUN fpm --output-type deb \
+  --input-type dir --chdir /deb-package \
+  --prefix /usr/bin --name $binary_name \
+  --version $version_string \
+  --description '${deb_package_description}' \
+  -p ${deb_package_name}-${version_string}.deb \
+  $binary_name &amp;&amp; cp *.deb /deb-package/
+CMD [&quot;/bin/bash&quot;]
+</code></pre><p><code>build-deb-docker.sh</code>:</p>
+<pre><code>#!/bin/bash
+set -xe
+
+if ! which docker; then
+    echo &quot;docker engine not installed&quot;
+    exit 1
+fi
+# Check if we have docker running and accessible
+# as the current user
+# If not bail out with the default error message
+docker ps
+
+BUILD_IMAGE='amitsaha/golang-binary-builder'
+FPM_IMAGE='amitsaha/golang-deb-builder'
+BUILD_ARTIFACTS_DIR=&quot;artifacts&quot;
+
+version=`git rev-parse --short HEAD`
+VERSION_STRING=&quot;$(cat VERSION)-${version}&quot;
+
+
+# check all the required environment variables are supplied
+[ -z &quot;$BINARY_NAME&quot; ] &amp;&amp; echo &quot;Need to set BINARY_NAME&quot; &amp;&amp; exit 1;
+[ -z &quot;$DEB_PACKAGE_NAME&quot; ] &amp;&amp; echo &quot;Need to set DEB_PACKAGE_NAME&quot; &amp;&amp; exit 1;
+[ -z &quot;$DEB_PACKAGE_DESCRIPTION&quot; ] &amp;&amp; echo &quot;Need to set DEB_PACKAGE_DESCRIPTION&quot; &amp;&amp; exit 1;
+
+
+docker build --build-arg \
+    version_string=$VERSION_STRING \
+    --build-arg \
+    binary_name=$BINARY_NAME \
+    -t $BUILD_IMAGE -f Dockerfile-go .
+containerID=$(docker run --detach $BUILD_IMAGE)
+docker cp $containerID:/${BINARY_NAME} .
+sleep 1
+docker rm $containerID
+
+echo &quot;Binary built. Building DEB now.&quot;
+
+docker build --build-arg \
+    version_string=$VERSION_STRING \
+    --build-arg \
+    binary_name=$BINARY_NAME \
+    --build-arg \
+    deb_package_name=$DEB_PACKAGE_NAME  \
+    --build-arg \
+    deb_package_description=&quot;$DEB_PACKAGE_DESCRIPTION&quot; \
+    -t $FPM_IMAGE -f Dockerfile-fpm .
+containerID=$(docker run -dt $FPM_IMAGE)
+# docker cp does not support wildcard:
+# https://github.com/moby/moby/issues/7710
+mkdir -p $BUILD_ARTIFACTS_DIR
+docker cp $containerID:/deb-package/${DEB_PACKAGE_NAME}-${VERSION_STRING}.deb $BUILD_ARTIFACTS_DIR/.
+sleep 1
+docker rm -f $containerID
+rm $BINARY_NAME
+</code></pre><p>We can build the debian package with:</p>
+<pre><code>$ make build-deb DEB_PACKAGE_DESCRIPTION=&quot;Logrus Demo&quot; DEB_PACKAGE_NA
+ME=demo BINARY_NAME=demo
+...
+</code></pre><p>The resulting debian package will be in the <code>artifacts/</code>
+sub-directory.</p>
+<h1 id="use-case-2-existing-golang-application-project">Use case #2: Existing golang application project</h1>
+<p>If you want to use the proposed workflow in an existing golang
+application project, you will have to carry out all the workflow
+steps above other than step #3. In addition, since we also be
+switching to use <a href="https://golang.github.io/dep/">dep</a> as the package management program,
+you will need to remove the <code>vendor</code> or similar directory, and
+any other metadata files that may be related to the package
+management tool you are migrating from.</p>
+<h1 id="example-project">Example project</h1>
+<p>An example project with the above files is at
+<a href="https://github.com/amitsaha/golang-packaging-demo">golang-packaging-demo</a>. The files in the project are:</p>
+<pre><code>16:55 $ tree -L 1
+.
+├── build-deb-docker.sh
+├── build-deb-host.sh
+├── Dockerfile-fpm
+├── Dockerfile-go
+├── Gopkg.lock
+├── Gopkg.toml
+├── main.go
+├── Makefile
+└── VERSION
+</code></pre><p>The most important files above are:</p>
+<ul>
+<li><code>build-deb-docker.sh</code></li>
+<li><code>build-deb-host.sh</code></li>
+<li><code>Dockerfile-fpm</code></li>
+<li><code>Dockerfile-go</code></li>
+<li><code>Makefile</code></li>
+<li><code>VERSION</code></li>
+</ul>
+<p>These files are generic and should work for any golang application project once they are dropped in alongwith the application code. The
+assumptions in the beginning of course hold - the primary one being
+the use of <a href="https://github.com/jordansissel/fpm">dep</a> as the package management tool.</p>
+<p>You may be interested in the extension of this post in <a href="http://echorand.me/automatic-building-and-publishing-deb-packages-for-golang-applications.html">Automatic building and publishing DEB packages for Golang applications</a></p>
+<h1 id="resources">Resources</h1>
+<ul>
+<li><a href="https://golang.github.io/dep/">Dep</a></li>
+<li><a href="https://golang.github.io/dep/docs/daily-dep.html">Daily Dep</a></li>
+<li><a href="https://gist.github.com/prwhite/8168133">Help Makefile target</a></li>
+</ul>
+
+    </div>
+  </article>
+
+  
+  
+
+
+
+
+
+  <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/about">About</a></li>
+         
+          <li><a href="/articles">Articles</a></li>
+         
+          <li><a href="/books">Books</a></li>
+         
+          <li><a href="/posts">Posts</a></li>
+         
+          <li><a href="/talks">Talks</a></li>
+         
+          <li><a href="/categories/">Categories</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <nav id="TableOfContents"></nav>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      
+      <ul>
+  
+  
+    
+  
+  
+  <li>
+    <a class="icon" href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fechorand.me%2fposts%2fbuilding-golang-deb-packages%2f">
+      <i class="fab fa-facebook fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://twitter.com/share?url=https%3a%2f%2fechorand.me%2fposts%2fbuilding-golang-deb-packages%2f&text=Quick%20and%20dirty%20debian%20packages%20for%20your%20Golang%20application">
+      <i class="fab fa-twitter fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fechorand.me%2fposts%2fbuilding-golang-deb-packages%2f&title=Quick%20and%20dirty%20debian%20packages%20for%20your%20Golang%20application">
+      <i class="fab fa-linkedin fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fechorand.me%2fposts%2fbuilding-golang-deb-packages%2f&is_video=false&description=Quick%20and%20dirty%20debian%20packages%20for%20your%20Golang%20application">
+      <i class="fab fa-pinterest fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="mailto:?subject=Quick%20and%20dirty%20debian%20packages%20for%20your%20Golang%20application&body=Check out this article: https%3a%2f%2fechorand.me%2fposts%2fbuilding-golang-deb-packages%2f">
+      <i class="fas fa-envelope fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://getpocket.com/save?url=https%3a%2f%2fechorand.me%2fposts%2fbuilding-golang-deb-packages%2f&title=Quick%20and%20dirty%20debian%20packages%20for%20your%20Golang%20application">
+      <i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://reddit.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fbuilding-golang-deb-packages%2f&title=Quick%20and%20dirty%20debian%20packages%20for%20your%20Golang%20application">
+      <i class="fab fa-reddit fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.stumbleupon.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fbuilding-golang-deb-packages%2f&title=Quick%20and%20dirty%20debian%20packages%20for%20your%20Golang%20application">
+      <i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://digg.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fbuilding-golang-deb-packages%2f&title=Quick%20and%20dirty%20debian%20packages%20for%20your%20Golang%20application">
+      <i class="fab fa-digg fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.tumblr.com/share/link?url=https%3a%2f%2fechorand.me%2fposts%2fbuilding-golang-deb-packages%2f&name=Quick%20and%20dirty%20debian%20packages%20for%20your%20Golang%20application&description=In%20this%20post%2c%20we%20will%20learn%20about%20a%20quick%20and%20easy%20workflow%20for%20building%20and%20deploying%20your%20golang%20applications%20as%20Debian%20packages.%20The%20packages%20produced%20will%20not%20be%20official%20quality%20DEB%20packages.%0aAssumptions%20I%20have%20been%20using%20dep%20for%20dependency%20management%2c%20and%20I%20assume%20that%20you%20are%20doing%20the%20same.%20Other%20dependency%20management%20solutions%20should%20work%20with%20only%20the%20specific%20bits%20of%20the%20workflow%20swapped%20out%20to%20suit%20the%20one%20you%20may%20be%20using.">
+      <i class="fab fa-tumblr fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fechorand.me%2fposts%2fbuilding-golang-deb-packages%2f&t=Quick%20and%20dirty%20debian%20packages%20for%20your%20Golang%20application">
+      <i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+      
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;">
+          <i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;">
+          <i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;">
+          <i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');">
+          <i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+
+  <footer id="footer">
+  <div class="footer-left">
+    Copyright  &copy; 2020  Exploring Software 
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+        <li><a href="/about">About</a></li>
+         
+        <li><a href="/articles">Articles</a></li>
+         
+        <li><a href="/books">Books</a></li>
+         
+        <li><a href="/posts">Posts</a></li>
+         
+        <li><a href="/talks">Talks</a></li>
+         
+        <li><a href="/categories/">Categories</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+
+  </div>
+</body>
+
+<link rel="stylesheet" href=/lib/font-awesome/css/all.min.css>
+<script src=/lib/jquery/jquery.min.js></script>
+<script src=/js/main.js></script>
+
+
+
+</html>

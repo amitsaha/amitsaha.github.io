@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title> Sorted Sets in Redis from CLI, Python and Golang | Exploring Software</title>
+  <meta name="description" content="echo $RANDOM. Exploring Software and writing about it.">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="all,follow">
+  <meta name="googlebot" content="index,follow,snippet,archive">
+  <meta property="og:title" content="Sorted Sets in Redis from CLI, Python and Golang" />
+<meta property="og:description" content="In this post, we will see a demo of sorted sets in redis. I just learned about them and I think they are really cool! This post shows how we can play with sorted sets first via the redis-cli, then from Python and Golang.
+ ┌────────────┐ .───────────────. │ │ .─────────────. ( Redis CLI ) ───▶ │ Redis │ ◀───── ( Golang ) `───────────────&#39; │ │ `─────────────&#39; └────────────┘ ▲ │ │ ." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://echorand.me/posts/redis-sorted-sets/" />
+<meta property="article:published_time" content="2018-02-19T00:00:00+00:00" />
+<meta property="article:modified_time" content="2019-07-11T16:52:00+10:00" />
+
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Sorted Sets in Redis from CLI, Python and Golang"/>
+<meta name="twitter:description" content="In this post, we will see a demo of sorted sets in redis. I just learned about them and I think they are really cool! This post shows how we can play with sorted sets first via the redis-cli, then from Python and Golang.
+ ┌────────────┐ .───────────────. │ │ .─────────────. ( Redis CLI ) ───▶ │ Redis │ ◀───── ( Golang ) `───────────────&#39; │ │ `─────────────&#39; └────────────┘ ▲ │ │ ."/>
+
+  
+  
+  
+  <link rel="stylesheet" href="https://echorand.me/css/style-white.css">
+  
+  
+  
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  
+
+  
+<link rel="icon" type="image/png" href="https://echorand.me/images/favicon.ico" />
+
+  
+  
+  
+  
+  
+    
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-108901610-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+  
+  
+</head>
+
+<body class="max-width mx-auto px3 ltr">
+  <div class="content index py4">
+
+  <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+        <li><a href="/about">About</a></li>
+         
+        <li><a href="/articles">Articles</a></li>
+         
+        <li><a href="/books">Books</a></li>
+         
+        <li><a href="/posts">Posts</a></li>
+         
+        <li><a href="/talks">Talks</a></li>
+         
+        <li><a href="/categories/">Categories</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li>
+          <a class="icon" href=" https://echorand.me/posts/python-using-specific-git-commits-of-packages/">
+            <i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i>
+          </a>
+        </li>
+        
+        
+        <li>
+          <a class="icon" href="https://echorand.me/posts/python-rlo/">
+            <i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i>
+          </a>
+        </li>
+        
+        <li>
+          <a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');">
+            <i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i>
+          </a>
+        </li>
+        <li>
+          <a class="icon" href="#">
+            <i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i>
+          </a>
+        </li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      
+      <ul>
+  
+  
+    
+  
+  
+  <li>
+    <a class="icon" href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fechorand.me%2fposts%2fredis-sorted-sets%2f">
+      <i class="fab fa-facebook " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://twitter.com/share?url=https%3a%2f%2fechorand.me%2fposts%2fredis-sorted-sets%2f&text=Sorted%20Sets%20in%20Redis%20from%20CLI%2c%20Python%20and%20Golang">
+      <i class="fab fa-twitter " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fechorand.me%2fposts%2fredis-sorted-sets%2f&title=Sorted%20Sets%20in%20Redis%20from%20CLI%2c%20Python%20and%20Golang">
+      <i class="fab fa-linkedin " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fechorand.me%2fposts%2fredis-sorted-sets%2f&is_video=false&description=Sorted%20Sets%20in%20Redis%20from%20CLI%2c%20Python%20and%20Golang">
+      <i class="fab fa-pinterest " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="mailto:?subject=Sorted%20Sets%20in%20Redis%20from%20CLI%2c%20Python%20and%20Golang&body=Check out this article: https%3a%2f%2fechorand.me%2fposts%2fredis-sorted-sets%2f">
+      <i class="fas fa-envelope " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://getpocket.com/save?url=https%3a%2f%2fechorand.me%2fposts%2fredis-sorted-sets%2f&title=Sorted%20Sets%20in%20Redis%20from%20CLI%2c%20Python%20and%20Golang">
+      <i class="fab fa-get-pocket " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://reddit.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fredis-sorted-sets%2f&title=Sorted%20Sets%20in%20Redis%20from%20CLI%2c%20Python%20and%20Golang">
+      <i class="fab fa-reddit " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.stumbleupon.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fredis-sorted-sets%2f&title=Sorted%20Sets%20in%20Redis%20from%20CLI%2c%20Python%20and%20Golang">
+      <i class="fab fa-stumbleupon " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://digg.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fredis-sorted-sets%2f&title=Sorted%20Sets%20in%20Redis%20from%20CLI%2c%20Python%20and%20Golang">
+      <i class="fab fa-digg " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.tumblr.com/share/link?url=https%3a%2f%2fechorand.me%2fposts%2fredis-sorted-sets%2f&name=Sorted%20Sets%20in%20Redis%20from%20CLI%2c%20Python%20and%20Golang&description=In%20this%20post%2c%20we%20will%20see%20a%20demo%20of%20sorted%20sets%20in%20redis.%20I%20just%20learned%20about%20them%20and%20I%20think%20they%20are%20really%20cool%21%20This%20post%20shows%20how%20we%20can%20play%20with%20sorted%20sets%20first%20via%20the%20redis-cli%2c%20then%20from%20Python%20and%20Golang.%0a%20%e2%94%8c%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%90%20.%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80.%20%e2%94%82%20%e2%94%82%20.%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80.%20%28%20Redis%20CLI%20%29%20%e2%94%80%e2%94%80%e2%94%80%e2%96%b6%20%e2%94%82%20Redis%20%e2%94%82%20%e2%97%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%20%28%20Golang%20%29%20%60%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%27%20%e2%94%82%20%e2%94%82%20%60%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%27%20%e2%94%94%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%98%20%e2%96%b2%20%e2%94%82%20%e2%94%82%20.">
+      <i class="fab fa-tumblr " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fechorand.me%2fposts%2fredis-sorted-sets%2f&t=Sorted%20Sets%20in%20Redis%20from%20CLI%2c%20Python%20and%20Golang">
+      <i class="fab fa-hacker-news " aria-hidden="true"></i>
+    </a>
+  </li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <nav id="TableOfContents"></nav>
+    </div>
+  </span>
+</div>
+
+
+  <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+    <header>
+      <h1 class="posttitle" itemprop="name headline">
+        Sorted Sets in Redis from CLI, Python and Golang
+      </h1>
+      <div class="meta">
+        
+        <div class="postdate">
+          
+          <time datetime="2018-02-19 00:00:00 &#43;0000 UTC" itemprop="datePublished">2018-02-19</time>
+          
+        </div>
+        
+        <div class="article-category">
+            <i class="fas fa-archive"></i>
+            
+            
+            <a class="category-link" href="/categories/software">software</a>
+            
+        </div>
+        
+        
+      </div>
+    </header>
+
+  
+    <div class="content" itemprop="articleBody">
+      <p>In this post, we will see a demo of <em>sorted sets</em> in <a href="https://redis.io/">redis</a>. I just learned about them and I think they are really cool! This post shows how we can play with sorted sets first via the <code>redis-cli</code>, then from Python and Golang.</p>
+<pre><code>                            ┌────────────┐
+ .───────────────.          │            │           .─────────────.
+(    Redis CLI    )   ───▶  │   Redis    │  ◀─────  (    Golang     )
+ `───────────────'          │            │           `─────────────'
+                            └────────────┘
+                                  ▲
+                                  │
+                                  │
+                           .─────────────.
+                          (    Python     )
+                           `─────────────'
+</code></pre><p>We will first need a local redis server running. We will see how we do so on Fedora Linux next. If you are running
+another operating system, please see the <a href="https://redis.io/download">download page</a>.</p>
+<h1 id="installation-and-server-setup-on-fedora-linux">Installation and server setup on Fedora Linux</h1>
+<p>We can install <code>redis</code> server using <code>dnf</code>, like so:</p>
+<pre><code>$ sudo dnf install redis
+..
+$ redis-server --version
+Redis server v=4.0.6 sha=00000000:0 malloc=jemalloc-4.5.0 bits=64 build=427484a80e1b4515
+</code></pre><p>Let&rsquo;s start the server:</p>
+<pre><code>$ sudo systemctl start redis
+$ sudo systemctl status redis
+● redis.service - Redis persistent key-value database
+   Loaded: loaded (/usr/lib/systemd/system/redis.service; disabled; vendor preset: disabled)
+  Drop-In: /etc/systemd/system/redis.service.d
+           └─limit.conf
+   Active: active (running) since Sun 2018-02-18 00:08:22 AEDT; 4s ago
+ Main PID: 29944 (redis-server)
+    Tasks: 4 (limit: 4915)
+   CGroup: /system.slice/redis.service
+           └─29944 /usr/bin/redis-server 127.0.0.1:6379
+
+Feb 18 00:08:22 fedora.home systemd[1]: Starting Redis persistent key-value database...
+Feb 18 00:08:22 fedora.home systemd[1]: Started Redis persistent key-value database.
+..
+</code></pre><h1 id="check-if-redis-is-alive">Check if Redis is alive</h1>
+<p>Once the server has started, let&rsquo;s check if our server is up and running:</p>
+<pre><code>$ redis-cli ping
+PONG
+</code></pre><h1 id="sorted-sets">Sorted Sets</h1>
+<p>Redis' sorted set is a set data structure but each element in the set is also associated with a <code>score</code>. It is a
+hash map but with an interesting property - the set is ordered based on this <code>score</code> value.</p>
+<p>This allows us to perform the following operations easily:</p>
+<ul>
+<li>Retrieve the top or bottom 10 keys based on the score</li>
+<li>Find the rank/position of a key in the set</li>
+<li>The score of a key can be updated anytime while the set will be adjusted (if needed) based on the new score</li>
+</ul>
+<p>The section on sorted sets <a href="https://redis.io/topics/data-types#sorted-sets">here</a> and <a href="https://redis.io/topics/data-types-intro">here</a> in the Redis docs has more details on this.</p>
+<h1 id="example-scenario-top-tags">Example scenario: Top tags</h1>
+<p>We will now create a sorted set called <code>tags</code>. This set will store tags for posts in a blog or some other content
+system where entries can have one or more tags associated with them. At any given point of time, we would like to
+know what are the top 5 tags in our system.</p>
+<h1 id="redis-cli-demo"><code>redis-cli</code> demo</h1>
+<p>We will first add a few tags to our sorted set <code>tags</code> using the <a href="https://redis.io/commands/zadd">ZADD</a> command:</p>
+<pre><code>127.0.0.1:6379&gt; ZADD tags 1 &quot;python&quot;
+(integer) 1
+127.0.0.1:6379&gt; ZADD tags 1 &quot;golang&quot;
+(integer) 1
+127.0.0.1:6379&gt; ZADD tags 1 &quot;redis&quot;
+(integer) 1
+127.0.0.1:6379&gt; ZADD tags 1 &quot;flask&quot;
+(integer) 1
+127.0.0.1:6379&gt; ZADD tags 1 &quot;rust&quot;
+(integer) 1
+127.0.0.1:6379&gt; ZADD tags 2 &quot;rust&quot;
+(integer) 0
+127.0.0.1:6379&gt; ZADD tags 3 &quot;python&quot;
+(integer) 0
+127.0.0.1:6379&gt; ZADD tags 1 &quot;docker&quot;
+(integer) 1
+127.0.0.1:6379&gt; ZADD tags 1 &quot;linux&quot;
+(integer) 1
+127.0.0.1:6379&gt; ZADD tags 1 &quot;c&quot;
+(integer) 1
+127.0.0.1:6379&gt; ZADD tags 1 &quot;software&quot;
+(integer) 1
+1
+127.0.0.1:6379&gt; ZADD tags 1 &quot;memcache&quot;
+(integer) 1
+
+</code></pre><p>Above, I used the command to update the score of <code>rust</code> and <code>python</code> twice to be 2 and 3 respectively. I could have used
+<a href="https://redis.io/commands/zincrby">ZINCRBY</a> as well. Now, I will list all the keys using the <a href="https://redis.io/commands/zrange">zrange</a> command:</p>
+<pre><code>127.0.0.1:6379&gt; zrange tags 0 -1
+ 1) &quot;c&quot;
+ 2) &quot;docker&quot;
+ 3) &quot;flask&quot;
+ 4) &quot;golang&quot;
+ 5) &quot;linux&quot;
+ 6) &quot;memcache&quot;
+ 7) &quot;redis&quot;
+ 8) &quot;software&quot;
+ 9) &quot;rust&quot;
+10) &quot;python&quot;
+</code></pre><p>Note how the last two keys are <code>rust</code> and <code>python</code> - as they have the highest scores (2 and 3 respectively). The others are
+sorted lexicographically.</p>
+<p>To reverse the order, we will use the <a href="https://redis.io/commands/zrevrange">zrevrange</a> command:</p>
+<pre><code>127.0.0.1:6379&gt; ZREVRANGE tags 0 -1 withscores
+ 1) &quot;python&quot;
+ 2) &quot;3&quot;
+ 3) &quot;rust&quot;
+ 4) &quot;2&quot;
+ 5) &quot;redis&quot;
+ 6) &quot;1&quot;
+ 7) &quot;golang&quot;
+ 8) &quot;1&quot;
+ 9) &quot;flask&quot;
+10) &quot;1&quot;
+
+</code></pre><p>Above, we can see how with the <code>withscores</code> command, we also get the scores back.</p>
+<p>Now, to get the top 5 tags, we will do the following:</p>
+<pre><code>127.0.0.1:6379&gt; ZREVRANGE tags 0 4 withscores
+ 1) &quot;python&quot;
+ 2) &quot;3&quot;
+ 3) &quot;rust&quot;
+ 4) &quot;2&quot;
+ 5) &quot;software&quot;
+ 6) &quot;1&quot;
+ 7) &quot;redis&quot;
+ 8) &quot;1&quot;
+ 9) &quot;memcache&quot;
+10) &quot;1&quot;
+1
+</code></pre><h1 id="python-demo">Python demo</h1>
+<p>We will use the <a href="https://github.com/andymccurdy/redis-py">redis-py</a> package to talk to redis and perform the above operations. The Python client looks as follows:</p>
+<pre><code>import redis
+r = redis.StrictRedis(host='localhost', port=6379, db=0)
+
+tags_scores = {
+    'rust': 2,
+    'python': 3,
+    'golang': 1,
+    'redis': 1,
+    'docker': 1,
+    'linux': 1,
+    'software': 1,
+    'c': 1,
+    'memcache': 1,
+    'flask': 1,
+}
+    
+
+# Add the keys with scores     
+for tag, score in tags_scores.items():
+    r.zadd('tags', score, tag)
+
+# Retrieve the top 5 keys
+for key, score in r.zrevrange('tags', 0, 4, 'withscores'):
+    print(key, score)
+</code></pre><p>Running the above (<a href="https://github.com/amitsaha/python-redis-demo">How?</a>) will give us the output:</p>
+<pre><code>b'python' 3.0
+b'rust' 2.0
+b'software' 1.0
+b'redis' 1.0
+b'memcache' 1.0
+</code></pre><p>Note above how the syntax for the Python wrappers  are almost the same as the corresponding redis CLI command.</p>
+<h1 id="golang-demo">Golang demo</h1>
+<p>We will use the <a href="https://github.com/go-redis/redis">go-redis</a> package to interact with redis. The following program shows
+how we can achieve the above in Go:</p>
+<pre><code>package main
+
+import (
+	&quot;log&quot;
+
+	&quot;github.com/go-redis/redis&quot;
+)
+
+func main() {
+	client := redis.NewClient(&amp;redis.Options{
+		Addr:     &quot;localhost:6379&quot;,
+		Password: &quot;&quot;, // no password set
+		DB:       0,  // use default DB
+	})
+
+	tags := map[string]float64{
+		&quot;python&quot;:   3,
+		&quot;memcache&quot;: 1,
+		&quot;rust&quot;:     2,
+		&quot;c&quot;:        1,
+		&quot;redis&quot;:    1,
+		&quot;software&quot;: 1,
+		&quot;docker&quot;:   1,
+		&quot;go&quot;:       1,
+		&quot;linux&quot;:    1,
+		&quot;flask&quot;:    1,
+	}
+
+	for tag, score := range tags {
+		_, err := client.ZAdd(&quot;tags&quot;, redis.Z{score, tag}).Result()
+		if err != nil {
+			log.Fatalf(&quot;Error adding %s&quot;, tag)
+		}
+	}
+
+	result, err := client.ZRevRangeWithScores(&quot;tags&quot;, 0, 4).Result()
+	if err != nil {
+		log.Fatalf(&quot;Error retrieving top 5 keys: %v&quot;, err)
+	}
+	for _, zItem := range result {
+		log.Printf(&quot;%v\n&quot;, zItem)
+	}
+}
+</code></pre><p>When we run the program after having done the necessary <a href="https://github.com/amitsaha/golang-redis-demo">setup</a>, we will
+see the following output:</p>
+<pre><code>$ go run sorted_sets.go
+2018/02/18 23:28:41 {3 python}
+2018/02/18 23:28:41 {2 rust}
+2018/02/18 23:28:41 {1 software}
+2018/02/18 23:28:41 {1 redis}
+2018/02/18 23:28:41 {1 memcache}
+
+</code></pre><p>And that&rsquo;s all for this post.</p>
+<h1 id="resources">Resources</h1>
+<ul>
+<li><a href="https://redis.io/topics/data-types-intro">Redis data types</a></li>
+<li><a href="https://redis.io/topics/quickstart">Redis quick start</a></li>
+</ul>
+
+    </div>
+  </article>
+
+  
+  
+
+
+
+
+
+  <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/about">About</a></li>
+         
+          <li><a href="/articles">Articles</a></li>
+         
+          <li><a href="/books">Books</a></li>
+         
+          <li><a href="/posts">Posts</a></li>
+         
+          <li><a href="/talks">Talks</a></li>
+         
+          <li><a href="/categories/">Categories</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <nav id="TableOfContents"></nav>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      
+      <ul>
+  
+  
+    
+  
+  
+  <li>
+    <a class="icon" href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fechorand.me%2fposts%2fredis-sorted-sets%2f">
+      <i class="fab fa-facebook fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://twitter.com/share?url=https%3a%2f%2fechorand.me%2fposts%2fredis-sorted-sets%2f&text=Sorted%20Sets%20in%20Redis%20from%20CLI%2c%20Python%20and%20Golang">
+      <i class="fab fa-twitter fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fechorand.me%2fposts%2fredis-sorted-sets%2f&title=Sorted%20Sets%20in%20Redis%20from%20CLI%2c%20Python%20and%20Golang">
+      <i class="fab fa-linkedin fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fechorand.me%2fposts%2fredis-sorted-sets%2f&is_video=false&description=Sorted%20Sets%20in%20Redis%20from%20CLI%2c%20Python%20and%20Golang">
+      <i class="fab fa-pinterest fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="mailto:?subject=Sorted%20Sets%20in%20Redis%20from%20CLI%2c%20Python%20and%20Golang&body=Check out this article: https%3a%2f%2fechorand.me%2fposts%2fredis-sorted-sets%2f">
+      <i class="fas fa-envelope fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://getpocket.com/save?url=https%3a%2f%2fechorand.me%2fposts%2fredis-sorted-sets%2f&title=Sorted%20Sets%20in%20Redis%20from%20CLI%2c%20Python%20and%20Golang">
+      <i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://reddit.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fredis-sorted-sets%2f&title=Sorted%20Sets%20in%20Redis%20from%20CLI%2c%20Python%20and%20Golang">
+      <i class="fab fa-reddit fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.stumbleupon.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fredis-sorted-sets%2f&title=Sorted%20Sets%20in%20Redis%20from%20CLI%2c%20Python%20and%20Golang">
+      <i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://digg.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fredis-sorted-sets%2f&title=Sorted%20Sets%20in%20Redis%20from%20CLI%2c%20Python%20and%20Golang">
+      <i class="fab fa-digg fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.tumblr.com/share/link?url=https%3a%2f%2fechorand.me%2fposts%2fredis-sorted-sets%2f&name=Sorted%20Sets%20in%20Redis%20from%20CLI%2c%20Python%20and%20Golang&description=In%20this%20post%2c%20we%20will%20see%20a%20demo%20of%20sorted%20sets%20in%20redis.%20I%20just%20learned%20about%20them%20and%20I%20think%20they%20are%20really%20cool%21%20This%20post%20shows%20how%20we%20can%20play%20with%20sorted%20sets%20first%20via%20the%20redis-cli%2c%20then%20from%20Python%20and%20Golang.%0a%20%e2%94%8c%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%90%20.%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80.%20%e2%94%82%20%e2%94%82%20.%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80.%20%28%20Redis%20CLI%20%29%20%e2%94%80%e2%94%80%e2%94%80%e2%96%b6%20%e2%94%82%20Redis%20%e2%94%82%20%e2%97%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%20%28%20Golang%20%29%20%60%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%27%20%e2%94%82%20%e2%94%82%20%60%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%27%20%e2%94%94%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%80%e2%94%98%20%e2%96%b2%20%e2%94%82%20%e2%94%82%20.">
+      <i class="fab fa-tumblr fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fechorand.me%2fposts%2fredis-sorted-sets%2f&t=Sorted%20Sets%20in%20Redis%20from%20CLI%2c%20Python%20and%20Golang">
+      <i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+      
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;">
+          <i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;">
+          <i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;">
+          <i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');">
+          <i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+
+  <footer id="footer">
+  <div class="footer-left">
+    Copyright  &copy; 2020  Exploring Software 
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+        <li><a href="/about">About</a></li>
+         
+        <li><a href="/articles">Articles</a></li>
+         
+        <li><a href="/books">Books</a></li>
+         
+        <li><a href="/posts">Posts</a></li>
+         
+        <li><a href="/talks">Talks</a></li>
+         
+        <li><a href="/categories/">Categories</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+
+  </div>
+</body>
+
+<link rel="stylesheet" href=/lib/font-awesome/css/all.min.css>
+<script src=/lib/jquery/jquery.min.js></script>
+<script src=/js/main.js></script>
+
+
+
+</html>

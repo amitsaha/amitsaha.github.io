@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title> Hard Links and Soft/Symbolic Links on Linux | Exploring Software</title>
+  <meta name="description" content="echo $RANDOM. Exploring Software and writing about it.">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="all,follow">
+  <meta name="googlebot" content="index,follow,snippet,archive">
+  <meta property="og:title" content="Hard Links and Soft/Symbolic Links on Linux" />
+<meta property="og:description" content="Much has been written (and asked) on the topic of hard links and soft links (a.k.a symbolic links) on Linux. I have read a few of those more than once. However, I end up getting confused between the two, specifically the differences between the two. So, here&rsquo;s my post on the topic with the hope that I will stop getting confused ever again.
+Our setup Let&rsquo;s create a file and write a line into it:" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://echorand.me/posts/hard-links-soft-links-linux/" />
+<meta property="article:published_time" content="2018-11-09T00:00:00+00:00" />
+<meta property="article:modified_time" content="2020-01-09T13:57:20+11:00" />
+
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Hard Links and Soft/Symbolic Links on Linux"/>
+<meta name="twitter:description" content="Much has been written (and asked) on the topic of hard links and soft links (a.k.a symbolic links) on Linux. I have read a few of those more than once. However, I end up getting confused between the two, specifically the differences between the two. So, here&rsquo;s my post on the topic with the hope that I will stop getting confused ever again.
+Our setup Let&rsquo;s create a file and write a line into it:"/>
+
+  
+  
+  
+  <link rel="stylesheet" href="https://echorand.me/css/style-white.css">
+  
+  
+  
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  
+
+  
+<link rel="icon" type="image/png" href="https://echorand.me/images/favicon.ico" />
+
+  
+  
+  
+  
+  
+    
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-108901610-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+  
+  
+</head>
+
+<body class="max-width mx-auto px3 ltr">
+  <div class="content index py4">
+
+  <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+        <li><a href="/about">About</a></li>
+         
+        <li><a href="/articles">Articles</a></li>
+         
+        <li><a href="/books">Books</a></li>
+         
+        <li><a href="/posts">Posts</a></li>
+         
+        <li><a href="/talks">Talks</a></li>
+         
+        <li><a href="/categories/">Categories</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li>
+          <a class="icon" href=" https://echorand.me/posts/manual-letsencrypt-dns-challenge/">
+            <i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i>
+          </a>
+        </li>
+        
+        
+        <li>
+          <a class="icon" href="https://echorand.me/posts/aws-codedeploy-autoscaling-group/">
+            <i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i>
+          </a>
+        </li>
+        
+        <li>
+          <a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');">
+            <i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i>
+          </a>
+        </li>
+        <li>
+          <a class="icon" href="#">
+            <i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i>
+          </a>
+        </li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      
+      <ul>
+  
+  
+    
+  
+  
+  <li>
+    <a class="icon" href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fechorand.me%2fposts%2fhard-links-soft-links-linux%2f">
+      <i class="fab fa-facebook " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://twitter.com/share?url=https%3a%2f%2fechorand.me%2fposts%2fhard-links-soft-links-linux%2f&text=Hard%20Links%20and%20Soft%2fSymbolic%20Links%20on%20Linux">
+      <i class="fab fa-twitter " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fechorand.me%2fposts%2fhard-links-soft-links-linux%2f&title=Hard%20Links%20and%20Soft%2fSymbolic%20Links%20on%20Linux">
+      <i class="fab fa-linkedin " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fechorand.me%2fposts%2fhard-links-soft-links-linux%2f&is_video=false&description=Hard%20Links%20and%20Soft%2fSymbolic%20Links%20on%20Linux">
+      <i class="fab fa-pinterest " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="mailto:?subject=Hard%20Links%20and%20Soft%2fSymbolic%20Links%20on%20Linux&body=Check out this article: https%3a%2f%2fechorand.me%2fposts%2fhard-links-soft-links-linux%2f">
+      <i class="fas fa-envelope " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://getpocket.com/save?url=https%3a%2f%2fechorand.me%2fposts%2fhard-links-soft-links-linux%2f&title=Hard%20Links%20and%20Soft%2fSymbolic%20Links%20on%20Linux">
+      <i class="fab fa-get-pocket " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://reddit.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fhard-links-soft-links-linux%2f&title=Hard%20Links%20and%20Soft%2fSymbolic%20Links%20on%20Linux">
+      <i class="fab fa-reddit " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.stumbleupon.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fhard-links-soft-links-linux%2f&title=Hard%20Links%20and%20Soft%2fSymbolic%20Links%20on%20Linux">
+      <i class="fab fa-stumbleupon " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://digg.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fhard-links-soft-links-linux%2f&title=Hard%20Links%20and%20Soft%2fSymbolic%20Links%20on%20Linux">
+      <i class="fab fa-digg " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.tumblr.com/share/link?url=https%3a%2f%2fechorand.me%2fposts%2fhard-links-soft-links-linux%2f&name=Hard%20Links%20and%20Soft%2fSymbolic%20Links%20on%20Linux&description=Much%20has%20been%20written%20%28and%20asked%29%20on%20the%20topic%20of%20hard%20links%20and%20soft%20links%20%28a.k.a%20symbolic%20links%29%20on%20Linux.%20I%20have%20read%20a%20few%20of%20those%20more%20than%20once.%20However%2c%20I%20end%20up%20getting%20confused%20between%20the%20two%2c%20specifically%20the%20differences%20between%20the%20two.%20So%2c%20here%26rsquo%3bs%20my%20post%20on%20the%20topic%20with%20the%20hope%20that%20I%20will%20stop%20getting%20confused%20ever%20again.%0aOur%20setup%20Let%26rsquo%3bs%20create%20a%20file%20and%20write%20a%20line%20into%20it%3a">
+      <i class="fab fa-tumblr " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fechorand.me%2fposts%2fhard-links-soft-links-linux%2f&t=Hard%20Links%20and%20Soft%2fSymbolic%20Links%20on%20Linux">
+      <i class="fab fa-hacker-news " aria-hidden="true"></i>
+    </a>
+  </li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <nav id="TableOfContents">
+  <ul>
+    <li><a href="#is-it-a-symbolic-link-or-a-hard-link">Is it a symbolic link or a hard link?</a></li>
+    <li><a href="#links-and-filesystem-boundaries">Links and Filesystem Boundaries</a></li>
+  </ul>
+</nav>
+    </div>
+  </span>
+</div>
+
+
+  <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+    <header>
+      <h1 class="posttitle" itemprop="name headline">
+        Hard Links and Soft/Symbolic Links on Linux
+      </h1>
+      <div class="meta">
+        
+        <div class="postdate">
+          
+          <time datetime="2018-11-09 00:00:00 &#43;0000 UTC" itemprop="datePublished">2018-11-09</time>
+          
+        </div>
+        
+        <div class="article-category">
+            <i class="fas fa-archive"></i>
+            
+            
+            <a class="category-link" href="/categories/software">software</a>
+            
+        </div>
+        
+        
+      </div>
+    </header>
+
+  
+    <div class="content" itemprop="articleBody">
+      <p><a href="https://medium.com/@wendymayorgasegura/what-is-the-difference-between-a-hard-link-and-a-symbolic-link-8c0493041b62">Much</a>
+<a href="https://medium.com/@meghamohan/hard-link-and-symbolic-link-3cad74e5b5dc">has</a> <a href="https://medium.com/meatandmachines/explaining-the-difference-between-hard-links-symbolic-links-using-bruce-lee-32828832e8d3">been</a> written (and <a href="https://stackoverflow.com/questions/185899/what-is-the-difference-between-a-symbolic-link-and-a-hard-link">asked</a>)
+on the topic of hard links and soft links (a.k.a symbolic links) on Linux. I have read a few of those more than once.
+However, I end up getting confused between the two, specifically the differences between the two. So, here&rsquo;s
+my post on the topic with the hope that I will stop getting confused ever again.</p>
+<h1 id="our-setup">Our setup</h1>
+<p>Let&rsquo;s create a file and write a line into it:</p>
+<pre><code>$ echo &quot;Hello, I am file1&quot; &gt; file1
+</code></pre><p>Next, we create a <code>hard</code> link using the <code>ln</code> command:</p>
+<pre><code>$ ln file1 file1-hlink
+</code></pre><p>Now, let&rsquo;s create a soft link using <code>ln -s</code>:</p>
+<pre><code>$ ln -s file1 file1-slink
+</code></pre><p>At this stage, if we use the <code>cat</code> command to display the contents of each of the above, we
+will see the same line of text:</p>
+<pre><code>$ cat file1
+Hello, I am file1
+
+$ cat file1-hlink
+Hello, I am file1
+
+$ cat file1-slink
+Hello, I am file1
+</code></pre><h1 id="investigation-inodes">Investigation: Inodes</h1>
+<p>One of the key differences between soft links and hard links is with respect to how they are represented
+in the filesystem. If we run <code>ls</code> with the <code>i</code> switch, it will show the <a href="https://en.wikipedia.org/wiki/Inode">inode</a>
+number of each of the above files:</p>
+<pre><code>$ ls -il
+
+15481123719144131 -rw-rw-rw- 2 asaha asaha 18 Nov  9 13:52 file1
+15481123719144131 -rw-rw-rw- 2 asaha asaha 18 Nov  9 13:52 file1-hlink
+29836347531381846 lrwxrwxrwx 1 asaha asaha  5 Nov  9 13:54 file1-slink -&gt; file1
+</code></pre><p>We can see that:</p>
+<ul>
+<li>The hardlink <code>file1-hlink</code> has the same Inode number as the original file itself (<code>file1</code>)</li>
+<li>The softlink <code>file1-slink</code> has a different Inode number</li>
+</ul>
+<p>This tells us two things straightaway:</p>
+<p>When we create a soft link, it is equivalent to creating a new file with its own filename. In the filesystem,
+it is a separate file, with the special property that its contents is the <code>path</code> to the real file <code>file1</code>.</p>
+<p>Graphically:</p>
+<pre><code>            Soft link -&gt;   FILE CONTENTS -&gt; Path of original file -&gt; FILE CONTENTS -&gt; &quot;Hello, I am file1&quot;
+</code></pre><p>A hard link on the other hand is a reference to the original file. It exists on the filesystem, but only as another
+reference or a link. Let&rsquo;s explore a bit into what it means. If we execute <code>ls</code> with the <code>-l</code> (small <code>L</code>) switch, the
+second column gives the number of <code>link</code> counts of a file:</p>
+<pre><code>$ ls -l file1
+-rw-rw-rw- 2 asaha asaha 18 Nov  9 13:52 file1
+</code></pre><p>We have created a hard link above, so, the link count now is 2. If we create another hard link, the link count will be 3:</p>
+<pre><code>$ ln file1 file1-hlink-2
+$ ls -l file1
+-rw-rw-rw- 3 asaha asaha 18 Nov  9 13:52 file1
+</code></pre><p>Graphically:</p>
+<pre><code>file1-hlink  -----&gt; FILE CONTENTS (&quot;Hello, I am file1&quot;) &lt;------ file1
+                         /|\ 
+                          |
+                     file1-hlink-2
+</code></pre><p>Perhaps, this post <a href="https://linuxgazette.net/35/tag/links.html">here</a> best describes how hard links defer from
+soft links.</p>
+<h1 id="investigation-size-of-hard-links-and-soft-links">Investigation: Size of hard links and soft links</h1>
+<p>Let&rsquo;s go back to one of the previous output of <code>ls -l</code>:</p>
+<pre><code>$ ls -il
+
+15481123719144131 -rw-rw-rw- 2 asaha asaha 18 Nov  9 13:52 file1
+15481123719144131 -rw-rw-rw- 2 asaha asaha 18 Nov  9 13:52 file1-hlink
+29836347531381846 lrwxrwxrwx 1 asaha asaha  5 Nov  9 13:54 file1-slink -&gt; file1
+</code></pre><p>The sixth column above of the output shows the number of bytes in each of the files. We see <code>18</code> as the size
+of the original file, <code>file1</code> and the hardlink, <code>file1-hlink</code>. 18 is the number of characters in <code>&quot;Hello, I am a file1&quot;</code>
+and a new line character. This doesn&rsquo;t mean that each hard link takes up 18 bytes on the disk. Each link is effectively
+a <a href="https://ext4.wiki.kernel.org/index.php/Ext4_Disk_Layout#Directory_Entries">directory entry</a>.</p>
+<p>What are the five bytes in <code>file1-slink</code>? The <code>readlink</code> command will help us:</p>
+<pre><code>$ readlink file1-slink
+file1
+</code></pre><p>It is the &ldquo;relative&rdquo; path to the original file. Contrary to a hard link, a soft link actually takes up some space of it&rsquo;s
+own.</p>
+<h1 id="investigation-deleting-the-original-file">Investigation: Deleting the original file</h1>
+<p>What happens to each kind of link when we delete the original file? From the graphics above, we expect that the symbolic
+link will basically be a &ldquo;dangling&rdquo; link and hence, we will lose access to the file contents. In the case of hard link, the contents will still continue to be accessible, since all we are doing is deleting one of the links.
+Even though it is the original file, it doesn&rsquo;t matter. Other links continue to exist and point to the data.</p>
+<p>Let&rsquo;s validate our theory:</p>
+<pre><code>$ rm file1
+
+$ ls -lrt
+total 0
+-rw-rw-rw- 2 asaha asaha 18 Nov  9 13:52 file1-hlink-2
+-rw-rw-rw- 2 asaha asaha 18 Nov  9 13:52 file1-hlink
+lrwxrwxrwx 1 asaha asaha  5 Nov  9 13:54 file1-slink -&gt; file1
+</code></pre><p>We delete the original file above. Now the link count of <code>file1-hlink</code> and <code>file-hlink-2</code> has decreased by 1 and
+is now 2.</p>
+<p>If we try to display the contents of a hard link:</p>
+<pre><code>$ cat file1-hlink
+Hello, I am file1
+</code></pre><p>For the soft link though:</p>
+<pre><code>$ cat file1-slink
+cat: file1-slink: No such file or directory
+</code></pre><p>What the above error really says is I am trying to look for a file, <code>file1</code>, but it doesn&rsquo;t exist. This also means that
+we can essentially do:</p>
+<pre><code>$ echo &quot;Hello, I am a different file1&quot; &gt; file1
+$ cat file1-slink
+Hello, I am a different file1
+</code></pre><p>I wonder what kind of security risk this may post - may be we need symbolic links with checksums?</p>
+<h1 id="investigation-modifying-original-file-contents">Investigation: Modifying original file contents</h1>
+<p>What happens if we modify the original file contents? They will be reflected in both types of links</p>
+<h1 id="investigation-directories-and-links">Investigation: Directories and Links</h1>
+<p>We cannot create hardlinks to directories. This <a href="https://askubuntu.com/questions/210741/why-are-hard-links-not-allowed-for-directories">link</a> is a good resource to learn why. Soft links doesn&rsquo;t have such a limitation.</p>
+<p>Mildly related to this topic is the number of &ldquo;default&rdquo; links for a directory on Linux:</p>
+<pre><code>$ ls -lrta
+total 12
+drwxr-xr-x 6 ubuntu ubuntu 4096 Nov  9 05:38 ..
+drwxrwxr-x 2 ubuntu ubuntu 4096 Nov  9 05:41 dir2
+drwxrwxr-x 3 ubuntu ubuntu 4096 Nov  9 05:41 .
+</code></pre><p>The above is a directory listing which has another sub-directory, <code>dir2</code> inside it. Note the <code>.</code> and <code>..</code> entries? The <code>.</code> is
+a hard link to the current directory, <code>..</code> is a hard link to the parent directory. Each directory by default will have these
+additional entries. Where do we get the two links by default?</p>
+<ul>
+<li>The first is the <code>.</code> inside the directory itself</li>
+<li>The other is each directory will have a link to the sub-directory, hence 2 links</li>
+</ul>
+<h1 id="miscellaneous">Miscellaneous</h1>
+<h2 id="is-it-a-symbolic-link-or-a-hard-link">Is it a symbolic link or a hard link?</h2>
+<p>As a program how do I know if a file is a &ldquo;regular&rdquo; file, symbolic link or a hard link? The answer lies in the
+data that the <code>stat()</code> system call returns. Specifically, the <code>st_mode</code> field as described
+<a href="http://man7.org/linux/man-pages/man7/inode.7.html">here</a>.</p>
+<h2 id="links-and-filesystem-boundaries">Links and Filesystem Boundaries</h2>
+<p>A hard link - since it points to the same Inode cannot span a filesystem boundary. That is, we cannot create a hard link
+to a file which resides in a different filesystem. Soft links have no such limitations.</p>
+<h1 id="using-links-to-solve-a-problem">Using links to solve a problem</h1>
+<p>What are links useful for? One reason you may want to use links is to not have duplicate data in multiple files.
+Let&rsquo;s say, we have a bunch of files lying around in our file-system and we want to keep only a single copy of any duplicate
+data, and replace the others by links. Since hard links cannot span more than one filesystem, symbolic links may seem more
+attractive. However, one caveat to keep in mind with symbolic links is, if we accidentally delete the original file,
+we end up losing the data. So, it depends on the use-case.</p>
+<h1 id="learning-more">Learning more</h1>
+<ul>
+<li><a href="http://man7.org/linux/man-pages/man7/inode.7.html">inode man page</a></li>
+</ul>
+
+    </div>
+  </article>
+
+  
+  
+
+
+
+
+
+  <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/about">About</a></li>
+         
+          <li><a href="/articles">Articles</a></li>
+         
+          <li><a href="/books">Books</a></li>
+         
+          <li><a href="/posts">Posts</a></li>
+         
+          <li><a href="/talks">Talks</a></li>
+         
+          <li><a href="/categories/">Categories</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <nav id="TableOfContents">
+  <ul>
+    <li><a href="#is-it-a-symbolic-link-or-a-hard-link">Is it a symbolic link or a hard link?</a></li>
+    <li><a href="#links-and-filesystem-boundaries">Links and Filesystem Boundaries</a></li>
+  </ul>
+</nav>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      
+      <ul>
+  
+  
+    
+  
+  
+  <li>
+    <a class="icon" href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fechorand.me%2fposts%2fhard-links-soft-links-linux%2f">
+      <i class="fab fa-facebook fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://twitter.com/share?url=https%3a%2f%2fechorand.me%2fposts%2fhard-links-soft-links-linux%2f&text=Hard%20Links%20and%20Soft%2fSymbolic%20Links%20on%20Linux">
+      <i class="fab fa-twitter fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fechorand.me%2fposts%2fhard-links-soft-links-linux%2f&title=Hard%20Links%20and%20Soft%2fSymbolic%20Links%20on%20Linux">
+      <i class="fab fa-linkedin fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fechorand.me%2fposts%2fhard-links-soft-links-linux%2f&is_video=false&description=Hard%20Links%20and%20Soft%2fSymbolic%20Links%20on%20Linux">
+      <i class="fab fa-pinterest fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="mailto:?subject=Hard%20Links%20and%20Soft%2fSymbolic%20Links%20on%20Linux&body=Check out this article: https%3a%2f%2fechorand.me%2fposts%2fhard-links-soft-links-linux%2f">
+      <i class="fas fa-envelope fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://getpocket.com/save?url=https%3a%2f%2fechorand.me%2fposts%2fhard-links-soft-links-linux%2f&title=Hard%20Links%20and%20Soft%2fSymbolic%20Links%20on%20Linux">
+      <i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://reddit.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fhard-links-soft-links-linux%2f&title=Hard%20Links%20and%20Soft%2fSymbolic%20Links%20on%20Linux">
+      <i class="fab fa-reddit fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.stumbleupon.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fhard-links-soft-links-linux%2f&title=Hard%20Links%20and%20Soft%2fSymbolic%20Links%20on%20Linux">
+      <i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://digg.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fhard-links-soft-links-linux%2f&title=Hard%20Links%20and%20Soft%2fSymbolic%20Links%20on%20Linux">
+      <i class="fab fa-digg fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.tumblr.com/share/link?url=https%3a%2f%2fechorand.me%2fposts%2fhard-links-soft-links-linux%2f&name=Hard%20Links%20and%20Soft%2fSymbolic%20Links%20on%20Linux&description=Much%20has%20been%20written%20%28and%20asked%29%20on%20the%20topic%20of%20hard%20links%20and%20soft%20links%20%28a.k.a%20symbolic%20links%29%20on%20Linux.%20I%20have%20read%20a%20few%20of%20those%20more%20than%20once.%20However%2c%20I%20end%20up%20getting%20confused%20between%20the%20two%2c%20specifically%20the%20differences%20between%20the%20two.%20So%2c%20here%26rsquo%3bs%20my%20post%20on%20the%20topic%20with%20the%20hope%20that%20I%20will%20stop%20getting%20confused%20ever%20again.%0aOur%20setup%20Let%26rsquo%3bs%20create%20a%20file%20and%20write%20a%20line%20into%20it%3a">
+      <i class="fab fa-tumblr fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fechorand.me%2fposts%2fhard-links-soft-links-linux%2f&t=Hard%20Links%20and%20Soft%2fSymbolic%20Links%20on%20Linux">
+      <i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+      
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;">
+          <i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;">
+          <i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;">
+          <i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');">
+          <i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+
+  <footer id="footer">
+  <div class="footer-left">
+    Copyright  &copy; 2020  Exploring Software 
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+        <li><a href="/about">About</a></li>
+         
+        <li><a href="/articles">Articles</a></li>
+         
+        <li><a href="/books">Books</a></li>
+         
+        <li><a href="/posts">Posts</a></li>
+         
+        <li><a href="/talks">Talks</a></li>
+         
+        <li><a href="/categories/">Categories</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+
+  </div>
+</body>
+
+<link rel="stylesheet" href=/lib/font-awesome/css/all.min.css>
+<script src=/lib/jquery/jquery.min.js></script>
+<script src=/js/main.js></script>
+
+
+
+</html>

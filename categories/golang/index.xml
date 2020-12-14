@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>golang on Exploring Software</title>
+    <link>https://echorand.me/categories/golang/</link>
+    <description>Recent content in golang on Exploring Software</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 26 May 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://echorand.me/categories/golang/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Getting started with Golang plugins</title>
+      <link>https://echorand.me/posts/getting-started-with-golang-plugins/</link>
+      <pubDate>Tue, 26 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/getting-started-with-golang-plugins/</guid>
+      <description>Introduction In this post, I will share some of my learnings and explorations on plugins in Golang. We will write a &amp;ldquo;driver&amp;rdquo; program which will load two plugins and execute a certain function which are present in both of them. The driver program will feed an integer into the first plugin, which will run some processing on it. The result of the first plugin is fed into the second plugin and finally the driver program will print the result.</description>
+    </item>
+    
+    <item>
+      <title>Using Golang for automating infrastructure and operations work</title>
+      <link>https://echorand.me/posts/golang-ops-automation/</link>
+      <pubDate>Sat, 07 Dec 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/golang-ops-automation/</guid>
+      <description>Since around 1.5 years ago, I have been working in roles which has required to automate various things usually classified as &amp;ldquo;infrastructure and operations&amp;rdquo; work. Sometimes they have involved working with cloud infrastructure and at other times they have involved interacting with databases and other services via HTTP APIs. During this period, to solve such tasks I have started using the Go programming language to implement these things.
+I shared my experience and some examples in a talk at the combined Golang/Women who Go and Infrastructure as code meetup in Sydney.</description>
+    </item>
+    
+    <item>
+      <title>Examples of consuming data in Golang templates</title>
+      <link>https://echorand.me/posts/golang-templates/</link>
+      <pubDate>Tue, 18 Sep 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/golang-templates/</guid>
+      <description>While working on creating a template file for a Golang project, I wanted to better understand how to work with data in Golang templates as available via the html/template package. In this post, I discuss a few use cases that may arise.
+Accessing a variable Let&amp;rsquo;s consider our first program:
+package main import ( &amp;quot;html/template&amp;quot; &amp;quot;log&amp;quot; &amp;quot;os&amp;quot; ) func main() { var names = []string{&amp;quot;Tabby&amp;quot;, &amp;quot;Jill&amp;quot;} tmpl := template.New(&amp;quot;test&amp;quot;) tmpl, err := tmpl.</description>
+    </item>
+    
+    <item>
+      <title>Automatic building and publishing DEB packages for Golang applications</title>
+      <link>https://echorand.me/posts/automate-deb-package-packagecloud/</link>
+      <pubDate>Sat, 24 Feb 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/automate-deb-package-packagecloud/</guid>
+      <description>In my earlier post, Quick and dirty debian packages for your Golang application I shared a recipe building DEB packages for Golang applications. We are going to see the following things in this post building upon our recipe in that post:
+ Building the DEB packages in Travis CI Publishing the DEB package to packagecloud.io  The primary assumption in my first post was using dep for dependency management. That still holds here.</description>
+    </item>
+    
+    <item>
+      <title>Quick and dirty debian packages for your Golang application</title>
+      <link>https://echorand.me/posts/building-golang-deb-packages/</link>
+      <pubDate>Thu, 25 Jan 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/building-golang-deb-packages/</guid>
+      <description>In this post, we will learn about a quick and easy workflow for building and deploying your golang applications as Debian packages. The packages produced will not be official quality DEB packages.
+Assumptions I have been using dep for dependency management, and I assume that you are doing the same. Other dependency management solutions should work with only the specific bits of the workflow swapped out to suit the one you may be using.</description>
+    </item>
+    
+    <item>
+      <title>HandlerFunc, Handle and DefaultServeMux in Golang</title>
+      <link>https://echorand.me/posts/golang-dissecting-listen-and-serve/</link>
+      <pubDate>Wed, 26 Apr 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/golang-dissecting-listen-and-serve/</guid>
+      <description>Introduction My aim in this post is to discuss three &amp;ldquo;concepts&amp;rdquo; in Golang that I come across while writing HTTP servers. Through this post, my aim to get rid of my own lack of understanding (at least to a certain degree) about these. Hopefully, it will be of use to others too.. The understanding will help you write better unit tests for your handlers as well as shown in this blog post.</description>
+    </item>
+    
+    <item>
+      <title>Notes on using Go to write gitbackup</title>
+      <link>https://echorand.me/posts/golang-notes-gitbackup/</link>
+      <pubDate>Sun, 26 Mar 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/golang-notes-gitbackup/</guid>
+      <description>gitbackup is a tool to backup your git repositories from GitHub and GitLab. I wrote the initial version as a project for a go article which is in review for publication in a Linux magazine. It supports GitHub enterprise installations and custom GitLab installations in addition to repositories on github.com and gitlab.com. It&#39;s written in Golang, and built upon go-github and go-gitlab and other third party golang packages.
+Since the initial version, the project&#39;s code has seen number of changes which has been a learning experience for me since I am still fairly new to Go.</description>
+    </item>
+    
+    <item>
+      <title>Setup Golang 1.8 and gb on Fedora (and other Linux distributions)</title>
+      <link>https://echorand.me/posts/golang-setup-1.8/</link>
+      <pubDate>Wed, 01 Mar 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/golang-setup-1.8/</guid>
+      <description>This guide will be how I usually setup and get started with Go development environment on Linux. By the end of this document, we will have seen how to:
+Install the Go 1.8 compiler and other tools (gofmt, for eaxmple), collectively referred to as go tools Install gb and the vendor plugin Vendoring third party packages  Installing Go tools We can follow the official install guide to get the latest stable version of the Go tools:</description>
+    </item>
+    
+    <item>
+      <title>Setup Golang on Fedora 24 (and other Linux distributions)</title>
+      <link>https://echorand.me/posts/golang-setup/</link>
+      <pubDate>Thu, 23 Jun 2016 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/golang-setup/</guid>
+      <description>This guide will be how I usually setup and get started with Go development environment on Linux. By the end of this document, we will have seen how to:
+Install the Go compiler and other tools (gofmt, for eaxmple), collectively referred to as go tools Setup Go workspace Working with Go programs using third-party packages  Installing Go tools The first option to install the Go compiler and other tools from your distro&#39;s package manager.</description>
+    </item>
+    
+    <item>
+      <title>runC and libcontainer on Fedora 23/24</title>
+      <link>https://echorand.me/posts/libcontainer-runc-fedora-24/</link>
+      <pubDate>Wed, 27 Apr 2016 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/libcontainer-runc-fedora-24/</guid>
+      <description>In this post, I will post my notes on how I got runC and then using libcontainer on Fedora. The first step is to install golang:
+$ sudo dnf -y install golang $ go version go version go1.6 linux/amd64  We will set GOPATH=~/golang/ and then do the following:
+$ mkdir -p ~/golang/github.com/opencontainers $ cd ~/golang/github.com/opencontainers $ git clone https://github.com/opencontainers/runc.git $ cd runc $ sudo dnf -y install libseccomp-devel $ make $ sudo make install  At this stage, runc should be installed and ready to use:</description>
+    </item>
+    
+    <item>
+      <title>New article Write an Image Cropping program with Go</title>
+      <link>https://echorand.me/posts/go_image_cropping/</link>
+      <pubDate>Sun, 17 Apr 2016 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/go_image_cropping/</guid>
+      <description>My article &amp;quot;Write an Image Cropping with Go&amp;quot; is out in Linux Voice (Issue 26). It is my first article to be published in Linux Voice and I am very excited about it.
+It is challenging to write an introductory article without being able to explain everything the reader needs to know so as to follow the article, while keeping the article concise. Therefore I have updated the GitHub repo of the final code with a README which points you to various resources and tips I found useful while I was learning myself.</description>
+    </item>
+    
+  </channel>
+</rss>

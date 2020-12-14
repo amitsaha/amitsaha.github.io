@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title> Linux System Mining with Python | Exploring Software</title>
+  <meta name="description" content="echo $RANDOM. Exploring Software and writing about it.">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="all,follow">
+  <meta name="googlebot" content="index,follow,snippet,archive">
+  <meta property="og:title" content="Linux System Mining with Python" />
+<meta property="og:description" content="In this article, we will explore the Python programming language as a tool to retrieve various information about a system running Linux. Let&#39;s get started.
+Which Python? When I refer to Python, I am referring to CPython 2 (2.7 to be exact). I will mention it explicitly when the same code won&#39;t work with CPython 3 (3.3) and provide the alternative code, explaining the differences. Just to make sure that you have CPython installed, type python or python3 from the terminal and you should see the Python prompt displayed in your terminal." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://echorand.me/posts/linux-system-mining/" />
+<meta property="article:published_time" content="2018-01-22T00:00:00+00:00" />
+<meta property="article:modified_time" content="2019-06-17T14:58:57+10:00" />
+
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Linux System Mining with Python"/>
+<meta name="twitter:description" content="In this article, we will explore the Python programming language as a tool to retrieve various information about a system running Linux. Let&#39;s get started.
+Which Python? When I refer to Python, I am referring to CPython 2 (2.7 to be exact). I will mention it explicitly when the same code won&#39;t work with CPython 3 (3.3) and provide the alternative code, explaining the differences. Just to make sure that you have CPython installed, type python or python3 from the terminal and you should see the Python prompt displayed in your terminal."/>
+
+  
+  
+  
+  <link rel="stylesheet" href="https://echorand.me/css/style-white.css">
+  
+  
+  
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  
+
+  
+<link rel="icon" type="image/png" href="https://echorand.me/images/favicon.ico" />
+
+  
+  
+  
+  
+  
+    
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-108901610-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+  
+  
+</head>
+
+<body class="max-width mx-auto px3 ltr">
+  <div class="content index py4">
+
+  <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+        <li><a href="/about">About</a></li>
+         
+        <li><a href="/articles">Articles</a></li>
+         
+        <li><a href="/books">Books</a></li>
+         
+        <li><a href="/posts">Posts</a></li>
+         
+        <li><a href="/talks">Talks</a></li>
+         
+        <li><a href="/categories/">Categories</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li>
+          <a class="icon" href=" https://echorand.me/posts/systemd-supervisord/">
+            <i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i>
+          </a>
+        </li>
+        
+        
+        <li>
+          <a class="icon" href="https://echorand.me/posts/python-prometheus-monitoring-options/">
+            <i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i>
+          </a>
+        </li>
+        
+        <li>
+          <a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');">
+            <i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i>
+          </a>
+        </li>
+        <li>
+          <a class="icon" href="#">
+            <i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i>
+          </a>
+        </li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      
+      <ul>
+  
+  
+    
+  
+  
+  <li>
+    <a class="icon" href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fechorand.me%2fposts%2flinux-system-mining%2f">
+      <i class="fab fa-facebook " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://twitter.com/share?url=https%3a%2f%2fechorand.me%2fposts%2flinux-system-mining%2f&text=Linux%20System%20Mining%20with%20Python">
+      <i class="fab fa-twitter " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fechorand.me%2fposts%2flinux-system-mining%2f&title=Linux%20System%20Mining%20with%20Python">
+      <i class="fab fa-linkedin " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fechorand.me%2fposts%2flinux-system-mining%2f&is_video=false&description=Linux%20System%20Mining%20with%20Python">
+      <i class="fab fa-pinterest " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="mailto:?subject=Linux%20System%20Mining%20with%20Python&body=Check out this article: https%3a%2f%2fechorand.me%2fposts%2flinux-system-mining%2f">
+      <i class="fas fa-envelope " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://getpocket.com/save?url=https%3a%2f%2fechorand.me%2fposts%2flinux-system-mining%2f&title=Linux%20System%20Mining%20with%20Python">
+      <i class="fab fa-get-pocket " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://reddit.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2flinux-system-mining%2f&title=Linux%20System%20Mining%20with%20Python">
+      <i class="fab fa-reddit " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.stumbleupon.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2flinux-system-mining%2f&title=Linux%20System%20Mining%20with%20Python">
+      <i class="fab fa-stumbleupon " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://digg.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2flinux-system-mining%2f&title=Linux%20System%20Mining%20with%20Python">
+      <i class="fab fa-digg " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.tumblr.com/share/link?url=https%3a%2f%2fechorand.me%2fposts%2flinux-system-mining%2f&name=Linux%20System%20Mining%20with%20Python&description=In%20this%20article%2c%20we%20will%20explore%20the%20Python%20programming%20language%20as%20a%20tool%20to%20retrieve%20various%20information%20about%20a%20system%20running%20Linux.%20Let%27s%20get%20started.%0aWhich%20Python%3f%20When%20I%20refer%20to%20Python%2c%20I%20am%20referring%20to%20CPython%202%20%282.7%20to%20be%20exact%29.%20I%20will%20mention%20it%20explicitly%20when%20the%20same%20code%20won%27t%20work%20with%20CPython%203%20%283.3%29%20and%20provide%20the%20alternative%20code%2c%20explaining%20the%20differences.%20Just%20to%20make%20sure%20that%20you%20have%20CPython%20installed%2c%20type%20python%20or%20python3%20from%20the%20terminal%20and%20you%20should%20see%20the%20Python%20prompt%20displayed%20in%20your%20terminal.">
+      <i class="fab fa-tumblr " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fechorand.me%2fposts%2flinux-system-mining%2f&t=Linux%20System%20Mining%20with%20Python">
+      <i class="fab fa-hacker-news " aria-hidden="true"></i>
+    </a>
+  </li>
+</ul>
+
+    </div>
+    <div id="toc">
+      
+    </div>
+  </span>
+</div>
+
+
+  <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+    <header>
+      <h1 class="posttitle" itemprop="name headline">
+        Linux System Mining with Python
+      </h1>
+      <div class="meta">
+        
+        <div class="postdate">
+          
+          <time datetime="2018-01-22 00:00:00 &#43;0000 UTC" itemprop="datePublished">2018-01-22</time>
+          
+        </div>
+        
+        <div class="article-category">
+            <i class="fas fa-archive"></i>
+            
+            
+            <a class="category-link" href="/categories/python">Python</a>
+            
+        </div>
+        
+        
+      </div>
+    </header>
+
+  
+    <div class="content" itemprop="articleBody">
+      <div class="document">
+
+
+<p>In this article, we will explore the Python programming language as a tool
+to retrieve various information about a system running Linux. Let's get started.</p>
+<div class="section" id="which-python">
+<h2>Which Python?</h2>
+<p>When I refer to Python, I am referring to <a class="reference external" href="http://python.org">CPython</a>  2 (2.7 to be exact). I will mention it
+explicitly when the same code won't work with CPython 3 (3.3) and
+provide the alternative code, explaining the differences. Just to make
+sure that you have CPython installed, type <tt class="docutils literal">python</tt> or <tt class="docutils literal">python3</tt>
+from the terminal and you should see the Python prompt displayed in
+your terminal.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Please note that all the programs have their first line as
+<tt class="docutils literal"><span class="pre">#!/usr/bin/env</span> python</tt> meaning that, we want the Python
+interpreter to execute these scripts. Hence, if you make your
+script executable using <tt class="docutils literal">chmod +x <span class="pre">your-script.py</span></tt>, you can
+execute it using <tt class="docutils literal"><span class="pre">./your-script.py</span></tt> (which is what you will see
+in this article).</p>
+</div>
+</div>
+<div class="section" id="exploring-the-platform-module">
+<h2>Exploring the <cite>platform</cite> module</h2>
+<p>The <cite>platform</cite> module in the standard library has a number of functions which
+allow us to retrieve various system information. Let
+us start the Python interpreter and explore some of them, starting
+with the <tt class="docutils literal">platform.uname()</tt> function:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; import platform
+&gt;&gt;&gt; platform.uname()
+('Linux', 'fedora.echorand', '3.7.4-204.fc18.x86_64', '#1 SMP Wed Jan 23 16:44:29 UTC 2013', 'x86_64')
+</pre>
+<p>If you are aware of the <tt class="docutils literal">uname</tt> command on Linux, you will recognize
+that this function is an interface of sorts to this command. On Python
+2, it returns a tuple consisting of the system type (or Kernel type),
+hostname, version, release, machine hardware and processor
+information. You can access individual attributes using indices, like so:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; platform.uname()[0]
+'Linux'
+</pre>
+<p>On Python 3, the function returns a named tuple:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; platform.uname()
+
+uname_result(system='Linux', node='fedora.echorand',
+release='3.7.4-204.fc18.x86_64', version='#1 SMP Wed Jan 23 16:44:29
+UTC 2013', machine='x86_64', processor='x86_64')
+</pre>
+<p>Since the returned result is a named tuple, this makes it easy to
+refer to individual attributes by name rather than having to remember
+the indices, like so:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; platform.uname().system
+'Linux'
+</pre>
+<p>The <cite>platform</cite> module also has direct interfaces to some of
+the above attributes, like so:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; platform.system()
+'Linux'
+
+&gt;&gt;&gt; platform.release()
+'3.7.4-204.fc18.x86_64'
+</pre>
+<p>The <tt class="docutils literal">linux_distribution()</tt> function returns details about the
+Linux distribution you are on. For example, on a Fedora 18 system,
+this command returns the following information:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; platform.linux_distribution()
+('Fedora', '18', 'Spherical Cow')
+</pre>
+<p>The result is returned as a tuple consisting of the distribution name,
+version and the code name. The distributions supported by your
+particular Python version can be obtained by printing the value of the
+<tt class="docutils literal">_supported_dists</tt> attribute:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; platform._supported_dists
+('SuSE', 'debian', 'fedora', 'redhat', 'centos', 'mandrake',
+'mandriva', 'rocks', 'slackware', 'yellowdog', 'gentoo',
+'UnitedLinux', 'turbolinux')
+</pre>
+<p>If your Linux distribution is not one of these (or a derivative of
+one of these), then you will likely not see any useful information
+from the above function call.</p>
+<p>The final function from the <cite>platform</cite> module, we will look at is
+the <tt class="docutils literal">architecture()</tt> function. When you call the function without
+any arguments, this function returns a tuple consisting of the bit
+architecture and the executable format of the Python executable, like
+so:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; platform.architecture()
+('64bit', 'ELF')
+</pre>
+<p>On a 32-bit Linux system, you would see:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; platform.architecture()
+('32bit', 'ELF')
+</pre>
+<p>You will get similar results if you specify any other executable on the system, like so:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; platform.architecture(executable='/usr/bin/ls')
+('64bit', 'ELF')
+</pre>
+<p>You are encouraged to explore other functions of the <cite>platform</cite>
+module which among others, allow you to find the current Python version you are
+running. If you are keen to know how this module retrieves this
+information, the <cite>Lib/platform.py</cite> file in the Python source
+directory is where you should look into.</p>
+<p>The <cite>os</cite> and <cite>sys</cite> modules are also of interest to retrieve
+certain system attributes such as the native byteorder. Next, we move beyond
+the Python standard library modules to explore some generic
+approaches to access the information on a Linux system made available
+via the <cite>proc</cite> and <cite>sysfs</cite> file systems. It is to be noted
+that the information made available via these filesystems will vary
+between various hardware architectures and hence you should keep that in mind while
+reading this article and also writing scripts which attempt to
+retrieve information from these files.</p>
+</div>
+<div class="section" id="cpu-information">
+<h2>CPU Information</h2>
+<p>The file <cite>/proc/cpuinfo</cite> contains information about the
+processing units on your system. For example, here is a Python version
+of what the Linux command <tt class="docutils literal">cat /proc/cpuinfo</tt> would do:</p>
+<pre class="code literal-block">
+#! /usr/bin/env python
+&quot;&quot;&quot; print out the /proc/cpuinfo
+    file
+&quot;&quot;&quot;
+
+from __future__ import print_function
+
+with open('/proc/cpuinfo') as f:
+    for line in f:
+        print(line.rstrip('\n'))
+</pre>
+<p>When you execute this program either using Python 2 or Python 3, you
+should see all the contents of <cite>/proc/cpuinfo</cite> dumped on your
+screen (In the above program, the <tt class="docutils literal">rstrip()</tt> method removes the
+trailing newline character from the end of each line).</p>
+<p>The next code listing uses the <tt class="docutils literal">startswith()</tt> string method to
+display the models of your processing units:</p>
+<pre class="code literal-block">
+#! /usr/bin/env python
+
+&quot;&quot;&quot; Print the model of your
+    processing units
+
+&quot;&quot;&quot;
+
+from __future__ import print_function
+
+with open('/proc/cpuinfo') as f:
+    for line in f:
+        # Ignore the blank line separating the information between
+        # details about two processing units
+        if line.strip():
+            if line.rstrip('\n').startswith('model name'):
+                model_name = line.rstrip('\n').split(':')[1]
+                print(model_name)
+</pre>
+<p>When you run this program, you should see the model names of each of
+your processing units. For example, here is what I see on my computer:</p>
+<pre class="literal-block">
+Intel(R) Core(TM) i7-3520M CPU &#64; 2.90GHz
+Intel(R) Core(TM) i7-3520M CPU &#64; 2.90GHz
+Intel(R) Core(TM) i7-3520M CPU &#64; 2.90GHz
+Intel(R) Core(TM) i7-3520M CPU &#64; 2.90GHz
+</pre>
+<p>We have so far seen a couple of ways to find the architecture of
+the computer system we are on. To be technically correct, both those
+approaches actually report the architecture of the kernel your system is
+running. So, if your computer is actually a 64-bit computer, but is
+running a 32-bit kernel, then the above methods will report it as
+having a 32-bit architecture. To find the true architecture of the computer
+you can look for the <tt class="docutils literal">lm</tt> flag in the list of flags in
+<cite>/proc/cpuinfo</cite>. The <tt class="docutils literal">lm</tt> flag stands for long mode and
+is only present on computers with a 64-bit architecture. The next
+program shows how you can do this:</p>
+<pre class="code literal-block">
+#! /usr/bin/env python
+
+&quot;&quot;&quot; Find the real bit architecture
+&quot;&quot;&quot;
+
+from __future__ import print_function
+
+with open('/proc/cpuinfo') as f:
+    for line in f:
+        # Ignore the blank line separating the information between
+        # details about two processing units
+        if line.strip():
+            if line.rstrip('\n').startswith('flags') \
+                    or line.rstrip('\n').startswith('Features'):
+                if 'lm' in line.rstrip('\n').split():
+                    print('64-bit')
+                else:
+                    print('32-bit')
+</pre>
+<p>As we have seen so far, it is possible to read the
+<cite>/proc/cpuinfo</cite> and use simple text processing techniques to
+read the data we are looking for. To make it friendlier for other
+programs to use this data, it is perhaps a better idea to make the
+contents of <cite>/proc/cpuinfo</cite> available as a standard data
+structure, such as a dictionary. The idea is simple: if you see the
+contents of this file, you will find that for each processing unit,
+there are a number of key, value pairs (in an earlier example, we
+printed the model name of the processor, here model name was a
+key). The information about different processing units are separated
+from each other by a blank line. It is simple to build a dictionary
+structure which has each of the processing unit's data as keys. For
+each of the these keys, the value is all the information about the
+corresponding processing unit present in the file <cite>/proc/cpuinfo</cite>.
+The next listing shows how you can do so.</p>
+<pre class="code literal-block">
+#!/usr/bin/env/ python
+
+&quot;&quot;&quot;
+/proc/cpuinfo as a Python dict
+&quot;&quot;&quot;
+from __future__ import print_function
+from collections import OrderedDict
+import pprint
+
+def cpuinfo():
+    ''' Return the information in /proc/cpuinfo
+    as a dictionary in the following format:
+    cpu_info['proc0']={...}
+    cpu_info['proc1']={...}
+
+    '''
+
+    cpuinfo=OrderedDict()
+    procinfo=OrderedDict()
+
+    nprocs = 0
+    with open('/proc/cpuinfo') as f:
+        for line in f:
+            if not line.strip():
+                # end of one processor
+                cpuinfo['proc%s' % nprocs] = procinfo
+                nprocs=nprocs+1
+                # Reset
+                procinfo=OrderedDict()
+            else:
+                if len(line.split(':')) == 2:
+                    procinfo[line.split(':')[0].strip()] = line.split(':')[1].strip()
+                else:
+                    procinfo[line.split(':')[0].strip()] = ''
+
+    return cpuinfo
+
+if __name__=='__main__':
+    cpuinfo = cpuinfo()
+    for processor in cpuinfo.keys():
+        print(cpuinfo[processor]['model name'])
+</pre>
+<p>This code uses an <cite>OrderedDict</cite> (Ordered dictionary) instead of a usual dictionary so
+that the key and values are stored in the order which they are found in
+the file. Hence, the data for the first processing unit is followed by
+the data about the second processing unit and so on. If you call this
+function, it returns you a dictionary. The keys of dictionary are each
+processing unit with. You can then use to sieve for the information
+you are looking for (as demonstrated in the <tt class="docutils literal">if
+<span class="pre">__name__=='__main__'</span></tt> block). The above program when run will once
+again print the model name of each processing unit (as indicated by
+the statement <tt class="docutils literal"><span class="pre">print(cpuinfo[processor]['model</span> <span class="pre">name'])</span></tt>:</p>
+<pre class="literal-block">
+Intel(R) Core(TM) i7-3520M CPU &#64; 2.90GHz
+Intel(R) Core(TM) i7-3520M CPU &#64; 2.90GHz
+Intel(R) Core(TM) i7-3520M CPU &#64; 2.90GHz
+Intel(R) Core(TM) i7-3520M CPU &#64; 2.90GHz
+</pre>
+</div>
+<div class="section" id="memory-information">
+<h2>Memory Information</h2>
+<p>Similar to <cite>/proc/cpuinfo</cite>, the file <cite>/proc/meminfo</cite>
+contains information about the main memory on your computer. The next program
+creates a dictionary from the contents of this file and dumps it.</p>
+<pre class="code literal-block">
+#!/usr/bin/env python
+
+from __future__ import print_function
+from collections import OrderedDict
+
+def meminfo():
+    ''' Return the information in /proc/meminfo
+    as a dictionary '''
+    meminfo=OrderedDict()
+
+    with open('/proc/meminfo') as f:
+        for line in f:
+            meminfo[line.split(':')[0]] = line.split(':')[1].strip()
+    return meminfo
+
+if __name__=='__main__':
+    #print(meminfo())
+
+    meminfo = meminfo()
+    print('Total memory: {0}'.format(meminfo['MemTotal']))
+    print('Free memory: {0}'.format(meminfo['MemFree']))
+</pre>
+<p>As earlier, you could also access any specific information you are
+looking for by using that as a key (shown in the <tt class="docutils literal">if
+<span class="pre">__name__==__main__</span></tt> block). When you execute the program, you should
+see an output similar to the following:</p>
+<pre class="literal-block">
+Total memory: 7897012 kB
+Free memory: 249508 kB
+</pre>
+</div>
+<div class="section" id="network-statistics">
+<h2>Network Statistics</h2>
+<p>Next, we explore the network devices on our computer system. We will
+retrieve the network interfaces on the system and the data bytes sent
+and recieved by them since your system reboot. The
+<cite>/proc/net/dev</cite> file makes this information available. If you
+examine the contents of this file, you will notice that the first two
+lines contain header information - i.e. the first column of this file
+is the network interface name, the second and the third columns
+display information about the received and the transmitted bytes (such
+as total bytes sent, number of packets, errors, etc.). Our interest
+here is to extract the total data sent and recieved by the
+different network devices. The next listing shows how we can extract this
+information from <cite>/proc/net/dev</cite>:</p>
+<pre class="code literal-block">
+#!/usr/bin/env python
+from __future__ import print_function
+from collections import namedtuple
+
+def netdevs():
+    ''' RX and TX bytes for each of the network devices '''
+
+    with open('/proc/net/dev') as f:
+        net_dump = f.readlines()
+
+    device_data={}
+    data = namedtuple('data',['rx','tx'])
+    for line in net_dump[2:]:
+        line = line.split(':')
+        if line[0].strip() != 'lo':
+            device_data[line[0].strip()] = data(float(line[1].split()[0])/(1024.0*1024.0),
+                                                float(line[1].split()[8])/(1024.0*1024.0))
+
+    return device_data
+
+if __name__=='__main__':
+
+    netdevs = netdevs()
+    for dev in netdevs.keys():
+        print('{0}: {1} MiB {2} MiB'.format(dev, netdevs[dev].rx, netdevs[dev].tx))
+</pre>
+<p>When you run the above program, the output should display your
+network devices along with the total recieved and transmitted data in
+MiB since your last reboot as shown below:</p>
+<pre class="literal-block">
+em1: 0.0 MiB 0.0 MiB
+wlan0: 2651.40951061 MiB 183.173976898 MiB
+</pre>
+<p>You could probably couple this with a persistent data storage mechanism to write your own data usage
+monitoring program.</p>
+</div>
+<div class="section" id="processes">
+<h2>Processes</h2>
+<p>The <cite>/proc</cite> directory also contains a directory each for all
+the running processes. The directory names are the same as the process
+IDs for these processes. Hence, if you scan <cite>/proc</cite> for all
+directories which have digits as their names, you will have a list of
+process IDs of all the currently running processes. The function
+<tt class="docutils literal">process_list()</tt> in the next listing returns a list with process IDs of
+all the currently running processes. The length of this list will
+hence be the total number of processes running on the system as you
+will see when you execute the above program.</p>
+<pre class="code literal-block">
+#!/usr/bin/env python
+&quot;&quot;&quot;
+ List of all process IDs currently active
+&quot;&quot;&quot;
+
+from __future__ import print_function
+import os
+def process_list():
+
+    pids = []
+    for subdir in os.listdir('/proc'):
+        if subdir.isdigit():
+            pids.append(subdir)
+
+    return pids
+
+
+if __name__=='__main__':
+
+    pids = process_list()
+    print('Total number of running processes:: {0}'.format(len(pids)))
+</pre>
+<p>The above program when executed will show an output similar to:</p>
+<pre class="literal-block">
+Total number of running processes:: 229
+</pre>
+<p>Each of the process directories contain number of other files and
+directories which contain various information about the invoking
+command of the process, the shared libraries its using, and
+others.</p>
+<!-- Generic reader for /proc -->
+<!-- ======================== -->
+<!-- So far, we have concentrated on "hand-picking" the files or -->
+<!-- directories we wanted to read from `/proc`. The next listing presents a -->
+<!-- more generic reader of `/proc` entries. -->
+<pre class="code literal-block">
+#!/usr/bin/env python
+
+&quot;&quot;&quot;
+Python interface to the /proc file system.
+Although this can be used as a replacement for cat /proc/... on the command line,
+its really aimed to be an interface to /proc for other Python programs.
+
+As long as the object you are looking for exists in /proc
+and is readable (you have permission and if you are reading a file,
+its contents are alphanumeric, this program will find it). If its a
+directory, it will return a list of all the files in that directory
+(and its sub-dirs) which you can then read using the same function.
+
+
+Example usage:
+
+Read /proc/cpuinfo:
+
+$ ./readproc.py proc.cpuinfo
+
+Read /proc/meminfo:
+
+$ ./readproc.py proc.meminfo
+
+Read /proc/cmdline:
+
+$ ./readproc.py proc.cmdline
+
+Read /proc/1/cmdline:
+
+$ ./readproc.py proc.1.cmdline
+
+Read /proc/net/dev:
+
+$ ./readproc.py proc.net.dev
+
+Comments/Suggestions:
+
+Amit Saha &lt;&#64;echorand&gt;
+&lt;http://echorand.me&gt;
+
+&quot;&quot;&quot;
+
+from __future__ import print_function
+import os
+import sys
+import re
+
+def toitem(path):
+    &quot;&quot;&quot; Convert /foo/bar to foo.bar &quot;&quot;&quot;
+    path = path.lstrip('/').replace('/','.')
+    return path
+
+def todir(item):
+    &quot;&quot;&quot; Convert foo.bar to /foo/bar&quot;&quot;&quot;
+    # TODO: breaks if there is a directory whose name is foo.bar (for
+    # eg. conf.d/), but we don't have to worry as long as we are using
+    # this for reading /proc
+    return '/' + item.replace('.','/')
+
+def readproc(item):
+    &quot;&quot;&quot;
+    Resolves proc.foo.bar items to /proc/foo/bar and returns the
+    appropriate data.
+    1. If its a file, simply return the lines in this file as a list
+    2. If its a directory, return the files in this directory in the
+    proc.foo.bar style as a list, so that this function can then be
+    called to retrieve the contents
+    &quot;&quot;&quot;
+    item = todir(item)
+
+    if not os.path.exists(item):
+        return 'Non-existent object'
+
+    if os.path.isfile(item):
+        # its a little tricky here. We don't want to read huge binary
+        # files and return the contents. We will probably not need it
+        # in the usual case.
+        # utilities like 'file' on Linux and the Python interface to
+        # libmagic are useless when it comes to files in /proc for
+        # detecting the mime type, since the these are not on-disk
+        # files.
+        # Searching, i find this solution which seems to be a
+        # reasonable assumption. If we find a '\0' in the first 1024
+        # bytes of a file, we declare it as binary and return an empty string
+        # however, some of the files in /proc which contain text may
+        # also contain the null byte as a constituent character.
+        # Hence, I use a RE expression that matches against any
+        # combination of alphanumeric characters
+        # If any of these conditions suffice, we read the file's contents
+
+        pattern = re.compile('\w*')
+        try:
+            with open(item) as f:
+                chunk = f.read(1024)
+                if '\0' not in chunk or pattern.match(chunk) is not None:
+                    f.seek(0)
+                    data = f.readlines()
+                    return data
+                else:
+                    return '{0} is binary'.format(item)
+        except IOError:
+            return 'Error reading object'
+
+    if os.path.isdir(item):
+        data = []
+        for dir_path, dir_name, files in os.walk(item):
+            for file in files:
+                data.append(toitem(os.path.join(dir_path, file)))
+        return data
+
+if __name__=='__main__':
+
+    if len(sys.argv)&gt;1:
+        data = readproc(sys.argv[1])
+    else:
+        data = readproc('proc')
+
+    if type(data) == list:
+        for line in data:
+            print(line)
+    else:
+        print(data)
+</pre>
+<!-- The function ``readproc()`` takes inputs such as ``proc.meminfo``, -->
+<!-- ``proc.cpuinfo`` or ``proc.cmdline`` and returns the contents of -->
+<!-- the file. If the input is a directory (such as ``/proc/1903``), it -->
+<!-- will return the list of all files in the this directory and all its -->
+<!-- sub-directories. You could then invoke the function ``readproc()`` -->
+<!-- on these files to read the file contents. For example: -->
+<!-- - Read /proc/cpuinfo: ``$ ./readproc.py proc.cpuinfo`` -->
+<!-- - Read /proc/meminfo: ``$ ./readproc.py proc.meminfo`` -->
+<!-- - Read /proc/cmdline: ``$ ./readproc.py proc.cmdline`` -->
+<!-- - Read /proc/1/cmdline, i.e. the command that invoked the process with -->
+<!-- process ID 1: ``$ ./readproc.py proc.1.cmdline`` -->
+<!-- - Read /proc/net/dev: ``$ ./readproc.py proc.net.dev`` -->
+</div>
+<div class="section" id="block-devices">
+<h2>Block devices</h2>
+<p>The next program lists all the block devices by reading from the
+<cite>sysfs</cite> virtual file system. The block devices on your system can
+be found in the <cite>/sys/block</cite> directory. Thus, you may have
+directories such as <cite>/sys/block/sda, /sys/block/sdb</cite> and so on.
+To find all such devices, we perform a scan of the <cite>/sys/block</cite>
+directory using a simple regular expression to express the block devices we
+are interested in finding.</p>
+<pre class="code literal-block">
+#!/usr/bin/env python
+
+&quot;&quot;&quot;
+Read block device data from sysfs
+&quot;&quot;&quot;
+
+from __future__ import print_function
+import glob
+import re
+import os
+
+# Add any other device pattern to read from
+dev_pattern = ['sd.*','mmcblk*']
+
+def size(device):
+    nr_sectors = open(device+'/size').read().rstrip('\n')
+    sect_size = open(device+'/queue/hw_sector_size').read().rstrip('\n')
+
+    # The sect_size is in bytes, so we convert it to GiB and then send it back
+    return (float(nr_sectors)*float(sect_size))/(1024.0*1024.0*1024.0)
+
+def detect_devs():
+    for device in glob.glob('/sys/block/*'):
+        for pattern in dev_pattern:
+            if re.compile(pattern).match(os.path.basename(device)):
+                print('Device:: {0}, Size:: {1} GiB'.format(device, size(device)))
+
+if __name__=='__main__':
+    detect_devs()
+</pre>
+<p>If you run this program, you will see output similar to as follows:</p>
+<pre class="literal-block">
+Device:: /sys/block/sda, Size:: 465.761741638 GiB
+Device:: /sys/block/mmcblk0, Size:: 3.70703125 GiB
+</pre>
+<p>When I run the program, I had a SD memory card plugged in as well
+and hence you can see that the program detects it. You can extend this
+program to recognize other block devices (such as virtual hard disks)
+as well.</p>
+</div>
+<div class="section" id="building-command-line-utilities">
+<h2>Building command line utilities</h2>
+<p>One ubiquitious part of all Linux command line utilities is that they
+allow the user to specify command line arguments to customise the
+default behavior of the program. The argparse module
+allows your program to have an interface similar to built-in Linux
+utilities. The next listing shows a program which retrieves all the users on
+your system and prints their login shells (using the <cite>pwd</cite>
+standard library module):</p>
+<pre class="literal-block">
+#!/usr/bin/env python
+
+&quot;&quot;&quot;
+Print all the users and their login shells
+&quot;&quot;&quot;
+
+from __future__ import print_function
+import pwd
+
+
+# Get the users from /etc/passwd
+def getusers():
+    users = pwd.getpwall()
+    for user in users:
+        print('{0}:{1}'.format(user.pw_name, user.pw_shell))
+
+if __name__=='__main__':
+    getusers()
+</pre>
+<p>When run the program above, it will print all the users on your system
+and their login shells.</p>
+<p>Now, let us say that you want the program user
+to be able to choose whether he or she wants to see the system users
+(like <cite>daemon</cite>, <cite>apache</cite>). We will see a first use of the
+<cite>argparse</cite> module to implement this feature in by extending the
+previous listing as follows.</p>
+<pre class="code literal-block">
+#!/usr/bin/env python
+
+&quot;&quot;&quot;
+Utility to play around with users and passwords on a Linux system
+&quot;&quot;&quot;
+
+from __future__ import print_function
+import pwd
+import argparse
+import os
+
+def read_login_defs():
+
+    uid_min = None
+    uid_max = None
+
+    if os.path.exists('/etc/login.defs'):
+        with open('/etc/login.defs') as f:
+            login_data = f.readlines()
+
+        for line in login_data:
+            if line.startswith('UID_MIN'):
+                uid_min = int(line.split()[1].strip())
+
+            if line.startswith('UID_MAX'):
+                uid_max = int(line.split()[1].strip())
+
+    return uid_min, uid_max
+
+# Get the users from /etc/passwd
+def getusers(no_system=False):
+
+    uid_min, uid_max = read_login_defs()
+
+    if uid_min is None:
+        uid_min = 1000
+    if uid_max is None:
+        uid_max = 60000
+
+    users = pwd.getpwall()
+    for user in users:
+        if no_system:
+            if user.pw_uid &gt;= uid_min and user.pw_uid &lt;= uid_max:
+                print('{0}:{1}'.format(user.pw_name, user.pw_shell))
+        else:
+            print('{0}:{1}'.format(user.pw_name, user.pw_shell))
+
+if __name__=='__main__':
+
+    parser = argparse.ArgumentParser(description='User/Password Utility')
+
+    parser.add_argument('--no-system', action='store_true',dest='no_system',
+                        default = False, help='Specify to omit system users')
+
+    args = parser.parse_args()
+    getusers(args.no_system)
+</pre>
+<p>On executing the above program with the <tt class="docutils literal"><span class="pre">--help</span></tt> option, you
+will see a nice help message with the available options (and what they do):</p>
+<pre class="literal-block">
+$ ./getusers.py --help
+usage: getusers.py [-h] [--no-system]
+
+User/Password Utility
+
+optional arguments:
+  -h, --help   show this help message and exit
+  --no-system  Specify to omit system users
+</pre>
+<p>An example invocation of the above program is as follows:</p>
+<pre class="literal-block">
+$ ./getusers.py --no-system
+gene:/bin/bash
+</pre>
+<p>When you pass an invalid parameter, the program complains:</p>
+<pre class="literal-block">
+$ ./getusers.py --param
+usage: getusers.py [-h] [--no-system]
+getusers.py: error: unrecognized arguments: --param
+</pre>
+<p>Let us try to understand in brief how we used argparse in the
+above program. The statement: <tt class="docutils literal">parser =
+<span class="pre">argparse.ArgumentParser(description='User/Password</span> Utility')</tt>
+creates a new <tt class="docutils literal">ArgumentParser</tt> object with an optional description
+of what this program does.</p>
+<p>Then, we add the arguments that we want the program to recognize using
+the <tt class="docutils literal">add_argument()</tt> method in the next statement:
+<tt class="docutils literal"><span class="pre">parser.add_argument('--no-system',</span> <span class="pre">action='store_true',</span>
+<span class="pre">dest='no_system',</span> default = False, <span class="pre">help='Specify</span> to omit system
+users')</tt>. The first argument to this method is the
+name of the option that the program user will supply as an argument
+while invoking the program, the next parameter
+<tt class="docutils literal">action=store_true</tt> indicates that this is a boolean option. That
+is, its presence or absence affects the program behavior in some
+way. The <tt class="docutils literal">dest</tt> parameter specifies the variable in which the
+value that the value of this option will be available to the
+program. If this option is not supplied by the user, the default value
+is <tt class="docutils literal">False</tt> which is indicated by the parameter <tt class="docutils literal">default =
+False</tt> and the last parameter is the help message that the program
+displays about this option. Finally, the arguments are parsed using
+the <tt class="docutils literal">parse_args()</tt> method: <tt class="docutils literal">args =
+parser.parse_args()</tt>. Once the parsing is done, the values of the
+options supplied by the user can be retrieved using the syntax
+<tt class="docutils literal">args.option_dest</tt>, where <tt class="docutils literal">option_dest</tt> is the <tt class="docutils literal">dest</tt>
+variable that you specified while setting up the arguments. This
+statement: <tt class="docutils literal">getusers(args.no_system)</tt> calls the <tt class="docutils literal">getusers()</tt>
+function with the option value for <tt class="docutils literal">no_system</tt> supplied by the
+user.</p>
+<p>The next program shows how you can specify options which
+allow the user to specify non-boolean preferences to your
+program. This program is a rewrite of Listing 6, with the additional
+option to specify the network device you may be interested in.</p>
+<pre class="code literal-block">
+#!/usr/bin/env python
+from __future__ import print_function
+from collections import namedtuple
+import argparse
+
+def netdevs(iface=None):
+    ''' RX and TX bytes for each of the network devices '''
+
+    with open('/proc/net/dev') as f:
+        net_dump = f.readlines()
+
+    device_data={}
+    data = namedtuple('data',['rx','tx'])
+    for line in net_dump[2:]:
+        line = line.split(':')
+        if not iface:
+            if line[0].strip() != 'lo':
+                device_data[line[0].strip()] = data(float(line[1].split()[0])/(1024.0*1024.0),
+                                                    float(line[1].split()[8])/(1024.0*1024.0))
+        else:
+            if line[0].strip() == iface:
+                device_data[line[0].strip()] = data(float(line[1].split()[0])/(1024.0*1024.0),
+                                                    float(line[1].split()[8])/(1024.0*1024.0))
+    return device_data
+
+if __name__=='__main__':
+
+    parser = argparse.ArgumentParser(description='Network Interface Usage Monitor')
+    parser.add_argument('-i','--interface', dest='iface',
+                        help='Network interface')
+
+    args = parser.parse_args()
+
+    netdevs = netdevs(iface = args.iface)
+    for dev in netdevs.keys():
+        print('{0}: {1} MiB {2} MiB'.format(dev, netdevs[dev].rx, netdevs[dev].tx))
+</pre>
+<p>When you execute the program without any arguments, it behaves exactly
+as the earlier version. However, you can also specify the network
+device you may be interested in. For example:</p>
+<pre class="literal-block">
+$ ./net_devs_2.py
+
+em1: 0.0 MiB 0.0 MiB
+wlan0: 146.099492073 MiB 12.9737148285 MiB
+virbr1: 0.0 MiB 0.0 MiB
+virbr1-nic: 0.0 MiB 0.0 MiB
+
+$ ./net_devs_2.py  --help
+usage: net_devs_2.py [-h] [-i IFACE]
+
+Network Interface Usage Monitor
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -i IFACE, --interface IFACE
+                        Network interface
+
+$ ./net_devs_2.py  -i wlan0
+wlan0: 146.100307465 MiB 12.9777050018 MiB
+</pre>
+</div>
+<div class="section" id="system-wide-availability-of-your-scripts">
+<h2>System-wide availability of your scripts</h2>
+<p>With the help of this article, you may have been able to write one or more
+useful scripts for yourself which you want to use everyday like any
+other Linux command. The easiest way to do is make this script
+executable and setup a BASH alias to this script. You could also
+remove the .py extension and place this file in a standard location
+such as <cite>/usr/local/sbin</cite>.</p>
+</div>
+<div class="section" id="other-useful-standard-library-modules">
+<h2>Other useful standard library modules</h2>
+<p>Besides the standard library modules we have already looked at in
+this article so far, there are number of other standard modules which
+may be useful: subprocess, ConfigParser, readline and curses.</p>
+</div>
+<div class="section" id="what-next">
+<h2>What next?</h2>
+<p>At this stage, depending on your own experience with Python and
+exploring Linux internals, you may follow one of the following
+paths. If you have been writing a lot of shell scripts/command
+pipelines to explore various Linux internals, take a look at
+Python. If you wanted a easier way to write your own utility scripts
+for performing various tasks, take a look at Python. Lastly, if you
+have been using Python for programming of other kinds on Linux, have
+fun using Python for exploring Linux internals.</p>
+</div>
+<div class="section" id="resources">
+<h2>Resources</h2>
+<div class="section" id="python-resources">
+<h3>Python resources</h3>
+<ul class="simple">
+<li><a class="reference external" href="http://docs.python.org/2/tutorial/introduction.html#lists">Lists</a></li>
+<li><a class="reference external" href="http://docs.python.org/2/tutorial/datastructures.html#tuples-and-sequences">Tuples</a></li>
+<li><a class="reference external" href="http://docs.python.org/2/library/collections.html#collections.namedtuple">Namedtuples</a></li>
+<li><a class="reference external" href="http://docs.python.org/2/library/collections.html#collections.OrderedDict">OrderedDict</a></li>
+<li><a class="reference external" href="http://docs.python.org/2/library/stdtypes.html#str.split">split()</a></li>
+<li><a class="reference external" href="http://docs.python.org/2/library/stdtypes.html#string-methods">strip() rstrip() and other string methods</a></li>
+<li><a class="reference external" href="http://docs.python.org/2/tutorial/inputoutput.html#reading-and-writing-files">Reading and writing files</a></li>
+<li><a class="reference external" href="http://docs.python.org/2.7/library/os.html">os module</a></li>
+<li><a class="reference external" href="http://docs.python.org/2.7/library/platform.html">platform module</a></li>
+<li><a class="reference external" href="http://docs.python.org/2/library/pwd.html">pwd module</a></li>
+<li><a class="reference external" href="http://docs.python.org/2/library/spwd.html">spwd module</a></li>
+<li><a class="reference external" href="http://docs.python.org/2/library/grp.html">grp module</a></li>
+<li><a class="reference external" href="http://docs.python.org/2/library/subprocess.html">subprocess module</a></li>
+<li><a class="reference external" href="http://docs.python.org/2/library/configparser.html">ConfigParser module</a></li>
+<li><a class="reference external" href="http://docs.python.org/2/library/readline.html">readline module</a></li>
+</ul>
+</div>
+<div class="section" id="system-information">
+<h3>System Information</h3>
+<ul class="simple">
+<li><a class="reference external" href="http://en.wikipedia.org/wiki/Long_mode">Long Mode</a></li>
+<li><a class="reference external" href="http://linux.die.net/man/5/proc">/proc file system</a></li>
+<li><a class="reference external" href="http://en.wikipedia.org/wiki/Sysfs">sysfs</a></li>
+</ul>
+</div>
+</div>
+</div>
+    </div>
+  </article>
+
+  
+  
+
+
+
+
+
+  <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/about">About</a></li>
+         
+          <li><a href="/articles">Articles</a></li>
+         
+          <li><a href="/books">Books</a></li>
+         
+          <li><a href="/posts">Posts</a></li>
+         
+          <li><a href="/talks">Talks</a></li>
+         
+          <li><a href="/categories/">Categories</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      
+    </div>
+
+    <div id="share-footer" style="display: none">
+      
+      <ul>
+  
+  
+    
+  
+  
+  <li>
+    <a class="icon" href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fechorand.me%2fposts%2flinux-system-mining%2f">
+      <i class="fab fa-facebook fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://twitter.com/share?url=https%3a%2f%2fechorand.me%2fposts%2flinux-system-mining%2f&text=Linux%20System%20Mining%20with%20Python">
+      <i class="fab fa-twitter fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fechorand.me%2fposts%2flinux-system-mining%2f&title=Linux%20System%20Mining%20with%20Python">
+      <i class="fab fa-linkedin fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fechorand.me%2fposts%2flinux-system-mining%2f&is_video=false&description=Linux%20System%20Mining%20with%20Python">
+      <i class="fab fa-pinterest fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="mailto:?subject=Linux%20System%20Mining%20with%20Python&body=Check out this article: https%3a%2f%2fechorand.me%2fposts%2flinux-system-mining%2f">
+      <i class="fas fa-envelope fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://getpocket.com/save?url=https%3a%2f%2fechorand.me%2fposts%2flinux-system-mining%2f&title=Linux%20System%20Mining%20with%20Python">
+      <i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://reddit.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2flinux-system-mining%2f&title=Linux%20System%20Mining%20with%20Python">
+      <i class="fab fa-reddit fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.stumbleupon.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2flinux-system-mining%2f&title=Linux%20System%20Mining%20with%20Python">
+      <i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://digg.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2flinux-system-mining%2f&title=Linux%20System%20Mining%20with%20Python">
+      <i class="fab fa-digg fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.tumblr.com/share/link?url=https%3a%2f%2fechorand.me%2fposts%2flinux-system-mining%2f&name=Linux%20System%20Mining%20with%20Python&description=In%20this%20article%2c%20we%20will%20explore%20the%20Python%20programming%20language%20as%20a%20tool%20to%20retrieve%20various%20information%20about%20a%20system%20running%20Linux.%20Let%27s%20get%20started.%0aWhich%20Python%3f%20When%20I%20refer%20to%20Python%2c%20I%20am%20referring%20to%20CPython%202%20%282.7%20to%20be%20exact%29.%20I%20will%20mention%20it%20explicitly%20when%20the%20same%20code%20won%27t%20work%20with%20CPython%203%20%283.3%29%20and%20provide%20the%20alternative%20code%2c%20explaining%20the%20differences.%20Just%20to%20make%20sure%20that%20you%20have%20CPython%20installed%2c%20type%20python%20or%20python3%20from%20the%20terminal%20and%20you%20should%20see%20the%20Python%20prompt%20displayed%20in%20your%20terminal.">
+      <i class="fab fa-tumblr fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fechorand.me%2fposts%2flinux-system-mining%2f&t=Linux%20System%20Mining%20with%20Python">
+      <i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+      
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;">
+          <i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;">
+          <i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;">
+          <i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');">
+          <i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+
+  <footer id="footer">
+  <div class="footer-left">
+    Copyright  &copy; 2020  Exploring Software 
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+        <li><a href="/about">About</a></li>
+         
+        <li><a href="/articles">Articles</a></li>
+         
+        <li><a href="/books">Books</a></li>
+         
+        <li><a href="/posts">Posts</a></li>
+         
+        <li><a href="/talks">Talks</a></li>
+         
+        <li><a href="/categories/">Categories</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+
+  </div>
+</body>
+
+<link rel="stylesheet" href=/lib/font-awesome/css/all.min.css>
+<script src=/lib/jquery/jquery.min.js></script>
+<script src=/js/main.js></script>
+
+
+
+</html>

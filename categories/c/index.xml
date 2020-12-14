@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>C on Exploring Software</title>
+    <link>https://echorand.me/categories/c/</link>
+    <description>Recent content in C on Exploring Software</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 26 Jan 2018 00:00:00 +0000</lastBuildDate><atom:link href="https://echorand.me/categories/c/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>C/C&#43;&#43; Scientific Programming Libraries and Tools</title>
+      <link>https://echorand.me/posts/c_cplus_scientific_programming/</link>
+      <pubDate>Fri, 26 Jan 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/c_cplus_scientific_programming/</guid>
+      <description>math.h provides basic mathematical functions as part of the C standard library and are also usable from C++. However, it needs to be supplemented with custom libraries when advanced numerical functionalities are desired. In this article, we shall take a look at two such libraries - the GNU Scientific Library and Blitz++. In the last section of this article, we take a look at Ch - a C/C++ interpreter which combines the power of C/C++ with the ease of use of an interpreter.</description>
+    </item>
+    
+    <item>
+      <title>Data in C</title>
+      <link>https://echorand.me/posts/data-in-c/</link>
+      <pubDate>Fri, 26 Jan 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/data-in-c/</guid>
+      <description>In C, the data you use in your programs will usually fall into one of the three basic categories: int, char and float. Data in C has no existence without an associated memory location labeled by an identifier, usually referred to as a variable (the term variable is a bit misleading, since it essentially means that it must always vary, but you can have constant variables - i.e. variables whose values do not vary).</description>
+    </item>
+    
+    <item>
+      <title>Resource Acquisition Is Initialization (RAII) in C</title>
+      <link>https://echorand.me/posts/clean_up_variable_attribute/</link>
+      <pubDate>Fri, 26 Jan 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/clean_up_variable_attribute/</guid>
+      <description>GCC&#39;s C compiler allows you to define various variable attributes. One of them is the cleanup attribute (which you can also write as __cleanup__) which allows you to define a function to be called when the variable goes out of scope (for example, before returning from a function). This is useful, for example to never forget to close a file or freeing the memory you may have allocated. Next up is a demo example defining this attribute on an integer variable (which obviously has no practical value).</description>
+    </item>
+    
+  </channel>
+</rss>

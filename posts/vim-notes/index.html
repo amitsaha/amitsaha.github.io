@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title> Notes on Vim | Exploring Software</title>
+  <meta name="description" content="echo $RANDOM. Exploring Software and writing about it.">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="all,follow">
+  <meta name="googlebot" content="index,follow,snippet,archive">
+  <meta property="og:title" content="Notes on Vim" />
+<meta property="og:description" content="Modes  Insert Normal mode: In insert mode, press Ctrl-o to quickly execute a command and come back to insert mode  Files  Save current buffer as file.txt: :sav file.text. If you use :w to write the current buffer contents into a new file, post-write, you will still be editing the current buffer  Opening commands  &#43;NUM: File will be opened and cursor positioned on line, NUM &#43;/{pattern}: File will be opened and cursor positioned on first occurence of pattern &#43;&quot;NUMd|x&quot; : Delete a specific line from the file  Cursor movement  Move to the line below: j Move the line above: k Move to the character on the right: l Move to the character on the left: h Move forward to the start of the next word: w Move forward to the end of the next word: e Move backward to the start of the previous word: b Move backward to the end of the previous word: ge Jump to the beginning of a line: 0 Jump the end of a line: $  Line search f&lt;c&gt; to go the next occurence of c, ; to repeat this search, , to repeat the search in backward direction F&lt;c&gt; to go the previous occurence of c, ; to repeat this search, , to repeat the search in forward direction" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://echorand.me/posts/vim-notes/" />
+<meta property="article:published_time" content="2018-01-05T00:00:00+00:00" />
+<meta property="article:modified_time" content="2020-05-29T11:37:55+10:00" />
+
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Notes on Vim"/>
+<meta name="twitter:description" content="Modes  Insert Normal mode: In insert mode, press Ctrl-o to quickly execute a command and come back to insert mode  Files  Save current buffer as file.txt: :sav file.text. If you use :w to write the current buffer contents into a new file, post-write, you will still be editing the current buffer  Opening commands  &#43;NUM: File will be opened and cursor positioned on line, NUM &#43;/{pattern}: File will be opened and cursor positioned on first occurence of pattern &#43;&quot;NUMd|x&quot; : Delete a specific line from the file  Cursor movement  Move to the line below: j Move the line above: k Move to the character on the right: l Move to the character on the left: h Move forward to the start of the next word: w Move forward to the end of the next word: e Move backward to the start of the previous word: b Move backward to the end of the previous word: ge Jump to the beginning of a line: 0 Jump the end of a line: $  Line search f&lt;c&gt; to go the next occurence of c, ; to repeat this search, , to repeat the search in backward direction F&lt;c&gt; to go the previous occurence of c, ; to repeat this search, , to repeat the search in forward direction"/>
+
+  
+  
+  
+  <link rel="stylesheet" href="https://echorand.me/css/style-white.css">
+  
+  
+  
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  
+
+  
+<link rel="icon" type="image/png" href="https://echorand.me/images/favicon.ico" />
+
+  
+  
+  
+  
+  
+    
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-108901610-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+  
+  
+</head>
+
+<body class="max-width mx-auto px3 ltr">
+  <div class="content index py4">
+
+  <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+        <li><a href="/about">About</a></li>
+         
+        <li><a href="/articles">Articles</a></li>
+         
+        <li><a href="/books">Books</a></li>
+         
+        <li><a href="/posts">Posts</a></li>
+         
+        <li><a href="/talks">Talks</a></li>
+         
+        <li><a href="/categories/">Categories</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li>
+          <a class="icon" href=" https://echorand.me/posts/tip-terraform-security-group-existing/">
+            <i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i>
+          </a>
+        </li>
+        
+        
+        <li>
+          <a class="icon" href="https://echorand.me/posts/compilation-interpretation-c-python/">
+            <i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i>
+          </a>
+        </li>
+        
+        <li>
+          <a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');">
+            <i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i>
+          </a>
+        </li>
+        <li>
+          <a class="icon" href="#">
+            <i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i>
+          </a>
+        </li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      
+      <ul>
+  
+  
+    
+  
+  
+  <li>
+    <a class="icon" href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fechorand.me%2fposts%2fvim-notes%2f">
+      <i class="fab fa-facebook " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://twitter.com/share?url=https%3a%2f%2fechorand.me%2fposts%2fvim-notes%2f&text=Notes%20on%20Vim">
+      <i class="fab fa-twitter " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fechorand.me%2fposts%2fvim-notes%2f&title=Notes%20on%20Vim">
+      <i class="fab fa-linkedin " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fechorand.me%2fposts%2fvim-notes%2f&is_video=false&description=Notes%20on%20Vim">
+      <i class="fab fa-pinterest " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="mailto:?subject=Notes%20on%20Vim&body=Check out this article: https%3a%2f%2fechorand.me%2fposts%2fvim-notes%2f">
+      <i class="fas fa-envelope " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://getpocket.com/save?url=https%3a%2f%2fechorand.me%2fposts%2fvim-notes%2f&title=Notes%20on%20Vim">
+      <i class="fab fa-get-pocket " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://reddit.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fvim-notes%2f&title=Notes%20on%20Vim">
+      <i class="fab fa-reddit " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.stumbleupon.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fvim-notes%2f&title=Notes%20on%20Vim">
+      <i class="fab fa-stumbleupon " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://digg.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fvim-notes%2f&title=Notes%20on%20Vim">
+      <i class="fab fa-digg " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.tumblr.com/share/link?url=https%3a%2f%2fechorand.me%2fposts%2fvim-notes%2f&name=Notes%20on%20Vim&description=Modes%20%20Insert%20Normal%20mode%3a%20In%20insert%20mode%2c%20press%20Ctrl-o%20to%20quickly%20execute%20a%20command%20and%20come%20back%20to%20insert%20mode%20%20Files%20%20Save%20current%20buffer%20as%20file.txt%3a%20%3asav%20file.text.%20If%20you%20use%20%3aw%20to%20write%20the%20current%20buffer%20contents%20into%20a%20new%20file%2c%20post-write%2c%20you%20will%20still%20be%20editing%20the%20current%20buffer%20%20Opening%20commands%20%20%2bNUM%3a%20File%20will%20be%20opened%20and%20cursor%20positioned%20on%20line%2c%20NUM%20%2b%2f%7bpattern%7d%3a%20File%20will%20be%20opened%20and%20cursor%20positioned%20on%20first%20occurence%20of%20pattern%20%2b%26quot%3bNUMd%7cx%26quot%3b%20%3a%20Delete%20a%20specific%20line%20from%20the%20file%20%20Cursor%20movement%20%20Move%20to%20the%20line%20below%3a%20j%20Move%20the%20line%20above%3a%20k%20Move%20to%20the%20character%20on%20the%20right%3a%20l%20Move%20to%20the%20character%20on%20the%20left%3a%20h%20Move%20forward%20to%20the%20start%20of%20the%20next%20word%3a%20w%20Move%20forward%20to%20the%20end%20of%20the%20next%20word%3a%20e%20Move%20backward%20to%20the%20start%20of%20the%20previous%20word%3a%20b%20Move%20backward%20to%20the%20end%20of%20the%20previous%20word%3a%20ge%20Jump%20to%20the%20beginning%20of%20a%20line%3a%200%20Jump%20the%20end%20of%20a%20line%3a%20%24%20%20Line%20search%20f%26lt%3bc%26gt%3b%20to%20go%20the%20next%20occurence%20of%20c%2c%20%3b%20to%20repeat%20this%20search%2c%20%2c%20to%20repeat%20the%20search%20in%20backward%20direction%20F%26lt%3bc%26gt%3b%20to%20go%20the%20previous%20occurence%20of%20c%2c%20%3b%20to%20repeat%20this%20search%2c%20%2c%20to%20repeat%20the%20search%20in%20forward%20direction">
+      <i class="fab fa-tumblr " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fechorand.me%2fposts%2fvim-notes%2f&t=Notes%20on%20Vim">
+      <i class="fab fa-hacker-news " aria-hidden="true"></i>
+    </a>
+  </li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <nav id="TableOfContents">
+  <ul>
+    <li><a href="#movements">Movements</a></li>
+  </ul>
+</nav>
+    </div>
+  </span>
+</div>
+
+
+  <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+    <header>
+      <h1 class="posttitle" itemprop="name headline">
+        Notes on Vim
+      </h1>
+      <div class="meta">
+        
+        <div class="postdate">
+          
+          <time datetime="2018-01-05 00:00:00 &#43;0000 UTC" itemprop="datePublished">2018-01-05</time>
+          
+        </div>
+        
+        
+      </div>
+    </header>
+
+  
+    <div class="content" itemprop="articleBody">
+      <h1 id="modes">Modes</h1>
+<ul>
+<li>Insert Normal mode: In insert mode, press <code>Ctrl-o</code> to quickly execute a command and come back to insert mode</li>
+</ul>
+<h1 id="files">Files</h1>
+<ul>
+<li>Save current buffer as <code>file.txt</code>: <code>:sav file.text</code>. If you use <code>:w</code> to write the current buffer contents into a new file, post-write, you will still be editing the current buffer</li>
+</ul>
+<h1 id="opening-commands">Opening commands</h1>
+<ul>
+<li><code>+NUM</code>: File will be opened and cursor positioned on line, NUM</li>
+<li><code>+/{pattern}</code>: File will be opened and cursor positioned on first occurence of <code>pattern</code></li>
+<li><code>+&quot;NUMd|x&quot;</code> : Delete a specific line from the file</li>
+</ul>
+<h1 id="cursor-movement">Cursor movement</h1>
+<ul>
+<li>Move to the line below: <code>j</code></li>
+<li>Move the line above: <code>k</code></li>
+<li>Move to the character on the right: <code>l</code></li>
+<li>Move to the character on the left: <code>h</code></li>
+<li>Move forward to the start of the next word: <code>w</code></li>
+<li>Move forward to the end of the next word: <code>e</code></li>
+<li>Move backward to the start of the previous word: <code>b</code></li>
+<li>Move backward to the end of the previous word: <code>ge</code></li>
+<li>Jump to the beginning of a line: <code>0</code></li>
+<li>Jump the end of a line: <code>$</code></li>
+</ul>
+<h1 id="line-search">Line search</h1>
+<p><code>f&lt;c&gt;</code> to go the next occurence of <code>c</code>, <code>;</code> to repeat this search, <code>,</code> to repeat the search in backward direction
+<code>F&lt;c&gt;</code> to go the previous occurence of <code>c</code>, <code>;</code> to repeat this search, <code>,</code> to repeat the search in forward direction</p>
+<h1 id="replacing-a-word-in-a-block">Replacing a word in a block</h1>
+<ul>
+<li>Go the beginning of a word in the block</li>
+<li>Press <code>Ctrl+v</code>, select the word</li>
+<li>Select all the words using down arrow</li>
+<li><code>c</code>, type in the new word, <code>esc</code></li>
+</ul>
+<h1 id="changing-a-word-at-n-positions">Changing a word at n positions</h1>
+<ul>
+<li>Search for the word</li>
+<li><code>cgn</code> - change it</li>
+<li>Press the <code>.</code> key to change the next, <code>n</code> to skip it</li>
+</ul>
+<h1 id="recording-and-playing-macros">Recording and playing macros</h1>
+<ul>
+<li>Start macro recording: <code>q&lt;key&gt;</code> where key is the register you want to store the macro in</li>
+<li><code>&lt;perform actions&gt;</code>. One point to note here is to make your steps so that you start from the beginning of a line.</li>
+<li>Press <code>q</code> to save</li>
+<li>To apply the macro on a line: <code>@&lt;key&gt;</code></li>
+<li>To apply the macro to a selection:
+<ul>
+<li>Visually select the area</li>
+<li><code>:'&lt;,'&gt; normal @&lt;key&gt;</code></li>
+</ul>
+</li>
+</ul>
+<h1 id="swap-two-characters">Swap two characters</h1>
+<ul>
+<li>Place cursor on the first character</li>
+<li><code>xp</code></li>
+<li>Learn more: <a href="https://stackoverflow.com/questions/1529414/vim-how-do-i-swap-two-characters">https://stackoverflow.com/questions/1529414/vim-how-do-i-swap-two-characters</a></li>
+</ul>
+<h1 id="switch-case">Switch case</h1>
+<ul>
+<li>Select the character, word</li>
+<li>Press <code>~</code>.</li>
+</ul>
+<h1 id="replace-character">Replace character</h1>
+<ul>
+<li>Select</li>
+<li><code>Shift+R</code></li>
+</ul>
+<h1 id="move-block-of-text">Move block of text</h1>
+<ul>
+<li>Left: <code>&lt;&lt;</code></li>
+<li>Right: <code>&gt;&gt;</code></li>
+</ul>
+<h1 id="delete">Delete</h1>
+<ul>
+<li>Delete till a character on the current line: <code>dt&lt;character&gt;</code></li>
+<li>Delete current word: <code>diw</code></li>
+<li>Delete text between quotes: <code>di&quot;</code></li>
+<li>Delete all the contents: <code>gg</code> to go to the beginning + <code>dG</code></li>
+<li>Delete from current position to the end of line: <code>d$</code></li>
+<li>Delete entire file contents: <code>:%d</code></li>
+<li>Delete current work and enter insert mode: <code>cw</code></li>
+</ul>
+<h1 id="search">Search</h1>
+<ul>
+<li><code>*</code> searches forward for the word under cursor, <code>#</code> searches backward for the word under cursor.</li>
+<li><code>ggn</code> - go to the top of the file and find next occurence</li>
+<li>Search history: <code>/</code> and type <code>Ctrl+r</code>, <code>ctrl+w</code> to search in reverse and forward</li>
+</ul>
+<h1 id="folds">Folds</h1>
+<ul>
+<li><code>set foldmethod=indent</code></li>
+</ul>
+<h2 id="movements">Movements</h2>
+<pre><code>zo Open current fold under the cursor.
+zc Close current fold under the cursor.
+za Toggle current fold under the cursor.
+zd Delete fold under the cursor. (only the fold, text is unchanged.)
+zj Move the cursor to the next fold.
+zk Move the cursor to the previous fold.
+zR Open all folds in a current buffer. (Reduce all folds)
+zM Close all open folds in a current buffer. (Close more and More folds)
+zE Delete all folds the current buffer
+:fold In Visual mode: fold selected lines
+</code></pre><h1 id="powerless-verbs">Powerless verbs</h1>
+<ul>
+<li>x - delete character under the cursor to the right</li>
+<li>X - delete character under the cursor to the left</li>
+<li>r - replace character under the cursor with another character</li>
+<li>s- delete character under the cursor and enter the Insert mode</li>
+</ul>
+<h1 id="miscellaneous-movements">Miscellaneous movements</h1>
+<ul>
+<li><code>zz</code> to center the current line to the center</li>
+<li><code>G</code> to go the last line of the document</li>
+<li><code>gg</code> to go the first line of the document</li>
+<li><code>H</code> to move to the top of the screen</li>
+<li><code>M</code> to move to the middle of the screen</li>
+<li><code>L</code> to move to the bottom of the screen</li>
+<li>Scroll down half page: <code>Ctrl-d</code></li>
+<li>Scroll up half page: <code>Ctrl-u</code></li>
+<li>Scroll down full page: <code>Ctrl-f</code></li>
+<li>Scroll up full page: <code>Ctrl-b</code></li>
+<li>Go to line at 50% of file: <code>50%</code></li>
+<li>In Insert mode, <code>shift+right/left arrow</code> to jump forward/backward by words</li>
+</ul>
+<h1 id="external-resources">External Resources</h1>
+<ul>
+<li><a href="https://www.rosehosting.com/blog/vim-tips-and-tricks/">vim tips and tricks</a></li>
+<li><a href="http://www.viemu.com/vi-vim-cheat-sheet.gif">vi/vim cheat sheet</a></li>
+<li><a href="https://vim.rtorr.com/">vim cheat sheet</a></li>
+<li><a href="http://vim.wikia.com/wiki/Search_and_replace">Search and Replace</a></li>
+<li><a href="http://vimcasts.org/transcripts/22/en/">Visual block mode</a></li>
+<li><a href="http://vimcasts.org/blog/2013/02/habit-breaking-habit-making/">Habit breaking, Habit Making</a></li>
+<li><a href="https://medium.com/@schtoeffel/you-don-t-need-more-than-one-cursor-in-vim-2c44117d51db">You don’t need more than one cursor in vim
+</a></li>
+</ul>
+
+    </div>
+  </article>
+
+  
+  
+
+
+
+
+
+  <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/about">About</a></li>
+         
+          <li><a href="/articles">Articles</a></li>
+         
+          <li><a href="/books">Books</a></li>
+         
+          <li><a href="/posts">Posts</a></li>
+         
+          <li><a href="/talks">Talks</a></li>
+         
+          <li><a href="/categories/">Categories</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <nav id="TableOfContents">
+  <ul>
+    <li><a href="#movements">Movements</a></li>
+  </ul>
+</nav>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      
+      <ul>
+  
+  
+    
+  
+  
+  <li>
+    <a class="icon" href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fechorand.me%2fposts%2fvim-notes%2f">
+      <i class="fab fa-facebook fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://twitter.com/share?url=https%3a%2f%2fechorand.me%2fposts%2fvim-notes%2f&text=Notes%20on%20Vim">
+      <i class="fab fa-twitter fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fechorand.me%2fposts%2fvim-notes%2f&title=Notes%20on%20Vim">
+      <i class="fab fa-linkedin fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fechorand.me%2fposts%2fvim-notes%2f&is_video=false&description=Notes%20on%20Vim">
+      <i class="fab fa-pinterest fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="mailto:?subject=Notes%20on%20Vim&body=Check out this article: https%3a%2f%2fechorand.me%2fposts%2fvim-notes%2f">
+      <i class="fas fa-envelope fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://getpocket.com/save?url=https%3a%2f%2fechorand.me%2fposts%2fvim-notes%2f&title=Notes%20on%20Vim">
+      <i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://reddit.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fvim-notes%2f&title=Notes%20on%20Vim">
+      <i class="fab fa-reddit fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.stumbleupon.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fvim-notes%2f&title=Notes%20on%20Vim">
+      <i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://digg.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fvim-notes%2f&title=Notes%20on%20Vim">
+      <i class="fab fa-digg fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.tumblr.com/share/link?url=https%3a%2f%2fechorand.me%2fposts%2fvim-notes%2f&name=Notes%20on%20Vim&description=Modes%20%20Insert%20Normal%20mode%3a%20In%20insert%20mode%2c%20press%20Ctrl-o%20to%20quickly%20execute%20a%20command%20and%20come%20back%20to%20insert%20mode%20%20Files%20%20Save%20current%20buffer%20as%20file.txt%3a%20%3asav%20file.text.%20If%20you%20use%20%3aw%20to%20write%20the%20current%20buffer%20contents%20into%20a%20new%20file%2c%20post-write%2c%20you%20will%20still%20be%20editing%20the%20current%20buffer%20%20Opening%20commands%20%20%2bNUM%3a%20File%20will%20be%20opened%20and%20cursor%20positioned%20on%20line%2c%20NUM%20%2b%2f%7bpattern%7d%3a%20File%20will%20be%20opened%20and%20cursor%20positioned%20on%20first%20occurence%20of%20pattern%20%2b%26quot%3bNUMd%7cx%26quot%3b%20%3a%20Delete%20a%20specific%20line%20from%20the%20file%20%20Cursor%20movement%20%20Move%20to%20the%20line%20below%3a%20j%20Move%20the%20line%20above%3a%20k%20Move%20to%20the%20character%20on%20the%20right%3a%20l%20Move%20to%20the%20character%20on%20the%20left%3a%20h%20Move%20forward%20to%20the%20start%20of%20the%20next%20word%3a%20w%20Move%20forward%20to%20the%20end%20of%20the%20next%20word%3a%20e%20Move%20backward%20to%20the%20start%20of%20the%20previous%20word%3a%20b%20Move%20backward%20to%20the%20end%20of%20the%20previous%20word%3a%20ge%20Jump%20to%20the%20beginning%20of%20a%20line%3a%200%20Jump%20the%20end%20of%20a%20line%3a%20%24%20%20Line%20search%20f%26lt%3bc%26gt%3b%20to%20go%20the%20next%20occurence%20of%20c%2c%20%3b%20to%20repeat%20this%20search%2c%20%2c%20to%20repeat%20the%20search%20in%20backward%20direction%20F%26lt%3bc%26gt%3b%20to%20go%20the%20previous%20occurence%20of%20c%2c%20%3b%20to%20repeat%20this%20search%2c%20%2c%20to%20repeat%20the%20search%20in%20forward%20direction">
+      <i class="fab fa-tumblr fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fechorand.me%2fposts%2fvim-notes%2f&t=Notes%20on%20Vim">
+      <i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+      
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;">
+          <i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;">
+          <i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;">
+          <i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');">
+          <i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+
+  <footer id="footer">
+  <div class="footer-left">
+    Copyright  &copy; 2020  Exploring Software 
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+        <li><a href="/about">About</a></li>
+         
+        <li><a href="/articles">Articles</a></li>
+         
+        <li><a href="/books">Books</a></li>
+         
+        <li><a href="/posts">Posts</a></li>
+         
+        <li><a href="/talks">Talks</a></li>
+         
+        <li><a href="/categories/">Categories</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+
+  </div>
+</body>
+
+<link rel="stylesheet" href=/lib/font-awesome/css/all.min.css>
+<script src=/lib/jquery/jquery.min.js></script>
+<script src=/js/main.js></script>
+
+
+
+</html>

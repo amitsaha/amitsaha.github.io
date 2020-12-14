@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title> PYCON US 2018 talk Counter, Gauge, Upper 90 - Oh my! | Exploring Software</title>
+  <meta name="description" content="echo $RANDOM. Exploring Software and writing about it.">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="all,follow">
+  <meta name="googlebot" content="index,follow,snippet,archive">
+  <meta property="og:title" content="PYCON US 2018 talk Counter, Gauge, Upper 90 - Oh my!" />
+<meta property="og:description" content="In a couple of days, on Saturday, I will be delivering my PYCON US talk titled Counter, Gauge, Upper 90 - Oh my!.
+This talk covers my journey into application monitoring in general and Python applications specifically. We will start with looking into the why of monitoring, learn the absolute basics of various monitoring terminologies and use pandas to play with some of the aggregation and summarizing operation usually associated with monitoring." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://echorand.me/posts/pycon-counter-gauge-oh-my/" />
+<meta property="article:published_time" content="2018-05-09T00:00:00+00:00" />
+<meta property="article:modified_time" content="2019-06-17T14:58:57+10:00" />
+
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="PYCON US 2018 talk Counter, Gauge, Upper 90 - Oh my!"/>
+<meta name="twitter:description" content="In a couple of days, on Saturday, I will be delivering my PYCON US talk titled Counter, Gauge, Upper 90 - Oh my!.
+This talk covers my journey into application monitoring in general and Python applications specifically. We will start with looking into the why of monitoring, learn the absolute basics of various monitoring terminologies and use pandas to play with some of the aggregation and summarizing operation usually associated with monitoring."/>
+
+  
+  
+  
+  <link rel="stylesheet" href="https://echorand.me/css/style-white.css">
+  
+  
+  
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  
+
+  
+<link rel="icon" type="image/png" href="https://echorand.me/images/favicon.ico" />
+
+  
+  
+  
+  
+  
+    
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-108901610-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+  
+  
+</head>
+
+<body class="max-width mx-auto px3 ltr">
+  <div class="content index py4">
+
+  <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+        <li><a href="/about">About</a></li>
+         
+        <li><a href="/articles">Articles</a></li>
+         
+        <li><a href="/books">Books</a></li>
+         
+        <li><a href="/posts">Posts</a></li>
+         
+        <li><a href="/talks">Talks</a></li>
+         
+        <li><a href="/categories/">Categories</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li>
+          <a class="icon" href=" https://echorand.me/posts/fedora-scientific-28/">
+            <i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i>
+          </a>
+        </li>
+        
+        
+        <li>
+          <a class="icon" href="https://echorand.me/posts/video-counter-gauge-oh-my/">
+            <i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i>
+          </a>
+        </li>
+        
+        <li>
+          <a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');">
+            <i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i>
+          </a>
+        </li>
+        <li>
+          <a class="icon" href="#">
+            <i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i>
+          </a>
+        </li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      
+      <ul>
+  
+  
+    
+  
+  
+  <li>
+    <a class="icon" href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fechorand.me%2fposts%2fpycon-counter-gauge-oh-my%2f">
+      <i class="fab fa-facebook " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://twitter.com/share?url=https%3a%2f%2fechorand.me%2fposts%2fpycon-counter-gauge-oh-my%2f&text=PYCON%20US%202018%20talk%20Counter%2c%20Gauge%2c%20Upper%2090%20-%20Oh%20my%21">
+      <i class="fab fa-twitter " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fechorand.me%2fposts%2fpycon-counter-gauge-oh-my%2f&title=PYCON%20US%202018%20talk%20Counter%2c%20Gauge%2c%20Upper%2090%20-%20Oh%20my%21">
+      <i class="fab fa-linkedin " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fechorand.me%2fposts%2fpycon-counter-gauge-oh-my%2f&is_video=false&description=PYCON%20US%202018%20talk%20Counter%2c%20Gauge%2c%20Upper%2090%20-%20Oh%20my%21">
+      <i class="fab fa-pinterest " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="mailto:?subject=PYCON%20US%202018%20talk%20Counter%2c%20Gauge%2c%20Upper%2090%20-%20Oh%20my%21&body=Check out this article: https%3a%2f%2fechorand.me%2fposts%2fpycon-counter-gauge-oh-my%2f">
+      <i class="fas fa-envelope " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://getpocket.com/save?url=https%3a%2f%2fechorand.me%2fposts%2fpycon-counter-gauge-oh-my%2f&title=PYCON%20US%202018%20talk%20Counter%2c%20Gauge%2c%20Upper%2090%20-%20Oh%20my%21">
+      <i class="fab fa-get-pocket " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://reddit.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fpycon-counter-gauge-oh-my%2f&title=PYCON%20US%202018%20talk%20Counter%2c%20Gauge%2c%20Upper%2090%20-%20Oh%20my%21">
+      <i class="fab fa-reddit " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.stumbleupon.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fpycon-counter-gauge-oh-my%2f&title=PYCON%20US%202018%20talk%20Counter%2c%20Gauge%2c%20Upper%2090%20-%20Oh%20my%21">
+      <i class="fab fa-stumbleupon " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://digg.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fpycon-counter-gauge-oh-my%2f&title=PYCON%20US%202018%20talk%20Counter%2c%20Gauge%2c%20Upper%2090%20-%20Oh%20my%21">
+      <i class="fab fa-digg " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.tumblr.com/share/link?url=https%3a%2f%2fechorand.me%2fposts%2fpycon-counter-gauge-oh-my%2f&name=PYCON%20US%202018%20talk%20Counter%2c%20Gauge%2c%20Upper%2090%20-%20Oh%20my%21&description=In%20a%20couple%20of%20days%2c%20on%20Saturday%2c%20I%20will%20be%20delivering%20my%20PYCON%20US%20talk%20titled%20Counter%2c%20Gauge%2c%20Upper%2090%20-%20Oh%20my%21.%0aThis%20talk%20covers%20my%20journey%20into%20application%20monitoring%20in%20general%20and%20Python%20applications%20specifically.%20We%20will%20start%20with%20looking%20into%20the%20why%20of%20monitoring%2c%20learn%20the%20absolute%20basics%20of%20various%20monitoring%20terminologies%20and%20use%20pandas%20to%20play%20with%20some%20of%20the%20aggregation%20and%20summarizing%20operation%20usually%20associated%20with%20monitoring.">
+      <i class="fab fa-tumblr " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fechorand.me%2fposts%2fpycon-counter-gauge-oh-my%2f&t=PYCON%20US%202018%20talk%20Counter%2c%20Gauge%2c%20Upper%2090%20-%20Oh%20my%21">
+      <i class="fab fa-hacker-news " aria-hidden="true"></i>
+    </a>
+  </li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <nav id="TableOfContents"></nav>
+    </div>
+  </span>
+</div>
+
+
+  <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+    <header>
+      <h1 class="posttitle" itemprop="name headline">
+        PYCON US 2018 talk Counter, Gauge, Upper 90 - Oh my!
+      </h1>
+      <div class="meta">
+        
+        <div class="postdate">
+          
+          <time datetime="2018-05-09 00:00:00 &#43;0000 UTC" itemprop="datePublished">2018-05-09</time>
+          
+        </div>
+        
+        <div class="article-category">
+            <i class="fas fa-archive"></i>
+            
+            
+            <a class="category-link" href="/categories/python">python</a>
+            
+        </div>
+        
+        
+      </div>
+    </header>
+
+  
+    <div class="content" itemprop="articleBody">
+      <p>In a couple of days, on Saturday, I will be delivering my PYCON US talk titled <a href="https://us.pycon.org/2018/schedule/presentation/133/">Counter, Gauge, Upper 90 - Oh my!</a>.</p>
+<p>This talk covers my journey into application monitoring in general and Python applications specifically.
+We will start with looking into the why of monitoring, learn the absolute basics of various monitoring
+terminologies and use <a href="https://pandas.pydata.org/">pandas</a> to play with some of the aggregation and summarizing operation usually
+associated with monitoring. We will look into what we should monitor and then conclude with a
+look at integrating monitoring into our Python applications.</p>
+<p>If you are keen to learn more before the talk to help you decide, my <a href="https://opensource.com/article/18/4/metrics-monitoring-and-python">article</a> may be helpful.</p>
+
+    </div>
+  </article>
+
+  
+  
+
+
+
+
+
+  <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/about">About</a></li>
+         
+          <li><a href="/articles">Articles</a></li>
+         
+          <li><a href="/books">Books</a></li>
+         
+          <li><a href="/posts">Posts</a></li>
+         
+          <li><a href="/talks">Talks</a></li>
+         
+          <li><a href="/categories/">Categories</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <nav id="TableOfContents"></nav>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      
+      <ul>
+  
+  
+    
+  
+  
+  <li>
+    <a class="icon" href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fechorand.me%2fposts%2fpycon-counter-gauge-oh-my%2f">
+      <i class="fab fa-facebook fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://twitter.com/share?url=https%3a%2f%2fechorand.me%2fposts%2fpycon-counter-gauge-oh-my%2f&text=PYCON%20US%202018%20talk%20Counter%2c%20Gauge%2c%20Upper%2090%20-%20Oh%20my%21">
+      <i class="fab fa-twitter fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fechorand.me%2fposts%2fpycon-counter-gauge-oh-my%2f&title=PYCON%20US%202018%20talk%20Counter%2c%20Gauge%2c%20Upper%2090%20-%20Oh%20my%21">
+      <i class="fab fa-linkedin fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fechorand.me%2fposts%2fpycon-counter-gauge-oh-my%2f&is_video=false&description=PYCON%20US%202018%20talk%20Counter%2c%20Gauge%2c%20Upper%2090%20-%20Oh%20my%21">
+      <i class="fab fa-pinterest fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="mailto:?subject=PYCON%20US%202018%20talk%20Counter%2c%20Gauge%2c%20Upper%2090%20-%20Oh%20my%21&body=Check out this article: https%3a%2f%2fechorand.me%2fposts%2fpycon-counter-gauge-oh-my%2f">
+      <i class="fas fa-envelope fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://getpocket.com/save?url=https%3a%2f%2fechorand.me%2fposts%2fpycon-counter-gauge-oh-my%2f&title=PYCON%20US%202018%20talk%20Counter%2c%20Gauge%2c%20Upper%2090%20-%20Oh%20my%21">
+      <i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://reddit.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fpycon-counter-gauge-oh-my%2f&title=PYCON%20US%202018%20talk%20Counter%2c%20Gauge%2c%20Upper%2090%20-%20Oh%20my%21">
+      <i class="fab fa-reddit fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.stumbleupon.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fpycon-counter-gauge-oh-my%2f&title=PYCON%20US%202018%20talk%20Counter%2c%20Gauge%2c%20Upper%2090%20-%20Oh%20my%21">
+      <i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://digg.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fpycon-counter-gauge-oh-my%2f&title=PYCON%20US%202018%20talk%20Counter%2c%20Gauge%2c%20Upper%2090%20-%20Oh%20my%21">
+      <i class="fab fa-digg fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.tumblr.com/share/link?url=https%3a%2f%2fechorand.me%2fposts%2fpycon-counter-gauge-oh-my%2f&name=PYCON%20US%202018%20talk%20Counter%2c%20Gauge%2c%20Upper%2090%20-%20Oh%20my%21&description=In%20a%20couple%20of%20days%2c%20on%20Saturday%2c%20I%20will%20be%20delivering%20my%20PYCON%20US%20talk%20titled%20Counter%2c%20Gauge%2c%20Upper%2090%20-%20Oh%20my%21.%0aThis%20talk%20covers%20my%20journey%20into%20application%20monitoring%20in%20general%20and%20Python%20applications%20specifically.%20We%20will%20start%20with%20looking%20into%20the%20why%20of%20monitoring%2c%20learn%20the%20absolute%20basics%20of%20various%20monitoring%20terminologies%20and%20use%20pandas%20to%20play%20with%20some%20of%20the%20aggregation%20and%20summarizing%20operation%20usually%20associated%20with%20monitoring.">
+      <i class="fab fa-tumblr fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fechorand.me%2fposts%2fpycon-counter-gauge-oh-my%2f&t=PYCON%20US%202018%20talk%20Counter%2c%20Gauge%2c%20Upper%2090%20-%20Oh%20my%21">
+      <i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+      
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;">
+          <i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;">
+          <i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;">
+          <i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');">
+          <i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+
+  <footer id="footer">
+  <div class="footer-left">
+    Copyright  &copy; 2020  Exploring Software 
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+        <li><a href="/about">About</a></li>
+         
+        <li><a href="/articles">Articles</a></li>
+         
+        <li><a href="/books">Books</a></li>
+         
+        <li><a href="/posts">Posts</a></li>
+         
+        <li><a href="/talks">Talks</a></li>
+         
+        <li><a href="/categories/">Categories</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+
+  </div>
+</body>
+
+<link rel="stylesheet" href=/lib/font-awesome/css/all.min.css>
+<script src=/lib/jquery/jquery.min.js></script>
+<script src=/js/main.js></script>
+
+
+
+</html>

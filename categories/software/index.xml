@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>software on Exploring Software</title>
+    <link>https://echorand.me/categories/software/</link>
+    <description>Recent content in software on Exploring Software</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 05 May 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://echorand.me/categories/software/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Sorting pages by last modified date in Hugo</title>
+      <link>https://echorand.me/posts/hugo-reverse-sort-modified/</link>
+      <pubDate>Tue, 05 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/hugo-reverse-sort-modified/</guid>
+      <description>This blog is managed as a git repository and I use Hugo as the framework for managing it. I am using the Hugo classic theme which I have tweaked slightly and store it along with the blog source.
+I wanted to modify the sorting of the blog post titles on the index page so that the most recently modified page was displayed first. The support was added to Hugo 4 years back, so the following template worked for me:</description>
+    </item>
+    
+    <item>
+      <title>Correlated error logging</title>
+      <link>https://echorand.me/posts/correlated-error-logging/</link>
+      <pubDate>Thu, 12 Dec 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/correlated-error-logging/</guid>
+      <description>Please note this document is currently in progress. You may read this other post instead which illustrates what I wanted to discuss in this post with an implementation in Go.
+Introduction In a service oriented architecture, more popular these days as a microservice oriented architecture it&amp;rsquo;s notoriously difficult and time consuming to find out whether a certain error observed in a particular service may have been caused to an error in another service.</description>
+    </item>
+    
+    <item>
+      <title>Notes on Bash auto-completion on Linux</title>
+      <link>https://echorand.me/posts/linux_shell_autocompletion/</link>
+      <pubDate>Wed, 03 Jul 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/linux_shell_autocompletion/</guid>
+      <description>Introduction What happens when you press &amp;lt;command&amp;gt; &amp;lt;TAB&amp;gt; or &amp;lt;command&amp;gt; &amp;lt;TAB&amp;gt;&amp;lt;TAB&amp;gt;? You get a bunch of suggestions with one of them just the one you had in mind you were going to type. Auto completions in shells are super helpful and as we will find out, quite a bit goes on behind the scenes. Before we go too further into my investigations and findings, I must credit the author of this blog post - it triggered my curiosity and made me find time out to learn more about something I use everyday, but didn&amp;rsquo;t know much about how it worked.</description>
+    </item>
+    
+    <item>
+      <title>Notes on PostgreSQL</title>
+      <link>https://echorand.me/posts/pg-sql-notes/</link>
+      <pubDate>Thu, 27 Jun 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/pg-sql-notes/</guid>
+      <description>Some notes on PostgreSQL which you may find useful. Thanks to all those numerous StackOverflow answers that helped me do my job at hand.
+Schemas and Database The database is the highest level of organization. A database can have one or more schemas. The public schema is present by default and all tables created are created in this schema, if not otherwise specified. Learn more about it in the documentation</description>
+    </item>
+    
+    <item>
+      <title>Hard Links and Soft/Symbolic Links on Linux</title>
+      <link>https://echorand.me/posts/hard-links-soft-links-linux/</link>
+      <pubDate>Fri, 09 Nov 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/hard-links-soft-links-linux/</guid>
+      <description>Much has been written (and asked) on the topic of hard links and soft links (a.k.a symbolic links) on Linux. I have read a few of those more than once. However, I end up getting confused between the two, specifically the differences between the two. So, here&amp;rsquo;s my post on the topic with the hope that I will stop getting confused ever again.
+Our setup Let&amp;rsquo;s create a file and write a line into it:</description>
+    </item>
+    
+    <item>
+      <title>On sane defaults in sofware tools</title>
+      <link>https://echorand.me/posts/on-sane-defaults/</link>
+      <pubDate>Fri, 26 Oct 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/on-sane-defaults/</guid>
+      <description>My task at hand was simple. Build a Docker image of a ASP.NET application (full framework) hosted in IIS on a build host (host1) and move it to a deployment host (host2) and run it. This is a story of how I spent close to two full working days trying to debug a simple issue which sane default behavior of a tool would have cut it to seconds.
+Key details The key details that are important to my story are:</description>
+    </item>
+    
+    <item>
+      <title>flyway baseline Introducing flyway migrations into existing database</title>
+      <link>https://echorand.me/posts/flyway-baseline-migration/</link>
+      <pubDate>Fri, 12 Oct 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/flyway-baseline-migration/</guid>
+      <description>If you are trying to introduce flyway to an existing database with the schemas and tables already created, you may find flyway baseline command useful.
+Let&amp;rsquo;s say you already have the migration scripts written, or perhaps dumped out of your existing DB setup, and they are:
+V1__foo.sql V2__foo_new.sql. V3__bar.sql You basically want to say - flyway, ignore all scripts upto V3, but if there are newer migrations, run them. To do so, you run the baseline command, like so:</description>
+    </item>
+    
+    <item>
+      <title>Git Staging partial changes in a file</title>
+      <link>https://echorand.me/posts/git-only-stage-partial-changes/</link>
+      <pubDate>Thu, 11 Oct 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/git-only-stage-partial-changes/</guid>
+      <description>Let&amp;rsquo;s say you have made a few changes to a file and only want to stage only some of those changes for commit. You may want to do so either to create a nice commit history or may be you just want to discard some of the changes. Either way, git add -p is our friend. Let&amp;rsquo;s see an example:
+$ git add -p file1 ... index b82819b..a281865 100644 --- file1 +++ file2 @@ -139,8 +139,14 @@ else docker run \ -e ConnectionStrings__Db=&amp;quot;Data Source=\&amp;quot;tcp:$SQL_SERVER_IP\&amp;quot;;Persist Security Info=True;Initial Catalog=$DB_NAME;User ID=$APPLICATION_USER_NAME;Password=$DB_APPLICATION_PASSWORD&amp;quot; \ - -e App__RedisCS=&amp;quot;$REDIS_IP&amp;quot; \ + -e &amp;quot;${APPLICATION_NAME}_Web__CI__ConnectionStrings__Db&amp;quot;=&amp;quot;Data Source=\&amp;quot;tcp:$SQL_SERVER_IP\&amp;quot;;Persist Security Info=True;Initial Catalog=$DB_NAME;User ID=$APPLICATION_USER_NAME;Password=$DB_APPLICATION_PASSWORD&amp;quot; \ --sysctl net.</description>
+    </item>
+    
+    <item>
+      <title>flyway, SQL server and non-empty schema?</title>
+      <link>https://echorand.me/posts/sql-server-flyway-non-empty-schema/</link>
+      <pubDate>Fri, 28 Sep 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/sql-server-flyway-non-empty-schema/</guid>
+      <description>While attempting to use flyway for SQL server schema migrations, I was consistently getting an error of the form Found non-empty schema xxx ithout metadata table! Use init() or set initOnMigrate to true to initialize the metadata table.. Okay, so easy - let me just delete the tables, drop the schema and we will be good. No luck!
+Okay, let&amp;rsquo;s try cleaning it - a destructive process potentially, but the risks were low in my case.</description>
+    </item>
+    
+    <item>
+      <title>Download a file using `curl` - How hard can it get?</title>
+      <link>https://echorand.me/posts/curl-download-redirect/</link>
+      <pubDate>Fri, 14 Sep 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/curl-download-redirect/</guid>
+      <description>I wanted to download the prometheus binary using curl. My first attempt:
+$ curl https://github.com/prometheus/prometheus/releases/download/v2.4.0/prometheus-2.4.0.linux-amd64.tar.gz &amp;lt;html&amp;gt;&amp;lt;body&amp;gt; You are being &amp;lt;a href=&amp;quot;https://github-production-release-asset-2e65be.s3.amazonaws.com/6838921/5c87dc00-b5d1-11e8-8a3a-fd29b54e0c60?X-Amz-Algorithm=AWS4-HMAC-SHA256&amp;amp;amp;X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20180914%2Fus-east-1%2Fs3%2Faws4_request&amp;amp;amp;X-Amz-Date=20180914T004135Z&amp;amp;amp;X-Amz-Expires=300&amp;amp;amp;X-Amz-Signature=5a4887918cf75526c045d236dd5a8b22dace657900a1d131a7ffa947be66fc81&amp;amp;amp;X-Amz-SignedHeaders=host&amp;amp;amp;actor_id=0&amp;amp;amp;response-content-disposition=attachment%3B%20filename%3Dprometheus-2.4.0.linux-amd64.tar.gz&amp;amp;amp;response-content-type=application%2Foctet-stream&amp;quot;&amp;gt;redirected&amp;lt;/a&amp;gt;. Sure, that&amp;rsquo;s a redirect, let&amp;rsquo;s try:
+$ curl --location https://github.com/prometheus/prometheus/releases/download/v2.4.0/prometheus-2.4.0.linux-amd64.tar.gz curl: (23) Failed writing body (0 != 16360) What does that mean? I frantically then google, &amp;ldquo;download prometheus using curl&amp;rdquo; and hit upon this link.
+So, the -O option will help:
+$ curl --remote-name --location https://github.com/prometheus/prometheus/releases/download/v2.4.0/prometheus-2.4.0.linux-amd64.tar.gz &amp;lt;file downloaded&amp;gt; The -O option is equivalent to --remote-name which basically says two things:</description>
+    </item>
+    
+    <item>
+      <title>Powershell Measuring seconds elapsed</title>
+      <link>https://echorand.me/posts/measuring-seconds-elapsed-powershell/</link>
+      <pubDate>Wed, 25 Jul 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/measuring-seconds-elapsed-powershell/</guid>
+      <description>I have been working with PowerShell for three months now, and my approach to using it has been pretty much google and trial - copying things, modifying things till they work and learning new things on the way. This post talks about a discovery which I made today.
+I had a script like this:
+while ($health -ne &#39;healthy&#39;) { $elapsedTime = $(get-date) - $StartTime Write-Output &amp;quot;--- Waiting for service to become ready - $($elapsedTime.</description>
+    </item>
+    
+    <item>
+      <title>How does ping roughly work over IPv4 on Linux?</title>
+      <link>https://echorand.me/posts/my-own-ping/</link>
+      <pubDate>Fri, 27 Apr 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/my-own-ping/</guid>
+      <description>Introduction The ping program is one of the most common programs which is used to check the &amp;ldquo;aliveness&amp;rdquo; of a host and a typical execution looks as follows:
+$ ping 127.0.0.1 -c 1 -4 PING 127.0.0.1 (127.0.0.1) 56(84) bytes of data. 64 bytes from 127.0.0.1: icmp_seq=1 ttl=64 time=0.062 ms --- 127.0.0.1 ping statistics --- 1 packets transmitted, 1 received, 0% packet loss, time 0ms rtt min/avg/max/mdev = 0.062/0.062/0.062/0.000 ms The -c switch indicates that we want to send a single &amp;ldquo;probe&amp;rdquo;.</description>
+    </item>
+    
+    <item>
+      <title>Sorted Sets in Redis from CLI, Python and Golang</title>
+      <link>https://echorand.me/posts/redis-sorted-sets/</link>
+      <pubDate>Mon, 19 Feb 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/redis-sorted-sets/</guid>
+      <description>In this post, we will see a demo of sorted sets in redis. I just learned about them and I think they are really cool! This post shows how we can play with sorted sets first via the redis-cli, then from Python and Golang.
+ ┌────────────┐ .───────────────. │ │ .─────────────. ( Redis CLI ) ───▶ │ Redis │ ◀───── ( Golang ) `───────────────&#39; │ │ `─────────────&#39; └────────────┘ ▲ │ │ .</description>
+    </item>
+    
+    <item>
+      <title>Why RPC in Microservices instead of HTTP?</title>
+      <link>https://echorand.me/posts/rest-or-rpc-for-microservices/</link>
+      <pubDate>Sun, 11 Feb 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/rest-or-rpc-for-microservices/</guid>
+      <description>The Freelancer.com REST API is powered by a number of backend services. The API itself is powered by a Python HTTP server which communicates with the other services (Python, Golang and PHP) via RPC calls implemented using Apache Thrift. It is only during the past 2.5 years that I have been working with Apache Thrift or cross-language RPCs in general. The question often comes up especially when thinking about the future - why not just use HTTP throughout across all services?</description>
+    </item>
+    
+    <item>
+      <title>Data in C and CPython</title>
+      <link>https://echorand.me/posts/data-in-c-cpython/</link>
+      <pubDate>Fri, 26 Jan 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/data-in-c-cpython/</guid>
+      <description>In the last two articles (Data in CPython and Data in C), as it turned out, I discussed two fundamental points in each language:
+What happens in an assignment operation (such as a=2)? Are separate copies of data created or references passed to the original when they are sent as function parameters?  In this article, I will summarize the findings by presenting a comparative analysis.
+Assignment The simplest way to explain the difference between an assignment operation in C and that in CPython is as follows.</description>
+    </item>
+    
+    <item>
+      <title>Using Travis CI to publish to GitHub pages with custom domain</title>
+      <link>https://echorand.me/posts/github-pages-custom-domain-travis-ci/</link>
+      <pubDate>Wed, 03 Jan 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/github-pages-custom-domain-travis-ci/</guid>
+      <description>As of yesterday, this blog is automatically being published via Travis CI. When I push a new commit to my GitHub repository it triggers a new build in Travis CI. The build completes and the the git repository is then updated with the generated output (mostly HTML with some static CSS).
+The overall flow looks as follows:
+This is how I set it all up.
+Please see issue issue.
+Blog repository setup I use pelican as my blog engine.</description>
+    </item>
+    
+    <item>
+      <title>Tip Rotating video frames using iMovie</title>
+      <link>https://echorand.me/posts/imovie-rotate-video/</link>
+      <pubDate>Mon, 01 Jan 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/imovie-rotate-video/</guid>
+      <description>I had to rotate a few video frames using iMovie. The instructions for rotating the frames were working, but the rotation was being applied to &amp;ldquo;neighboring&amp;rdquo; frames as well. It turns out the trick is to use &amp;ldquo;split clip&amp;rdquo; to split a frame so that you can isolate the exact frame to be rotated. And that worked!
+Thanks to this forum reply.</description>
+    </item>
+    
+  </channel>
+</rss>

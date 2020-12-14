@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title> Setting up AWS EC2 Assume Role with Terraform | Exploring Software</title>
+  <meta name="description" content="echo $RANDOM. Exploring Software and writing about it.">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="all,follow">
+  <meta name="googlebot" content="index,follow,snippet,archive">
+  <meta property="og:title" content="Setting up AWS EC2 Assume Role with Terraform" />
+<meta property="og:description" content="In this post, we will see how we can implement the AWS assume role functionality which allows an IAM role to be able to obtain temporary credentials to access a resource otherwise only accessible by another IAM role. We will implement the infrastructure changes using Terraform and see how to obtain temporary credentials and access an AWS resource (a S3 bucket) that the corresponding IAM role doesn&rsquo;t have access to otherwise via the AWS CLI." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://echorand.me/posts/aws-assume-iam-role-from-another/" />
+<meta property="article:published_time" content="2018-02-27T00:00:00+00:00" />
+<meta property="article:modified_time" content="2019-07-11T16:52:00+10:00" />
+
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Setting up AWS EC2 Assume Role with Terraform"/>
+<meta name="twitter:description" content="In this post, we will see how we can implement the AWS assume role functionality which allows an IAM role to be able to obtain temporary credentials to access a resource otherwise only accessible by another IAM role. We will implement the infrastructure changes using Terraform and see how to obtain temporary credentials and access an AWS resource (a S3 bucket) that the corresponding IAM role doesn&rsquo;t have access to otherwise via the AWS CLI."/>
+
+  
+  
+  
+  <link rel="stylesheet" href="https://echorand.me/css/style-white.css">
+  
+  
+  
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  
+
+  
+<link rel="icon" type="image/png" href="https://echorand.me/images/favicon.ico" />
+
+  
+  
+  
+  
+  
+    
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-108901610-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+  
+  
+</head>
+
+<body class="max-width mx-auto px3 ltr">
+  <div class="content index py4">
+
+  <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+        <li><a href="/about">About</a></li>
+         
+        <li><a href="/articles">Articles</a></li>
+         
+        <li><a href="/books">Books</a></li>
+         
+        <li><a href="/posts">Posts</a></li>
+         
+        <li><a href="/talks">Talks</a></li>
+         
+        <li><a href="/categories/">Categories</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li>
+          <a class="icon" href=" https://echorand.me/posts/automate-deb-package-packagecloud/">
+            <i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i>
+          </a>
+        </li>
+        
+        
+        <li>
+          <a class="icon" href="https://echorand.me/posts/fedora-scientific-28-beta/">
+            <i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i>
+          </a>
+        </li>
+        
+        <li>
+          <a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');">
+            <i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i>
+          </a>
+        </li>
+        <li>
+          <a class="icon" href="#">
+            <i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i>
+          </a>
+        </li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      
+      <ul>
+  
+  
+    
+  
+  
+  <li>
+    <a class="icon" href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fechorand.me%2fposts%2faws-assume-iam-role-from-another%2f">
+      <i class="fab fa-facebook " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://twitter.com/share?url=https%3a%2f%2fechorand.me%2fposts%2faws-assume-iam-role-from-another%2f&text=Setting%20up%20AWS%20EC2%20Assume%20Role%20with%20Terraform">
+      <i class="fab fa-twitter " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fechorand.me%2fposts%2faws-assume-iam-role-from-another%2f&title=Setting%20up%20AWS%20EC2%20Assume%20Role%20with%20Terraform">
+      <i class="fab fa-linkedin " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fechorand.me%2fposts%2faws-assume-iam-role-from-another%2f&is_video=false&description=Setting%20up%20AWS%20EC2%20Assume%20Role%20with%20Terraform">
+      <i class="fab fa-pinterest " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="mailto:?subject=Setting%20up%20AWS%20EC2%20Assume%20Role%20with%20Terraform&body=Check out this article: https%3a%2f%2fechorand.me%2fposts%2faws-assume-iam-role-from-another%2f">
+      <i class="fas fa-envelope " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://getpocket.com/save?url=https%3a%2f%2fechorand.me%2fposts%2faws-assume-iam-role-from-another%2f&title=Setting%20up%20AWS%20EC2%20Assume%20Role%20with%20Terraform">
+      <i class="fab fa-get-pocket " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://reddit.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2faws-assume-iam-role-from-another%2f&title=Setting%20up%20AWS%20EC2%20Assume%20Role%20with%20Terraform">
+      <i class="fab fa-reddit " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.stumbleupon.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2faws-assume-iam-role-from-another%2f&title=Setting%20up%20AWS%20EC2%20Assume%20Role%20with%20Terraform">
+      <i class="fab fa-stumbleupon " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://digg.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2faws-assume-iam-role-from-another%2f&title=Setting%20up%20AWS%20EC2%20Assume%20Role%20with%20Terraform">
+      <i class="fab fa-digg " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.tumblr.com/share/link?url=https%3a%2f%2fechorand.me%2fposts%2faws-assume-iam-role-from-another%2f&name=Setting%20up%20AWS%20EC2%20Assume%20Role%20with%20Terraform&description=In%20this%20post%2c%20we%20will%20see%20how%20we%20can%20implement%20the%20AWS%20assume%20role%20functionality%20which%20allows%20an%20IAM%20role%20to%20be%20able%20to%20obtain%20temporary%20credentials%20to%20access%20a%20resource%20otherwise%20only%20accessible%20by%20another%20IAM%20role.%20We%20will%20implement%20the%20infrastructure%20changes%20using%20Terraform%20and%20see%20how%20to%20obtain%20temporary%20credentials%20and%20access%20an%20AWS%20resource%20%28a%20S3%20bucket%29%20that%20the%20corresponding%20IAM%20role%20doesn%26rsquo%3bt%20have%20access%20to%20otherwise%20via%20the%20AWS%20CLI.">
+      <i class="fab fa-tumblr " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fechorand.me%2fposts%2faws-assume-iam-role-from-another%2f&t=Setting%20up%20AWS%20EC2%20Assume%20Role%20with%20Terraform">
+      <i class="fab fa-hacker-news " aria-hidden="true"></i>
+    </a>
+  </li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <nav id="TableOfContents"></nav>
+    </div>
+  </span>
+</div>
+
+
+  <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+    <header>
+      <h1 class="posttitle" itemprop="name headline">
+        Setting up AWS EC2 Assume Role with Terraform
+      </h1>
+      <div class="meta">
+        
+        <div class="postdate">
+          
+          <time datetime="2018-02-27 00:00:00 &#43;0000 UTC" itemprop="datePublished">2018-02-27</time>
+          
+        </div>
+        
+        <div class="article-category">
+            <i class="fas fa-archive"></i>
+            
+            
+            <a class="category-link" href="/categories/infrastructure">infrastructure</a>
+            
+        </div>
+        
+        
+      </div>
+    </header>
+
+  
+    <div class="content" itemprop="articleBody">
+      <p>In this post, we will see how we can implement the AWS <code>assume role</code> functionality which allows
+an IAM role to be able to obtain temporary credentials to access a resource otherwise only accessible
+by another IAM role. We will implement the infrastructure changes using <a href="terraform.io">Terraform</a>
+and see how to obtain temporary credentials and access an AWS resource (a S3 bucket) that the corresponding
+IAM role doesn&rsquo;t have access to otherwise via the <a href="https://aws.amazon.com/documentation/cli/">AWS CLI</a>.</p>
+<p>If you want to follow along, please install <code>terraform</code> and setup AWS config so that it has a profile named
+<code>dev</code>. If you have a profile or want to use a different AWS profile, you can change it in the <code>aws.tf</code> file
+of the configuration you are applying. If you are like me, you may have trouble setting up the profile
+correctly, so here&rsquo;s my two config files:</p>
+<pre><code># ~/.aws/config
+
+[profile dev]
+region=ap-southeast-2
+
+# ~/.aws/credentials
+
+[dev]
+aws_access_key_id=&lt;Your access key&gt;
+aws_secret_access_key=&lt;Your secret key&gt;
+</code></pre><p>In each of the configuration directory, you will have to run <code>terraform init</code>
+before you can run <code>terraform apply</code>.</p>
+<p>This functionality may be found useful in different problem scenarios. Next, I describe the scenario where
+I first used it.</p>
+<h1 id="problem-scenario">Problem Scenario</h1>
+<p>Consider the following scenario for 3 services running on their own AWS EC2 instances in
+a production setup:</p>
+<pre><code>                       ┌───────────────────────────┐
+                       │   Production AWS Setup    │
+                       └───────────────────────────┘
+
+
+
+
+ .───────────────────.      .───────────────────.    .───────────────────.
+(      S3Bucket1      )    (      S3Bucket2      )  (      S3Bucket3      )
+ `───────────────────'      `───────────────────'    `───────────────────'
+            ▲                         ▲                        ▲
+      ┌ ─ ─ ┴ ─ ─ ┐             ┌ ─ ─ ┴ ─ ─ ┐            ┌ ─ ─ ┴ ─ ─ ┐
+       IAM Role 1                IAM Role 2               IAM Role 3
+      └ ─ ─ ┬ ─ ─ ┘             └ ─ ─ ┬ ─ ─ ┘            └ ─ ─ ┬ ─ ─ ┘
+            │                         │                        │
+
+     ┌────────────┐            ┌────────────┐            ┌────────────┐
+     │ Service A  │            │ Service B  │            │ Service C  │
+     └────────────┘            └────────────┘            └────────────┘
+
+       ◀─ ─ ─ ─ ─ ─ ─ ─ ─    AWS EC2 Instances   ─ ─ ─ ─ ─ ─ ─ ─▶
+</code></pre><p>Each service running on their own EC2 instance has their own AWS IAM profile which via
+their role and role policy gives them access to the corresponding S3 bucket.</p>
+<p>Now, consider the setup below for a developer environment for the above services:</p>
+<pre><code>
+                       ┌───────────────────────────┐
+                       │   Development AWS Setup   │
+                       └───────────────────────────┘
+
+
+
+
+ .───────────────────.      .───────────────────.    .───────────────────.
+(      S3Bucket1      )    (      S3Bucket2      )  (      S3Bucket3      )
+ `───────────────────'      `───────────────────'    `───────────────────'
+              ▲                      ▲                       ▲
+              │                      │                       │
+      ┌ ─ ─ ─ ┴ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─│─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─│─
+                            Access Denied                      │
+      └ ─ ─ ─ ┬ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─│─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─│─
+              │                 ┌ ─ ─ ─ ─ ─ ┐                │
+              └────────────────   IAM Role   ────────────────┘
+                                └ ─ ─ ─ ─ ─ ┘
+                                     ▲
+                                     │
+                               ┌────────────┐
+                               │ Service B  │
+                               └────────────┘
+                               ┌────────────┐
+                               │ Service A  │
+                               └────────────┘
+                               ┌────────────┐
+                               │ Service C  │
+                               └────────────┘
+
+
+                              AWS EC2 Instance
+
+</code></pre><p>Instead of each service running on their own development EC2 instance, we run all the services
+on a single EC2 instance.</p>
+<p>As I note in the diagram above, the individual services will get an access denied error since
+the EC2 instance above is using a different IAM profile than the ones used when the services
+are running in the production setup.</p>
+<h1 id="setting-up-test-infrastructure">Setting up test infrastructure</h1>
+<p>Let&rsquo;s verify the problem for ourselves first by created a test infrastructure as follows:</p>
+<ul>
+<li>Create a S3 bucket (<code>github-amitsaha-bucket</code>)</li>
+<li>Create two IAM profiles, <code>role1</code> and <code>role2</code></li>
+<li>Add a policy to <code>role2</code> to be able to perform all operations on the S3 bucket</li>
+<li>Spin up an EC2 instance using <code>role1</code></li>
+</ul>
+<p>To see how this is representative of our problem, note that <code>role2</code> has access to the S3 bucket, but <code>role1</code> doesn&rsquo;t.
+The EC2 instance we will be running our experiment is setup to use <code>role1</code>, and hence we do not have access
+to the S3 bucket.</p>
+<p>The <a href="https://terraform.io">terraform</a> configuration for setting up the above infrastructure can be found
+<a href="https://github.com/amitsaha/aws-assume-role-demo/tree/master/terraform_configuration/problem_demo">here</a>.</p>
+<pre><code>$ cd terraform_configuration/problem_demo
+$ terraform init
+$ terraform apply
+</code></pre><p>If we now try to access the S3 bucket from the EC2 instance via the AWS CLI, we will get:</p>
+<pre><code>$ ssh ec2-user@&lt;Public-IP&gt;
+..
+
+$ aws s3 ls s3://github-amitsaha-bucket/*
+An error occurred (AccessDenied) when calling the ListObjects operation: Access Denied
+</code></pre><p>There are two solutions to this problem:</p>
+<ul>
+<li>The first is to create an IAM profile which will have all the IAM policies of the constituent services</li>
+<li>The second is to use <a href="https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRole.html">AssumeRole</a></li>
+</ul>
+<p>The first solution, although simple has the main problem of duplicating your IAM policies and it doesn&rsquo;t
+feel clean. The second approach, although requires some work is a much cleaner approach.</p>
+<p>There are two stages to implement this solution. The first stage is to setup the infrastructure to allow the
+assume role operation to succeed. If an IAM role, <code>role1</code> wants to assume another</p>
+<p>Before we move on, we will run <code>terraform destroy</code> here so that the next step succeeds. We are using a local
+<code>tfstate</code> file in each configuration directory for the demos which makes this step necessary.</p>
+<h1 id="solution-infrastructure-setup">Solution: Infrastructure setup</h1>
+<p>If an IAM role, <code>role1</code> wants to assume another role, <code>role2</code>, then:</p>
+<ul>
+<li><code>role1</code> should be allowed to perform the <code>sts:AssumeRole</code> action on <code>role2</code></li>
+<li><code>role2</code> should allow <code>role1</code> to assume itself</li>
+</ul>
+<p>The corresponding IAM configuration earlier will be updated as follows:</p>
+<pre><code>data &quot;aws_iam_policy_document&quot; &quot;assume_role2_policy&quot; {
+  statement {
+    actions = [
+      &quot;sts:AssumeRole&quot;,
+    ]
+    resources = [
+      &quot;${aws_iam_role.role2.arn}&quot;,
+    ]
+  }
+}
+
+resource &quot;aws_iam_role_policy&quot; &quot;role1_assume_role2&quot; {
+  name   = &quot;AssumeRole2&quot;
+  role = &quot;${aws_iam_role.role1.name}&quot;
+  policy = &quot;${data.aws_iam_policy_document.assume_role2_policy.json}&quot;
+}
+
+resource &quot;aws_iam_role&quot; &quot;role2&quot; {
+  name = &quot;test_profile2_role&quot;
+  path = &quot;/&quot;
+
+  assume_role_policy = &lt;&lt;EOF
+{
+    &quot;Version&quot;: &quot;2012-10-17&quot;,
+    &quot;Statement&quot;: [
+        {
+            &quot;Action&quot;: &quot;sts:AssumeRole&quot;,
+            &quot;Principal&quot;: {
+               &quot;Service&quot;: &quot;ec2.amazonaws.com&quot;,
+               &quot;AWS&quot;: &quot;${aws_iam_role.role1.arn}&quot;
+            },
+            &quot;Effect&quot;: &quot;Allow&quot;,
+            &quot;Sid&quot;: &quot;&quot;
+        }
+    ]
+}
+EOF
+}
+</code></pre><p>The updated terraform configuration can be found <a href="https://github.com/amitsaha/aws-assume-role-demo/tree/master/terraform_configuration/solution_demo">here</a>.
+Let&rsquo;s create the new infrastructure:</p>
+<pre><code>$ cd terraform_configuration/solution_demo
+$ terraform init
+$ terraform apply
+
+</code></pre><p>Now, if we <code>ssh</code> into the instance and try the same operation, we will get the same error:</p>
+<pre><code>[ec2-user@ip-172-31-6-239 ~]$ aws s3 ls s3://github-amitsaha-bucket/*
+An error occurred (AccessDenied) when calling the ListObjects operation: Access Denied
+</code></pre><p>However, since the infrastructure is now setup to allow us to perform assume role, we can make use
+of that.</p>
+<h1 id="solution-perform-assumerole-operation">Solution: Perform AssumeRole operation</h1>
+<p>The AWS CLI is already installed in the EC2 instance we spun up, so let&rsquo;s see how we can perform <code>assume role</code> operation:</p>
+<pre><code>[ec2-user@ip-172-31-6-239 ~]$ aws sts assume-role --role-arn arn:aws:iam::033145145979:role/test_profile2_role --role-session-name s3-example
+{
+    &quot;AssumedRoleUser&quot;: {
+        &quot;AssumedRoleId&quot;: &quot;AROAJ3CMHLQFMYPPWQLSQ:s3-example&quot;, 
+        &quot;Arn&quot;: &quot;arn:aws:sts::033145145979:assumed-role/test_profile2_role/s3-example&quot;
+    }, 
+    &quot;Credentials&quot;: {
+        &quot;SecretAccessKey&quot;: &quot;PzFA0bJxxeB+i4kWjowpM6VTQTQfIiejbRxXkZdo&quot;, 
+        &quot;SessionToken&quot;: &quot;FQoDYXdzEI7//////////wEaDDqRJAWz11tovnatwSLuAUf1CIjLW0OI5dTCAh610HW7f3fBxglofbntqxCSJVyei1DafEjriLIskDzKoCdz6Y7F5Z/uyv/Ue7dCCCvXFpVYExwt82hE7yTGrYJB/oQl+bkMIzPhlHyegDa3/+vxdFu2kbcve8a1VlNhZE8fnpaRLGMoEr9/Ll+NQLjtRyysQ7DuN0GuMVIDiUzqOZHVDFDt4/c5LBHd2VZNfZ2t/rfPTkIwfkI9JQUVON+lcrk5W+FH16Onp1vuZXX4cmraMWQ1ROGf2x4fHGPIcMqaw674sgOnMSllyCUONLIaSPOeJLfOSDIrM/Xfv0PvslgotNrK1AU=&quot;, 
+        &quot;Expiration&quot;: &quot;2018-02-25T13:33:56Z&quot;, 
+    &quot;AccessKeyId&quot;: &quot;ASIAI7JVCNUGFT6XGMAQ&quot;
+    }
+}
+
+</code></pre><p>The <code>--role-arn</code> option specifies the ARN of the IAM profile we want to assume, give it a name via the <code>--role-session-name</code> and we get back three key pieces
+of data back in the <code>Credentials</code> object:</p>
+<ul>
+<li>SecretAccessKey</li>
+<li>SessionToken</li>
+<li>AccessKeyId</li>
+</ul>
+<p>We then pass these as environment variables to the AWS CLI and try to perform the above operation on the S3 bucket:</p>
+<pre><code>$ AWS_SESSION_TOKEN=&quot;&lt;session-token-above&gt;&quot; \
+  AWS_ACCESS_KEY_ID=&lt;key id above&gt; \
+  AWS_SECRET_ACCESS_KEY=&lt;secret key above&gt; aws s3 ls s3://github-amitsaha-bucket/
+</code></pre><p>And it works!</p>
+<p>We can create an object as well:</p>
+<pre><code>$ touch hello
+$ AWS_SESSION_TOKEN=&quot;&lt;session-token-above&gt;&quot; \
+  AWS_ACCESS_KEY_ID=&lt;key id above&gt; \
+  AWS_SECRET_ACCESS_KEY=&lt;secret key above&gt; aws s3 cp hello  s3://github-amitsaha-bucket/
+upload: ./hello to s3://github-amitsaha-bucket/hello             
+$ AWS_SESSION_TOKEN=&quot;&lt;session-token-above&gt;&quot; \
+  AWS_ACCESS_KEY_ID=&lt;key id above&gt; \
+  AWS_SECRET_ACCESS_KEY=&lt;secret key above&gt; aws s3 ls s3://github-amitsaha-bucket/
+2018-02-25 12:38:32         12 hello
+</code></pre><h1 id="discussions-of-the-solution">Discussions of the solution</h1>
+<p>When we discussed the necessary permissions for <code>role1</code> to be able to assume <code>role2</code>, we learned that:</p>
+<ul>
+<li><code>role1</code> needed to have the permission to perform the <code>sts:AssumeRole</code> action on <code>role2</code>, and</li>
+<li><code>role2</code> needed allow itself to be assumed by <code>role1</code></li>
+</ul>
+<p>We explicitly specified <code>role1</code>&rsquo;s ARN in the assume role policy of <code>role2</code>. This is okay for our demo setup, but
+it introduces perhaps an unnecessary dependency on <code>role1</code>. Since <code>role1</code> doesn&rsquo;t play any role in the production setup
+of the service which is only reliant on <code>role2</code>, it may be a good idea to remove this explicit dependency. Hence, we may
+be better off allowing <em>any</em> role in the current AWS account to assume <code>role2</code>. To implement this, we change the IAM configuration
+as follows:</p>
+<pre><code>60c60
+&lt;                &quot;AWS&quot;: &quot;${aws_iam_role.role1.arn}&quot;
+---
+&gt;                &quot;AWS&quot;: &quot;arn:aws::iam::${data.aws_caller_identity.current.account_id}:root&quot;
+</code></pre><p>You can find the entire configuration in the
+<a href="https://github.com/amitsaha/aws-assume-role-demo/tree/master/terraform_configuration/solution_demo_root_user">solution_demo_root_user</a>.</p>
+<h1 id="assumerole-in-your-applications">AssumeRole in your applications</h1>
+<p>Above we performed the assume role operation via the AWS CLI, but in your applications we will use the corresponding
+language&rsquo;s SDK function to do so. We will also need to check the expiry of the access key and secret key pair before
+we attempt to use it make an AWS API call with them.</p>
+<h1 id="alternatives-to-modifying-your-application">Alternatives to modifying your application</h1>
+<p><a href="https://github.com/lyft/metadataproxy">metadataproxy</a> aims to provide a solution to this problem such that you
+don&rsquo;t have to modify your application code. This is great if you are using containers to deploy your application
+and should work out of the box when you combine the infrastructure setup that this post aims to help you with.</p>
+<p><a href="https://github.com/jtblin/kube2iam">kube2iam</a> again aims to provide a similar solution to <code>metadataproxy</code> for
+Kubernetes.</p>
+<h1 id="conclusion">Conclusion</h1>
+<p>The problem is generic enough and whether you have to modify your application or not depends on your deployment
+platform and choices. However, the infrastructure setup needed for these solutions are similar and hopefully my post
+will help you with that.</p>
+<h1 id="resources">Resources</h1>
+<ul>
+<li><a href="https://github.com/amitsaha/aws-assume-role-demo">Terraform configuration repo</a></li>
+<li><a href="https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRole.html">AWS Assume Role</a></li>
+<li><a href="https://www.terraform.io/">Terraform</a></li>
+</ul>
+
+    </div>
+  </article>
+
+  
+  
+
+
+
+
+
+  <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/about">About</a></li>
+         
+          <li><a href="/articles">Articles</a></li>
+         
+          <li><a href="/books">Books</a></li>
+         
+          <li><a href="/posts">Posts</a></li>
+         
+          <li><a href="/talks">Talks</a></li>
+         
+          <li><a href="/categories/">Categories</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <nav id="TableOfContents"></nav>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      
+      <ul>
+  
+  
+    
+  
+  
+  <li>
+    <a class="icon" href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fechorand.me%2fposts%2faws-assume-iam-role-from-another%2f">
+      <i class="fab fa-facebook fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://twitter.com/share?url=https%3a%2f%2fechorand.me%2fposts%2faws-assume-iam-role-from-another%2f&text=Setting%20up%20AWS%20EC2%20Assume%20Role%20with%20Terraform">
+      <i class="fab fa-twitter fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fechorand.me%2fposts%2faws-assume-iam-role-from-another%2f&title=Setting%20up%20AWS%20EC2%20Assume%20Role%20with%20Terraform">
+      <i class="fab fa-linkedin fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fechorand.me%2fposts%2faws-assume-iam-role-from-another%2f&is_video=false&description=Setting%20up%20AWS%20EC2%20Assume%20Role%20with%20Terraform">
+      <i class="fab fa-pinterest fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="mailto:?subject=Setting%20up%20AWS%20EC2%20Assume%20Role%20with%20Terraform&body=Check out this article: https%3a%2f%2fechorand.me%2fposts%2faws-assume-iam-role-from-another%2f">
+      <i class="fas fa-envelope fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://getpocket.com/save?url=https%3a%2f%2fechorand.me%2fposts%2faws-assume-iam-role-from-another%2f&title=Setting%20up%20AWS%20EC2%20Assume%20Role%20with%20Terraform">
+      <i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://reddit.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2faws-assume-iam-role-from-another%2f&title=Setting%20up%20AWS%20EC2%20Assume%20Role%20with%20Terraform">
+      <i class="fab fa-reddit fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.stumbleupon.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2faws-assume-iam-role-from-another%2f&title=Setting%20up%20AWS%20EC2%20Assume%20Role%20with%20Terraform">
+      <i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://digg.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2faws-assume-iam-role-from-another%2f&title=Setting%20up%20AWS%20EC2%20Assume%20Role%20with%20Terraform">
+      <i class="fab fa-digg fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.tumblr.com/share/link?url=https%3a%2f%2fechorand.me%2fposts%2faws-assume-iam-role-from-another%2f&name=Setting%20up%20AWS%20EC2%20Assume%20Role%20with%20Terraform&description=In%20this%20post%2c%20we%20will%20see%20how%20we%20can%20implement%20the%20AWS%20assume%20role%20functionality%20which%20allows%20an%20IAM%20role%20to%20be%20able%20to%20obtain%20temporary%20credentials%20to%20access%20a%20resource%20otherwise%20only%20accessible%20by%20another%20IAM%20role.%20We%20will%20implement%20the%20infrastructure%20changes%20using%20Terraform%20and%20see%20how%20to%20obtain%20temporary%20credentials%20and%20access%20an%20AWS%20resource%20%28a%20S3%20bucket%29%20that%20the%20corresponding%20IAM%20role%20doesn%26rsquo%3bt%20have%20access%20to%20otherwise%20via%20the%20AWS%20CLI.">
+      <i class="fab fa-tumblr fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fechorand.me%2fposts%2faws-assume-iam-role-from-another%2f&t=Setting%20up%20AWS%20EC2%20Assume%20Role%20with%20Terraform">
+      <i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+      
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;">
+          <i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;">
+          <i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;">
+          <i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');">
+          <i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+
+  <footer id="footer">
+  <div class="footer-left">
+    Copyright  &copy; 2020  Exploring Software 
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+        <li><a href="/about">About</a></li>
+         
+        <li><a href="/articles">Articles</a></li>
+         
+        <li><a href="/books">Books</a></li>
+         
+        <li><a href="/posts">Posts</a></li>
+         
+        <li><a href="/talks">Talks</a></li>
+         
+        <li><a href="/categories/">Categories</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+
+  </div>
+</body>
+
+<link rel="stylesheet" href=/lib/font-awesome/css/all.min.css>
+<script src=/lib/jquery/jquery.min.js></script>
+<script src=/js/main.js></script>
+
+
+
+</html>

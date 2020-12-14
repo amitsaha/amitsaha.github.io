@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title> Brief overview of using consul tags | Exploring Software</title>
+  <meta name="description" content="echo $RANDOM. Exploring Software and writing about it.">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="all,follow">
+  <meta name="googlebot" content="index,follow,snippet,archive">
+  <meta property="og:title" content="Brief overview of using consul tags" />
+<meta property="og:description" content="consul allows a service to associate itself with tags. These are arbitrary metadata that can be associated with the service and can be used for different purposes. Below I outline a few examples of making use of tags and discuss some related topics.
+Use case #1: Dedicated service instances based on requests Let&rsquo;s say our service is a HTTP server (REST API) acting as a routing point for multiple independent resources with the following service definition:" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://echorand.me/posts/consul-tags/" />
+<meta property="article:published_time" content="2017-12-01T00:00:00+00:00" />
+<meta property="article:modified_time" content="2019-07-11T16:52:00+10:00" />
+
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Brief overview of using consul tags"/>
+<meta name="twitter:description" content="consul allows a service to associate itself with tags. These are arbitrary metadata that can be associated with the service and can be used for different purposes. Below I outline a few examples of making use of tags and discuss some related topics.
+Use case #1: Dedicated service instances based on requests Let&rsquo;s say our service is a HTTP server (REST API) acting as a routing point for multiple independent resources with the following service definition:"/>
+
+  
+  
+  
+  <link rel="stylesheet" href="https://echorand.me/css/style-white.css">
+  
+  
+  
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  
+
+  
+<link rel="icon" type="image/png" href="https://echorand.me/images/favicon.ico" />
+
+  
+  
+  
+  
+  
+    
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-108901610-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+  
+  
+</head>
+
+<body class="max-width mx-auto px3 ltr">
+  <div class="content index py4">
+
+  <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+        <li><a href="/about">About</a></li>
+         
+        <li><a href="/articles">Articles</a></li>
+         
+        <li><a href="/books">Books</a></li>
+         
+        <li><a href="/posts">Posts</a></li>
+         
+        <li><a href="/talks">Talks</a></li>
+         
+        <li><a href="/categories/">Categories</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li>
+          <a class="icon" href=" https://echorand.me/posts/docker-extra-hosts/">
+            <i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i>
+          </a>
+        </li>
+        
+        
+        <li>
+          <a class="icon" href="https://echorand.me/posts/imovie-rotate-video/">
+            <i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i>
+          </a>
+        </li>
+        
+        <li>
+          <a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');">
+            <i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i>
+          </a>
+        </li>
+        <li>
+          <a class="icon" href="#">
+            <i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i>
+          </a>
+        </li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      
+      <ul>
+  
+  
+    
+  
+  
+  <li>
+    <a class="icon" href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fechorand.me%2fposts%2fconsul-tags%2f">
+      <i class="fab fa-facebook " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://twitter.com/share?url=https%3a%2f%2fechorand.me%2fposts%2fconsul-tags%2f&text=Brief%20overview%20of%20using%20consul%20tags">
+      <i class="fab fa-twitter " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fechorand.me%2fposts%2fconsul-tags%2f&title=Brief%20overview%20of%20using%20consul%20tags">
+      <i class="fab fa-linkedin " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fechorand.me%2fposts%2fconsul-tags%2f&is_video=false&description=Brief%20overview%20of%20using%20consul%20tags">
+      <i class="fab fa-pinterest " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="mailto:?subject=Brief%20overview%20of%20using%20consul%20tags&body=Check out this article: https%3a%2f%2fechorand.me%2fposts%2fconsul-tags%2f">
+      <i class="fas fa-envelope " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://getpocket.com/save?url=https%3a%2f%2fechorand.me%2fposts%2fconsul-tags%2f&title=Brief%20overview%20of%20using%20consul%20tags">
+      <i class="fab fa-get-pocket " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://reddit.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fconsul-tags%2f&title=Brief%20overview%20of%20using%20consul%20tags">
+      <i class="fab fa-reddit " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.stumbleupon.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fconsul-tags%2f&title=Brief%20overview%20of%20using%20consul%20tags">
+      <i class="fab fa-stumbleupon " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://digg.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fconsul-tags%2f&title=Brief%20overview%20of%20using%20consul%20tags">
+      <i class="fab fa-digg " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.tumblr.com/share/link?url=https%3a%2f%2fechorand.me%2fposts%2fconsul-tags%2f&name=Brief%20overview%20of%20using%20consul%20tags&description=consul%20allows%20a%20service%20to%20associate%20itself%20with%20tags.%20These%20are%20arbitrary%20metadata%20that%20can%20be%20associated%20with%20the%20service%20and%20can%20be%20used%20for%20different%20purposes.%20Below%20I%20outline%20a%20few%20examples%20of%20making%20use%20of%20tags%20and%20discuss%20some%20related%20topics.%0aUse%20case%20%231%3a%20Dedicated%20service%20instances%20based%20on%20requests%20Let%26rsquo%3bs%20say%20our%20service%20is%20a%20HTTP%20server%20%28REST%20API%29%20acting%20as%20a%20routing%20point%20for%20multiple%20independent%20resources%20with%20the%20following%20service%20definition%3a">
+      <i class="fab fa-tumblr " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fechorand.me%2fposts%2fconsul-tags%2f&t=Brief%20overview%20of%20using%20consul%20tags">
+      <i class="fab fa-hacker-news " aria-hidden="true"></i>
+    </a>
+  </li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <nav id="TableOfContents">
+  <ul>
+    <li><a href="#start-consul-and-the-two-versions-of-the-api">Start consul and the two versions of the API</a></li>
+    <li><a href="#start-the-dnsmasq-container">Start the dnsmasq container</a></li>
+    <li><a href="#start-the-api-client-container">Start the API client container</a></li>
+    <li><a href="#points-to-note">Points to note</a></li>
+  </ul>
+</nav>
+    </div>
+  </span>
+</div>
+
+
+  <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+    <header>
+      <h1 class="posttitle" itemprop="name headline">
+        Brief overview of using consul tags
+      </h1>
+      <div class="meta">
+        
+        <div class="postdate">
+          
+          <time datetime="2017-12-01 00:00:00 &#43;0000 UTC" itemprop="datePublished">2017-12-01</time>
+          
+        </div>
+        
+        <div class="article-category">
+            <i class="fas fa-archive"></i>
+            
+            
+            <a class="category-link" href="/categories/infrastructure">infrastructure</a>
+            
+        </div>
+        
+        
+      </div>
+    </header>
+
+  
+    <div class="content" itemprop="articleBody">
+      <p><a href="https://www.consul.io/">consul</a> allows a service to associate itself with <code>tags</code>. These are arbitrary
+metadata that can be associated with the service and can be used for different purposes. Below I outline
+a few examples of making use of tags and discuss some related topics.</p>
+<h1 id="use-case-1-dedicated-service-instances-based-on-requests">Use case #1: Dedicated service instances based on requests</h1>
+<p>Let&rsquo;s say our service is a HTTP server (REST API) acting as a routing point for multiple
+independent resources with the following service definition:</p>
+<pre><code>{
+  &quot;service&quot;: {
+    &quot;name&quot;: &quot;api&quot;,
+    &quot;address&quot;: &quot;&quot;,
+    &quot;port&quot;: 8080,
+    &quot;checks&quot;: [],
+  }
+}
+</code></pre><p>We can then communicate with service using the DNS, <code>api.service.consul</code>.</p>
+<p>Let&rsquo;s assume we are running N copies of this service, but want to have dedicated sub-pools for
+separate resource groups. We will assign the services in each pool a different tag as follows:</p>
+<p><strong>projects</strong></p>
+<pre><code>{
+  &quot;service&quot;: {
+    &quot;name&quot;: &quot;api&quot;,
+    &quot;address&quot;: &quot;&quot;,
+    &quot;port&quot;: 8080,
+    &quot;checks&quot;: [],
+    &quot;tags&quot;:[&quot;projects&quot;],
+  }
+}
+</code></pre><p><strong>users</strong></p>
+<pre><code>{
+  &quot;service&quot;: {
+    &quot;name&quot;: &quot;api&quot;,
+    &quot;address&quot;: &quot;&quot;,
+    &quot;port&quot;: 8080,
+    &quot;checks&quot;: [],
+    &quot;tags&quot;:[&quot;users&quot;],
+  }
+}
+</code></pre><p>Once we register the services using the different tags, they automatically become discoverable via DNS
+as <code>projects.api.service.consul</code> and <code>users.api.service.consul</code> respectively. Assuming that the routing
+to our HTTP server is happening in a higher layer, we will then direct traffic to these pools as follows:</p>
+<pre><code>api/projects/ -&gt; projects.api.service.consul
+api/users/ -&gt; users.api.service.consul
+</code></pre><h1 id="use-case-2-running-different-versions-of-your-service">Use case #2: Running different versions of your service</h1>
+<p>We can use tags to run two different versions of our application for testing, gathering
+performance data, blue-green deployment or any other reason:</p>
+<p><strong>v1</strong></p>
+<pre><code>{
+  &quot;service&quot;: {
+    &quot;name&quot;: &quot;api&quot;,
+    &quot;address&quot;: &quot;&quot;,
+    &quot;port&quot;: 8080,
+    &quot;checks&quot;: [],
+    &quot;tags&quot;:[&quot;v1&quot;],
+  }
+}
+</code></pre><p><strong>v2</strong></p>
+<pre><code>{
+  &quot;service&quot;: {
+    &quot;name&quot;: &quot;api&quot;,
+    &quot;address&quot;: &quot;&quot;,
+    &quot;port&quot;: 8080,
+    &quot;checks&quot;: [],
+    &quot;tags&quot;:[&quot;v2&quot;],
+  }
+}
+</code></pre><p>We can then use a tag based weighted mechanism at a higher level proxy (such as <a href="https://github.com/linkerd/linkerd/commit/718514fb1d4b86153820880162d3c9559e115725">linkerd</a>) to send traffic to these different service
+versions.</p>
+<h1 id="use-case-3-other-metadata">Use case #3: Other metadata</h1>
+<p>This <a href="https://github.com/hashicorp/consul/issues/997/">issue</a> on consul&rsquo;s project discusses using
+tags as a way to have artbitary metadata for a service due to the lack of support for key-value
+labels.</p>
+<h1 id="using-tags-for-discovery">Using tags for discovery</h1>
+<p>Besides using the DNS interface for communicating with the services, we can use <code>tags</code> as filter with
+the consul <a href="https://www.consul.io/api/catalog.html">catalog API</a>. However, it currently supports a single
+tag. There is a feature request <a href="https://github.com/hashicorp/consul/issues/1781">open</a> to support multiple
+tags.</p>
+<h1 id="demo-running-two-versions-of-a-service">Demo: Running two versions of a service</h1>
+<p>I have two versions of a service, <code>api</code>. Each service is running in a separate docker container on port 8080.
+<code>v1</code> and <code>v2</code> are also the tags associated with the respective instances. The demo source code can be found
+<a href="https://github.com/amitsaha/consul-demo">here</a>. To follow along, clone the repository, install <code>docker</code> and
+<code>docker-compose</code>.</p>
+<h2 id="start-consul-and-the-two-versions-of-the-api">Start consul and the two versions of the API</h2>
+<pre><code>$ pushd tags/api/v1
+$ ./build-image.sh
+$ popd
+
+$ pushd tags/api/v2
+$ ./build-image.sh
+$ popd
+
+$ pushd tags
+$ docker-compose up
+</code></pre><p>We should see the following output from <code>docker-compose up</code>:</p>
+<pre><code>consul    |     2017/12/01 04:01:03 [DEBUG] http: Request PUT /v1/agent/service/register (1.020389ms) from=172.21.0.4:34030
+consul    |     2017/12/01 04:01:03 [DEBUG] agent: Service 'apiv2' in sync
+consul    |     2017/12/01 04:01:03 [DEBUG] agent: Node info in sync
+consul    |     2017/12/01 04:01:03 [DEBUG] agent: Service 'apiv2' in sync
+consul    |     2017/12/01 04:01:03 [DEBUG] agent: Node info in sync
+consul    |     2017/12/01 04:01:04 [DEBUG] agent: Service 'apiv2' in sync
+consul    |     2017/12/01 04:01:04 [INFO] agent: Synced service 'apiv1'
+consul    |     2017/12/01 04:01:04 [DEBUG] agent: Node info in sync
+consul    |     2017/12/01 04:01:04 [DEBUG] http: Request PUT /v1/agent/service/register (3.333932ms) from=172.21.0.3:42486
+consul    |     2017/12/01 04:01:04 [DEBUG] agent: Service 'apiv2' in sync
+consul    |     2017/12/01 04:01:04 [DEBUG] agent: Service 'apiv1' in sync
+consul    |     2017/12/01 04:01:04 [DEBUG] agent: Node info in sync
+consul    |     2017/12/01 04:01:04 [DEBUG] agent: Service 'apiv1' in sync
+consul    |     2017/12/01 04:01:04 [DEBUG] agent: Service 'apiv2' in sync
+consul    |     2017/12/01 04:01:04 [DEBUG] agent: Node info in sync
+</code></pre><h2 id="start-the-dnsmasq-container">Start the dnsmasq container</h2>
+<p>Next, we are going to start a new docker container running <a href="http://www.thekelleys.org.uk/dnsmasq/doc.html">dnsmasq</a>:</p>
+<pre><code>
+$ &lt; repo root &gt;
+$ pushd support/dnsmasq
+$ ./start-dnsmasq.sh
+</code></pre><h2 id="start-the-api-client-container">Start the API client container</h2>
+<p>Now, let&rsquo;s start a container which will act as an API client:</p>
+<pre><code>$ &lt; repo root &gt;
+$ cd support/apiclient
+$ ./start-client.sh 
+
+/ # dig api.service.consul +short
+172.21.0.4
+172.21.0.3
+
+/ # dig v1.api.service.consul +short
+172.21.0.3
+
+/ # dig v2.api.service.consul +short
+172.21.0.4
+
+/ # curl v1.api.service.consul:8080/ping/
+Hi there! I am v1/ # 
+
+/ # curl v2.api.service.consul:8080/ping/
+Hi there! I am v2/ # 
+
+</code></pre><h2 id="points-to-note">Points to note</h2>
+<p>While working on the demo, I found out that I needed to specify the IP address of the service I was registering.
+Otherwise, they were being registered with empty IP addresses. This could be due to those services running in the
+<code>docker</code> container. I am not sure.</p>
+<p>I also learned that since I was running a single consul agent, I had to specify a unique service ID for the two
+service instances.</p>
+
+    </div>
+  </article>
+
+  
+  
+
+
+
+
+
+  <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/about">About</a></li>
+         
+          <li><a href="/articles">Articles</a></li>
+         
+          <li><a href="/books">Books</a></li>
+         
+          <li><a href="/posts">Posts</a></li>
+         
+          <li><a href="/talks">Talks</a></li>
+         
+          <li><a href="/categories/">Categories</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <nav id="TableOfContents">
+  <ul>
+    <li><a href="#start-consul-and-the-two-versions-of-the-api">Start consul and the two versions of the API</a></li>
+    <li><a href="#start-the-dnsmasq-container">Start the dnsmasq container</a></li>
+    <li><a href="#start-the-api-client-container">Start the API client container</a></li>
+    <li><a href="#points-to-note">Points to note</a></li>
+  </ul>
+</nav>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      
+      <ul>
+  
+  
+    
+  
+  
+  <li>
+    <a class="icon" href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fechorand.me%2fposts%2fconsul-tags%2f">
+      <i class="fab fa-facebook fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://twitter.com/share?url=https%3a%2f%2fechorand.me%2fposts%2fconsul-tags%2f&text=Brief%20overview%20of%20using%20consul%20tags">
+      <i class="fab fa-twitter fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fechorand.me%2fposts%2fconsul-tags%2f&title=Brief%20overview%20of%20using%20consul%20tags">
+      <i class="fab fa-linkedin fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fechorand.me%2fposts%2fconsul-tags%2f&is_video=false&description=Brief%20overview%20of%20using%20consul%20tags">
+      <i class="fab fa-pinterest fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="mailto:?subject=Brief%20overview%20of%20using%20consul%20tags&body=Check out this article: https%3a%2f%2fechorand.me%2fposts%2fconsul-tags%2f">
+      <i class="fas fa-envelope fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://getpocket.com/save?url=https%3a%2f%2fechorand.me%2fposts%2fconsul-tags%2f&title=Brief%20overview%20of%20using%20consul%20tags">
+      <i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://reddit.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fconsul-tags%2f&title=Brief%20overview%20of%20using%20consul%20tags">
+      <i class="fab fa-reddit fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.stumbleupon.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fconsul-tags%2f&title=Brief%20overview%20of%20using%20consul%20tags">
+      <i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://digg.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fconsul-tags%2f&title=Brief%20overview%20of%20using%20consul%20tags">
+      <i class="fab fa-digg fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.tumblr.com/share/link?url=https%3a%2f%2fechorand.me%2fposts%2fconsul-tags%2f&name=Brief%20overview%20of%20using%20consul%20tags&description=consul%20allows%20a%20service%20to%20associate%20itself%20with%20tags.%20These%20are%20arbitrary%20metadata%20that%20can%20be%20associated%20with%20the%20service%20and%20can%20be%20used%20for%20different%20purposes.%20Below%20I%20outline%20a%20few%20examples%20of%20making%20use%20of%20tags%20and%20discuss%20some%20related%20topics.%0aUse%20case%20%231%3a%20Dedicated%20service%20instances%20based%20on%20requests%20Let%26rsquo%3bs%20say%20our%20service%20is%20a%20HTTP%20server%20%28REST%20API%29%20acting%20as%20a%20routing%20point%20for%20multiple%20independent%20resources%20with%20the%20following%20service%20definition%3a">
+      <i class="fab fa-tumblr fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fechorand.me%2fposts%2fconsul-tags%2f&t=Brief%20overview%20of%20using%20consul%20tags">
+      <i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+      
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;">
+          <i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;">
+          <i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;">
+          <i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');">
+          <i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+
+  <footer id="footer">
+  <div class="footer-left">
+    Copyright  &copy; 2020  Exploring Software 
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+        <li><a href="/about">About</a></li>
+         
+        <li><a href="/articles">Articles</a></li>
+         
+        <li><a href="/books">Books</a></li>
+         
+        <li><a href="/posts">Posts</a></li>
+         
+        <li><a href="/talks">Talks</a></li>
+         
+        <li><a href="/categories/">Categories</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+
+  </div>
+</body>
+
+<link rel="stylesheet" href=/lib/font-awesome/css/all.min.css>
+<script src=/lib/jquery/jquery.min.js></script>
+<script src=/js/main.js></script>
+
+
+
+</html>

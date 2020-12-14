@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>go on Exploring Software</title>
+    <link>https://echorand.me/categories/go/</link>
+    <description>Recent content in go on Exploring Software</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 07 Aug 2019 00:00:00 +0000</lastBuildDate><atom:link href="https://echorand.me/categories/go/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Notes on Go</title>
+      <link>https://echorand.me/posts/go-notes/</link>
+      <pubDate>Wed, 07 Aug 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/go-notes/</guid>
+      <description>Repeating the same argument to Printf If we wanted to repeat the same argument to a call to fmt.Printf(), we can make use of &amp;ldquo;indexed&amp;rdquo; arguments. That is, instead of writing fmt.Printf(&amp;quot;%s %s&amp;quot;, &amp;quot;Hello&amp;quot;, &amp;quot;Hello&amp;quot;), we can write fmt.Printf(&amp;quot;%[1]s %[1]s&amp;quot;, &amp;quot;Hello&amp;quot;). Learn about it in the docs.
+Multi-line strings Things are hassle free on the multi-line strings front:
+package main import ( &amp;quot;fmt&amp;quot; ) func main() { s := `Multi line strings are easy.</description>
+    </item>
+    
+  </channel>
+</rss>

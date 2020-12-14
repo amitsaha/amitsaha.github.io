@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>python on Exploring Software</title>
+    <link>https://echorand.me/categories/python/</link>
+    <description>Recent content in python on Exploring Software</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Thu, 02 Jan 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://echorand.me/categories/python/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Restricting attributes that can be set in Python</title>
+      <link>https://echorand.me/posts/python-restrict-attributes/</link>
+      <pubDate>Thu, 02 Jan 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/python-restrict-attributes/</guid>
+      <description>A reader of my book &amp;ldquo;Doing Math with Python&amp;rdquo; wrote to me a few weeks back about a strange problem they were having. They were trying to create an animated projectile motion from the code listing in the book. However, they were not seeing the expected results. Worse, there were no errors. They figured the issue on their own eventually since I didn&amp;rsquo;t get the time to reply back and the issue was there was an attribute center on a class that was being set in the correct version.</description>
+    </item>
+    
+    <item>
+      <title>A demo plugin based Python code analyser</title>
+      <link>https://echorand.me/posts/py-ast-straightplugin-nox/</link>
+      <pubDate>Sun, 13 May 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/py-ast-straightplugin-nox/</guid>
+      <description>A few weeks back I wrote a analyser for Apache Thrift IDL in Python. We used it to enforce some code review guidelines. When we hooked it onto arcanist lint engine, we could give feedback to developers at the time they were proposing a code change. The thrift parsing was done using ptsd. The analyser was written as a single file which meant adding new rules meant changing the engine itself.</description>
+    </item>
+    
+    <item>
+      <title>Video PYCON US 2018 Talk - Counter, Gauge, Oh my!</title>
+      <link>https://echorand.me/posts/video-counter-gauge-oh-my/</link>
+      <pubDate>Sun, 13 May 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/video-counter-gauge-oh-my/</guid>
+      <description>The video for my PyCon talk - &amp;ldquo;Counter, Gauge, Oh My!&amp;rdquo; is up:
+The accompanying git repository is here and has the demos, links to some of my related articles and other resources.
+If you have any feedback, please let me know.</description>
+    </item>
+    
+    <item>
+      <title>PYCON US 2018 talk Counter, Gauge, Upper 90 - Oh my!</title>
+      <link>https://echorand.me/posts/pycon-counter-gauge-oh-my/</link>
+      <pubDate>Wed, 09 May 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/pycon-counter-gauge-oh-my/</guid>
+      <description>In a couple of days, on Saturday, I will be delivering my PYCON US talk titled Counter, Gauge, Upper 90 - Oh my!.
+This talk covers my journey into application monitoring in general and Python applications specifically. We will start with looking into the why of monitoring, learn the absolute basics of various monitoring terminologies and use pandas to play with some of the aggregation and summarizing operation usually associated with monitoring.</description>
+    </item>
+    
+    <item>
+      <title>Detecting RLO character in Python</title>
+      <link>https://echorand.me/posts/python-rlo/</link>
+      <pubDate>Mon, 19 Feb 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/python-rlo/</guid>
+      <description>At work, I learned about how Right-to-Left Override was being used to make actually malicious files to look harmless. For example, a .exe file was being made to appear as .doc files. We didn&amp;rsquo;t want to allow uploading such files. This meant that I nedded to detect the presence of the RLO character in the filename.
+Then, I came across this post, where I learned about unicode bidirectional class and Python&amp;rsquo;s bidirectional() method.</description>
+    </item>
+    
+    <item>
+      <title>Python Using specific git commits of third party packages</title>
+      <link>https://echorand.me/posts/python-using-specific-git-commits-of-packages/</link>
+      <pubDate>Fri, 16 Feb 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/python-using-specific-git-commits-of-packages/</guid>
+      <description>After a fair number of furious impatient attempts to try and use specific git commits of third party packages in my Python software, I finally have been able to make it work. I went back to the drawing board - basically reading setup-vs-requirement.
+Applications This is what I did:
+ If you have a setup.py, add the library name to setup.py (abstract dependency) Add the git URL in a requirements.txt file (concrete dependency) When you create your deployment artifact, do pip install -r requirements.</description>
+    </item>
+    
+    <item>
+      <title>Data in CPython</title>
+      <link>https://echorand.me/posts/data-in-cpython/</link>
+      <pubDate>Fri, 26 Jan 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/data-in-cpython/</guid>
+      <description>When writing programs in Python (CPython), you have access to data types such as a int, str, tuple, list and a dict. It is fairly obvious what each of these data types would be used to represent: an int data type would represent an integer and a list would represent a list of items - homeogeneous or heterogenous. As opposed to a language like C, the Python compiler automatically decides what type to use for your data without the need to be explicitly specified.</description>
+    </item>
+    
+    <item>
+      <title>Your options for monitoring multi-process Python applications with Prometheus</title>
+      <link>https://echorand.me/posts/python-prometheus-monitoring-options/</link>
+      <pubDate>Wed, 24 Jan 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/python-prometheus-monitoring-options/</guid>
+      <description>In an earlier article, Monitoring Your Synchronous Python Web Applications Using Prometheus, I discussed a limitation of using the Python client for prometheus.
+Limitation of native prometheus exporting prometheus was built with single process multi-threaded applications in mind. I use the term multi-threaded here to also include coroutine based concurrent applications such as those written in golang or using Python&amp;rsquo;s asynchronous primitives (Example: Monitoring Your Asynchronous Python Web Applications Using Prometheus).</description>
+    </item>
+    
+    <item>
+      <title>Linux System Mining with Python</title>
+      <link>https://echorand.me/posts/linux-system-mining/</link>
+      <pubDate>Mon, 22 Jan 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/linux-system-mining/</guid>
+      <description>In this article, we will explore the Python programming language as a tool to retrieve various information about a system running Linux. Let&#39;s get started.
+Which Python? When I refer to Python, I am referring to CPython 2 (2.7 to be exact). I will mention it explicitly when the same code won&#39;t work with CPython 3 (3.3) and provide the alternative code, explaining the differences. Just to make sure that you have CPython installed, type python or python3 from the terminal and you should see the Python prompt displayed in your terminal.</description>
+    </item>
+    
+    <item>
+      <title>Compilation and Interpretation in C and CPython</title>
+      <link>https://echorand.me/posts/compilation-interpretation-c-python/</link>
+      <pubDate>Fri, 05 Jan 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/compilation-interpretation-c-python/</guid>
+      <description>It is common knowledge that programs written in high level languages have to be translated into a low level language using programs referred to as translators. This low level language is either in a native form, in the sense that it is understood by the operating system itself, or in an intermediate form which is understood by an intermediate program such as the bytecode interpreter. It is also known that C is a compiled language, whereas CPython is both first compiled and then interpreted.</description>
+    </item>
+    
+    <item>
+      <title>Getting started with gRPC and Python</title>
+      <link>https://echorand.me/posts/python-grpc/</link>
+      <pubDate>Mon, 01 Jan 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/python-grpc/</guid>
+      <description>My article on getting started with gRPC in Python is up on the codeship blog:
+ Using gRPC in Python  I build upon it in the next article:
+ Exploring Security, Metrics, and Error-handling with gRPC in Python  The demos can be found in the python-grpc-demo repository.</description>
+    </item>
+    
+    <item>
+      <title>Monitoring Python applications with Prometheus</title>
+      <link>https://echorand.me/posts/python-prometheus/</link>
+      <pubDate>Thu, 26 Oct 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/python-prometheus/</guid>
+      <description>I recently wrote two articles on Python application monitoring with Prometheus:
+ Monitoring Your Synchronous Python Web Applications Using Prometheus Monitoring Your Asynchronous Python Web Applications Using Prometheus  The demos can be found in the python-prometheus-demo repository.
+Also checkout aiohttp-prometheus.</description>
+    </item>
+    
+    <item>
+      <title>Doing Math with Python Humble Bundle</title>
+      <link>https://echorand.me/posts/doing-math-humble-bundle/</link>
+      <pubDate>Thu, 06 Apr 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/doing-math-humble-bundle/</guid>
+      <description>Slug:humble-bundle  Summary:Humble bundle    No Starch Press has launched a &amp;quot;Pay what you want&amp;quot; Python Humble Bundle running from April 5th - April 19th! Your purchases will help support the Python Software Foundation and I am excited to announce that Doing Math with Python is part of it.
+ For 1+ USD you can get three books including &amp;quot;Doing Math with Python&amp;quot;! For 15+ USD you get nine excellent Python books!</description>
+    </item>
+    
+    <item>
+      <title>Introducing distributed tracing in your Python application via Zipkin</title>
+      <link>https://echorand.me/posts/python-zipkin/</link>
+      <pubDate>Tue, 28 Mar 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/python-zipkin/</guid>
+      <description>Distributed tracing is the idea of tracing a network request as it travels through your services, as it would be in a microservices based architecture. The primary reason you may want to do is to troubleshoot or monitor the latency of a request as it travels through the different services.
+In this post we will see a demo of how we can introduce distributed tracing into a Python network stack communicating via HTTP.</description>
+    </item>
+    
+    <item>
+      <title>QueueLogger and Python JSON Logger</title>
+      <link>https://echorand.me/posts/queue-logger-python-json-logging/</link>
+      <pubDate>Wed, 01 Mar 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/queue-logger-python-json-logging/</guid>
+      <description>Using QueueLogger with Python JSON Logger When logging from multiple processes (via multiprocessing module), using QueueHandler is one approach with Python 2.
+QueueHandler however sets exc_info attribute of a LogRecord to None since it is not &amp;quot;pickleable&amp;quot; (more on this later). This becomes a problem when you use python-json-logger to format your logs as JSON since it relies on exc_info being set. The result is you don&#39;t get exc_info in your logs.</description>
+    </item>
+    
+    <item>
+      <title>Presentation slides with Jupyter Notebook</title>
+      <link>https://echorand.me/posts/slides-jupyter-notebook/</link>
+      <pubDate>Tue, 31 May 2016 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/slides-jupyter-notebook/</guid>
+      <description>I presented at the PyCon 2016 Education Summit on &amp;quot;Doing Math with Python&amp;quot; day before yesterday and a lightning talk yesterday. This is the first time, I prepared a slide deck using Jupyter Notebook + Reveal.js. I was pleased with the content creation process and the end result. So, here is what worked for me.
+Please note that I have basically taken quite a bit of liberty with HTML where I didn&#39;t want to search for markdown way of doing something</description>
+    </item>
+    
+    <item>
+      <title>Replacing boto S3 mocks using moto in Python</title>
+      <link>https://echorand.me/posts/mocking_s3_with_moto_in_python/</link>
+      <pubDate>Mon, 25 Jan 2016 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/mocking_s3_with_moto_in_python/</guid>
+      <description>Let&#39;s say you have some Python application code which connects to Amazon S3 which retrieves the keys in a bucket. Very likely, the application would be using boto and the code would like this:
+import boto def get_s3_conn(): return boto.connect_s3(&#39;&amp;lt;aws-access-key&#39;, &#39;&amp;lt;aws-secret-key&amp;gt;&#39;) def list_keys(): s3_conn = get_s3_conn() b = s3_conn.get_bucket(&#39;bucket_name&#39;) keys = b.list() return keys  The corresponding test would presumably use some mocks and patching. Here is one way to write a test for the above code:</description>
+    </item>
+    
+    <item>
+      <title>tempfile.NamedTemporaryFile() in Python</title>
+      <link>https://echorand.me/posts/named_temporary_file/</link>
+      <pubDate>Wed, 20 Jan 2016 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/named_temporary_file/</guid>
+      <description>In Python, when you need to create a temporary file with a filename associated to it on disk, NamedTemporaryFile function in the tempfile module is the goto function. Here are some use cases that I think one might use it for.
+Case #1: You simply need a named empty temporary file
+You just want a file object (pointing to an empty file) which has a filename associated to it and hence you cannot use a StringIO object:</description>
+    </item>
+    
+    <item>
+      <title>Mock objects and non-existent attributes/methods in Python</title>
+      <link>https://echorand.me/posts/mock_and_attribute_error/</link>
+      <pubDate>Mon, 11 Jan 2016 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/mock_and_attribute_error/</guid>
+      <description>Updated: Fixed typo in the last paragraph.
+Today, I was curious to see this behavior of Mock() objects when using mock:
+&amp;gt;&amp;gt;&amp;gt; from mock import Mock &amp;gt;&amp;gt;&amp;gt; m = Mock() &amp;gt;&amp;gt;&amp;gt; m.i_dont_exist &amp;lt;Mock name=&#39;mock.i_dont_exist&#39; id=&#39;139841609578768&#39;&amp;gt; &amp;gt;&amp;gt;&amp;gt; m.i_dont_exist() &amp;lt;Mock name=&#39;mock.i_dont_exist()&#39; id=&#39;139841609106896&#39;&amp;gt;  The above is expected, since I have not declared a spec when creating the Mock() object, so even when you call a non-existent method or get/set a non-existent attribute, you will not get a AttributeError.</description>
+    </item>
+    
+    <item>
+      <title>A virtualenv first approach to Python projects</title>
+      <link>https://echorand.me/posts/virtualenv-first-python/</link>
+      <pubDate>Mon, 30 Nov 2015 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/virtualenv-first-python/</guid>
+      <description>I have until the last few months (of my ~4 years of working with Python) always worked without virtualenv for all my Python projects. Why? I think I found the whole idea of having to do the following two steps before I work on something cumbersome:
+Remember the exact virtualenv name, and then Activate it  That said, I was very much aware that it was certainly a good thing to do and would cause me less headaches someday.</description>
+    </item>
+    
+    <item>
+      <title>PYTHONHASHSEED and your tests</title>
+      <link>https://echorand.me/posts/python-hashseed/</link>
+      <pubDate>Thu, 19 Nov 2015 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/python-hashseed/</guid>
+      <description>Recently at work, I wanted to test a string which was being created by the urllib.urlencode() function. My first attempt was simple - test my expected string with that being created by the function above using unittest&#39;s assertEquals() function. It passed all the times I ran the tests before I committed the code, but it started failing when the tests were ran as part of the deployment process.
+The input to the urllib.</description>
+    </item>
+    
+  </channel>
+</rss>

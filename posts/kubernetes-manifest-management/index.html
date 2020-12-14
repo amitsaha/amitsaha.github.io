@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title> On managing Kubernetes YAML manifests | Exploring Software</title>
+  <meta name="description" content="echo $RANDOM. Exploring Software and writing about it.">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="all,follow">
+  <meta name="googlebot" content="index,follow,snippet,archive">
+  <meta property="og:title" content="On managing Kubernetes YAML manifests" />
+<meta property="og:description" content="Introduction There are two broad discussion points in this post:
+ Managing the lifecycle of Kubernetes YAML manifests Static guarantees/best practices enforcements around Kubernetes YAML files before they are applied to a cluster  Prior art and background Please read this article to get a more holistic view of this space. What follows is my summary of what I think is the state at this stage and how it fits in with my two gols above." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://echorand.me/posts/kubernetes-manifest-management/" />
+<meta property="article:published_time" content="2019-12-20T00:00:00+00:00" />
+<meta property="article:modified_time" content="2020-03-06T16:38:19+11:00" />
+
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="On managing Kubernetes YAML manifests"/>
+<meta name="twitter:description" content="Introduction There are two broad discussion points in this post:
+ Managing the lifecycle of Kubernetes YAML manifests Static guarantees/best practices enforcements around Kubernetes YAML files before they are applied to a cluster  Prior art and background Please read this article to get a more holistic view of this space. What follows is my summary of what I think is the state at this stage and how it fits in with my two gols above."/>
+
+  
+  
+  
+  <link rel="stylesheet" href="https://echorand.me/css/style-white.css">
+  
+  
+  
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  
+
+  
+<link rel="icon" type="image/png" href="https://echorand.me/images/favicon.ico" />
+
+  
+  
+  
+  
+  
+    
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-108901610-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+  
+  
+</head>
+
+<body class="max-width mx-auto px3 ltr">
+  <div class="content index py4">
+
+  <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+        <li><a href="/about">About</a></li>
+         
+        <li><a href="/articles">Articles</a></li>
+         
+        <li><a href="/books">Books</a></li>
+         
+        <li><a href="/posts">Posts</a></li>
+         
+        <li><a href="/talks">Talks</a></li>
+         
+        <li><a href="/categories/">Categories</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li>
+          <a class="icon" href=" https://echorand.me/posts/correlated-error-logging/">
+            <i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i>
+          </a>
+        </li>
+        
+        
+        <li>
+          <a class="icon" href="https://echorand.me/posts/python-restrict-attributes/">
+            <i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i>
+          </a>
+        </li>
+        
+        <li>
+          <a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');">
+            <i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i>
+          </a>
+        </li>
+        <li>
+          <a class="icon" href="#">
+            <i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i>
+          </a>
+        </li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      
+      <ul>
+  
+  
+    
+  
+  
+  <li>
+    <a class="icon" href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fechorand.me%2fposts%2fkubernetes-manifest-management%2f">
+      <i class="fab fa-facebook " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://twitter.com/share?url=https%3a%2f%2fechorand.me%2fposts%2fkubernetes-manifest-management%2f&text=On%20managing%20Kubernetes%20YAML%20manifests">
+      <i class="fab fa-twitter " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fechorand.me%2fposts%2fkubernetes-manifest-management%2f&title=On%20managing%20Kubernetes%20YAML%20manifests">
+      <i class="fab fa-linkedin " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fechorand.me%2fposts%2fkubernetes-manifest-management%2f&is_video=false&description=On%20managing%20Kubernetes%20YAML%20manifests">
+      <i class="fab fa-pinterest " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="mailto:?subject=On%20managing%20Kubernetes%20YAML%20manifests&body=Check out this article: https%3a%2f%2fechorand.me%2fposts%2fkubernetes-manifest-management%2f">
+      <i class="fas fa-envelope " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://getpocket.com/save?url=https%3a%2f%2fechorand.me%2fposts%2fkubernetes-manifest-management%2f&title=On%20managing%20Kubernetes%20YAML%20manifests">
+      <i class="fab fa-get-pocket " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://reddit.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fkubernetes-manifest-management%2f&title=On%20managing%20Kubernetes%20YAML%20manifests">
+      <i class="fab fa-reddit " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.stumbleupon.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fkubernetes-manifest-management%2f&title=On%20managing%20Kubernetes%20YAML%20manifests">
+      <i class="fab fa-stumbleupon " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://digg.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fkubernetes-manifest-management%2f&title=On%20managing%20Kubernetes%20YAML%20manifests">
+      <i class="fab fa-digg " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.tumblr.com/share/link?url=https%3a%2f%2fechorand.me%2fposts%2fkubernetes-manifest-management%2f&name=On%20managing%20Kubernetes%20YAML%20manifests&description=Introduction%20There%20are%20two%20broad%20discussion%20points%20in%20this%20post%3a%0a%20Managing%20the%20lifecycle%20of%20Kubernetes%20YAML%20manifests%20Static%20guarantees%2fbest%20practices%20enforcements%20around%20Kubernetes%20YAML%20files%20before%20they%20are%20applied%20to%20a%20cluster%20%20Prior%20art%20and%20background%20Please%20read%20this%20article%20to%20get%20a%20more%20holistic%20view%20of%20this%20space.%20What%20follows%20is%20my%20summary%20of%20what%20I%20think%20is%20the%20state%20at%20this%20stage%20and%20how%20it%20fits%20in%20with%20my%20two%20gols%20above.">
+      <i class="fab fa-tumblr " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fechorand.me%2fposts%2fkubernetes-manifest-management%2f&t=On%20managing%20Kubernetes%20YAML%20manifests">
+      <i class="fab fa-hacker-news " aria-hidden="true"></i>
+    </a>
+  </li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <nav id="TableOfContents">
+  <ul>
+    <li><a href="#prior-art-and-background">Prior art and background</a></li>
+    <li><a href="#limitations-of-prior-art">Limitations of prior art</a></li>
+    <li><a href="#proposed-solution">Proposed solution</a>
+      <ul>
+        <li><a href="#examples">Examples</a></li>
+      </ul>
+    </li>
+    <li><a href="#improvements-to-the-above-generation">Improvements to the above generation</a>
+      <ul>
+        <li><a href="#why-not-use-kubekutr--kustomize">Why not use <code>kubekutr</code> + <code>kustomize</code>?</a></li>
+      </ul>
+    </li>
+    <li><a href="#brain-dump">Brain dump</a></li>
+  </ul>
+</nav>
+    </div>
+  </span>
+</div>
+
+
+  <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+    <header>
+      <h1 class="posttitle" itemprop="name headline">
+        On managing Kubernetes YAML manifests
+      </h1>
+      <div class="meta">
+        
+        <div class="postdate">
+          
+          <time datetime="2019-12-20 00:00:00 &#43;0000 UTC" itemprop="datePublished">2019-12-20</time>
+          
+        </div>
+        
+        <div class="article-category">
+            <i class="fas fa-archive"></i>
+            
+            
+            <a class="category-link" href="/categories/infrastructure">infrastructure</a>
+            
+        </div>
+        
+        
+      </div>
+    </header>
+
+  
+    <div class="content" itemprop="articleBody">
+      <h1 id="introduction">Introduction</h1>
+<p>There are two broad discussion points in this post:</p>
+<ol>
+<li>Managing the lifecycle of Kubernetes YAML manifests</li>
+<li>Static guarantees/best practices enforcements around Kubernetes YAML files <em>before</em> they are applied to a cluster</li>
+</ol>
+<h2 id="prior-art-and-background">Prior art and background</h2>
+<p>Please read <a href="https://blog.cedriccharly.com/post/20191109-the-configuration-complexity-curse/">this article</a> to
+get a more holistic view of this space. What follows is my summary of what I think is the state at this stage
+and how it fits in with my two gols above.</p>
+<p>The top two pain points (as far as my understanding goes) with managing YAML manifests for Kubernetes resource are:</p>
+<ul>
+<li>Prevent &ldquo;YAML duplication&rdquo; across similar functional resources and environments</li>
+<li>Data validation</li>
+</ul>
+<p>The solutions to the the first issue above has been solved via mechanisms such as &ldquo;helm templates&rdquo;
+and &ldquo;kustomize&rdquo;. Perhaps, one can combine both these to completely solve the YAML duplication problem
+as well as implement a hierarchy of YAML files. The data validation problem can be solved via a relatively
+new &ldquo;data configuration language&rdquo;, called <a href="https://cuelang.org">cue</a>. In fact, <code>cue</code> aims to help solve
+the YAML duplication issue as well as it supports &ldquo;templates&rdquo;. And it seems like, using packages may be a way
+to solve the hierarchy problem as well. Essentially, as far as I understand, these three tools all work on the
+principle that the final &ldquo;output&rdquo; will be a YAML file which is ready to be deployed to a Kubernetes cluster.
+The article I link to above has links to other non-YAML alternatives such as <a href="https://github.com/cruise-automation/isopod">isopod</a>
+and <a href="https://github.com/dhall-lang/dhall-kubernetes">dhall-kubernetes</a>.</p>
+<p>Coming back to the requirements I stated in the beginning of the document, there is a good chance we
+can meet the requirement (1) with either &ldquo;helm template&rdquo; + kustomize or &ldquo;cue&rdquo; itself. The requirement
+(2) stated above can be satisfied with tools like:</p>
+<ul>
+<li><a href="https://github.com/instrumenta/kubeval">kubeval</a></li>
+<li><a href="https://github.com/digitalocean/clusterlint">clusterlint</a> (More for cluster wide usage)</li>
+<li><a href="https://github.com/Shopify/kubeaudit">kubeaudit</a></li>
+<li><a href="https://github.com/controlplaneio/kubesec">kubesec</a></li>
+</ul>
+<h2 id="limitations-of-prior-art">Limitations of prior art</h2>
+<p>All the solutions discussued in the previous section still need that initial &ldquo;seed&rdquo; configuration to be
+specified for a Kubernetes resource manually in some form - a helm chart, a kustomize base YAML or a cue specification.
+That is, a human operator is needed to copy/paste or write a new YAML/Cue file from scratch for each service
+and then have the overrides in each environment to establish the hierarchical setup. In addition, it will involve
+using one or more external tools. &ldquo;helm&rdquo; specifically adds too much complexity for us (IMO), even though
+the latest release has removed the need for the server-side tiller component. &ldquo;kustomize&rdquo; is a simple tool,
+but it doesn&rsquo;t help with the initial seed template generation. Writing various plugins as a way
+to customize its behavior is possible, but does involve substantial effort. &ldquo;cue&rdquo; is a promising tool, but it has a steep
+learning curve for little gain as far as I can see.</p>
+<p>Of course, in addition we will need to solve the problem (2) with more than one third party tool.</p>
+<h2 id="proposed-solution">Proposed solution</h2>
+<p>The solution will solve the initial hand generation of configuration by making it a tool&rsquo;s responsibility. It will take
+the minimal set of command line arguments, pass it through various validation, policy enforcements and if all that
+succeeds, will spit out the YAML configuration ready to be deployed. This solution will also be used to enforce and
+continuously scan for any policy violations by existing manifests. So, any policy updates will be enforced.</p>
+<p>As a starting point, the tool supports the concept of a &ldquo;service&rdquo; as the only top-level
+generate-able object. A service may have:</p>
+<ul>
+<li>A worker deployable</li>
+<li>A DB migration job</li>
+<li>A cron job</li>
+</ul>
+<p>At this stage, it only supports the following:</p>
+<ul>
+<li>Only one container per pod</li>
+<li>Only supports persistent volumes and secret volumes</li>
+<li>No IAM role support</li>
+<li>Doesn&rsquo;t allow resource limit setting</li>
+</ul>
+<p>As of now, the CLI interface looks as follows:</p>
+<pre><code>Error: accepts 1 arg(s), received 0
+Usage:
+  mycli service generate-k8s [flags]
+
+Flags:
+      --container-image string       Container image to run in the pod (only AWS ECR registries allowed)
+      --cron-schedule string         Cron job schedule
+      --db-migrate                   Generate database migration job
+      --db-migrate-truncate          Truncate DB before migration
+      --deploy-environment string    Deployment Environment (dev/qa/staging/production)
+      --environ stringArray          Environment variables and values (key=value)
+  -h, --help                         help for generate-k8s
+      --host string                  FQDN for external web services
+      --node-group string            Node group name
+      --port int                     Container service port
+      --project string               Project name for the service
+      --pvc-claims stringArray       Persistent volume claims (name=/path/to/mount;5Gi)
+      --replicas int                 Number of replicas
+      --role string                  Role of the service (web/worker)
+      --secret-environ stringArray   Secret environment variables and values (key=secret/key)
+      --secret-volumes stringArray   Secret volume mounts (name=/path/to/mount;secret)
+      --type string                  Type of the service (external/internal)
+      --worker-replicas int          Number of worker replicas
+
+Global Flags:
+      --log int   Set log level (default 3)
+
+accepts 1 arg(s), received 0
+
+</code></pre><p>Out of scope at this stage:</p>
+<ul>
+<li>Cluster admin will be the exclusive manifest applier</li>
+<li>Node groups will be created externally</li>
+<li>Secrets (TLS certs) will be created externally</li>
+</ul>
+<h3 id="examples">Examples</h3>
+<p><strong>Correct user input</strong></p>
+<p>The following command will generate YAML files to deploy a container image:</p>
+<pre><code>$ mycli service generate-k8s hello-world  \
+  --container-image=amitsaha/webapp-demo:golang-tls \
+  --environ LISTEN_ADDRESS=&quot;:8443&quot;  \
+  --deploy-environment=qa  \
+  --type internal \
+  --port 8443  \
+  --role=web \
+  --project demo \ 
+  --replicas 1 \
+  --node-group demo 
+</code></pre><p>This will generate an YAML manifest similar to <a href="./example_generated.yaml">this</a>. Key features of the generated configuration are:</p>
+<ul>
+<li>Create a namespace per service and deployment environment</li>
+<li>Enforce non-root user for container init process (UID: 1000, GID: 1000)</li>
+<li>Disallow privilege escalation</li>
+<li>Disallow privileged containers</li>
+<li>Enforce resource limits</li>
+<li>Add automatic readiness and liveness probes</li>
+<li>Add Network policy automatically</li>
+<li>Create a service account for the deployment and use that for the deployment</li>
+</ul>
+<p><strong>Bad user input - invalid service name</strong></p>
+<pre><code>$ mycli service generate-k8s hello_world  --container-image=amitsaha/webapp-demo:golang-tls --environ LISTEN_ADDRESS=&quot;:8443&quot;  --deploy-environment=qa  --type in
+ternal --port 8443  --role=web --project demo  --replicas 1 --node-group demo   
+
+&amp;validator.fieldError{v:(*validator.Validate)(0xc0000de420), tag:&quot;Host&quot;, actualTag:&quot;Host&quot;, ns:&quot;ServiceData.ServiceHost&quot;, structNs:&quot;ServiceData.Host&quot;, fieldLen:0xb, structfie
+ldLen:0x4, value:&quot;&quot;, param:&quot;&quot;, kind:0x18, typ:(*reflect.rtype)(0x18fce60)}
+
+2019/12/10 15:56:18 Validations failed
+
+</code></pre><p><strong>Bad user input - 1 replica for stateless applications</strong></p>
+<p>TODO</p>
+<p>To summarize, the following resources are created:</p>
+<ul>
+<li>Namespace</li>
+<li>Service</li>
+<li>Deployment</li>
+<li>NetworkPolicy</li>
+<li>ServiceAccount</li>
+<li>Ingress object</li>
+</ul>
+<h2 id="improvements-to-the-above-generation">Improvements to the above generation</h2>
+<p>With the above command, we generate the initial set of manifests for an environment. We have the following limitations:</p>
+<ol>
+<li>We need to do the above per environment: <code>qa</code>, <code>staging</code>, <code>production</code>, etc.</li>
+<li>We essentially have duplication across environments, althought not hand written or copied</li>
+<li>If we wanted to change something across all environments, we will have to manually edit each environment&rsquo;s manifests</li>
+<li>For the same kind of service  (<code>redis</code>, <code>db</code>), we will need to do the same operation over and over again</li>
+</ol>
+<p>All the above problems can be solved by instead generating the seed configuration for <code>kustomize</code> or <code>helm</code> instead
+of plain YAML files. For example, <a href="https://github.com/mr-karan/kubekutr">kubekutr</a> generates <code>kustomize</code> bases based
+on user input.</p>
+<p>Alternatively, we could enhance our above generation command as follows. We will consider two kinds of deployment units:</p>
+<ul>
+<li>Custom services</li>
+<li>Standard services - DBs, Storage services, Cache</li>
+</ul>
+<p>For custom services, using the command line parameters, create a specification for your application. Then using this specification,
+generate manifests for each environment. This will solve 1, 2 and 3 above. If we want to change something across
+all or a specific environments, we will change the specification. Let&rsquo;s consider example specifications:</p>
+<pre><code># For an external PHP service with a
+# Web, Worker, DB migration jobs and a Cron job
+
+Kind: PHPService
+Project: hello-world
+Type: External
+Host: api.hello-world.xcover.com
+Port: 8443
+Container:
+  Image: 121211.aws.ecr.io/hello-world-api:&lt;githash&gt;
+DBMigration: true
+CIServiceAccount: true
+CronSchedule: &quot;* * * * *&quot;
+Environments:
+  qa:
+    Namespace: hello-world-qa
+    WebReplicas: 2
+    WorkerReplicas: 2
+    EnvVars:
+      Environment: qa
+      TruncateDB: true
+    NodeGroup: hello-world_qa
+  staging:
+    Namespace: hello-world-qa 
+    WebReplicas: 3
+    WorkerReplicas: 3
+    EnvVars:
+      Environment: staging
+    NodeGroup: hello-world_staging
+EnvVars:
+  secret:
+  - name: TOKEN
+    path: hello-world-api/token
+  plain:
+  - name: APP_NAME
+    value: hello-world
+PersistentVolumeClaims:
+  - name: data
+    mountPath: /storage
+    size:5
+</code></pre><pre><code># For an external Python service with a
+# Web, Worker, DB migration jobs and a Cron job
+
+Kind: PythonService
+Project: hello-world
+Type: External
+Host: api.hello-world.xcover.com
+Port: 8443
+Container:
+  Image: 121211.aws.ecr.io/hello-world-api:&lt;githash&gt;
+DBMigration: true
+CIServiceAccount: true
+CronSchedule: &quot;* * * * *&quot;
+Environments:
+  qa:
+    Namespace: hello-world-qa
+    WebReplicas: 2
+    WorkerReplicas: 2
+    EnvVars:
+      Environment: qa
+      TruncateDB: true
+    NodeGroup: hello-world_qa
+  staging:
+    Namespace: hello-world-qa 
+    WebReplicas: 3
+    WorkerReplicas: 3
+    EnvVars:
+      Environment: staging
+    NodeGroup: hello-world_staging
+EnvVars:
+  secret:
+  - name: TOKEN
+    path: hello-world-api/token
+  plain:
+  - name: APP_NAME
+    value: hello-world
+PersistentVolumeClaims:
+  - name: data
+    mountPath: /storage
+    size:5
+
+</code></pre><p>For deploying standard services which will be deployed in multiple environments across multiple
+applications, the following specification will be generated using in-built custom parameters, thus
+minimizing the number of user inputs:</p>
+<pre><code>Kind: Redis
+Project: hello-world
+Type: Internal
+Port: 6379
+Container:
+  Image: 12121.aws.ecr.io/redis-infra:&lt;git bash&gt;
+Environments:
+  qa:
+    Namespace: hello-world-qa
+    NodeGroup: xledget_qa
+PersistentVolumeClaims:
+  - name: data
+    mountPath: /redis-data
+    size: 5
+...
+</code></pre><p>We can do the same for other standard services like PostgreSQL, etc.</p>
+<h3 id="why-not-use-kubekutr--kustomize">Why not use <code>kubekutr</code> + <code>kustomize</code>?</h3>
+<p>The above solution aims to make it straighforward to:</p>
+<ul>
+<li>Generate initial multi-environment YAML manifests</li>
+<li>Make subsequent changes across environments</li>
+<li>Not require experience with another tool</li>
+</ul>
+<p><code>kubekutr</code>&rsquo;s scope is limited to generating <code>kustomize</code> bases. That way, the proposed tool&rsquo;s scope
+is more extensive as well as being self-contained - not needing another tool.</p>
+<p>The workflow we are aiming for with the proposed tool is:</p>
+<ul>
+<li>Run the above tool</li>
+<li>Run standard linting/checks</li>
+<li>Run <code>kubectl apply</code></li>
+</ul>
+<h2 id="brain-dump">Brain dump</h2>
+<p>In the last three years while writing puppet classes/modules, chef recipes, terraform configuration
+and most recently Kubernetes YAML files, i have felt that I am writing the same stuff over and over
+again. Generating these configurations have often been at the back of my mind. I was losing quite a
+bit of sleep (literally!) over this again with Kubernetes manifests. I sent a Twitter DM to Kelsey
+Hightower briefly explaining to him what I am trying to do here. One of his sentences was &ldquo;Configuration
+is complicated&rdquo; (paraphrased slightly) which was the moment for me when I realized that this is not
+the first time I have been trying to think about generating configuration rather than copy/pasting them
+and hand-editing them. He also mentioned that he likes the idea of &ldquo;pipelines&rdquo;. Something could be
+generating the configuration and something else could be validating it and may be sending pull requests
+to fix the issues.</p>
+
+    </div>
+  </article>
+
+  
+  
+
+
+
+
+
+  <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/about">About</a></li>
+         
+          <li><a href="/articles">Articles</a></li>
+         
+          <li><a href="/books">Books</a></li>
+         
+          <li><a href="/posts">Posts</a></li>
+         
+          <li><a href="/talks">Talks</a></li>
+         
+          <li><a href="/categories/">Categories</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <nav id="TableOfContents">
+  <ul>
+    <li><a href="#prior-art-and-background">Prior art and background</a></li>
+    <li><a href="#limitations-of-prior-art">Limitations of prior art</a></li>
+    <li><a href="#proposed-solution">Proposed solution</a>
+      <ul>
+        <li><a href="#examples">Examples</a></li>
+      </ul>
+    </li>
+    <li><a href="#improvements-to-the-above-generation">Improvements to the above generation</a>
+      <ul>
+        <li><a href="#why-not-use-kubekutr--kustomize">Why not use <code>kubekutr</code> + <code>kustomize</code>?</a></li>
+      </ul>
+    </li>
+    <li><a href="#brain-dump">Brain dump</a></li>
+  </ul>
+</nav>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      
+      <ul>
+  
+  
+    
+  
+  
+  <li>
+    <a class="icon" href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fechorand.me%2fposts%2fkubernetes-manifest-management%2f">
+      <i class="fab fa-facebook fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://twitter.com/share?url=https%3a%2f%2fechorand.me%2fposts%2fkubernetes-manifest-management%2f&text=On%20managing%20Kubernetes%20YAML%20manifests">
+      <i class="fab fa-twitter fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fechorand.me%2fposts%2fkubernetes-manifest-management%2f&title=On%20managing%20Kubernetes%20YAML%20manifests">
+      <i class="fab fa-linkedin fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fechorand.me%2fposts%2fkubernetes-manifest-management%2f&is_video=false&description=On%20managing%20Kubernetes%20YAML%20manifests">
+      <i class="fab fa-pinterest fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="mailto:?subject=On%20managing%20Kubernetes%20YAML%20manifests&body=Check out this article: https%3a%2f%2fechorand.me%2fposts%2fkubernetes-manifest-management%2f">
+      <i class="fas fa-envelope fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://getpocket.com/save?url=https%3a%2f%2fechorand.me%2fposts%2fkubernetes-manifest-management%2f&title=On%20managing%20Kubernetes%20YAML%20manifests">
+      <i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://reddit.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fkubernetes-manifest-management%2f&title=On%20managing%20Kubernetes%20YAML%20manifests">
+      <i class="fab fa-reddit fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.stumbleupon.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fkubernetes-manifest-management%2f&title=On%20managing%20Kubernetes%20YAML%20manifests">
+      <i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://digg.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fkubernetes-manifest-management%2f&title=On%20managing%20Kubernetes%20YAML%20manifests">
+      <i class="fab fa-digg fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.tumblr.com/share/link?url=https%3a%2f%2fechorand.me%2fposts%2fkubernetes-manifest-management%2f&name=On%20managing%20Kubernetes%20YAML%20manifests&description=Introduction%20There%20are%20two%20broad%20discussion%20points%20in%20this%20post%3a%0a%20Managing%20the%20lifecycle%20of%20Kubernetes%20YAML%20manifests%20Static%20guarantees%2fbest%20practices%20enforcements%20around%20Kubernetes%20YAML%20files%20before%20they%20are%20applied%20to%20a%20cluster%20%20Prior%20art%20and%20background%20Please%20read%20this%20article%20to%20get%20a%20more%20holistic%20view%20of%20this%20space.%20What%20follows%20is%20my%20summary%20of%20what%20I%20think%20is%20the%20state%20at%20this%20stage%20and%20how%20it%20fits%20in%20with%20my%20two%20gols%20above.">
+      <i class="fab fa-tumblr fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fechorand.me%2fposts%2fkubernetes-manifest-management%2f&t=On%20managing%20Kubernetes%20YAML%20manifests">
+      <i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+      
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;">
+          <i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;">
+          <i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;">
+          <i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');">
+          <i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+
+  <footer id="footer">
+  <div class="footer-left">
+    Copyright  &copy; 2020  Exploring Software 
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+        <li><a href="/about">About</a></li>
+         
+        <li><a href="/articles">Articles</a></li>
+         
+        <li><a href="/books">Books</a></li>
+         
+        <li><a href="/posts">Posts</a></li>
+         
+        <li><a href="/talks">Talks</a></li>
+         
+        <li><a href="/categories/">Categories</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+
+  </div>
+</body>
+
+<link rel="stylesheet" href=/lib/font-awesome/css/all.min.css>
+<script src=/lib/jquery/jquery.min.js></script>
+<script src=/js/main.js></script>
+
+
+
+</html>

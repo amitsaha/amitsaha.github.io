@@ -1,0 +1,411 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>infrastructure on Exploring Software</title>
+    <link>https://echorand.me/categories/infrastructure/</link>
+    <description>Recent content in infrastructure on Exploring Software</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 13 Dec 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://echorand.me/categories/infrastructure/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Authentication between services using Kubernetes primitives</title>
+      <link>https://echorand.me/posts/micros-auth-kubernetes/</link>
+      <pubDate>Sun, 13 Dec 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/micros-auth-kubernetes/</guid>
+      <description>In my latest article for the folks at learnk8s, I write about establishing authentication between services deployed in Kubernetes.
+Specifically, we discuss how you can use the Kubernetes primitives - Service accounts with a new feature - Service Account Token Volume Projection to setup authentication between two HTTP services.
+You can find the article here with the accompanying code repository here.</description>
+    </item>
+    
+    <item>
+      <title>Static and dynamic checks for your Kubernetes workloads</title>
+      <link>https://echorand.me/posts/policy-enforcement-kubernetes/</link>
+      <pubDate>Mon, 27 Jul 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/policy-enforcement-kubernetes/</guid>
+      <description>My two recent articles, Validating Kubernetes YAML for best practice and policies and Enforcing policies and governance for Kubernetes workloads looks at the topic of enforcing policies for your Kubernetes workloads. Check them out and let me know if you have any comments.</description>
+    </item>
+    
+    <item>
+      <title>Using Gatekeeper in Kubernetes</title>
+      <link>https://echorand.me/posts/gatekeeper-kubernetes/</link>
+      <pubDate>Thu, 28 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/gatekeeper-kubernetes/</guid>
+      <description>Introduction Gatekeeper allows a Kubernetes administrator to implement policies for ensuring compliance and best practices in their cluster. It makes use of Open Policy Agent (OPA) and is a validating admission controller. The policies are written in the Rego language. Gatekeeper embraces Kubernetes native concepts such as Custom Resource Definitions (CRDs) and hence the policies are managed as kubernetes resources. The GKE docs on this topic are a good place to learn more.</description>
+    </item>
+    
+    <item>
+      <title>Kubernetes pod security policies</title>
+      <link>https://echorand.me/posts/kubernetes-pod-security-policies/</link>
+      <pubDate>Wed, 20 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/kubernetes-pod-security-policies/</guid>
+      <description>Introduction Pod security policies are cluster level resources. The Google cloud docs has some basic human friendly docs. A psp is a way to enforce certain policies that pod needs to comply with before it&amp;rsquo;s allowed to be scheduled to be run on the cluster - create or an update operation (perhaps a restart of the pod?). Essentially, it is a type of a validating admission controller.
+I should mention that I found it (later on) to think about pod security policies as a way to &amp;ldquo;control&amp;rdquo; various attributes of a pod.</description>
+    </item>
+    
+    <item>
+      <title>How to Set up Log Forwarding in a Kubernetes Cluster Using Fluent Bit</title>
+      <link>https://echorand.me/posts/fluentbit-kubernetes/</link>
+      <pubDate>Thu, 07 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/fluentbit-kubernetes/</guid>
+      <description>Metadata I have posted this article on dev.to where I welcome comments and discussions.
+Introduction Log forwarding is an essential ingredient of a production logging pipeline in any organization. As an application author, you don&amp;rsquo;t want to be bothered with the responsibility of ensuring the application logs are being processed a certain way and then stored in a central log storage. As an operations personnel, you don&amp;rsquo;t want to have to hack your way around different applications to process and ship logs.</description>
+    </item>
+    
+    <item>
+      <title>Using cloud custodian to ensure compliance across AWS resources</title>
+      <link>https://echorand.me/posts/cloud-custodian-aws/</link>
+      <pubDate>Tue, 28 Apr 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/cloud-custodian-aws/</guid>
+      <description>Introduction In this post, I will describe my experiments with using Cloud Custodian to perform various tasks usually falling into the bucket of compliance and sometimes convention. I encourage you to take a look at some of the example policies.
+Some of the areas I will cover are resource tagging and unused resources across multiple AWS accounts.
+Installation and setup Cloud Custodian is a Python 3 application, so you will need that installed.</description>
+    </item>
+    
+    <item>
+      <title>On managing Kubernetes YAML manifests</title>
+      <link>https://echorand.me/posts/kubernetes-manifest-management/</link>
+      <pubDate>Fri, 20 Dec 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/kubernetes-manifest-management/</guid>
+      <description>Introduction There are two broad discussion points in this post:
+ Managing the lifecycle of Kubernetes YAML manifests Static guarantees/best practices enforcements around Kubernetes YAML files before they are applied to a cluster  Prior art and background Please read this article to get a more holistic view of this space. What follows is my summary of what I think is the state at this stage and how it fits in with my two gols above.</description>
+    </item>
+    
+    <item>
+      <title>Jenkins Docker Workflow plugin - A look inside `inside()`</title>
+      <link>https://echorand.me/posts/jenkins-docker-workflow-inside/</link>
+      <pubDate>Tue, 26 Nov 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/jenkins-docker-workflow-inside/</guid>
+      <description>Introduction The docker workflow plugin enables leveraging Docker containers for CI/CD workflows in Jenkins. There are two broad patterns one would generally use containers in their CI/CD environment. The first would be as &amp;ldquo;side car&amp;rdquo; containers - these are containers which run alongside your tests/other workflow and provide services such as a database server, memory store and such. The second would be as base execution environments for the tests/builds. The documentation for the plugin explains these two patterns and how to achieve either using Jenkins workflow plugin.</description>
+    </item>
+    
+    <item>
+      <title>Bash function and exiting early</title>
+      <link>https://echorand.me/posts/bash-functions-exit/</link>
+      <pubDate>Fri, 18 Oct 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/bash-functions-exit/</guid>
+      <description>Monday was just beginning to roll on as Monday does, I had managed to work out the VPN issues and had just started to do some planned work. Then, slack tells me that new deployment had just been pushed out successfully, but the service was actually down. Now, we had HTTP healthchecks which was hitting a specific endpoint but apparently that was successful, but functionally the service was down. So I check the service logs, which shows something like this:</description>
+    </item>
+    
+    <item>
+      <title>Using a specific SSH private key</title>
+      <link>https://echorand.me/ssh-with-private-key/</link>
+      <pubDate>Thu, 05 Sep 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/ssh-with-private-key/</guid>
+      <description>How do I specify a specifc private key with rsync? $ rsync &amp;lt;other options&amp;gt; -e &amp;quot;ssh -i &amp;lt;your private key&amp;gt;&amp;quot; &amp;lt;src&amp;gt; &amp;lt;destination&amp;gt; Answer from here
+How do I specify a specific private key with git? $ GIT_SSH_COMMAND=&amp;quot;ssh -i &amp;lt;your key file&amp;gt;&amp;quot; git &amp;lt;command&amp;gt; </description>
+    </item>
+    
+    <item>
+      <title>User access management on AWS Kubernetes cluster</title>
+      <link>https://echorand.me/posts/user-management-aws-eks-cluster/</link>
+      <pubDate>Fri, 23 Aug 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/user-management-aws-eks-cluster/</guid>
+      <description>Introduction When implementing a solution for allowing users other than the cluster creator to access the cluster resources we are faced with two fairly old generic problems - authentication and authorization. There are various ways one can solve these problems. I will discuss one such solution in this post. It makes use of AWS Identity and access management (IAM) features. This in my humble opinion is the simplest and hopefully secure enough solution when it comes to EKS.</description>
+    </item>
+    
+    <item>
+      <title>Notes on Kubernetes</title>
+      <link>https://echorand.me/posts/kubernetes-notes/</link>
+      <pubDate>Fri, 02 Aug 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/kubernetes-notes/</guid>
+      <description>Introduction This in-progress page lists some of my findings while working with Kubernetes.
+EKS cluster setup This section will have findings that are relevant when working with an AWS EKS cluster.
+Terraform configuration for master This is based on the tutorial from the Terraform folks here. Unlike the tutorial though, I assume that you already have the VPC and subnets you want to setup your EKS master in.
+First up, the master.</description>
+    </item>
+    
+    <item>
+      <title>Nginx - redirecting non-www to www hostnames</title>
+      <link>https://echorand.me/posts/nginx-non-www-www-redirect/</link>
+      <pubDate>Fri, 19 Jul 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/nginx-non-www-www-redirect/</guid>
+      <description>Introduction I wanted a Nginx configuration which would satisfy the following requirements:
+ Any example.com requests should be redirected to www.example.com The above should happen for http and https http://example.com should redirect directly to https://www.example.com  Solution We will need four server blocks:
+ http - example.com (listen on 80) http - www.example.com (listen on 80) https - example.com (listen on 443) https - www.example.com (listen on 443)  I obviously went through a bit of hit and trial, but my main issue was around how I would setup (3) correctly.</description>
+    </item>
+    
+    <item>
+      <title>Nginx &#43; strace</title>
+      <link>https://echorand.me/posts/strace-nginx/</link>
+      <pubDate>Wed, 19 Jun 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/strace-nginx/</guid>
+      <description>I was debugging a issue where we were getting truncated logs in ElasticSearch in the context of a setup as follows:
+Application Logs -&amp;gt; Fluentd (logging) -&amp;gt; Nginx -&amp;gt; ElasticSearch The original problem turned out to be on the application side, but my first point of investigation was what are we getting on the nginx side? Do we get the entire message that we are expecting and something is going on the ElasticSearch side?</description>
+    </item>
+    
+    <item>
+      <title>Nginx and geoip lookup with geoip2 module</title>
+      <link>https://echorand.me/posts/nginx-geoip2-mmdblookup/</link>
+      <pubDate>Fri, 24 May 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/nginx-geoip2-mmdblookup/</guid>
+      <description>I wanted to setup Nginx logging so that it would perform GeoIP lookup on the IPv4 address in the X-Forwarded-For header. Here&amp;rsquo;s how I went about doing it on CentOS 7.
+This nginx module integrates Maxmind GeoIP2 database with the RPMs being available by getpagespeed.com.
+Once I had installed the module, the hard part for me was how to get the data I wanted - city, timezone information and others from nginx and the geoip2 module integration.</description>
+    </item>
+    
+    <item>
+      <title>Generate yourself some Terraform code from TOML</title>
+      <link>https://echorand.me/posts/terraform_from_toml/</link>
+      <pubDate>Thu, 04 Apr 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/terraform_from_toml/</guid>
+      <description>In this post, we will see how we can use Golang to generate Terraform configuration from a TOML specification. That is, given a TOML file, like:
+subnet_name = &amp;quot;SubnetA&amp;quot; rules = [ {rule_no=101, egress = false, protocol = &amp;quot;tcp&amp;quot;, rule_action = &amp;quot;allow&amp;quot;, cidr_block = &amp;quot;127.0.0.1/32&amp;quot;, from_port = 22, to_port = 30}, ] We will generate:
+# This is a generated file, do not hand edit. See README at the # root of the repository resource &amp;quot;aws_network_acl_rule&amp;quot; &amp;quot;rule_SubnetA_ingress_101&amp;quot; { network_acl_id = &amp;quot;${lookup(local.</description>
+    </item>
+    
+    <item>
+      <title>Getting a docker container&#39;s stdout logs into a variable on Linux</title>
+      <link>https://echorand.me/posts/docker_logs_variable/</link>
+      <pubDate>Mon, 11 Mar 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/docker_logs_variable/</guid>
+      <description>docker logs by default shows the container&amp;rsquo;s stdout and stderr logs. However, what I discovered was that the stderr logs from the container are output to the host system&amp;rsquo;s stderr as well. I was expecting everything from the container to be on the host&amp;rsquo;s stdout.
+Let&amp;rsquo;s see a demo. Consider the Dockerfile:
+FROM alpine:3.7 CMD echo &amp;quot;I echoed to stdout&amp;quot; &amp;amp;&amp;amp; &amp;gt;&amp;amp;2 echo &amp;quot;I echoed to stderr&amp;quot; Let&amp;rsquo;s build it and run it:</description>
+    </item>
+    
+    <item>
+      <title>ASP.NET Compilation and other files don&#39;t mix</title>
+      <link>https://echorand.me/posts/aspnet_compiler_node_modules/</link>
+      <pubDate>Tue, 05 Mar 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/aspnet_compiler_node_modules/</guid>
+      <description>I love working in software. Mostly things work as expected, but at times no. I changed A, how can Z be affected - after all they are all miles apart. Right? Wrong. Z can be affected. Today&amp;rsquo;s story is the latest - totally unexpected, but not surprising.
+Background We run ASP.NET compilation on our code base as part of every build in our Continuous Integration (CI) pipeline. I changed some part of the pipeline so that we started caching node_modules directory between different parts of a pipeline.</description>
+    </item>
+    
+    <item>
+      <title>Poor man&#39;s zero downtime deployment setup using Traefik</title>
+      <link>https://echorand.me/posts/traefik-aspnet/</link>
+      <pubDate>Mon, 21 Jan 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/traefik-aspnet/</guid>
+      <description>Recently, I wrote two articles about using traefik as a reverse proxy. The first article discussed deploying a ASP.NET framework application and the second discussed deploying ASP.NET core applications.
+In both cases, I demonstrated the following:
+ Docker native integration In-built support for LetsEncrypt SSL certificates  One of the things I didn&amp;rsquo;t discuss was how we could setup an architecture which allowed us to do zero-downtime deployments without any external help.</description>
+    </item>
+    
+    <item>
+      <title>Scheduled task to prune docker images on Windows server</title>
+      <link>https://echorand.me/posts/scheduled-task-docker-prune/</link>
+      <pubDate>Mon, 21 Jan 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/scheduled-task-docker-prune/</guid>
+      <description>Windows docker images can be bulky and on a server that you are deploying your application as docker images, the free disk space becomes a metric to watch out for. The following script will setup a Scheduled tasks to be run at a 7.0 PM UTC which will prune all unused images:
+# Scheduled tasks if (-Not (Test-Path &amp;quot;C:\ScheduledScripts&amp;quot;)) { mkdir C:\ScheduledScripts } $command=&amp;quot;docker image prune --all -f&amp;quot; $command | Out-File -encoding ASCII C:\ScheduledScripts\DockerImagePrune.</description>
+    </item>
+    
+    <item>
+      <title>Ephemeral source port ranges and docker build</title>
+      <link>https://echorand.me/posts/docker-build-and-ephemeral-port-issues/</link>
+      <pubDate>Mon, 14 Jan 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/docker-build-and-ephemeral-port-issues/</guid>
+      <description>TLDR; If you are having trouble with docker build and ephemeral port ranges, we can use iptables to solve the issue:
+$ sudo iptables -t nat -I POSTROUTING -p tcp -m tcp --sport 32768:61000 -j MASQUERADE --to-ports 49152-61000 I have written previously about how things get interesting with ephemeral port ranges in a Windows and Linux environment and AWS network acls. Today’s post is related to the same topic but specifically relevant if you are building docker images in such an environment.</description>
+    </item>
+    
+    <item>
+      <title>AWS CodeDeploy Deployment Group and Initial Auto Scaling lifecycle hook</title>
+      <link>https://echorand.me/posts/aws-codedeploy-autoscaling-group/</link>
+      <pubDate>Wed, 19 Dec 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/aws-codedeploy-autoscaling-group/</guid>
+      <description>When we create an AWS Code Deploy deployment group via Terraform or CloudFormation and integrate with an Auto Scaling Group, it also by default creates an initial lifecycle hook which ensuresthat a new code deployment gets triggered when a scale-out event occurs.
+It is all very &amp;ldquo;magical&amp;rdquo; and it is one of those cases where you have troublesome behavior especially when you are managing your infrastructure as code. The troublesome behavior happens as a result of the lifecycle hook creation being a side-effect of creating a deployment group rather than an explicit operation that the user performs.</description>
+    </item>
+    
+    <item>
+      <title>Let&#39;s Encrypt, GoDadday DNS and IIS server</title>
+      <link>https://echorand.me/posts/manual-letsencrypt-dns-challenge/</link>
+      <pubDate>Thu, 08 Nov 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/manual-letsencrypt-dns-challenge/</guid>
+      <description>I wanted to create a new SSL certificate for IIS hosted ASP.NET framework application. The key data that may make this post relevant to you are:
+ Let&amp;rsquo;s Encrypt Challenge mode: DNS TXT record DNS provider: GoDaddy Target web server: IIS Target operating system: Windows Local operating environment/system: Linux (including Windows Subsystem for Linux).  Why I chose certbot? I decided to use certbot since it allowed me do create the DNS TXT entries manually.</description>
+    </item>
+    
+    <item>
+      <title>AWS VPC subnets and Internet connectivity over IPv4</title>
+      <link>https://echorand.me/posts/aws-vpc-internet-connectivity-subnets/</link>
+      <pubDate>Mon, 15 Oct 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/aws-vpc-internet-connectivity-subnets/</guid>
+      <description>We can have two kinds of subnets inside a AWS VPC - private and public. A public subnet is one which is attached to an Internet Gateway. This essentially adds a routing table entry to the subnet&amp;rsquo;s routing table sending all Internet traffic to an Internet Gateway. On the other hand, if traffic from a subnet destined for the &amp;ldquo;Internet&amp;rdquo; is sent to either a NAT instance, or a AWS managed NAT device, the subnet is a private subnet.</description>
+    </item>
+    
+    <item>
+      <title>Docker userns-remap and system users on Linux</title>
+      <link>https://echorand.me/posts/docker-user-namespacing-remap-system-user/</link>
+      <pubDate>Fri, 24 Aug 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/docker-user-namespacing-remap-system-user/</guid>
+      <description>In this post, we learn how we can make use of docker&amp;rsquo;s user namespacing feature on Linux in a CI/build environment to avoid running into permission issues. Using user namespacing also keeping things a bit sane without adopting sub-optimal alternatives.
+Introduction Let&amp;rsquo;s consider that we are leveraging docker in a continuous integration (CI)/build environment and the usage scenario looks as follows:
+ CI agent/slave runs as an unpriviliged user agent on the host agent clones the repository during a build on the host The build happens in a docker container spawned by scripts running as agent with the repository volume mounted  On a new build, the agent doesn&amp;rsquo;t do a fresh clone if a clone already exists, but instead does a git clean followed by git fetch of the commit.</description>
+    </item>
+    
+    <item>
+      <title>AWS Private Route53 DNS and Docker containers</title>
+      <link>https://echorand.me/posts/aws-vpc-private-dns/</link>
+      <pubDate>Wed, 15 Aug 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/aws-vpc-private-dns/</guid>
+      <description>AWS Route 53 private hosted zones enable you to have private DNS names which only resolve from your VPC. This is great when working from EC2 instances since everything is setup and ready to go. This however becomes a problem when using docker containers on a systemd system. On such a system, systemd-resolved sits in between your host applications and name resolution. The entry in /etc/resolv.conf is basically, 127.0.0.53 which doesn&amp;rsquo;t mean much when you want name resolution from a docker container which defaults to 8.</description>
+    </item>
+    
+    <item>
+      <title>AWS Network ACLs and ephemeral port ranges</title>
+      <link>https://echorand.me/posts/aws-network-acl-docker/</link>
+      <pubDate>Tue, 14 Aug 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/aws-network-acl-docker/</guid>
+      <description>In this post, I discuss a problem (and its solution) I encountered while working with AWS (Amazon Web Services) Network ACLs, docker containers and ephemeral port ranges.
+Infrastructure setup A Linux EC2 instance with docker engine running in a VPC with inbound and outbound traffic controlled by Network ACLs. I was connecting to another hosted service running on a separate VM, service1 running on port 10001 inside the same subnet with security groups allowing traffic from the host IP (via CIDR).</description>
+    </item>
+    
+    <item>
+      <title>Managing AWS lambda functions from start to finish with Terraform</title>
+      <link>https://echorand.me/posts/managing-aws-lambda-functions-terraform/</link>
+      <pubDate>Thu, 02 Aug 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/managing-aws-lambda-functions-terraform/</guid>
+      <description>AWS lambda functions look deceptively simple. The devil is in the details though. Once you have written the code and have created a .zip file, there&amp;rsquo;s a few more steps to go.
+For starters, we need an IAM profile to be defined with appropriate policies allowing the function to access the AWS resources. To setup the lambda function to be invoked automatically in reaction to another event, we need some more permissions and references to these resources.</description>
+    </item>
+    
+    <item>
+      <title>On running Windows Docker containers</title>
+      <link>https://echorand.me/posts/windows-docker-containers/</link>
+      <pubDate>Thu, 26 Jul 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/windows-docker-containers/</guid>
+      <description>I went into working with Windows docker containers after having been worked with docker on Linux exclusively. My goal was to have isolated environments for each build in a continuous integration pipeline. That is, each build happens on an exclusive build host (AWS EC2 VM instance) and every database and service the application needs access to for the integration tests (including selenium tets) are run on docker containers on the same host.</description>
+    </item>
+    
+    <item>
+      <title>Using Terraform with consul remote backend</title>
+      <link>https://echorand.me/posts/terraform-remote-state-consul/</link>
+      <pubDate>Wed, 27 Jun 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/terraform-remote-state-consul/</guid>
+      <description>In my new post on the CodeShip blog, I discuss configuring terraform with a consul remote backend. The entire aricle is available here.
+The accompanying git repository is here. Please file an issue if you have trouble following the setup.</description>
+    </item>
+    
+    <item>
+      <title>Notes on using Cloudflare DNS over HTTPS</title>
+      <link>https://echorand.me/posts/cloudflare-dns-over-https/</link>
+      <pubDate>Tue, 10 Apr 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/cloudflare-dns-over-https/</guid>
+      <description>Introduction I recently learned about Cloudflare&amp;rsquo;s 1.1.1.1 DNS service. Let&amp;rsquo;s explore.
+Exploration One of the more interesting things that caught my attention there was DNS over HTTPS. That is, we can do this:
+22:27 $ http &#39;https://cloudflare-dns.com/dns-query?ct=application/dns-json&amp;amp;name=echorand. me&#39; HTTP/1.1 200 OK CF-RAY: 409535ca3b3765bd-SYD Connection: keep-alive Content-Length: 281 Content-Type: application/dns-json Date: Tue, 10 Apr 2018 12:27:53 GMT Server: cloudflare-nginx Set-Cookie: __cfduid=dfb12106907c3b55c52b27b8ea99e185a1523363273; expires=Wed, 10-Apr-19 12:27:53 GMT; path=/; domain=.cloudflare-dns.com; HttpOnly; Secure cache-control: max-age=285 { &amp;quot;AD&amp;quot;: false, &amp;quot;Answer&amp;quot;: [ { &amp;quot;TTL&amp;quot;: 285, &amp;quot;data&amp;quot;: &amp;quot;192.</description>
+    </item>
+    
+    <item>
+      <title>Setting up AWS EC2 Assume Role with Terraform</title>
+      <link>https://echorand.me/posts/aws-assume-iam-role-from-another/</link>
+      <pubDate>Tue, 27 Feb 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/aws-assume-iam-role-from-another/</guid>
+      <description>In this post, we will see how we can implement the AWS assume role functionality which allows an IAM role to be able to obtain temporary credentials to access a resource otherwise only accessible by another IAM role. We will implement the infrastructure changes using Terraform and see how to obtain temporary credentials and access an AWS resource (a S3 bucket) that the corresponding IAM role doesn&amp;rsquo;t have access to otherwise via the AWS CLI.</description>
+    </item>
+    
+    <item>
+      <title>Doing something before systemd shuts your supervisord down</title>
+      <link>https://echorand.me/posts/systemd-supervisord/</link>
+      <pubDate>Fri, 12 Jan 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/systemd-supervisord/</guid>
+      <description>If you are running your server applications via supervisord on a Linux distro running systemd, you may find this post useful.
+Problem Scenario An example scenario to help us establish the utility for this post is as follows:
+ systemd starts the shutdown process systemd stops supervisord supervisord stops your processes You see in-flight requests being dropped  Solution What we want to do is prevent in-flight requests being dropped when a system is shutting down as part of a power off cycle (AWS instance termination, for example).</description>
+    </item>
+    
+    <item>
+      <title>Tip Terraform and AWS Security Group rules in EC2 classic</title>
+      <link>https://echorand.me/posts/tip-terraform-security-group-existing/</link>
+      <pubDate>Fri, 05 Jan 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/tip-terraform-security-group-existing/</guid>
+      <description>When using Terraform&amp;rsquo;s aws_security_group_rule with EC2 classic, you may get an error saying that the source security group doesn&amp;rsquo;t exist, even though it does. That&amp;rsquo;s probably because you (like me and others) used the source security group ID and not the security group name, like so:
+resource &amp;quot;aws_security_group_rule&amp;quot; &amp;quot;my_sg_rule&amp;quot; { type = &amp;quot;ingress&amp;quot; from_port = 11123 to_port = 11123 protocol = &amp;quot;tcp&amp;quot; security_group_id = &amp;quot;${aws_security_group.sg1.id}&amp;quot; source_security_group_id = &amp;quot;${aws_security_group.sg2.id}&amp;quot; } You should actually do this instead:</description>
+    </item>
+    
+    <item>
+      <title>Brief overview of using consul tags</title>
+      <link>https://echorand.me/posts/consul-tags/</link>
+      <pubDate>Fri, 01 Dec 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/consul-tags/</guid>
+      <description>consul allows a service to associate itself with tags. These are arbitrary metadata that can be associated with the service and can be used for different purposes. Below I outline a few examples of making use of tags and discuss some related topics.
+Use case #1: Dedicated service instances based on requests Let&amp;rsquo;s say our service is a HTTP server (REST API) acting as a routing point for multiple independent resources with the following service definition:</description>
+    </item>
+    
+    <item>
+      <title>Add an additional host entry to docker container</title>
+      <link>https://echorand.me/posts/docker-extra-hosts/</link>
+      <pubDate>Sun, 29 Oct 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/docker-extra-hosts/</guid>
+      <description>Problem
+Let&amp;rsquo;s say a program in a container should be able to resolve a custom hostname.
+Solution
+When using docker run:
+$ sudo docker run --add-host myhost.name:127.0.0.1 -ti python bash Unable to find image &#39;python:latest&#39; locally latest: Pulling from library/python Digest: sha256:eb20fd0c13d2c57fb602572f27f05f7f1e87f606045175c108a7da1af967313e Status: Downloaded newer image for python:latest ... This will show up as an additional entry in the container&amp;rsquo;s /etc/hosts file:
+root@fee9aeccbc4b:/# cat /etc/hosts ... 127.0.0.1	myhost.name With docker compose, we can use the extra_hosts key:</description>
+    </item>
+    
+    <item>
+      <title>User-defined networks in Docker for inter-container communication on Linux</title>
+      <link>https://echorand.me/posts/docker-user-defined-networks/</link>
+      <pubDate>Thu, 26 Oct 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/docker-user-defined-networks/</guid>
+      <description>Problem
+Let&amp;rsquo;s say a program in a container wants to communicate with a service running in another docker container on the same host. The current recommended approach to do so is using a user-defined network and avoid using links.
+Solution
+Create an user-defined network and run both (or as many you have) the containers in this network: (For reference, I am using docker 17.09.0-ce)
+$ sudo docker network create --driver bridge webapp1 The first container which we will launch in this network is a HTTP server listening on port 8000.</description>
+    </item>
+    
+    <item>
+      <title>Data only Docker containers</title>
+      <link>https://echorand.me/posts/data-containers-in-docker/</link>
+      <pubDate>Sun, 13 Dec 2015 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/data-containers-in-docker/</guid>
+      <description>In this post, we shall take a look at the idea of data only containers - containers whose sole purpose is to exist on the docker host so that other containers can have portable access to a persistent data volume.
+Why do we need a persistent data volume? We will experiment with the jenkins image from the docker hub. Let&#39;s run a jenkins container using $ sudo docker run -p 8080:8080 jenkins.</description>
+    </item>
+    
+    <item>
+      <title>Mounting a docker volume on SELinux enabled host</title>
+      <link>https://echorand.me/posts/docker-volume-mount-selinux/</link>
+      <pubDate>Mon, 05 Oct 2015 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/docker-volume-mount-selinux/</guid>
+      <description>My workflow with docker usually involves volume mounting a host directory so that I can read and write to the host directory from my container as a non-root user. On a Fedora 23 host with SELinux enabled, this is what I have to do differently:
+Use: -v /var/dir1:var/dir1:Z  Note the extra Z above? You can learn more about it this Project Atomic blog post</description>
+    </item>
+    
+  </channel>
+</rss>

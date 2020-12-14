@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title> Data in C | Exploring Software</title>
+  <meta name="description" content="echo $RANDOM. Exploring Software and writing about it.">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="all,follow">
+  <meta name="googlebot" content="index,follow,snippet,archive">
+  <meta property="og:title" content="Data in C" />
+<meta property="og:description" content="In C, the data you use in your programs will usually fall into one of the three basic categories: int, char and float. Data in C has no existence without an associated memory location labeled by an identifier, usually referred to as a variable (the term variable is a bit misleading, since it essentially means that it must always vary, but you can have constant variables - i.e. variables whose values do not vary)." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://echorand.me/posts/data-in-c/" />
+<meta property="article:published_time" content="2018-01-26T00:00:00+00:00" />
+<meta property="article:modified_time" content="2019-06-17T14:58:57+10:00" />
+
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Data in C"/>
+<meta name="twitter:description" content="In C, the data you use in your programs will usually fall into one of the three basic categories: int, char and float. Data in C has no existence without an associated memory location labeled by an identifier, usually referred to as a variable (the term variable is a bit misleading, since it essentially means that it must always vary, but you can have constant variables - i.e. variables whose values do not vary)."/>
+
+  
+  
+  
+  <link rel="stylesheet" href="https://echorand.me/css/style-white.css">
+  
+  
+  
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  
+
+  
+<link rel="icon" type="image/png" href="https://echorand.me/images/favicon.ico" />
+
+  
+  
+  
+  
+  
+    
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-108901610-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+  
+  
+</head>
+
+<body class="max-width mx-auto px3 ltr">
+  <div class="content index py4">
+
+  <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+        <li><a href="/about">About</a></li>
+         
+        <li><a href="/articles">Articles</a></li>
+         
+        <li><a href="/books">Books</a></li>
+         
+        <li><a href="/posts">Posts</a></li>
+         
+        <li><a href="/talks">Talks</a></li>
+         
+        <li><a href="/categories/">Categories</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li>
+          <a class="icon" href=" https://echorand.me/posts/data-in-c-cpython/">
+            <i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i>
+          </a>
+        </li>
+        
+        
+        <li>
+          <a class="icon" href="https://echorand.me/posts/c_cplus_scientific_programming/">
+            <i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i>
+          </a>
+        </li>
+        
+        <li>
+          <a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');">
+            <i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i>
+          </a>
+        </li>
+        <li>
+          <a class="icon" href="#">
+            <i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i>
+          </a>
+        </li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      
+      <ul>
+  
+  
+    
+  
+  
+  <li>
+    <a class="icon" href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fechorand.me%2fposts%2fdata-in-c%2f">
+      <i class="fab fa-facebook " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://twitter.com/share?url=https%3a%2f%2fechorand.me%2fposts%2fdata-in-c%2f&text=Data%20in%20C">
+      <i class="fab fa-twitter " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fechorand.me%2fposts%2fdata-in-c%2f&title=Data%20in%20C">
+      <i class="fab fa-linkedin " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fechorand.me%2fposts%2fdata-in-c%2f&is_video=false&description=Data%20in%20C">
+      <i class="fab fa-pinterest " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="mailto:?subject=Data%20in%20C&body=Check out this article: https%3a%2f%2fechorand.me%2fposts%2fdata-in-c%2f">
+      <i class="fas fa-envelope " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://getpocket.com/save?url=https%3a%2f%2fechorand.me%2fposts%2fdata-in-c%2f&title=Data%20in%20C">
+      <i class="fab fa-get-pocket " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://reddit.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fdata-in-c%2f&title=Data%20in%20C">
+      <i class="fab fa-reddit " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.stumbleupon.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fdata-in-c%2f&title=Data%20in%20C">
+      <i class="fab fa-stumbleupon " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://digg.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fdata-in-c%2f&title=Data%20in%20C">
+      <i class="fab fa-digg " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.tumblr.com/share/link?url=https%3a%2f%2fechorand.me%2fposts%2fdata-in-c%2f&name=Data%20in%20C&description=In%20C%2c%20the%20data%20you%20use%20in%20your%20programs%20will%20usually%20fall%20into%20one%20of%20the%20three%20basic%20categories%3a%20int%2c%20char%20and%20float.%20Data%20in%20C%20has%20no%20existence%20without%20an%20associated%20memory%20location%20labeled%20by%20an%20identifier%2c%20usually%20referred%20to%20as%20a%20variable%20%28the%20term%20variable%20is%20a%20bit%20misleading%2c%20since%20it%20essentially%20means%20that%20it%20must%20always%20vary%2c%20but%20you%20can%20have%20constant%20variables%20-%20i.e.%20variables%20whose%20values%20do%20not%20vary%29.">
+      <i class="fab fa-tumblr " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fechorand.me%2fposts%2fdata-in-c%2f&t=Data%20in%20C">
+      <i class="fab fa-hacker-news " aria-hidden="true"></i>
+    </a>
+  </li>
+</ul>
+
+    </div>
+    <div id="toc">
+      
+    </div>
+  </span>
+</div>
+
+
+  <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+    <header>
+      <h1 class="posttitle" itemprop="name headline">
+        Data in C
+      </h1>
+      <div class="meta">
+        
+        <div class="postdate">
+          
+          <time datetime="2018-01-26 00:00:00 &#43;0000 UTC" itemprop="datePublished">2018-01-26</time>
+          
+        </div>
+        
+        <div class="article-category">
+            <i class="fas fa-archive"></i>
+            
+            
+            <a class="category-link" href="/categories/c">C</a>
+            
+        </div>
+        
+        
+      </div>
+    </header>
+
+  
+    <div class="content" itemprop="articleBody">
+      <div class="document">
+
+
+<p>In C, the data you use in your programs will usually fall into one of the three
+basic categories: <tt class="docutils literal">int</tt>, <tt class="docutils literal">char</tt> and <tt class="docutils literal">float</tt>. Data in C has no
+existence without an associated memory location labeled by an
+<tt class="docutils literal">identifier</tt>, usually referred to as a <cite>variable</cite> (the term variable
+is a bit misleading, since it essentially means that it must always
+vary, but you can have <cite>constant variables</cite> - i.e. variables whose
+values do not vary). Considering this and C's requirement for <cite>static
+typing</cite>, a <cite>variable declaration</cite> statement is required before data
+can be stored in a variable. This declaration statement usually takes the
+form of <tt class="docutils literal"><span class="pre">data-type</span> <span class="pre">var-name</span> [= value]</tt>, where the <cite>=value</cite> part may
+or may not be present. For example, the statement <tt class="docutils literal">int a=1;</tt>
+declares a variable <tt class="docutils literal">a</tt> which will store integer data and stores
+<tt class="docutils literal">1</tt> in it. What this statment basically tells the C compiler is
+that it should allocate a block of memory large enough to store an
+integer and it will referred to as <tt class="docutils literal">a</tt>. It is possible to obtain the
+address of this memory location using the <tt class="docutils literal">&amp;</tt> operator.</p>
+<p>Listing: address.c</p>
+<pre class="literal-block">
+#include &lt;stdio.h&gt;
+int main(int argc, char **argv)
+{
+    int a=1;
+
+    printf(&quot;Address of a:: %p, Data in a:: %d\n&quot;, &amp;a, a);
+
+    return 0;
+}
+</pre>
+<p>When you compile and run the above program, you should see an output
+similar to the following:</p>
+<pre class="literal-block">
+Address of a:: 0x7fff0cadd1ac, Data in a:: 1
+</pre>
+<p>You should note that the exact value of this address is immaterial
+for us and it will definitely be different for you. Once you have this
+address, it is possibly to refer to this memory location without using
+the variable, <cite>a</cite>, by making use of the <cite>dereferencing</cite> operator,
+<tt class="docutils literal">*</tt>.</p>
+<p>Listing dereferencing.c</p>
+<pre class="literal-block">
+#include &lt;stdio.h&gt;
+
+int main(int argc, char **argv)
+{
+    int a=1;
+    int *ptr;
+
+    printf(&quot;Address of a:: %p, Data in a:: %d\n&quot;, &amp;a, a);
+
+    ptr = &amp;a;
+    *ptr = 2;
+
+    printf(&quot;Address of a:: %p, Data in a:: %d\n&quot;, ptr, a);
+
+    return 0;
+}
+</pre>
+<p>When you compile and execute the above program,  you will see an
+output similar to the following:</p>
+<pre class="literal-block">
+Address of a:: 0x7fff85a7f134, Data in a:: 1
+Address of a:: 0x7fff85a7f134, Data in a:: 2
+</pre>
+<p>In the above program, we store the address of the variable <tt class="docutils literal">a</tt> in
+the variable <tt class="docutils literal">ptr</tt> (declared as an integer pointer variable) in the
+statement <tt class="docutils literal"><span class="pre">ptr=&amp;a</span></tt>. Next, we use the dereferencing operator to change
+the integer stored at memory location to <tt class="docutils literal">2</tt>. Now, when we retrieve
+the data stored at <tt class="docutils literal">a</tt>, we get back the new integer.</p>
+<p>Pointers are variables themselves and hence you could use the
+<tt class="docutils literal">&amp;</tt> and <tt class="docutils literal">*</tt> operators on them as well. For the purpose of this
+article, we will just be needing pointers to non-pointer
+variables.</p>
+<div class="section" id="assignment">
+<h2>Assignment</h2>
+<p>The declaration statement <tt class="docutils literal">int a=1</tt> also includes an optional
+<cite>assignment</cite> operation. It is not mandatory to assign a value while
+declaring a variable. Thus, the above statement can be broken down to
+two statements:</p>
+<pre class="literal-block">
+int a;
+a=1;
+</pre>
+<p>The second statement is an assignment statement and the <tt class="docutils literal">=</tt> is known
+as the assignment operator. In C's terminology, the term on the left
+hand side is called the <cite>lvalue</cite> and the term on the right hand-side
+is called the <cite>rvalue</cite>. The <cite>lvalue</cite> must itself be a memory location
+or an identifier identifying a valid memory location and must be
+capable of storing new data. Thus, a variable initially declared
+as a <tt class="docutils literal">const</tt> cannot be used as a <cite>lvalue</cite>. The <cite>rvalue</cite> should
+itself be data of the same type as the <cite>lvalue</cite> or an <cite>expression</cite> which
+evaluates to it. (I hope to discuss <cite>lvalue</cite> and <cite>rvalue</cite> will be
+discussed in a later article.)</p>
+<p>The main point to note here is that assignment is simply the copying
+of data on the right hand side into the memory location pointed to by
+the left hand side (either using a variable name or using the direct
+memory location  by using the dereferencing operator). You can use the
+assignment operator on variables which store numbers and single
+characters. For arrays, except during declaration, you have to use
+specialized functions (in case of strings) or assign each a value to
+each element individually.</p>
+<p>The next code listing illustrates assignment operation and presents a
+few other related ideas.</p>
+<p>Listing: mut_data.c</p>
+<pre class="literal-block">
+/* Variables are by default mutable.
+
+   Two variables occupy different locations in memory even if
+   they may be storing the same data.
+
+*/
+# include &lt;stdio.h&gt;
+
+int a = 1;
+
+int main(int argc, char **argv)
+{
+    int b;
+
+    /*Copy the value stored in a to b*/
+    b = a;
+
+    /* A no-op operation*/
+    2;
+
+    /* The &amp; operator expects an 'lvalue' as an operand, and hence
+    the following statement will result in a compilation error.
+    */
+    /*printf(&quot;Address of 2 %p\n&quot;, &amp;2);*/
+
+    printf(&quot;Address of a: %p, Address of b: %p\n&quot;, &amp;a, &amp;b);
+    printf(&quot;a = %d b = %d \n&quot;,a,b);
+
+    /* Change value stored in the memory location identified as a.
+    */
+    a = 2;
+
+    printf(&quot;Address of a: %p, Address of b: %p\n&quot;, &amp;a, &amp;b);
+    printf(&quot;a = %d b = %d \n&quot;,a,b);
+
+    return 0;
+}
+</pre>
+<p>In the above program, we declare <tt class="docutils literal">a</tt> as an integer variable and
+store the integer <tt class="docutils literal">1</tt> in it. Next, we declare another integer
+variable <tt class="docutils literal">b</tt> and assign it to <tt class="docutils literal">a</tt> in a separate statement. As
+mentioned earlier, what this operation does is simply copy the
+contents of <tt class="docutils literal">a</tt> into <tt class="docutils literal">b</tt>. The data stored in <tt class="docutils literal">a</tt> and <tt class="docutils literal">b</tt> is
+now <tt class="docutils literal">1</tt>. The next statement in our program is <tt class="docutils literal">2;</tt> - is a valid
+primary expression, but since the <cite>result</cite> of this evaluation is not
+being stored, there is no way you are going to be able to refer to
+this particular <tt class="docutils literal">2</tt> anywhere else in this program. Hence an attemp
+to retrieve the <cite>address</cite> of this particular <tt class="docutils literal">2</tt> will result in
+compilation errors, because only lvalues have addresses. Next, we
+print the addresses of the variables <tt class="docutils literal">a</tt> and <tt class="docutils literal">b</tt>. As expected,
+each has a different address in memory, even though they have the same
+memory contents. Sample output:</p>
+<pre class="literal-block">
+Address of a: 0x601034, Address of b: 0x7fffb3a8565c
+a = 1 b = 1
+</pre>
+<p>Next, we change the value stored in <tt class="docutils literal">a</tt> to <tt class="docutils literal">2</tt> which is visible in
+the next part of the output:</p>
+<pre class="literal-block">
+Address of a: 0x601034, Address of b: 0x7fffb3a8565c
+a = 2 b = 1
+</pre>
+<p>The above output establishes that even though, <tt class="docutils literal">b</tt> was originally a
+copy of <tt class="docutils literal">a</tt> (storing the same data), in case of any changes to the
+&quot;original&quot; variable, any of its copies do not see the changes. Each of
+these variables are completely isolated from each other. With this
+idea, we proceed to discuss the semantics of <cite>call by value</cite> and <cite>call
+by reference</cite> while passing data as function parameters. However,
+before we can discuss this, we will learn about the <cite>base address</cite> of
+an array.</p>
+</div>
+<div class="section" id="base-address-of-an-array">
+<h2>Base address of an array</h2>
+<p>An array (say, declared as <tt class="docutils literal">int a[10]</tt>) is an instruction to the
+compiler that a block of memory for storing 10 integers should be
+allocated and identified by <tt class="docutils literal">a</tt>, with individual items being
+addressed as <tt class="docutils literal">a[0], <span class="pre">a[1]...a[9]</span></tt> (and <tt class="docutils literal"><span class="pre">0,1,..</span></tt> known as the
+indices). The operation, <tt class="docutils literal">&amp;a[0]</tt> returns the address of the first
+element of this array.</p>
+<p>Now, what does the compiler understand when we simply ask it do
+something like this <tt class="docutils literal"><span class="pre">printf(&quot;%d&quot;,</span> *a)</tt>? In case of an array
+variable, when we use only the variable name (without an index), it
+refers to the address of the the element, <tt class="docutils literal">a[0]</tt>. That is,
+<tt class="docutils literal">&amp;a[0]</tt>. Thus <tt class="docutils literal"><span class="pre">printf(&quot;%d&quot;,</span> *a)</tt> is actually <tt class="docutils literal"><span class="pre">printf(&quot;%d&quot;,</span>
+<span class="pre">*(&amp;a[0]))</span></tt>. We will refer to the address of the first element of an
+array as its <cite>base address</cite> to aid the rest of the discussion.</p>
+</div>
+<div class="section" id="function-parameters">
+<h2>Function parameters</h2>
+<p>Consider the next listing: nomod_parameter.c:</p>
+<pre class="literal-block">
+# include &lt;string.h&gt;
+# include &lt;stdio.h&gt;
+
+void func(int a, char string1[], char string2[])
+{
+
+    char string3[15];
+
+    /* Create a copy of string2 in string3*/
+    strcpy(string3, string2);
+
+    printf(&quot;Before modification in func()\n&quot;);
+    printf(&quot;Address of a: %p \n&quot;, &amp;a);
+    printf(&quot;Address of string1: %p \n&quot;, &amp;string1[0]);
+    printf(&quot;Address of string2: %p \n&quot;, &amp;string2[0]);
+    printf(&quot;Address of string3: %p \n&quot;, &amp;string3[0]);
+
+    printf(&quot;a = %d \nstring1 = %s \nstring2 = %s\n&quot;,a, string1,
+    string3);
+
+    /* Make modifications */
+    a = a+1;
+    string1[0] = string1[0] + 5;
+    string3[0] = string3[0] + 5;
+
+    printf(&quot;After modification in func()\n&quot;);
+
+    printf(&quot;Address of a: %p \n&quot;, &amp;a);
+    printf(&quot;Address of string1: %p \n&quot;, &amp;string1[0]);
+    printf(&quot;Address of string2: %p \n&quot;, &amp;string2[0]);
+    printf(&quot;Address of string3: %p \n&quot;, &amp;string3[0]);
+
+    printf(&quot;a = %d \nstring1 = %s \nstring2 = %s\n&quot;,a, string1,
+    string3);
+
+    return;
+}
+
+int main(int argc, char **argv)
+{
+
+    int a = 5;
+    char string1[] = &quot;A String&quot;;
+    char string2[] = &quot;B String&quot;;
+
+    printf(&quot;Before call to func()\n&quot;);
+
+    printf(&quot;Address of a: %p \n&quot;, &amp;a);
+    printf(&quot;Address of string1: %p \n&quot;, &amp;string1[0]);
+    printf(&quot;Address of string2: %p \n&quot;, &amp;string2[0]);
+
+    printf(&quot;a = %d \nstring1 = %s \nstring2 = %s\n&quot;,a, string1,
+    string2);
+
+    func(a, string1, string2);
+
+    printf(&quot;After call to func()\n&quot;);
+
+    printf(&quot;Address of a: %p \n&quot;, &amp;a);
+    printf(&quot;Address of string1: %p \n&quot;, &amp;string1[0]);
+    printf(&quot;Address of string2: %p \n&quot;, &amp;string2[0]);
+
+    printf(&quot;a = %d \nstring1 = %s \nstring2 = %s\n&quot;,a, string1,
+    string2);
+
+    return 0;
+}
+</pre>
+<p>In the <tt class="docutils literal">main()</tt> function, we declare an integer variable, <tt class="docutils literal">a</tt> and
+two character arrays (strings), <tt class="docutils literal">string1</tt> and <tt class="docutils literal">string2</tt>. When you
+compile and run this program, you will see four &quot;sets&quot; of output:
+<cite>Before call to func()</cite>, <cite>Before modification in func()</cite>, <cite>After
+modification in func()</cite> and <cite>After call to func()</cite>. First, I will
+discuss the first two sets:</p>
+<pre class="literal-block">
+Before call to func()
+Address of a: 0x7fff6549ad7c
+Address of string1: 0x7fff6549ad70
+Address of string2: 0x7fff6549ad60
+a = 5
+string1 = A String
+string2 = B String
+
+Before modification in func()
+Address of a: 0x7fff6549ad2c
+Address of string1: 0x7fff6549ad70
+Address of string2: 0x7fff6549ad60
+Address of string3: 0x7fff6549ad30
+a = 5
+string1 = A String
+string2 = B String
+</pre>
+<p>The key thing to note in the above output is the addresses of the
+three variables. (We discuss <tt class="docutils literal">string3</tt> a little later on, so ignore
+it for now).</p>
+<p>You can see that the address of <tt class="docutils literal">a</tt> is different in
+<tt class="docutils literal">main()</tt> and in <tt class="docutils literal">func()</tt> functions. This is because, the function
+<tt class="docutils literal">func()</tt> is creating a new variable <tt class="docutils literal">a</tt> to store the value being
+passed to it from the <tt class="docutils literal">main()</tt> function (it is immaterial that we
+are using the same variable name in both the same functions - each of
+these variables are local variables, having no existence beyond the
+functions themselves). This is what is referred to as <cite>call by
+value</cite> - a copy of the value in a variable is passed from the calling
+function to the called function.</p>
+<p>The addresses of the two character array variables are however the
+same in both the functions. This automatically follows from the
+discussion on <cite>base address of an array</cite>. When the function <tt class="docutils literal">func()</tt>
+is called from <tt class="docutils literal">main()</tt>, passing the array variables, <tt class="docutils literal">string1</tt>
+and <tt class="docutils literal">string2</tt> mean that we are passing the base address of each
+these arrays to the function, <tt class="docutils literal">func()</tt>. Hence, the two variables
+<tt class="docutils literal">string1</tt> and <tt class="docutils literal">string2</tt> in <tt class="docutils literal">func()</tt>, actually refer to the same
+memory location as <tt class="docutils literal">string1</tt> and <tt class="docutils literal">string2</tt> in <tt class="docutils literal">main()</tt> (Once
+again, the same variable names is irrelevant).</p>
+<p>Now, we consider the next set of output:</p>
+<pre class="literal-block">
+After modification in func()
+Address of a: 0x7fff6549ad2c
+Address of string1: 0x7fff6549ad70
+Address of string2: 0x7fff6549ad60
+Address of string3: 0x7fff6549ad30
+a = 6
+string1 = F String
+string2 = G String
+</pre>
+<p>We make some changes to the data stored in each of the three variables and
+this is reflected in their changed values.</p>
+<p>Finally, consider the last set of output:</p>
+<pre class="literal-block">
+After call to func()
+Address of a: 0x7fff6549ad7c
+Address of string1: 0x7fff6549ad70
+Address of string2: 0x7fff6549ad60
+a = 5
+string1 = F String
+string2 = B String
+</pre>
+<p>In the <tt class="docutils literal">main()</tt> function, the data stored in <tt class="docutils literal">a</tt> is the same as
+it was before the call to <tt class="docutils literal">func()</tt>, the data stored in <tt class="docutils literal">string1</tt>
+is same as after the modification in <tt class="docutils literal">func()</tt> and that of
+<tt class="docutils literal">string2</tt>, the same as it was before calling <tt class="docutils literal">func()</tt>.</p>
+<p>From the first set of output, we know that the variable <tt class="docutils literal">a</tt> in
+<tt class="docutils literal">func()</tt> was a separate variable from the <tt class="docutils literal">a</tt> in <tt class="docutils literal">main()</tt> and
+thus any changes made to the data stored in former will not be
+reflected in the latter. From the same set of output, we also know
+that <tt class="docutils literal">string1</tt> in <tt class="docutils literal">func()</tt> pointed to the same <tt class="docutils literal">string1</tt> in
+<tt class="docutils literal">main()</tt> and hence any changes made to it is reflected in the
+latter. So, what's happening with <tt class="docutils literal">string2()</tt>? The reasoning about
+<tt class="docutils literal">string1</tt> should also apply to <tt class="docutils literal">string2</tt>, and it does. However,
+the difference in the output is due to the statement:
+<tt class="docutils literal">strcpy(string3, string2)</tt> in <tt class="docutils literal">func()</tt>. In this statement, we are creating a
+copy of the data in <tt class="docutils literal">string2</tt> and storing it in a new variable
+<tt class="docutils literal">string3</tt>. Since <tt class="docutils literal">string3</tt> is a new variable (as demonstrated by
+the different address) as seen in the above sets of output, any
+changes to the value of <tt class="docutils literal">string3</tt> is not reflected in
+<tt class="docutils literal">string2</tt>. In fact, you may call this as cheating when I printed the
+data in <tt class="docutils literal">string3</tt> and as that in <tt class="docutils literal">string2</tt>. I did this to
+demonstrate a use case where you may need to change the value of an
+array parameter without changing the original array.</p>
+<p>This form of calling a function where the addresses (or references) to
+the parameters are sent from the calling function to the called
+function is referred to as <cite>call by reference</cite>. Thus, we can conclude
+that when arrays are passed, it is by default a <cite>call by reference</cite>,
+where as for data types such as <tt class="docutils literal">int</tt>, <tt class="docutils literal">char</tt> and <tt class="docutils literal">value</tt>, it is
+<cite>call by value</cite>.</p>
+<div class="section" id="explicit-call-by-reference">
+<h3>Explicit call by reference</h3>
+<p>As we have seen, we get <cite>call by reference</cite> for free in the case of
+arrays. How do accomplish this for <cite>int</cite>, for example? The key is to
+pass the address of the variable from the calling function to the
+called function. The next code listing demonstrates this.</p>
+<pre class="literal-block">
+# include &lt;string.h&gt;
+# include &lt;stdio.h&gt;
+
+void func(int *a, char *string)
+{
+
+    printf(&quot;In func()\n&quot;);
+
+    printf(&quot;Address of a: %p \n&quot;, a);
+    printf(&quot;Address of string: %p \n&quot;, &amp;string[0]);
+
+    printf(&quot;a = %d string = %s\n\n&quot;,*a, string);
+
+    /* Make modifications */
+    *a = *a+1;
+    string[0] = string[0] + 5;
+
+    printf(&quot;After modification in func()\n&quot;);
+    printf(&quot;a = %d string = %s\n\n&quot;,*a, string);
+
+    return;
+}
+
+int main(int argc, char **argv)
+{
+
+    int a = 5;
+    char string[] = &quot;A String&quot;;
+
+    printf(&quot;In main() before func()\n&quot;);
+
+    printf(&quot;Address of a: %p \n&quot;, &amp;a);
+    printf(&quot;Address of string: %p \n&quot;, &amp;string[0]);
+
+    printf(&quot;a = %d string = %s\n\n&quot;,a, string);
+
+    func(&amp;a, string);
+
+    printf(&quot;In main() after func()\n&quot;);
+
+    printf(&quot;a = %d string = %s\n\n&quot;,a, string);
+    return 0;
+}
+</pre>
+<p>When you compile and execute the above program, you will see an output
+similar to the following :</p>
+<pre class="literal-block">
+In main() before func()
+Address of a: 0x7fff22e7c25c
+Address of string: 0x7fff22e7c250
+a = 5 string = A String
+
+In func()
+Address of a: 0x7fff22e7c25c
+Address of string: 0x7fff22e7c250
+a = 5 string = A String
+
+After modification in func()
+a = 6 string = F String
+
+In main() after func()
+a = 6 string = F String
+</pre>
+<p>As the output shows, the pointer variable <tt class="docutils literal">a</tt> in <tt class="docutils literal">fun()</tt> stores
+the location of the variable <tt class="docutils literal">a</tt> in <tt class="docutils literal">main()</tt>. Hence, any changes
+to the data stored at that location in <tt class="docutils literal">func()</tt> is reflected back in
+the <tt class="docutils literal">main()</tt> function.</p>
+</div>
+<div class="section" id="call-by-value-for-an-array">
+<h3>Call by value for an array</h3>
+<p>We have now understood that arrays are by default <cite>call by
+reference</cite>. In the earlier program, we created an explicit copy of the
+string to prevent modifications to the <cite>original</cite> copy of the
+string. This strategy can also be followed for non-char arrays, such
+as an integer array where you can create a new array with the contents
+of the array being passed from another function.</p>
+<p>However, a well-known generic strategy to accomplish this from the <cite>calling</cite>
+function itself is to make the array variable a member of a <cite>structure</cite>
+and then passing this structure member to the called function. The
+following code listing shows this.</p>
+<p>Listing: call_value_array.c</p>
+<pre class="literal-block">
+# include &lt;string.h&gt;
+# include &lt;stdio.h&gt;
+
+struct string_wrapper{
+  char string[10];
+};
+
+void func(char string[])
+{
+
+    /* Make modifications */
+    string[0] = string[0] + 5;
+    printf(&quot;String: %s\n&quot;, string);
+
+    return;
+}
+
+int main(int argc, char **argv)
+{
+    struct string_wrapper string;
+
+    char astring[] = &quot;A String&quot;;
+    strcpy(string.string, astring);
+
+    printf(&quot;String: %s\n&quot;, astring);
+
+    func(string.string);
+
+    printf(&quot;String: %s\n&quot;, astring);
+
+    return 0;
+}
+</pre>
+<p>In the above code listing, we first define a structure
+<tt class="docutils literal">string_wrapper</tt> with a character array as a member. This is because
+we plan to use this structure to wrap a string. If we wanted to use
+this for wrapping an integer array, we would have an integer array as
+the structure member. In the <tt class="docutils literal">main()</tt> function, we copy the data in
+string variable <tt class="docutils literal">astring</tt> to the structure member, <tt class="docutils literal">string</tt> using
+<tt class="docutils literal">strcpy()</tt>. Next, we call <tt class="docutils literal">func()</tt> using this structure member
+instead of the string variable. This allows us to pass the data in
+<tt class="docutils literal">astring</tt>, instead of the variable itself.</p>
+<p>When you compile and execute the above program, you should see the
+following output:</p>
+<pre class="literal-block">
+String: A String
+String: F String
+String: A String
+</pre>
+</div>
+</div>
+<div class="section" id="immutable-data">
+<h2>Immutable data</h2>
+<p>If you want to enforce the restriction that the data stored in one or
+more of your variables shouldn't be changed from what was assigned
+during <cite>declaration</cite> of the variable, use the <tt class="docutils literal">const</tt> keyword during
+declaring the variable. For example, <tt class="docutils literal">const int a=1</tt> declares an
+integer variable <tt class="docutils literal">a</tt> and stores <tt class="docutils literal">1</tt> in it. If you attempt to make
+any changes to it in the rest of the <tt class="docutils literal">main()</tt> function, your
+compiler will not compile your program, telling you that this is not
+allowed. It is important to note that you have to store the data
+during declaration itself. The next code listing demonstrates this.</p>
+<p>Listing: immut_data.c</p>
+<pre class="literal-block">
+# include &lt;stdio.h&gt;
+
+int main(int argc, char **argv)
+{
+    int a = 1;
+    const int b = a;
+
+    /* This is not allowed as well
+   const c;
+   c=1;
+   */
+
+  /* Even though this is the same value as already stored in a,
+     this is not known to the compiler at compile time. Hence, the
+     following statement will result in a compile time error*/
+  /*b = a;*/
+
+  printf(&quot;Address of a: %p, Address of b: %p\n&quot;, &amp;a, &amp;b);
+  printf(&quot;a = %d b = %d \n&quot;,a,b);
+
+  return 0;
+}
+</pre>
+</div>
+<div class="section" id="conclusion">
+<h2>Conclusion</h2>
+<p>In this article, we have taken a look at the basics of how data in C
+has no identity if not stored in memory locations identified by
+identifiers. We also learnt about <cite>call by value</cite> and <cite>call by
+reference</cite> and how different data types behave differently when passed
+as function parameters.</p>
+<p>If you are familiar with Python, you may be interested in my article
+on <a class="reference external" href="http://echorand.me/data-in-cpython.html">data in CPython</a>. In my next article, I will summarize these two
+articles highlighting the differences between the two.</p>
+</div>
+</div>
+    </div>
+  </article>
+
+  
+  
+
+
+
+
+
+  <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/about">About</a></li>
+         
+          <li><a href="/articles">Articles</a></li>
+         
+          <li><a href="/books">Books</a></li>
+         
+          <li><a href="/posts">Posts</a></li>
+         
+          <li><a href="/talks">Talks</a></li>
+         
+          <li><a href="/categories/">Categories</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      
+    </div>
+
+    <div id="share-footer" style="display: none">
+      
+      <ul>
+  
+  
+    
+  
+  
+  <li>
+    <a class="icon" href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fechorand.me%2fposts%2fdata-in-c%2f">
+      <i class="fab fa-facebook fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://twitter.com/share?url=https%3a%2f%2fechorand.me%2fposts%2fdata-in-c%2f&text=Data%20in%20C">
+      <i class="fab fa-twitter fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fechorand.me%2fposts%2fdata-in-c%2f&title=Data%20in%20C">
+      <i class="fab fa-linkedin fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fechorand.me%2fposts%2fdata-in-c%2f&is_video=false&description=Data%20in%20C">
+      <i class="fab fa-pinterest fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="mailto:?subject=Data%20in%20C&body=Check out this article: https%3a%2f%2fechorand.me%2fposts%2fdata-in-c%2f">
+      <i class="fas fa-envelope fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://getpocket.com/save?url=https%3a%2f%2fechorand.me%2fposts%2fdata-in-c%2f&title=Data%20in%20C">
+      <i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://reddit.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fdata-in-c%2f&title=Data%20in%20C">
+      <i class="fab fa-reddit fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.stumbleupon.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fdata-in-c%2f&title=Data%20in%20C">
+      <i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://digg.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fdata-in-c%2f&title=Data%20in%20C">
+      <i class="fab fa-digg fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.tumblr.com/share/link?url=https%3a%2f%2fechorand.me%2fposts%2fdata-in-c%2f&name=Data%20in%20C&description=In%20C%2c%20the%20data%20you%20use%20in%20your%20programs%20will%20usually%20fall%20into%20one%20of%20the%20three%20basic%20categories%3a%20int%2c%20char%20and%20float.%20Data%20in%20C%20has%20no%20existence%20without%20an%20associated%20memory%20location%20labeled%20by%20an%20identifier%2c%20usually%20referred%20to%20as%20a%20variable%20%28the%20term%20variable%20is%20a%20bit%20misleading%2c%20since%20it%20essentially%20means%20that%20it%20must%20always%20vary%2c%20but%20you%20can%20have%20constant%20variables%20-%20i.e.%20variables%20whose%20values%20do%20not%20vary%29.">
+      <i class="fab fa-tumblr fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fechorand.me%2fposts%2fdata-in-c%2f&t=Data%20in%20C">
+      <i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+      
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;">
+          <i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;">
+          <i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;">
+          <i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');">
+          <i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+
+  <footer id="footer">
+  <div class="footer-left">
+    Copyright  &copy; 2020  Exploring Software 
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+        <li><a href="/about">About</a></li>
+         
+        <li><a href="/articles">Articles</a></li>
+         
+        <li><a href="/books">Books</a></li>
+         
+        <li><a href="/posts">Posts</a></li>
+         
+        <li><a href="/talks">Talks</a></li>
+         
+        <li><a href="/categories/">Categories</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+
+  </div>
+</body>
+
+<link rel="stylesheet" href=/lib/font-awesome/css/all.min.css>
+<script src=/lib/jquery/jquery.min.js></script>
+<script src=/js/main.js></script>
+
+
+
+</html>

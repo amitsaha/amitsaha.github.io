@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title> Using cloud custodian to ensure compliance across AWS resources | Exploring Software</title>
+  <meta name="description" content="echo $RANDOM. Exploring Software and writing about it.">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="all,follow">
+  <meta name="googlebot" content="index,follow,snippet,archive">
+  <meta property="og:title" content="Using cloud custodian to ensure compliance across AWS resources" />
+<meta property="og:description" content="Introduction In this post, I will describe my experiments with using Cloud Custodian to perform various tasks usually falling into the bucket of compliance and sometimes convention. I encourage you to take a look at some of the example policies.
+Some of the areas I will cover are resource tagging and unused resources across multiple AWS accounts.
+Installation and setup Cloud Custodian is a Python 3 application, so you will need that installed." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://echorand.me/posts/cloud-custodian-aws/" />
+<meta property="article:published_time" content="2020-04-28T00:00:00+00:00" />
+<meta property="article:modified_time" content="2020-04-30T16:22:58+10:00" />
+
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Using cloud custodian to ensure compliance across AWS resources"/>
+<meta name="twitter:description" content="Introduction In this post, I will describe my experiments with using Cloud Custodian to perform various tasks usually falling into the bucket of compliance and sometimes convention. I encourage you to take a look at some of the example policies.
+Some of the areas I will cover are resource tagging and unused resources across multiple AWS accounts.
+Installation and setup Cloud Custodian is a Python 3 application, so you will need that installed."/>
+
+  
+  
+  
+  <link rel="stylesheet" href="https://echorand.me/css/style-white.css">
+  
+  
+  
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  
+
+  
+<link rel="icon" type="image/png" href="https://echorand.me/images/favicon.ico" />
+
+  
+  
+  
+  
+  
+    
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-108901610-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+  
+  
+</head>
+
+<body class="max-width mx-auto px3 ltr">
+  <div class="content index py4">
+
+  <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+        <li><a href="/about">About</a></li>
+         
+        <li><a href="/articles">Articles</a></li>
+         
+        <li><a href="/books">Books</a></li>
+         
+        <li><a href="/posts">Posts</a></li>
+         
+        <li><a href="/talks">Talks</a></li>
+         
+        <li><a href="/categories/">Categories</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li>
+          <a class="icon" href=" https://echorand.me/posts/python-restrict-attributes/">
+            <i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i>
+          </a>
+        </li>
+        
+        
+        <li>
+          <a class="icon" href="https://echorand.me/posts/hugo-reverse-sort-modified/">
+            <i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i>
+          </a>
+        </li>
+        
+        <li>
+          <a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');">
+            <i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i>
+          </a>
+        </li>
+        <li>
+          <a class="icon" href="#">
+            <i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i>
+          </a>
+        </li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      
+      <ul>
+  
+  
+    
+  
+  
+  <li>
+    <a class="icon" href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fechorand.me%2fposts%2fcloud-custodian-aws%2f">
+      <i class="fab fa-facebook " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://twitter.com/share?url=https%3a%2f%2fechorand.me%2fposts%2fcloud-custodian-aws%2f&text=Using%20cloud%20custodian%20to%20ensure%20compliance%20across%20AWS%20resources">
+      <i class="fab fa-twitter " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fechorand.me%2fposts%2fcloud-custodian-aws%2f&title=Using%20cloud%20custodian%20to%20ensure%20compliance%20across%20AWS%20resources">
+      <i class="fab fa-linkedin " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fechorand.me%2fposts%2fcloud-custodian-aws%2f&is_video=false&description=Using%20cloud%20custodian%20to%20ensure%20compliance%20across%20AWS%20resources">
+      <i class="fab fa-pinterest " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="mailto:?subject=Using%20cloud%20custodian%20to%20ensure%20compliance%20across%20AWS%20resources&body=Check out this article: https%3a%2f%2fechorand.me%2fposts%2fcloud-custodian-aws%2f">
+      <i class="fas fa-envelope " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://getpocket.com/save?url=https%3a%2f%2fechorand.me%2fposts%2fcloud-custodian-aws%2f&title=Using%20cloud%20custodian%20to%20ensure%20compliance%20across%20AWS%20resources">
+      <i class="fab fa-get-pocket " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://reddit.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fcloud-custodian-aws%2f&title=Using%20cloud%20custodian%20to%20ensure%20compliance%20across%20AWS%20resources">
+      <i class="fab fa-reddit " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.stumbleupon.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fcloud-custodian-aws%2f&title=Using%20cloud%20custodian%20to%20ensure%20compliance%20across%20AWS%20resources">
+      <i class="fab fa-stumbleupon " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://digg.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fcloud-custodian-aws%2f&title=Using%20cloud%20custodian%20to%20ensure%20compliance%20across%20AWS%20resources">
+      <i class="fab fa-digg " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.tumblr.com/share/link?url=https%3a%2f%2fechorand.me%2fposts%2fcloud-custodian-aws%2f&name=Using%20cloud%20custodian%20to%20ensure%20compliance%20across%20AWS%20resources&description=Introduction%20In%20this%20post%2c%20I%20will%20describe%20my%20experiments%20with%20using%20Cloud%20Custodian%20to%20perform%20various%20tasks%20usually%20falling%20into%20the%20bucket%20of%20compliance%20and%20sometimes%20convention.%20I%20encourage%20you%20to%20take%20a%20look%20at%20some%20of%20the%20example%20policies.%0aSome%20of%20the%20areas%20I%20will%20cover%20are%20resource%20tagging%20and%20unused%20resources%20across%20multiple%20AWS%20accounts.%0aInstallation%20and%20setup%20Cloud%20Custodian%20is%20a%20Python%203%20application%2c%20so%20you%20will%20need%20that%20installed.">
+      <i class="fab fa-tumblr " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fechorand.me%2fposts%2fcloud-custodian-aws%2f&t=Using%20cloud%20custodian%20to%20ensure%20compliance%20across%20AWS%20resources">
+      <i class="fab fa-hacker-news " aria-hidden="true"></i>
+    </a>
+  </li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <nav id="TableOfContents">
+  <ul>
+    <li><a href="#installation-and-setup">Installation and setup</a></li>
+  </ul>
+
+  <ul>
+    <li><a href="#ensuring-certain-tags-exist">Ensuring certain tags exist</a></li>
+    <li><a href="#running-with-all-the-policies">Running with all the policies</a></li>
+  </ul>
+</nav>
+    </div>
+  </span>
+</div>
+
+
+  <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+    <header>
+      <h1 class="posttitle" itemprop="name headline">
+        Using cloud custodian to ensure compliance across AWS resources
+      </h1>
+      <div class="meta">
+        
+        <div class="postdate">
+          
+          <time datetime="2020-04-28 00:00:00 &#43;0000 UTC" itemprop="datePublished">2020-04-28</time>
+          
+        </div>
+        
+        <div class="article-category">
+            <i class="fas fa-archive"></i>
+            
+            
+            <a class="category-link" href="/categories/infrastructure">infrastructure</a>
+            
+        </div>
+        
+        
+      </div>
+    </header>
+
+  
+    <div class="content" itemprop="articleBody">
+      <h1 id="introduction">Introduction</h1>
+<p>In this post, I will describe my experiments with using <a href="https://cloudcustodian.io/docs/index.html">Cloud Custodian</a>
+to perform various tasks usually falling into the bucket of compliance and sometimes convention. I encourage you
+to take a look at some of the <a href="https://cloudcustodian.io/docs/aws/examples/index.html">example policies</a>.</p>
+<p>Some of the areas I will cover are resource tagging and unused resources across multiple AWS accounts.</p>
+<h2 id="installation-and-setup">Installation and setup</h2>
+<p>Cloud Custodian is a Python 3 application, so you will need that <a href="https://cloudcustodian.io/docs/quickstart/index.html#install-cloud-custodian">installed</a>.
+A docker image is also available to be used. In this post, I will assume a host installation with the CLI
+command <code>custodian</code> used to invoke the application.</p>
+<p>We will also need to ensure that we have the AWS CLI configuration setup correctly. I am using the <code>AWS_PROFILE</code>
+environment variable to point to the configuration I want to use with <code>custodian</code>.</p>
+<h1 id="non-actionable-policies-and-reporting">Non-actionable policies and reporting</h1>
+<p>The policies we will write and focus on in this section will have no actions associated with them. We will only
+use them as a discovery mechanism and then we will use the reporting functionality of cloud custodian to obtain
+a summarized report.</p>
+<h2 id="ensuring-certain-tags-exist">Ensuring certain tags exist</h2>
+<p>Let&rsquo;s say that we want to find out all the S3 buckets which do not have certain tags defined. Cloud custodian
+requires us to specify this requirement as a policy YAML file which looks like as follows:</p>
+<p><strong>S3</strong></p>
+<p>Create a new file called, <code>s3.yaml</code> and paste in the following contents:</p>
+<pre><code>policies:
+  - name: s3-tag-policy
+    resource: aws.s3
+    filters:
+      - or:
+        - &quot;tag:Project&quot;: absent
+        - &quot;tag:Environment&quot;: absent
+        - &quot;tag:Provisioner&quot;: absent
+</code></pre><p>Now, let&rsquo;s run <code>custodian</code> from the same directory as the above policy file:</p>
+<pre><code>$ custodian run s3.yaml --output-dir=. 
+2020-04-28 15:26:39,312: custodian.policy:INFO policy:s3-tag-policy resource:aws.s3 region:eu-central-1 count:13 time:27.72
+</code></pre><p>The above command has invoked cloud custodian with the above policy definition and created a few files with
+presumably the result of the query in a new sub-directory <code>s3-tag-policy</code> in
+the current directory specified via <code>--output-dir</code>.</p>
+<p>We will next use the <code>report</code> sub-command to summarize the results for us:</p>
+<pre><code>$ custodian report s3.yaml --output-dir=. --format grid
++-----------------------------------------+---------------------------+
+| Name                                    | CreationDate              |
++=========================================+===========================+
+| bucket 1                                | 2020-03-18T05:44:33+00:00 |
++-----------------------------------------+---------------------------+
+| bucket 2                                | 2020-03-18T05:44:33+00:00 |
+..
+
+</code></pre><p><strong>EC2</strong></p>
+<p>Let&rsquo;s now write a policy for checking the tagging across EC2 resources. Create a new file <code>ec2.yaml</code> and
+save it in the same directory as the above:</p>
+<pre><code>policies:
+  - name: ec2-tag-policy
+    resource: aws.ec2
+    filters:
+      - or:
+        - &quot;tag:Project&quot;: absent
+        - &quot;tag:Environment&quot;: absent
+        - &quot;tag:Provisioner&quot;: absent
+</code></pre><p><strong>RDS</strong></p>
+<p>Next, let write a policy for checking the tagging across RDS resources. Create a new file <code>rds.yaml</code> and
+save it in the same directory as the above:</p>
+<pre><code>policies:
+  - name: rds-tag-policy
+    resource: aws.rds
+    filters:
+      - or:
+        - &quot;tag:Project&quot;: absent
+        - &quot;tag:Environment&quot;: absent
+        - &quot;tag:Provisioner&quot;: absent
+</code></pre><h2 id="running-with-all-the-policies">Running with all the policies</h2>
+<p>Let&rsquo;s now run cloud custodian with all the above policies and across multiple AWS regions:</p>
+<pre><code>$ custodian run --output-dir=. ec2.yaml s3.yaml rds.yaml -r ap-southeast-2 -r eu-central-1 -r eu-west-1
+
+2020-04-29 09:40:25,067: custodian.policy:INFO policy:ec2-tag-policy resource:aws.ec2 region:ap-southeast-2 count:3 time:0.35
+2020-04-29 09:40:43,447: custodian.policy:INFO policy:s3-tag-policy resource:aws.s3 region:ap-southeast-2 count:13 time:18.38
+2020-04-29 09:40:43,615: custodian.policy:INFO policy:rds-tag-policy resource:aws.rds region:ap-southeast-2 count:0 time:0.16
+2020-04-29 09:40:46,425: custodian.policy:INFO policy:ec2-tag-policy resource:aws.ec2 region:eu-central-1 count:7 time:2.79
+2020-04-29 09:41:14,221: custodian.policy:INFO policy:s3-tag-policy resource:aws.s3 region:eu-central-1 count:13 time:27.79
+2020-04-29 09:41:17,455: custodian.policy:INFO policy:rds-tag-policy resource:aws.rds region:eu-central-1 count:0 time:3.23
+2020-04-29 09:41:18,893: custodian.policy:INFO policy:ec2-tag-policy resource:aws.ec2 region:eu-west-1 count:0 time:1.42
+2020-04-29 09:41:46,373: custodian.policy:INFO policy:s3-tag-policy resource:aws.s3 region:eu-west-1 count:13 time:27.48
+2020-04-29 09:41:49,368: custodian.policy:INFO policy:rds-tag-policy resource:aws.rds region:eu-west-1 count:0 time:2.99
+
+</code></pre><p>Now, let&rsquo;s run the <code>report</code> sub-command. We can only pass policy files of the same resource type to <code>report</code>.
+Hence, we will invoke it separately for each resource type which also corresponds to the separate policy files
+in our case:</p>
+<p>For EC2:</p>
+<pre><code>$ custodian report --output-dir=. ec2.yaml -r ap-southeast-2 -r eu-central-1 -r eu-west-1 --format grid
++----------------------------+---------------------+--------------------------------------------+----------------+---------------------------+--------------+--------------------+----------------+
+| CustodianDate              | InstanceId          | tag:Name                                   | InstanceType   | LaunchTime                | VpcId        | PrivateIpAddress   | Region         |
++============================+=====================+============================================+================+===========================+==============+====================+================+
+| 2020-04-29 09:40:46.423450 | i-0912121           | Instance Name                              | c4.large       | 2018-10-29T00:30:38+00:00 | vpc-0c6d8b65 | 172.31.14.88       | eu-central-1   |
+</code></pre><p>For S3:</p>
+<pre><code>$ custodian report --output-dir=. s3.yaml -r ap-southeast-2 -r eu-central-1 -r eu-west-1 --format grid
++-----------------------------------------+---------------------------+-----------+
+| Name                                    | CreationDate              | Region    |
++=========================================+===========================+===========+
+| cg-foo-bar                    | 2020-03-04T05:57:34+00:00 | eu-west-1 |
++-----------------------------------------+---------------------------+-----------+
+
+</code></pre><p>For RDS:</p>
+<pre><code>$ custodian report --output-dir=. rds.yaml -r ap-southeast-2 -r eu-central-1 -r eu-west-1 --format grid
++------------------------+----------+----------+-----------------+-----------+--------------------+--------------------+----------------------+----------------------+----------+
+| DBInstanceIdentifier   | DBName   | Engine   | EngineVersion   | MultiAZ   | AllocatedStorage   | StorageEncrypted   | PubliclyAccessible   | InstanceCreateTime   | Region   |
++========================+==========+==========+=================+===========+====================+====================+======================+======================+==========+
++------------------------+----------+----------+-----------------+-----------+--------------------+--------------------+----------------------+----------------------+----------+
+</code></pre><h1 id="multi-accountorganizational-invocation">Multi-account/Organizational Invocation</h1>
+<p>To run <code>custodian</code> against multiple AWS accounts under the same organization, we will use another application
+which is part of the cloud custodian project - <a href="https://cloudcustodian.io/docs/tools/c7n-org.html#">c7n-org</a>.
+In my case, in the same virtual environment, I installed <code>c7n-org</code>  using <code>pip install c7n-org</code>.</p>
+<p>The next step is to create a account config file using the script pointed to from
+<a href="https://cloudcustodian.io/docs/tools/c7n-org.html#config-file-generation">here</a> which will allow generation
+using the AWS Organizations API:</p>
+<pre><code>$ python orgaccounts.py  -f accounts.yaml
+</code></pre><p>The  generated accounts.yaml will look like:</p>
+<pre><code>accounts:
+- account_id: 1212121212121
+  email: awsroot+a@example.com
+  name: acccount1
+  role: arn:aws:iam::1212121212121:role/OrganizationAccountAccessRole
+  tags:
+  - path:/SomePath
+- account_id: 42312121477
+  email: awsroot+b@example.com
+  name: acccount2
+  role: arn:aws:iam::42312121477:role/OrganizationAccountAccessRole
+  tags:
+  - path:/SomePath1
+
+</code></pre><p>Next, we will need to have the IAM role <code>OrganizationAccountAccessRole</code> in each of the member accounts.
+For accounts which were created as a member account, this IAM role already exists. For accounts which were
+invited, we will need to create the IAM role manually.</p>
+<p>The key features for the Role are:</p>
+<ul>
+<li>Name: <code>OrganizationAccountAccessRole</code></li>
+<li>Attached policies: <code>AdministratorAccess</code></li>
+<li>Trust relationships: AWS Account ID of your master account</li>
+</ul>
+<p>Once we have created the IAM roles, we will run <code>c7n-org</code> as follows:</p>
+<pre><code>$ c7n-org run -c accounts.yaml -s output -u ec2.yaml  -r ap-southeast-2 -r eu-central-1 -r eu-west-1
+</code></pre><p>We can now use the <code>report</code> sub-command to summarize the results:</p>
+<pre><code>$ c7n-org report -c accounts.yaml -s output -u ec2.yaml  -r ap-southeast-2 -r eu-central-1 -r eu-west-1 
+Account,Region,Policy,CustodianDate,InstanceId,tag:Name,InstanceType,LaunchTime,VpcId,PrivateIpAddress
+Acc1,eu-central-1,ec2-tag-policy,2020-04-30 16:07:05.109961,i-0e979a763cfcd3d82,website-application,t3.medium,2020-04-20T03:56:31+00:00,vpc-ce7b04a5,192.168.6.145
+</code></pre><p>As compared to <code>custodian</code>, <code>c7-org run</code> doesn&rsquo;t support multiple policy files and <code>c7n-org report</code> doesn&rsquo;t support
+the grid format.</p>
+<h1 id="putting-custodian-to-use">Putting custodian to use</h1>
+<p>TBD</p>
+<h1 id="conclusion">Conclusion</h1>
+<p>TBD</p>
+
+    </div>
+  </article>
+
+  
+  
+
+
+
+
+
+  <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/about">About</a></li>
+         
+          <li><a href="/articles">Articles</a></li>
+         
+          <li><a href="/books">Books</a></li>
+         
+          <li><a href="/posts">Posts</a></li>
+         
+          <li><a href="/talks">Talks</a></li>
+         
+          <li><a href="/categories/">Categories</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <nav id="TableOfContents">
+  <ul>
+    <li><a href="#installation-and-setup">Installation and setup</a></li>
+  </ul>
+
+  <ul>
+    <li><a href="#ensuring-certain-tags-exist">Ensuring certain tags exist</a></li>
+    <li><a href="#running-with-all-the-policies">Running with all the policies</a></li>
+  </ul>
+</nav>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      
+      <ul>
+  
+  
+    
+  
+  
+  <li>
+    <a class="icon" href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fechorand.me%2fposts%2fcloud-custodian-aws%2f">
+      <i class="fab fa-facebook fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://twitter.com/share?url=https%3a%2f%2fechorand.me%2fposts%2fcloud-custodian-aws%2f&text=Using%20cloud%20custodian%20to%20ensure%20compliance%20across%20AWS%20resources">
+      <i class="fab fa-twitter fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fechorand.me%2fposts%2fcloud-custodian-aws%2f&title=Using%20cloud%20custodian%20to%20ensure%20compliance%20across%20AWS%20resources">
+      <i class="fab fa-linkedin fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fechorand.me%2fposts%2fcloud-custodian-aws%2f&is_video=false&description=Using%20cloud%20custodian%20to%20ensure%20compliance%20across%20AWS%20resources">
+      <i class="fab fa-pinterest fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="mailto:?subject=Using%20cloud%20custodian%20to%20ensure%20compliance%20across%20AWS%20resources&body=Check out this article: https%3a%2f%2fechorand.me%2fposts%2fcloud-custodian-aws%2f">
+      <i class="fas fa-envelope fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://getpocket.com/save?url=https%3a%2f%2fechorand.me%2fposts%2fcloud-custodian-aws%2f&title=Using%20cloud%20custodian%20to%20ensure%20compliance%20across%20AWS%20resources">
+      <i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://reddit.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fcloud-custodian-aws%2f&title=Using%20cloud%20custodian%20to%20ensure%20compliance%20across%20AWS%20resources">
+      <i class="fab fa-reddit fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.stumbleupon.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fcloud-custodian-aws%2f&title=Using%20cloud%20custodian%20to%20ensure%20compliance%20across%20AWS%20resources">
+      <i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://digg.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fcloud-custodian-aws%2f&title=Using%20cloud%20custodian%20to%20ensure%20compliance%20across%20AWS%20resources">
+      <i class="fab fa-digg fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.tumblr.com/share/link?url=https%3a%2f%2fechorand.me%2fposts%2fcloud-custodian-aws%2f&name=Using%20cloud%20custodian%20to%20ensure%20compliance%20across%20AWS%20resources&description=Introduction%20In%20this%20post%2c%20I%20will%20describe%20my%20experiments%20with%20using%20Cloud%20Custodian%20to%20perform%20various%20tasks%20usually%20falling%20into%20the%20bucket%20of%20compliance%20and%20sometimes%20convention.%20I%20encourage%20you%20to%20take%20a%20look%20at%20some%20of%20the%20example%20policies.%0aSome%20of%20the%20areas%20I%20will%20cover%20are%20resource%20tagging%20and%20unused%20resources%20across%20multiple%20AWS%20accounts.%0aInstallation%20and%20setup%20Cloud%20Custodian%20is%20a%20Python%203%20application%2c%20so%20you%20will%20need%20that%20installed.">
+      <i class="fab fa-tumblr fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fechorand.me%2fposts%2fcloud-custodian-aws%2f&t=Using%20cloud%20custodian%20to%20ensure%20compliance%20across%20AWS%20resources">
+      <i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+      
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;">
+          <i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;">
+          <i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;">
+          <i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');">
+          <i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+
+  <footer id="footer">
+  <div class="footer-left">
+    Copyright  &copy; 2020  Exploring Software 
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+        <li><a href="/about">About</a></li>
+         
+        <li><a href="/articles">Articles</a></li>
+         
+        <li><a href="/books">Books</a></li>
+         
+        <li><a href="/posts">Posts</a></li>
+         
+        <li><a href="/talks">Talks</a></li>
+         
+        <li><a href="/categories/">Categories</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+
+  </div>
+</body>
+
+<link rel="stylesheet" href=/lib/font-awesome/css/all.min.css>
+<script src=/lib/jquery/jquery.min.js></script>
+<script src=/js/main.js></script>
+
+
+
+</html>

@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title> Python Using specific git commits of third party packages | Exploring Software</title>
+  <meta name="description" content="echo $RANDOM. Exploring Software and writing about it.">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="all,follow">
+  <meta name="googlebot" content="index,follow,snippet,archive">
+  <meta property="og:title" content="Python Using specific git commits of third party packages" />
+<meta property="og:description" content="After a fair number of furious impatient attempts to try and use specific git commits of third party packages in my Python software, I finally have been able to make it work. I went back to the drawing board - basically reading setup-vs-requirement.
+Applications This is what I did:
+ If you have a setup.py, add the library name to setup.py (abstract dependency) Add the git URL in a requirements.txt file (concrete dependency) When you create your deployment artifact, do pip install -r requirements." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://echorand.me/posts/python-using-specific-git-commits-of-packages/" />
+<meta property="article:published_time" content="2018-02-16T00:00:00+00:00" />
+<meta property="article:modified_time" content="2019-07-11T16:52:00+10:00" />
+
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Python Using specific git commits of third party packages"/>
+<meta name="twitter:description" content="After a fair number of furious impatient attempts to try and use specific git commits of third party packages in my Python software, I finally have been able to make it work. I went back to the drawing board - basically reading setup-vs-requirement.
+Applications This is what I did:
+ If you have a setup.py, add the library name to setup.py (abstract dependency) Add the git URL in a requirements.txt file (concrete dependency) When you create your deployment artifact, do pip install -r requirements."/>
+
+  
+  
+  
+  <link rel="stylesheet" href="https://echorand.me/css/style-white.css">
+  
+  
+  
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  
+
+  
+<link rel="icon" type="image/png" href="https://echorand.me/images/favicon.ico" />
+
+  
+  
+  
+  
+  
+    
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-108901610-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+  
+  
+</head>
+
+<body class="max-width mx-auto px3 ltr">
+  <div class="content index py4">
+
+  <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+        <li><a href="/about">About</a></li>
+         
+        <li><a href="/articles">Articles</a></li>
+         
+        <li><a href="/books">Books</a></li>
+         
+        <li><a href="/posts">Posts</a></li>
+         
+        <li><a href="/talks">Talks</a></li>
+         
+        <li><a href="/categories/">Categories</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li>
+          <a class="icon" href=" https://echorand.me/posts/rest-or-rpc-for-microservices/">
+            <i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i>
+          </a>
+        </li>
+        
+        
+        <li>
+          <a class="icon" href="https://echorand.me/posts/redis-sorted-sets/">
+            <i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i>
+          </a>
+        </li>
+        
+        <li>
+          <a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');">
+            <i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i>
+          </a>
+        </li>
+        <li>
+          <a class="icon" href="#">
+            <i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i>
+          </a>
+        </li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      
+      <ul>
+  
+  
+    
+  
+  
+  <li>
+    <a class="icon" href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fechorand.me%2fposts%2fpython-using-specific-git-commits-of-packages%2f">
+      <i class="fab fa-facebook " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://twitter.com/share?url=https%3a%2f%2fechorand.me%2fposts%2fpython-using-specific-git-commits-of-packages%2f&text=Python%20Using%20specific%20git%20commits%20of%20third%20party%20packages">
+      <i class="fab fa-twitter " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fechorand.me%2fposts%2fpython-using-specific-git-commits-of-packages%2f&title=Python%20Using%20specific%20git%20commits%20of%20third%20party%20packages">
+      <i class="fab fa-linkedin " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fechorand.me%2fposts%2fpython-using-specific-git-commits-of-packages%2f&is_video=false&description=Python%20Using%20specific%20git%20commits%20of%20third%20party%20packages">
+      <i class="fab fa-pinterest " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="mailto:?subject=Python%20Using%20specific%20git%20commits%20of%20third%20party%20packages&body=Check out this article: https%3a%2f%2fechorand.me%2fposts%2fpython-using-specific-git-commits-of-packages%2f">
+      <i class="fas fa-envelope " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://getpocket.com/save?url=https%3a%2f%2fechorand.me%2fposts%2fpython-using-specific-git-commits-of-packages%2f&title=Python%20Using%20specific%20git%20commits%20of%20third%20party%20packages">
+      <i class="fab fa-get-pocket " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://reddit.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fpython-using-specific-git-commits-of-packages%2f&title=Python%20Using%20specific%20git%20commits%20of%20third%20party%20packages">
+      <i class="fab fa-reddit " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.stumbleupon.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fpython-using-specific-git-commits-of-packages%2f&title=Python%20Using%20specific%20git%20commits%20of%20third%20party%20packages">
+      <i class="fab fa-stumbleupon " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://digg.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fpython-using-specific-git-commits-of-packages%2f&title=Python%20Using%20specific%20git%20commits%20of%20third%20party%20packages">
+      <i class="fab fa-digg " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.tumblr.com/share/link?url=https%3a%2f%2fechorand.me%2fposts%2fpython-using-specific-git-commits-of-packages%2f&name=Python%20Using%20specific%20git%20commits%20of%20third%20party%20packages&description=After%20a%20fair%20number%20of%20furious%20impatient%20attempts%20to%20try%20and%20use%20specific%20git%20commits%20of%20third%20party%20packages%20in%20my%20Python%20software%2c%20I%20finally%20have%20been%20able%20to%20make%20it%20work.%20I%20went%20back%20to%20the%20drawing%20board%20-%20basically%20reading%20setup-vs-requirement.%0aApplications%20This%20is%20what%20I%20did%3a%0a%20If%20you%20have%20a%20setup.py%2c%20add%20the%20library%20name%20to%20setup.py%20%28abstract%20dependency%29%20Add%20the%20git%20URL%20in%20a%20requirements.txt%20file%20%28concrete%20dependency%29%20When%20you%20create%20your%20deployment%20artifact%2c%20do%20pip%20install%20-r%20requirements.">
+      <i class="fab fa-tumblr " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fechorand.me%2fposts%2fpython-using-specific-git-commits-of-packages%2f&t=Python%20Using%20specific%20git%20commits%20of%20third%20party%20packages">
+      <i class="fab fa-hacker-news " aria-hidden="true"></i>
+    </a>
+  </li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <nav id="TableOfContents"></nav>
+    </div>
+  </span>
+</div>
+
+
+  <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+    <header>
+      <h1 class="posttitle" itemprop="name headline">
+        Python Using specific git commits of third party packages
+      </h1>
+      <div class="meta">
+        
+        <div class="postdate">
+          
+          <time datetime="2018-02-16 00:00:00 &#43;0000 UTC" itemprop="datePublished">2018-02-16</time>
+          
+        </div>
+        
+        <div class="article-category">
+            <i class="fas fa-archive"></i>
+            
+            
+            <a class="category-link" href="/categories/python">Python</a>
+            
+        </div>
+        
+        
+      </div>
+    </header>
+
+  
+    <div class="content" itemprop="articleBody">
+      <p>After a fair number of furious impatient attempts to try and use specific git commits
+of third party packages in my Python software, I finally have been able to make it work.
+I went back to the drawing board - basically reading
+<a href="https://caremad.io/posts/2013/07/setup-vs-requirement/">setup-vs-requirement</a>.</p>
+<h1 id="applications">Applications</h1>
+<p>This is what I did:</p>
+<ul>
+<li>If you have a <code>setup.py</code>, add the library name to <code>setup.py</code> (abstract dependency)</li>
+<li>Add the git URL in a <code>requirements.txt</code> file (concrete dependency)</li>
+<li>When you create your deployment artifact, do <code>pip install -r requirements.txt</code>.</li>
+</ul>
+<p>An example requirements.txt file would look like:</p>
+<pre><code>git+https://&lt;git repo&gt;@master
+..
+
+</code></pre><p>You can replace the <code>master</code> by a specific commit/git tag.</p>
+<h1 id="librariesend-user-focused-tools">Libraries/End-user focused tools</h1>
+<p>Now, let&rsquo;s say you are publishing a package to PyPI and this package has a dependency on
+a version of a package which is not in PyPi or in a git repo. This is what we do:</p>
+<p>In our <code>setup.py</code>, we add the package name in <code>install_requires</code> and add <code>dependency_links</code>
+as follows:</p>
+<pre><code> dependency_links=['git+https://&lt;git-repo&gt;@4ed6231457c244b8459037ee2224b0ef430cf766#egg=&lt;package-name&gt;-0'],
+</code></pre><p>However if the third party package is already in <code>pypi</code>, we have a problem. So, we fool <code>pip</code> like, so:</p>
+<pre><code># I fool `pip` by specifying the version number which
+# is greater than the one released in PyPi and force
+# it to look at the dependency_links where i wrongly specify
+# that i have a version which is greater than 0.1.2
+install_requires='fire&gt;0.1.2',
+dependency_links=[
+    'git+https://github.com/google/python-fire.git@9bff9d01ce16589201f57ffef27ea84744951c11#egg=fire-0.1.2.1',
+],
+
+</code></pre><p>See an <a href="https://github.com/amitsaha/python-git-dependency-demo/tree/master/application">example project</a></p>
+<p>Now, if we install <code>pip install . --process-dependency-links</code>, we will see:</p>
+<pre><code>Could not find a tag or branch '9bff9d01ce16589201f57ffef27ea84744951c11', assuming commit.
+  Requested fire&gt;0.1.2 from git+https://github.com/google/python-fire.git@9bff9d01ce16589201f57ffef27ea84744951c11#egg=fire-0.1.2.1 (from my-awesome-cli==0.1), but installing version None
+</code></pre><p>To then distribute this to  PyPI, we need to make sure that we distribute this as a source tarball, <a href="https://github.com/pypa/pip/issues/3172">not a wheel</a>:</p>
+<pre><code> $ python setup.py sdist
+ $ TWINE_REPOSITORY_URL=https://test.pypi.org/legacy/ TWINE_USERNAME=echorand TWINE_PASSWORD=&quot;secret&quot; twine upload dist/*
+</code></pre><p>Once we have done that, we can install it, like so:</p>
+<pre><code>$ pip install my-awesome-cli==0.2 --process-dependency-links -i https://test.pypi.org/simple/
+...
+DEPRECATION: Dependency Links processing has been deprecated and will be removed in a future release.
+Collecting fire&gt;0.1.2 (from my-awesome-cli==0.2)
+  Cloning https://github.com/google/python-fire.git (to 9bff9d01ce16589201f57ffef27ea84744951c11) to /tmp/pip-build-SykxjY/fire
+  Could not find a tag or branch '9bff9d01ce16589201f57ffef27ea84744951c11', assuming commit.
+  Requested fire&gt;0.1.2 from git+https://github.com/google/python-fire.git@9bff9d01ce16589201f57ffef27ea84744951c11#egg=fire-0.1.2.1 (from my-awesome-cli==0.2), but installing version None
+Collecting six (from fire&gt;0.1.2-&gt;my-awesome-cli==0.2)
+...
+
+Successfully installed fire-0.1.2 my-awesome-cli-0.2 six-1.10.0
+</code></pre><p>We can then run our application:</p>
+<pre><code>$ my-awesome-cli
+Type:        Calculator
+String form: &lt;my_awesome_cli.main.Calculator object at 0x7feecae69850&gt;
+Docstring:   A simple calculator class.
+
+Usage:       my-awesome-cli
+             my-awesome-cli double
+
+</code></pre><h1 id="helpful-links">Helpful links</h1>
+<ul>
+<li><a href="https://caremad.io/posts/2013/07/setup-vs-requirement/">setup-vs-requirement</a></li>
+<li><a href="https://yuji.wordpress.com/2011/04/11/pip-install-specific-commit-from-git-repository/">pip install specific git commit</a></li>
+</ul>
+
+    </div>
+  </article>
+
+  
+  
+
+
+
+
+
+  <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/about">About</a></li>
+         
+          <li><a href="/articles">Articles</a></li>
+         
+          <li><a href="/books">Books</a></li>
+         
+          <li><a href="/posts">Posts</a></li>
+         
+          <li><a href="/talks">Talks</a></li>
+         
+          <li><a href="/categories/">Categories</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <nav id="TableOfContents"></nav>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      
+      <ul>
+  
+  
+    
+  
+  
+  <li>
+    <a class="icon" href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fechorand.me%2fposts%2fpython-using-specific-git-commits-of-packages%2f">
+      <i class="fab fa-facebook fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://twitter.com/share?url=https%3a%2f%2fechorand.me%2fposts%2fpython-using-specific-git-commits-of-packages%2f&text=Python%20Using%20specific%20git%20commits%20of%20third%20party%20packages">
+      <i class="fab fa-twitter fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fechorand.me%2fposts%2fpython-using-specific-git-commits-of-packages%2f&title=Python%20Using%20specific%20git%20commits%20of%20third%20party%20packages">
+      <i class="fab fa-linkedin fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fechorand.me%2fposts%2fpython-using-specific-git-commits-of-packages%2f&is_video=false&description=Python%20Using%20specific%20git%20commits%20of%20third%20party%20packages">
+      <i class="fab fa-pinterest fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="mailto:?subject=Python%20Using%20specific%20git%20commits%20of%20third%20party%20packages&body=Check out this article: https%3a%2f%2fechorand.me%2fposts%2fpython-using-specific-git-commits-of-packages%2f">
+      <i class="fas fa-envelope fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://getpocket.com/save?url=https%3a%2f%2fechorand.me%2fposts%2fpython-using-specific-git-commits-of-packages%2f&title=Python%20Using%20specific%20git%20commits%20of%20third%20party%20packages">
+      <i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://reddit.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fpython-using-specific-git-commits-of-packages%2f&title=Python%20Using%20specific%20git%20commits%20of%20third%20party%20packages">
+      <i class="fab fa-reddit fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.stumbleupon.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fpython-using-specific-git-commits-of-packages%2f&title=Python%20Using%20specific%20git%20commits%20of%20third%20party%20packages">
+      <i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://digg.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fpython-using-specific-git-commits-of-packages%2f&title=Python%20Using%20specific%20git%20commits%20of%20third%20party%20packages">
+      <i class="fab fa-digg fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.tumblr.com/share/link?url=https%3a%2f%2fechorand.me%2fposts%2fpython-using-specific-git-commits-of-packages%2f&name=Python%20Using%20specific%20git%20commits%20of%20third%20party%20packages&description=After%20a%20fair%20number%20of%20furious%20impatient%20attempts%20to%20try%20and%20use%20specific%20git%20commits%20of%20third%20party%20packages%20in%20my%20Python%20software%2c%20I%20finally%20have%20been%20able%20to%20make%20it%20work.%20I%20went%20back%20to%20the%20drawing%20board%20-%20basically%20reading%20setup-vs-requirement.%0aApplications%20This%20is%20what%20I%20did%3a%0a%20If%20you%20have%20a%20setup.py%2c%20add%20the%20library%20name%20to%20setup.py%20%28abstract%20dependency%29%20Add%20the%20git%20URL%20in%20a%20requirements.txt%20file%20%28concrete%20dependency%29%20When%20you%20create%20your%20deployment%20artifact%2c%20do%20pip%20install%20-r%20requirements.">
+      <i class="fab fa-tumblr fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fechorand.me%2fposts%2fpython-using-specific-git-commits-of-packages%2f&t=Python%20Using%20specific%20git%20commits%20of%20third%20party%20packages">
+      <i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+      
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;">
+          <i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;">
+          <i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;">
+          <i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');">
+          <i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+
+  <footer id="footer">
+  <div class="footer-left">
+    Copyright  &copy; 2020  Exploring Software 
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+        <li><a href="/about">About</a></li>
+         
+        <li><a href="/articles">Articles</a></li>
+         
+        <li><a href="/books">Books</a></li>
+         
+        <li><a href="/posts">Posts</a></li>
+         
+        <li><a href="/talks">Talks</a></li>
+         
+        <li><a href="/categories/">Categories</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+
+  </div>
+</body>
+
+<link rel="stylesheet" href=/lib/font-awesome/css/all.min.css>
+<script src=/lib/jquery/jquery.min.js></script>
+<script src=/js/main.js></script>
+
+
+
+</html>

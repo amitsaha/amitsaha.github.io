@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title> User access management on AWS Kubernetes cluster | Exploring Software</title>
+  <meta name="description" content="echo $RANDOM. Exploring Software and writing about it.">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="all,follow">
+  <meta name="googlebot" content="index,follow,snippet,archive">
+  <meta property="og:title" content="User access management on AWS Kubernetes cluster" />
+<meta property="og:description" content="Introduction When implementing a solution for allowing users other than the cluster creator to access the cluster resources we are faced with two fairly old generic problems - authentication and authorization. There are various ways one can solve these problems. I will discuss one such solution in this post. It makes use of AWS Identity and access management (IAM) features. This in my humble opinion is the simplest and hopefully secure enough solution when it comes to EKS." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://echorand.me/posts/user-management-aws-eks-cluster/" />
+<meta property="article:published_time" content="2019-08-23T00:00:00+00:00" />
+<meta property="article:modified_time" content="2019-08-23T18:24:25+10:00" />
+
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="User access management on AWS Kubernetes cluster"/>
+<meta name="twitter:description" content="Introduction When implementing a solution for allowing users other than the cluster creator to access the cluster resources we are faced with two fairly old generic problems - authentication and authorization. There are various ways one can solve these problems. I will discuss one such solution in this post. It makes use of AWS Identity and access management (IAM) features. This in my humble opinion is the simplest and hopefully secure enough solution when it comes to EKS."/>
+
+  
+  
+  
+  <link rel="stylesheet" href="https://echorand.me/css/style-white.css">
+  
+  
+  
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  
+
+  
+<link rel="icon" type="image/png" href="https://echorand.me/images/favicon.ico" />
+
+  
+  
+  
+  
+  
+    
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-108901610-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+  
+  
+</head>
+
+<body class="max-width mx-auto px3 ltr">
+  <div class="content index py4">
+
+  <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+        <li><a href="/about">About</a></li>
+         
+        <li><a href="/articles">Articles</a></li>
+         
+        <li><a href="/books">Books</a></li>
+         
+        <li><a href="/posts">Posts</a></li>
+         
+        <li><a href="/talks">Talks</a></li>
+         
+        <li><a href="/categories/">Categories</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li>
+          <a class="icon" href=" https://echorand.me/posts/go-notes/">
+            <i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i>
+          </a>
+        </li>
+        
+        
+        <li>
+          <a class="icon" href="https://echorand.me/ssh-with-private-key/">
+            <i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i>
+          </a>
+        </li>
+        
+        <li>
+          <a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');">
+            <i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i>
+          </a>
+        </li>
+        <li>
+          <a class="icon" href="#">
+            <i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i>
+          </a>
+        </li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      
+      <ul>
+  
+  
+    
+  
+  
+  <li>
+    <a class="icon" href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fechorand.me%2fposts%2fuser-management-aws-eks-cluster%2f">
+      <i class="fab fa-facebook " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://twitter.com/share?url=https%3a%2f%2fechorand.me%2fposts%2fuser-management-aws-eks-cluster%2f&text=User%20access%20management%20on%20AWS%20Kubernetes%20cluster">
+      <i class="fab fa-twitter " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fechorand.me%2fposts%2fuser-management-aws-eks-cluster%2f&title=User%20access%20management%20on%20AWS%20Kubernetes%20cluster">
+      <i class="fab fa-linkedin " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fechorand.me%2fposts%2fuser-management-aws-eks-cluster%2f&is_video=false&description=User%20access%20management%20on%20AWS%20Kubernetes%20cluster">
+      <i class="fab fa-pinterest " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="mailto:?subject=User%20access%20management%20on%20AWS%20Kubernetes%20cluster&body=Check out this article: https%3a%2f%2fechorand.me%2fposts%2fuser-management-aws-eks-cluster%2f">
+      <i class="fas fa-envelope " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://getpocket.com/save?url=https%3a%2f%2fechorand.me%2fposts%2fuser-management-aws-eks-cluster%2f&title=User%20access%20management%20on%20AWS%20Kubernetes%20cluster">
+      <i class="fab fa-get-pocket " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://reddit.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fuser-management-aws-eks-cluster%2f&title=User%20access%20management%20on%20AWS%20Kubernetes%20cluster">
+      <i class="fab fa-reddit " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.stumbleupon.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fuser-management-aws-eks-cluster%2f&title=User%20access%20management%20on%20AWS%20Kubernetes%20cluster">
+      <i class="fab fa-stumbleupon " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://digg.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fuser-management-aws-eks-cluster%2f&title=User%20access%20management%20on%20AWS%20Kubernetes%20cluster">
+      <i class="fab fa-digg " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.tumblr.com/share/link?url=https%3a%2f%2fechorand.me%2fposts%2fuser-management-aws-eks-cluster%2f&name=User%20access%20management%20on%20AWS%20Kubernetes%20cluster&description=Introduction%20When%20implementing%20a%20solution%20for%20allowing%20users%20other%20than%20the%20cluster%20creator%20to%20access%20the%20cluster%20resources%20we%20are%20faced%20with%20two%20fairly%20old%20generic%20problems%20-%20authentication%20and%20authorization.%20There%20are%20various%20ways%20one%20can%20solve%20these%20problems.%20I%20will%20discuss%20one%20such%20solution%20in%20this%20post.%20It%20makes%20use%20of%20AWS%20Identity%20and%20access%20management%20%28IAM%29%20features.%20This%20in%20my%20humble%20opinion%20is%20the%20simplest%20and%20hopefully%20secure%20enough%20solution%20when%20it%20comes%20to%20EKS.">
+      <i class="fab fa-tumblr " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fechorand.me%2fposts%2fuser-management-aws-eks-cluster%2f&t=User%20access%20management%20on%20AWS%20Kubernetes%20cluster">
+      <i class="fab fa-hacker-news " aria-hidden="true"></i>
+    </a>
+  </li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <nav id="TableOfContents">
+  <ul>
+    <li><a href="#which-aws-user-performed-this-api-operation">Which AWS user performed this API operation</a>
+      <ul>
+        <li><a href="#api-server-audit-logs">API server audit logs</a></li>
+        <li><a href="#cloudtrail">CloudTrail</a></li>
+      </ul>
+    </li>
+    <li><a href="#automating-kubeconfig-management-for-human-users">Automating kubeconfig management for human users</a></li>
+  </ul>
+
+  <ul>
+    <li><a href="#deployment-of-applications">Deployment of applications</a></li>
+    <li><a href="#read-only-access-to-the-cluster-api">Read only access to the cluster API</a></li>
+  </ul>
+</nav>
+    </div>
+  </span>
+</div>
+
+
+  <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+    <header>
+      <h1 class="posttitle" itemprop="name headline">
+        User access management on AWS Kubernetes cluster
+      </h1>
+      <div class="meta">
+        
+        <div class="postdate">
+          
+          <time datetime="2019-08-23 00:00:00 &#43;0000 UTC" itemprop="datePublished">2019-08-23</time>
+          
+        </div>
+        
+        <div class="article-category">
+            <i class="fas fa-archive"></i>
+            
+            
+            <a class="category-link" href="/categories/infrastructure">infrastructure</a>
+            
+        </div>
+        
+        
+      </div>
+    </header>
+
+  
+    <div class="content" itemprop="articleBody">
+      <h1 id="introduction">Introduction</h1>
+<p>When implementing a solution for allowing users other than the cluster creator to access the cluster resources we are
+faced with two fairly old generic problems - authentication and authorization. There are various ways one can solve
+these problems. I will discuss one such solution in this post. It makes use of AWS Identity and access management (IAM)
+features. This in my humble opinion is the simplest and hopefully secure enough solution when it comes to EKS.</p>
+<h1 id="allowing-nodes-to-join-the-cluster">Allowing nodes to join the cluster</h1>
+<p>Before we discuss human users (and services), I want to discuss how the nodes are able to talk to the master
+and join the cluster. One of the first things to do when you are setting up an EKS cluster is to setup a special
+ConfigMap - aws-auth in the kube-system namespace and add the IAM role ARNs to it. This allows the nodes to
+call home to the master and allow them to be part of the cluster. To make things concrete, here’s how the
+config map looks like:</p>
+<pre><code>apiVersion: v1
+data:
+  mapRoles: |
+    - rolearn: arn:aws:iam::AWS-ACCOUN-ID:role/myrole
+      username: system:node:{{EC2PrivateDNSName}}
+      groups:
+      - system:bootsrappers
+      - system:nodes
+kind: ConfigMap
+metadata:
+  name: aws-auth
+  namespace: kube-system
+
+</code></pre><p>The <code>mapRoles</code> array lists all the IAM roles that we want to allow to authenticate
+successfully to the cluster. We add the role to the kubernetes groups <code>system:bootstrappers</code>
+and <code>system:nodes</code>. We have to add all the IAM roles of the nodes in our cluster to this
+ConfigMap. Once we apply this manifest, you should see the nodes are ready when you run
+<code>kubectl get nodes</code> again.</p>
+<h1 id="allowing-other-admins">Allowing other admins</h1>
+<p>The cluster creator gets admin privileges by default. To add other admin users, we will
+have to update the above ConfigMap as follows:</p>
+<pre><code>apiVersion: v1
+data:
+  mapRoles: |
+    - rolearn: arn:aws:iam::AWS-ACCOUN-ID:role/myrole
+      username: system:node:{{EC2PrivateDNSName}}
+      groups:
+      - system:bootsrappers
+      - system:nodes
+  mapUsers: |
+    - userarn: arn:aws:iam::AWS-ACCOUN-ID:user/someusername
+      username: someusername
+      groups:
+      - system:masters
+kind: ConfigMap
+metadata:
+  name: aws-auth
+  namespace: kube-system
+</code></pre><h1 id="allowing-other-non-admin-users">Allowing other non-admin users</h1>
+<p>You have different teams working on different projects who need varying levels of access to the cluster resources.
+First of all, we want to have each project and environment in their own Kubernetes namespace - that&rsquo;s how
+we define the perimeter and granularity of our permissions. Let&rsquo;s assume:</p>
+<ol>
+<li>Our project name is projectA</li>
+<li>Our environments are <code>qa</code>, <code>staging</code> and <code>production</code></li>
+<li>Our namespaces are - <code>projectA-qa</code>, and <code>projectA-staging</code> and <code>projectA-production</code></li>
+</ol>
+<p>We can follow the approach for adding additional admin users above and list each user, assign them to different project
+groups in Kubernetes and then regulate access based on their group and Kubernetes role bindings.
+This is how it might look like.</p>
+<p>First, we update the <code>ConfigMap</code> to add new entry per user in the <code>mapUsers</code> section as follows:</p>
+<pre><code>apiVersion: v1
+data:
+  ...
+  mapUsers: |
+    - userarn: arn:aws:iam::AWS-ACCOUN-ID:user/username1
+      username: username1
+      groups:
+      - system:basic-user
+      - projectA:qa
+
+    - userarn: arn:aws:iam::AWS-ACCOUN-ID:user/username2
+      username: username2
+      groups:
+      - system:basic-user
+      - projectA:qa
+  ...  
+..
+</code></pre><p>We add each user to the <code>system:basic-user</code> group which &ldquo;Allows a user read-only access to basic information about themselves&rdquo;
+and added them to two other projectA specific groups.</p>
+<p>The above <code>ConfigMap</code> update coupled with the &ldquo;right&rdquo; <code>kubeconfig</code> and AWS CLI configuration
+will allow users, <code>username1</code> and <code>username2</code> to authenticate to the EKS cluster successfully.
+For completeness, a working kubeconfig will look as follows:</p>
+<pre><code>apiVersion: v1
+current-context: k8s-cluster
+clusters:
+- cluster:
+    certificate-authority-data: &lt;ca data&gt;
+    server: &lt;EKS endpoint&gt;
+  name: k8s-cluster
+contexts:
+- context:
+    cluster: k8s-cluster
+    namespace: projectA-qa
+    user: username1
+  name: username1
+kind: Config
+users:
+- name: username1
+  user:
+    exec:
+      apiVersion: client.authentication.k8s.io/v1alpha1
+      command: aws-iam-authenticator
+      args:
+      - token
+      - -i
+      - k8s-cluster
+</code></pre><p>However, to allow them to access project A specific resource, we will first create a <code>Role</code> and
+then a <code>RoleBinding</code> to associate the <code>projectA:qa</code> group above with the role.</p>
+<p>The manifest for the <code>Role</code> looks as follows:</p>
+<pre><code>kind: Role
+metadata:
+  name: projectA-qa-human-users
+  namespace: projectA-qa
+rules:
+- apiGroups:
+  - &quot;&quot;
+  resources:
+  - services
+  verbs:
+  - get
+- apiGroups:
+  - extensions
+  - apps
+  resources:
+  - deployments
+  verbs:
+  - get
+- apiGroups:
+  - batch
+  resources:
+  - cronjobs
+  - jobs
+  verbs:
+  - get
+- apiGroups:
+  - &quot;&quot;
+  resources:
+  - pods
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - &quot;&quot;
+  resources:
+  - pods/exec
+  verbs:
+  - create
+- apiGroups:
+  - &quot;&quot;
+  resources:
+  - pods/log
+  verbs:
+  - get
+
+</code></pre><p>The <code>RoleBinding</code> is as follows:</p>
+<pre><code>apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:  
+  name:  projectA-qa-human-users
+  namespace: projectA-qa
+
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: projectA-qa-human-users
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: Group
+  name: projectA:qa
+  namespace: projectA-qa
+</code></pre><p>The key bit of information that ties in an AWS user with a certain set of permissions in the cluster
+is the assignment to a group in the <code>ConfigMap</code> and the <code>group</code> assigment in the above role binding.</p>
+<p>So:</p>
+<pre><code>                                                                    Role with certain permissions
+                                                                              / \
+                                                                               |
+AWS user/IAM role -&gt; Assigned to a cluster group via ConfigMap -&gt; Role binding associates a role to the group
+</code></pre><p>With the above setup, you have successfully granted <code>username1</code> access to your cluster and they
+are confined to the <code>projectA-qa</code> namespace where they can only <code>exec</code> into pods and view the
+pods' logs. If you wanted to allow <code>username1</code> access to other projectA&rsquo;s environments or other
+projects' environments, you would do the following:</p>
+<ul>
+<li>Update <code>ConfigMap</code> to assign <code>username1</code> to the different groups</li>
+<li>Create <code>Role</code>s in your cluster corresponding to your different projects' namespaces</li>
+<li>Create <code>RoleBinding</code>s in your cluster corresponding the different groups and roles</li>
+</ul>
+<p>For adding new users such as other team members on the same project or different project
+members, you would essentially repeat the process - add new user and assign them to groups.</p>
+<p>For example:</p>
+<pre><code>apiVersion: v1
+data:
+  ...
+  mapUsers: |
+    - userarn: arn:aws:iam::AWS-ACCOUN-ID:user/username1
+      username: username1
+      groups:
+      - system:basic-user
+      - projectA:qa
+
+    - userarn: arn:aws:iam::AWS-ACCOUN-ID:user/username2
+      username: username2
+      groups:
+      - system:basic-user
+      - projectA:qa
+
+    - userarn: arn:aws:iam::AWS-ACCOUN-ID:user/username3
+      username: username3
+      groups:
+      - system:basic-user
+      - projectB:qa
+
+    - userarn: arn:aws:iam::AWS-ACCOUN-ID:user/username3
+      username: username3
+      groups:
+      - system:basic-user
+      - projectB:qa
+
+..
+  ...  
+..
+</code></pre><p>An alternative to adding each individual user to the <code>ConfigMap</code> is to use IAM roles per project
+environment. So, to replicate the above using IAM roles, we would do the following:</p>
+<pre><code>apiVersion: v1
+data:
+  mapRoles: |
+    - rolearn: arn:aws:iam::AWS-ACCOUN-ID:role/projectA-qa-humans
+      username: projectA-{{SessionName}}
+      groups:
+      - system:basic-user
+      - projectA:qa
+    - rolearn: arn:aws:iam::AWS-ACCOUN-ID:role/projectB-qa-humans
+      username: projectB-{{SessionName}}
+      groups:
+      - system:basic-user
+      - projectB:qa
+...
+
+</code></pre><p>We don&rsquo;t add the individual user accounts any more. So, how do the individual users authenticate themselves
+to the cluster and then access relevant resources? We use the <code>AssumeRole</code> functionality to do so. An example
+kubeconfig will now look like:</p>
+<pre><code>apiVersion: v1
+current-context: k8s-cluster
+clusters:
+- cluster:
+    certificate-authority-data: &lt;ca data&gt;
+    server: &lt;EKS endpoint&gt;
+  name: k8s-cluster
+contexts:
+- context:
+    cluster: k8s-cluster
+    namespace: projectA-qa
+    user: username1
+  name: username1
+kind: Config
+users:
+- name: username1
+  user:
+    exec:
+      apiVersion: client.authentication.k8s.io/v1alpha1
+      command: aws-iam-authenticator
+      args:
+      - token
+      - -i
+      - k8s-cluster
+      - -r
+      - arn:aws:iam::AWS-ACCOUN-ID:role/projectA-qa-humans
+
+</code></pre><p>If we compare it to the previous kubeconfig, the change is additional two arguments to <code>aws-iam-authenticator</code>
+to the end. <code>-r</code> says that we want to assume a role when fetching the token that we use to authenticate
+to the cluster. The role we want to assume here is the role which we have added to the <code>ConfigMap</code> above
+instead of individual users. To allow users to assume this role, we will need to do a couple of things.</p>
+<p>Allow the IAM role <code>projectA-qa-humans</code> to be assumed by everyone in the AWS account:</p>
+<pre><code>{
+  &quot;Version&quot;: &quot;2012-10-17&quot;,
+  &quot;Statement&quot;: [
+    {
+      &quot;Effect&quot;: &quot;Allow&quot;,
+      &quot;Principal&quot;: {
+        &quot;AWS&quot;: &quot;arn:aws:iam::&lt;AWS-ACCOUNT-ID&gt;:root&quot;
+      },
+      &quot;Action&quot;: &quot;sts:AssumeRole&quot;
+    }
+  ]
+}
+</code></pre><p>And then allow user&rsquo;s accounts to assume this role via this policy:</p>
+<pre><code>{
+  &quot;Version&quot;: &quot;2012-10-17&quot;,
+  &quot;Statement&quot;: {
+    &quot;Effect&quot;: &quot;Allow&quot;,
+    &quot;Action&quot;: &quot;sts:AssumeRole&quot;,
+    &quot;Resource&quot;: &quot;arn:aws:iam::&lt;AWS-ACCOUNT-ID&gt;:role/projectA-humans&quot;
+  }
+}
+</code></pre><h2 id="which-aws-user-performed-this-api-operation">Which AWS user performed this API operation</h2>
+<p>Let&rsquo;s say we have rolled out the idea of using a single IAM role per project environment which
+the project&rsquo;s team members use (via <code>AssumeRole</code>) to access and perform operations in the Kubernetes cluster. One
+question you will soon encounter is how do you identify which actual AWS user was performing
+the operation? Currently, <a href="https://github.com/kubernetes-sigs/aws-iam-authenticator/issues/242">aws-iam-authenticator</a>
+doesn&rsquo;t support this. However, we can write our own solution by reading Kubernetes logs and leveraging
+AWS CloudTrail.</p>
+<h3 id="api-server-audit-logs">API server audit logs</h3>
+<p>The specific EKS log stream we are interested in is <code>kube-apiserver-audit</code>. Entires in this log stream are similar to:</p>
+<pre><code>{
+    &quot;kind&quot;: &quot;Event&quot;,
+    &quot;apiVersion&quot;: &quot;audit.k8s.io/v1beta1&quot;,
+    &quot;metadata&quot;: {
+        &quot;creationTimestamp&quot;: &quot;2019-08-22T00:13:15Z&quot;
+    },
+    &quot;level&quot;: &quot;Request&quot;,
+    &quot;timestamp&quot;: &quot;2019-08-22T00:13:15Z&quot;,
+    &quot;auditID&quot;: &quot;b7140a45-50bf-4dc3-ad64-e64d211e4e6e&quot;,
+    &quot;stage&quot;: &quot;ResponseComplete&quot;,
+    &quot;requestURI&quot;: &quot;/api/v1/namespaces/projectA-qa/pods?limit=500&quot;,
+    &quot;verb&quot;: &quot;list&quot;,
+    &quot;user&quot;: {
+        &quot;username&quot;: &quot;projectA-qa-1566432791140199108&quot;,
+        &quot;uid&quot;: &quot;heptio-authenticator-aws:&lt;AWS-ACCOUNT-ID&gt;:AROAUBGCRZPAQIISY7KAL&quot;,
+        &quot;groups&quot;: [
+            &quot;system:basic-user&quot;,
+            &quot;projectA:qa&quot;,
+            &quot;system:authenticated&quot;
+        ]
+    },
+    &quot;sourceIPs&quot;: [
+        &quot;10.0.57.37&quot;
+    ],
+    &quot;userAgent&quot;: &quot;kubectl/v1.12.7 (linux/amd64) kubernetes/6f48297&quot;,
+    &quot;objectRef&quot;: {
+        &quot;resource&quot;: &quot;pods&quot;,
+        &quot;namespace&quot;: &quot;projectA-qa&quot;,
+        &quot;apiVersion&quot;: &quot;v1&quot;
+    },
+    &quot;responseStatus&quot;: {
+        &quot;metadata&quot;: {},
+        &quot;code&quot;: 200
+    },
+    &quot;requestReceivedTimestamp&quot;: &quot;2019-08-22T00:13:15.584533Z&quot;,
+    &quot;stageTimestamp&quot;: &quot;2019-08-22T00:13:15.589325Z&quot;,
+    &quot;annotations&quot;: {
+        &quot;authorization.k8s.io/decision&quot;: &quot;allow&quot;,
+        &quot;authorization.k8s.io/reason&quot;: &quot;RBAC: allowed by RoleBinding \&quot;projectA-qa-human-users/projectA-qa\&quot; of Role \&quot;projectA-qa-human-users\&quot; to Group \&quot;projectA:qa\&quot;&quot;
+    }
+}
+</code></pre><p>Our main interest in the above log is the <code>user</code> object and it&rsquo;s fields - <code>uid</code> and <code>username</code>. The <code>username</code> is composed
+of two parts - a hardcoded <code>projectA-qa</code> and a generated session name - <code>1566432791140199108</code>. This was specified in the <code>username</code> field of the
+<code>ConfigMap</code> (<code>username: projectA-{{SessionName}}</code>). The <code>uid</code> field is set to <code>&quot;heptio-authenticator-aws:&lt;AWS-ACCOUNT-ID&gt;:AROAUBGCRZPAQIISY7KAL&quot;</code>.
+The two key bits of data here that we will use to query CloudTrial are the strings <code>AROAUBGCRZPAQIISY7KAL</code> and <code>1566432791140199108</code>.</p>
+<h3 id="cloudtrail">CloudTrail</h3>
+<p>A CloudTrail event whose <code>EventName</code> is <code>AssumeRole</code> has the following structure:</p>
+<pre><code>{
+  AccessKeyId: &quot;AKKKLKLJLJLJLLHLHLHL&quot;,
+  CloudTrailEvent: &quot;...&quot;,
+  EventName: &quot;AssumeRole&quot;,
+  EventSource: &quot;sts.amazonaws.com&quot;,
+  EventTime: 2019-08-22 00:13:12 +0000 UTC,
+  ReadOnly: &quot;true&quot;,
+  Resources: [
+    {
+      ResourceName: &quot;AKHKHKLJLHLJLLHHLHLHL&quot;,
+      ResourceType: &quot;AWS::IAM::AccessKey&quot;
+    },
+    {
+      ResourceName: &quot;1566432791140199108&quot;,
+      ResourceType: &quot;AWS::STS::AssumedRole&quot;
+    },
+    {
+      ResourceName: &quot;AROAUBGCRZPAQIISY7KAL:1566432791140199108&quot;,
+      ResourceType: &quot;AWS::STS::AssumedRole&quot;
+    },
+    {
+      ResourceName: &quot;arn:aws:sts::AWS-ACCOUNT-ID:assumed-role/projectA-qa-humans/1566432791140199108&quot;,
+      ResourceType: &quot;AWS::STS::AssumedRole&quot;
+    },
+    {
+      ResourceName: &quot;arn:aws:iam::AWS-ACCOUNT-ID:role/projectA-qa-humans&quot;,
+      ResourceType: &quot;AWS::IAM::Role&quot;
+    }
+  ],
+  Username: &quot;username1&quot;
+}
+</code></pre><p>In the above event, if you see the third entry in the <code>Resources</code> array, you can see that the <code>ResourceName</code> is
+basically composed of our two strings of interest from the kubeserver audit logs. Thus, if we search for CloudTrail
+AssumeRole events for this ResourceName, we will have our actual AWS user who performed a specific operation
+in the <code>Username</code> field.</p>
+<p>You can write your own script for this. I implemented this in my hobby AWS CLI project <a href="https://github.com/amitsaha/yawsi">yawsi</a>.</p>
+<p>The interface looks like:</p>
+<pre><code>$ yawsi eks whois --uid heptio-authenticator-aws:&lt;user-id&gt;:AROAUBGCRZPAQIISY7KAL --username projectA-qa-1566432791140199108 --lookback 6
+</code></pre><p>The <code>--lookback</code> parameter specifies the number of hours of CloudTrail events to look back to.</p>
+<h2 id="automating-kubeconfig-management-for-human-users">Automating kubeconfig management for human users</h2>
+<p>To allow human users to access the kubernetes cluster in a setup where we use a IAM role per project
+and environment, there are a few steps involved:</p>
+<ul>
+<li>An AWS account</li>
+<li>Setup the AWS account with the right permissions (described below)</li>
+<li>Give them the EKS cluster endpoint and certificate authority data</li>
+<li>Generate a kubeconfig context per project environment</li>
+</ul>
+<p>Once we have created the AWS account for an user with the right permissions, we can allow the users
+to configure their own kubeconfig files using a tool - this is better than emailing them configuration files
+or walking up to them.</p>
+<p>Let&rsquo;s talk about the permisions which also allows us to look into the steps involved.</p>
+<p>The first thing the user needs to do is be able to query AWS for a specific cluster name. This
+gives us the certificate authority data and the cluster endpoint. However, if you are using a private
+EKS cluster, you will also need to account for this <a href="https://github.com/aws/containers-roadmap/issues/221">issue</a>
+where the cluster endpoint DNS is not resolvable from outside the cluster. The solution I have
+decided to go forward is to create an <code>/etc/hosts</code> entry with the IP address which we find by
+query the network interfaces in AWS. Once we have got all the information we need to talk to the cluster,
+the remaining step is to generate the different project environment specific kubeconfig contexts.
+To generate the project environment specific kubeconfig contexts, we need to lookup the IAM role ARN
+that we want to assume while authenticating ourselves to the cluster. The conventions that I am currently
+following which I have referred to previously is that the IAM role which users assume are named as:
+<code>&lt;project name&gt;-&lt;environment&gt;-humans</code>. The following IAM policy gives all these permissions:</p>
+<pre><code>{
+  &quot;Version&quot;: &quot;2012-10-17&quot;,
+  &quot;Statement&quot;: [
+    {
+      &quot;Sid&quot;: &quot;NI1&quot;,
+      &quot;Effect&quot;: &quot;Allow&quot;,
+      &quot;Action&quot;: &quot;ec2:DescribeNetworkInterfaces&quot;,
+      &quot;Resource&quot;: &quot;*&quot;
+    },
+    {
+      &quot;Sid&quot;: &quot;EKS1&quot;,
+      &quot;Effect&quot;: &quot;Allow&quot;,
+      &quot;Action&quot;: [
+        &quot;eks:ListUpdates&quot;,
+        &quot;eks:DescribeUpdate&quot;,
+        &quot;eks:DescribeCluster&quot;,
+        &quot;eks:ListClusters&quot;
+      ],
+      &quot;Resource&quot;: &quot;*&quot;
+    },
+    {
+      &quot;Sid&quot;: &quot;IAM1&quot;,
+      &quot;Effect&quot;: &quot;Allow&quot;,
+      &quot;Action&quot;: [
+        &quot;iam:GetRole&quot;
+      ],
+      &quot;Resource&quot;: &quot;arn:aws:iam::AWS-ACCOUNT-ID:role/*-humans&quot;
+    }
+  ]
+}
+</code></pre><p>And ofcourse, we need to allow the user to assume the project environment specific role:</p>
+<pre><code>{
+  &quot;Version&quot;: &quot;2012-10-17&quot;,
+  &quot;Statement&quot;: {
+    &quot;Effect&quot;: &quot;Allow&quot;,
+    &quot;Action&quot;: &quot;sts:AssumeRole&quot;,
+    &quot;Resource&quot;: &quot;arn:aws:iam::AWS-ACCOUNT-ID:role/projectA-qa-humans&quot;
+  }
+}
+</code></pre><p>(Instead of managing these permissions for individual users, I am using AWS user groups
+and assigning users to relevant groups and managing policies at the group level).</p>
+<p>I have implemented this in the <code>yawsi</code> project. To create a kubeconfig context if you want to access the
+EKS cluster as a individual AWS user:</p>
+<pre><code>$ yawsi eks create-kube-config --cluster-name &lt;your-cluster-name&gt;
+Kubeconfig written
+
+--------------------------/etc/hosts/ file entry ---------------------
+
+&lt;ip&gt; &lt;EKS cluster endpoint&gt;
+</code></pre><p>To create a kubeconfig context if you want to access the EKS cluster by assuming another role
+which follows the specified convention above:</p>
+<pre><code>$ yawsi eks create-kube-config --cluster-name &lt;your-cluster-name&gt; --project projectA --environment qa
+Kubeconfig written
+
+--------------------------/etc/hosts/ file entry ---------------------
+
+&lt;ip&gt; &lt;EKS cluster endpoint&gt;
+</code></pre><p>Checkout the other <a href="https://github.com/amitsaha/yawsi/blob/master/docs/yawsi_eks.md">eks related commands</a>.</p>
+<h1 id="non-human-users">Non human users</h1>
+<p>For non-human users, we can once again leverage IAM roles for authentication and groups and role bindings
+for authorization. I will discuss two scenarios which brings to light two different use cases.</p>
+<h2 id="deployment-of-applications">Deployment of applications</h2>
+<p>Let&rsquo;s consider a scenario where we use Jenkins running outside the cluster to build and deploy applications
+to our kubernetes cluster. Simply because of the operations that Jenkins will need to perform
+on the cluster, it will need a very large set of permissions which will cross any project and environment specific
+permiters we have set in our cluster such as namespaces. Hence, if we assign an IAM role to the Jenkins build instances,
+add the role to the <code>ConfigMap</code> as above and assign the various groups to it, we will end up with almost
+admin level access to the cluster. We do want to avoid this scenario by making it slightly more complicated.</p>
+<p>We wil use the IAM role for the authentication to the cluster. However, we will use separate service accounts per project
+environment and then use the corresponding credentials when performing operations on a specific project environment.
+A service account will only have permissions to perform operations in a specific namespace.</p>
+<p>Let&rsquo;s see an example of creating a service account, creating a role with permissions to perform operations
+one would usually need to perform deployments, and then creating a role binding with this service acccount:</p>
+<pre><code>apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: jenkins-projectA
+  namespace: projectA-qa
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: jenkins-projectA
+  namespace: projectA-qa
+rules:
+- apiGroups:
+  - &quot;&quot;
+  resources:
+  - services
+  verbs:
+  - '*'
+- apiGroups:
+  - extensions
+  - apps
+  resources:
+  - deployments
+  verbs:
+  - '*'
+- apiGroups:
+  - batch
+  resources:
+  - cronjobs
+  - jobs
+  verbs:
+  - '*'
+- apiGroups:
+  - &quot;&quot;
+  resources:
+  - pods
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - &quot;&quot;
+  resources:
+  - pods/log
+  verbs:
+  - get
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: RoleBinding
+metadata:
+  name: jenkins-projectA-role-binding
+  namespace: projectA-qa
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: jenkins-projectA
+subjects:
+- kind: ServiceAccount
+  name: jenkins-projectA
+  namespace: projectA-qa
+</code></pre><p>Once the above service account is created, we can then get the token corresponding to the service account
+and then use that when performing operations on the cluster for a project via <code>kubectl --token &lt;token&gt;</code>.</p>
+<p>For completeness, the <code>ConfigMap</code> entry would like this:</p>
+<pre><code>apiVersion: v1
+data:
+  mapRoles: |
+    - rolearn: arn:aws:iam::AWS-ACCOUNT-ID:role/Jenkins
+      username: system:node:{{EC2PrivateDNSName}}
+      groups:
+      - system:basic-user
+      ...
+</code></pre><h2 id="read-only-access-to-the-cluster-api">Read only access to the cluster API</h2>
+<p>Let&rsquo;s consider a scenario where you want to run some software outside the cluster which will need to make API
+calls to the cluster to read various information - example, for monitoring. In this case, we can use an approach
+similar to we do for human non-admin users:</p>
+<pre><code>apiVersion: v1
+data:
+  mapRoles: |
+  - rolearn: arn:aws:iam::AWS-ACCOUNT-ID:role/Monitoring
+      username: system:node:{{EC2PrivateDNSName}}
+      groups:
+      - monitoring
+</code></pre><p>We augment this with a <code>ClusterRole</code> and <code>ClusterRoleBinding</code> as follows:</p>
+<pre><code># Role defined here
+....
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: monitoring
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: monitoring-role
+subjects:
+  - apiGroup: rbac.authorization.k8s.io
+    kind: Group
+    name: monitoring
+</code></pre><h1 id="conclusion">Conclusion</h1>
+<p>In this post, I have discussed how we can leverage AWS Identity and Access Management features for authentication
+and authorization in an AWS EKS cluster setup. With the right amount of convention and automation, we can come up
+with a simple and easy to understand and reason approach. Time will tell how this scales though.</p>
+<h1 id="resources">Resources</h1>
+<p>To learn more, please refer to the following:</p>
+<ul>
+<li><a href="https://kubernetes.io/docs/reference/access-authn-authz/controlling-access/">https://kubernetes.io/docs/reference/access-authn-authz/controlling-access/</a></li>
+<li><a href="https://kubernetes.io/docs/reference/access-authn-authz/rbac/">https://kubernetes.io/docs/reference/access-authn-authz/rbac/</a></li>
+<li><a href="https://docs.aws.amazon.com/eks/latest/userguide/security-iam.html">https://docs.aws.amazon.com/eks/latest/userguide/security-iam.html</a></li>
+</ul>
+
+    </div>
+  </article>
+
+  
+  
+
+
+
+
+
+  <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/about">About</a></li>
+         
+          <li><a href="/articles">Articles</a></li>
+         
+          <li><a href="/books">Books</a></li>
+         
+          <li><a href="/posts">Posts</a></li>
+         
+          <li><a href="/talks">Talks</a></li>
+         
+          <li><a href="/categories/">Categories</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <nav id="TableOfContents">
+  <ul>
+    <li><a href="#which-aws-user-performed-this-api-operation">Which AWS user performed this API operation</a>
+      <ul>
+        <li><a href="#api-server-audit-logs">API server audit logs</a></li>
+        <li><a href="#cloudtrail">CloudTrail</a></li>
+      </ul>
+    </li>
+    <li><a href="#automating-kubeconfig-management-for-human-users">Automating kubeconfig management for human users</a></li>
+  </ul>
+
+  <ul>
+    <li><a href="#deployment-of-applications">Deployment of applications</a></li>
+    <li><a href="#read-only-access-to-the-cluster-api">Read only access to the cluster API</a></li>
+  </ul>
+</nav>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      
+      <ul>
+  
+  
+    
+  
+  
+  <li>
+    <a class="icon" href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fechorand.me%2fposts%2fuser-management-aws-eks-cluster%2f">
+      <i class="fab fa-facebook fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://twitter.com/share?url=https%3a%2f%2fechorand.me%2fposts%2fuser-management-aws-eks-cluster%2f&text=User%20access%20management%20on%20AWS%20Kubernetes%20cluster">
+      <i class="fab fa-twitter fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fechorand.me%2fposts%2fuser-management-aws-eks-cluster%2f&title=User%20access%20management%20on%20AWS%20Kubernetes%20cluster">
+      <i class="fab fa-linkedin fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fechorand.me%2fposts%2fuser-management-aws-eks-cluster%2f&is_video=false&description=User%20access%20management%20on%20AWS%20Kubernetes%20cluster">
+      <i class="fab fa-pinterest fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="mailto:?subject=User%20access%20management%20on%20AWS%20Kubernetes%20cluster&body=Check out this article: https%3a%2f%2fechorand.me%2fposts%2fuser-management-aws-eks-cluster%2f">
+      <i class="fas fa-envelope fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://getpocket.com/save?url=https%3a%2f%2fechorand.me%2fposts%2fuser-management-aws-eks-cluster%2f&title=User%20access%20management%20on%20AWS%20Kubernetes%20cluster">
+      <i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://reddit.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fuser-management-aws-eks-cluster%2f&title=User%20access%20management%20on%20AWS%20Kubernetes%20cluster">
+      <i class="fab fa-reddit fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.stumbleupon.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fuser-management-aws-eks-cluster%2f&title=User%20access%20management%20on%20AWS%20Kubernetes%20cluster">
+      <i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://digg.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fuser-management-aws-eks-cluster%2f&title=User%20access%20management%20on%20AWS%20Kubernetes%20cluster">
+      <i class="fab fa-digg fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.tumblr.com/share/link?url=https%3a%2f%2fechorand.me%2fposts%2fuser-management-aws-eks-cluster%2f&name=User%20access%20management%20on%20AWS%20Kubernetes%20cluster&description=Introduction%20When%20implementing%20a%20solution%20for%20allowing%20users%20other%20than%20the%20cluster%20creator%20to%20access%20the%20cluster%20resources%20we%20are%20faced%20with%20two%20fairly%20old%20generic%20problems%20-%20authentication%20and%20authorization.%20There%20are%20various%20ways%20one%20can%20solve%20these%20problems.%20I%20will%20discuss%20one%20such%20solution%20in%20this%20post.%20It%20makes%20use%20of%20AWS%20Identity%20and%20access%20management%20%28IAM%29%20features.%20This%20in%20my%20humble%20opinion%20is%20the%20simplest%20and%20hopefully%20secure%20enough%20solution%20when%20it%20comes%20to%20EKS.">
+      <i class="fab fa-tumblr fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fechorand.me%2fposts%2fuser-management-aws-eks-cluster%2f&t=User%20access%20management%20on%20AWS%20Kubernetes%20cluster">
+      <i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+      
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;">
+          <i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;">
+          <i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;">
+          <i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');">
+          <i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+
+  <footer id="footer">
+  <div class="footer-left">
+    Copyright  &copy; 2020  Exploring Software 
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+        <li><a href="/about">About</a></li>
+         
+        <li><a href="/articles">Articles</a></li>
+         
+        <li><a href="/books">Books</a></li>
+         
+        <li><a href="/posts">Posts</a></li>
+         
+        <li><a href="/talks">Talks</a></li>
+         
+        <li><a href="/categories/">Categories</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+
+  </div>
+</body>
+
+<link rel="stylesheet" href=/lib/font-awesome/css/all.min.css>
+<script src=/lib/jquery/jquery.min.js></script>
+<script src=/js/main.js></script>
+
+
+
+</html>

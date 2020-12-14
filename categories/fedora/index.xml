@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>fedora on Exploring Software</title>
+    <link>https://echorand.me/categories/fedora/</link>
+    <description>Recent content in fedora on Exploring Software</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Thu, 01 Nov 2018 00:00:00 +0000</lastBuildDate><atom:link href="https://echorand.me/categories/fedora/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Fedora Scientific Vagrant boxes are here!</title>
+      <link>https://echorand.me/posts/fedora-29-scientific-vagrant-boxes/</link>
+      <pubDate>Thu, 01 Nov 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/fedora-29-scientific-vagrant-boxes/</guid>
+      <description>Fedora Scientific brings together the most useful open source scientific and numerical tools atop the goodness of the KDE desktop environment. From the beginning, our focus has been to provide scientists, engineers and programmers in numerical/scientific computing a Linux distribution which has most of the tools that they would need to use as part of their work.
+With the Fedora 29 release, we have also started to provide Vagrant boxes for Fedora Scientific to make it even easier to use Fedora Scientific while not doing away with your present operating system.</description>
+    </item>
+    
+    <item>
+      <title>Building Fedora Vagrant boxes for VirtualBox using Packer</title>
+      <link>https://echorand.me/posts/building-fedora-vagrant-boxes-for-virtualbox-with-packer/</link>
+      <pubDate>Wed, 10 Oct 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/building-fedora-vagrant-boxes-for-virtualbox-with-packer/</guid>
+      <description>In a previous post, I shared that we are going to have Fedora Scientific Vagrant boxes with the upcoming Fedora 29 release. Few weeks back, I wanted to try out a more recent build to script some of the testing I do on Fedora Scientific boxes to make sure that the expected libraries/programs are installed. Unexpectedly, vagrant ssh would not succeed.
+I filed a issue with rel-eng where I was suggested to see if a package in Fedora Scientific was mucking around with the SSH config.</description>
+    </item>
+    
+    <item>
+      <title>Pre-release Fedora Scientific Vagrant Boxes</title>
+      <link>https://echorand.me/posts/fedora-29-scientific-rawhide-vagrant-box/</link>
+      <pubDate>Mon, 18 Jun 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/fedora-29-scientific-rawhide-vagrant-box/</guid>
+      <description>I am very excited to share that sometime back the Fedora project gave the go ahead on my idea of making Fedora Scientific available as Vagrant boxes starting with Fedora 29. This basically means (I think) that using Fedora Scientific in a virtual machine is even easier. Instead of downloading the ISO and then going through the installation process, you can now basically do:
+ Download Fedora Scientific Vagrant box Initialize VM vagrant up  Trying it out before Fedora 29 release As of a few days back, Fedora 29 rawhide vagrant boxes for Fedora Scientific are now being published.</description>
+    </item>
+    
+    <item>
+      <title>Fedora Scientific 28 is here!</title>
+      <link>https://echorand.me/posts/fedora-scientific-28/</link>
+      <pubDate>Wed, 02 May 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/fedora-scientific-28/</guid>
+      <description>Fedora 28 is out and I am happy to share that after a few releases of no Fedora Scientific, we are back. Thanks to all your emails and enquiring about whether Fedora Scientific is dead.
+Go Download it now!
+The Fedora Scientific Guide has been updated a bit as well.
+Thanks to all the packagers who fixed the issues we were having with some of the relevant packages.</description>
+    </item>
+    
+    <item>
+      <title>Fedora Scientific 28 Beta</title>
+      <link>https://echorand.me/posts/fedora-scientific-28-beta/</link>
+      <pubDate>Mon, 09 Apr 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/fedora-scientific-28-beta/</guid>
+      <description>Fedora 28 beta was announced recently and I am happy to say Fedora Scientific is back.
+One note though, the following applications/libraries are not part of the release:
+ networkx scilab sagemath rkward  You can install them on your installation using:
+$ sudo dnf install python*-networkx scilab sagemath rkward The reason for the above software to be not installed was some failures to install the packages which is why I commented those out so that we can have a release.</description>
+    </item>
+    
+    <item>
+      <title>Setting up OpenVPN client with systemd template unit files</title>
+      <link>https://echorand.me/posts/fedora-openvpn-systemd/</link>
+      <pubDate>Fri, 12 Jan 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/fedora-openvpn-systemd/</guid>
+      <description>First, I installed openvpn:
+$ sudo dnf -y install openvpn Then, I used the following systemd unit file from here to create a systemd service for creating a new VPN connection on Fedora 27:
+$ cat /etc/systemd/system/openvpn@.service [Unit] Description=OpenVPN service for %I After=syslog.target network-online.target Wants=network-online.target Documentation=man:openvpn(8) Documentation=https://community.openvpn.net/openvpn/wiki/Openvpn24ManPage Documentation=https://community.openvpn.net/openvpn/wiki/HOWTO [Service] Type=notify PrivateTmp=true WorkingDirectory=/etc/openvpn/client/%i/ ExecStart=/usr/sbin/openvpn --status %t/openvpn-server/status-%i.log --status-version 2 --suppress-timestamps --cipher AES-256-GCM --ncp-ciphers AES-256-GCM:AES-128-GCM:AES-256-CBC:AES-128-CBC:BF-CBC --config /etc/openvpn/client/%i/%i.conf CapabilityBoundingSet=CAP_IPC_LOCK CAP_NET_ADMIN CAP_NET_BIND_SERVICE CAP_NET_RAW CAP_SETGID CAP_SETUID CAP_SYS_CHROOT CAP_DAC_OVERRIDE LimitNPROC=10 DeviceAllow=/dev/null rw DeviceAllow=/dev/net/tun rw ProtectSystem=true ProtectHome=true KillMode=process RestartSec=5s Restart=on-failure [Install] WantedBy=multi-user.</description>
+    </item>
+    
+    <item>
+      <title>Did your Fedora live cd build fail?</title>
+      <link>https://echorand.me/posts/fedora_koji_livecd_builds/</link>
+      <pubDate>Wed, 17 Feb 2016 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/fedora_koji_livecd_builds/</guid>
+      <description>Update: Changed the Koji URL to reflect the change to livemedia
+As the Fedora Scientific maintainer, I have to make sure I look into whether the nightly build is failing so that I can look into the why. So far I have been doing that by going to the koji url.
+But I think there is a better way - make a program do it regularly. First, the program (a Python script):</description>
+    </item>
+    
+    <item>
+      <title>Standalone open source puppet setup on Fedora</title>
+      <link>https://echorand.me/posts/puppet-on-fedora-23/</link>
+      <pubDate>Thu, 01 Oct 2015 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/puppet-on-fedora-23/</guid>
+      <description>My goal in this post is to show how to setup puppet in standalone mode on a Fedora 23 system. This setup will allow writing puppet modules and then you can apply them on your local system and check manually and via serverspec tests that they are doing what you intend them to be doing. Obviously, a VM would be the best test environment for this, or even a container. Let&#39;s get started.</description>
+    </item>
+    
+    <item>
+      <title>Fedora 22 Scientific</title>
+      <link>https://echorand.me/posts/fedora-22-scientific/</link>
+      <pubDate>Thu, 11 Jun 2015 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/fedora-22-scientific/</guid>
+      <description>Fedora 22 was released recently which also means we have a new Fedora Scientific release. Fedora Scientific is now part of Fedora labs.
+ As you can see, the new home for Fedora Scientific looks amazing. The &amp;quot;Featured Applications&amp;quot; section features the most important and useful tools in Fedora Scientific. I think that is a great idea. Everyone associated with it, thank you very much.
+I have also updated the Fedora Scientific Guide to reflect the changes.</description>
+    </item>
+    
+  </channel>
+</rss>

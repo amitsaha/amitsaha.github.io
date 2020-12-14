@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title> HandlerFunc, Handle and DefaultServeMux in Golang | Exploring Software</title>
+  <meta name="description" content="echo $RANDOM. Exploring Software and writing about it.">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="all,follow">
+  <meta name="googlebot" content="index,follow,snippet,archive">
+  <meta property="og:title" content="HandlerFunc, Handle and DefaultServeMux in Golang" />
+<meta property="og:description" content="Introduction My aim in this post is to discuss three &ldquo;concepts&rdquo; in Golang that I come across while writing HTTP servers. Through this post, my aim to get rid of my own lack of understanding (at least to a certain degree) about these. Hopefully, it will be of use to others too.. The understanding will help you write better unit tests for your handlers as well as shown in this blog post." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://echorand.me/posts/golang-dissecting-listen-and-serve/" />
+<meta property="article:published_time" content="2017-04-26T00:00:00+00:00" />
+<meta property="article:modified_time" content="2020-07-27T18:02:06+10:00" />
+
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="HandlerFunc, Handle and DefaultServeMux in Golang"/>
+<meta name="twitter:description" content="Introduction My aim in this post is to discuss three &ldquo;concepts&rdquo; in Golang that I come across while writing HTTP servers. Through this post, my aim to get rid of my own lack of understanding (at least to a certain degree) about these. Hopefully, it will be of use to others too.. The understanding will help you write better unit tests for your handlers as well as shown in this blog post."/>
+
+  
+  
+  
+  <link rel="stylesheet" href="https://echorand.me/css/style-white.css">
+  
+  
+  
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  
+
+  
+<link rel="icon" type="image/png" href="https://echorand.me/images/favicon.ico" />
+
+  
+  
+  
+  
+  
+    
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-108901610-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+  
+  
+</head>
+
+<body class="max-width mx-auto px3 ltr">
+  <div class="content index py4">
+
+  <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+        <li><a href="/about">About</a></li>
+         
+        <li><a href="/articles">Articles</a></li>
+         
+        <li><a href="/books">Books</a></li>
+         
+        <li><a href="/posts">Posts</a></li>
+         
+        <li><a href="/talks">Talks</a></li>
+         
+        <li><a href="/categories/">Categories</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li>
+          <a class="icon" href=" https://echorand.me/posts/doing-math-humble-bundle/">
+            <i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i>
+          </a>
+        </li>
+        
+        
+        <li>
+          <a class="icon" href="https://echorand.me/posts/docker-user-defined-networks/">
+            <i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i>
+          </a>
+        </li>
+        
+        <li>
+          <a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');">
+            <i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i>
+          </a>
+        </li>
+        <li>
+          <a class="icon" href="#">
+            <i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i>
+          </a>
+        </li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      
+      <ul>
+  
+  
+    
+  
+  
+  <li>
+    <a class="icon" href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fechorand.me%2fposts%2fgolang-dissecting-listen-and-serve%2f">
+      <i class="fab fa-facebook " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://twitter.com/share?url=https%3a%2f%2fechorand.me%2fposts%2fgolang-dissecting-listen-and-serve%2f&text=HandlerFunc%2c%20Handle%20and%20DefaultServeMux%20in%20Golang">
+      <i class="fab fa-twitter " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fechorand.me%2fposts%2fgolang-dissecting-listen-and-serve%2f&title=HandlerFunc%2c%20Handle%20and%20DefaultServeMux%20in%20Golang">
+      <i class="fab fa-linkedin " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fechorand.me%2fposts%2fgolang-dissecting-listen-and-serve%2f&is_video=false&description=HandlerFunc%2c%20Handle%20and%20DefaultServeMux%20in%20Golang">
+      <i class="fab fa-pinterest " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="mailto:?subject=HandlerFunc%2c%20Handle%20and%20DefaultServeMux%20in%20Golang&body=Check out this article: https%3a%2f%2fechorand.me%2fposts%2fgolang-dissecting-listen-and-serve%2f">
+      <i class="fas fa-envelope " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://getpocket.com/save?url=https%3a%2f%2fechorand.me%2fposts%2fgolang-dissecting-listen-and-serve%2f&title=HandlerFunc%2c%20Handle%20and%20DefaultServeMux%20in%20Golang">
+      <i class="fab fa-get-pocket " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://reddit.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fgolang-dissecting-listen-and-serve%2f&title=HandlerFunc%2c%20Handle%20and%20DefaultServeMux%20in%20Golang">
+      <i class="fab fa-reddit " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.stumbleupon.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fgolang-dissecting-listen-and-serve%2f&title=HandlerFunc%2c%20Handle%20and%20DefaultServeMux%20in%20Golang">
+      <i class="fab fa-stumbleupon " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://digg.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fgolang-dissecting-listen-and-serve%2f&title=HandlerFunc%2c%20Handle%20and%20DefaultServeMux%20in%20Golang">
+      <i class="fab fa-digg " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.tumblr.com/share/link?url=https%3a%2f%2fechorand.me%2fposts%2fgolang-dissecting-listen-and-serve%2f&name=HandlerFunc%2c%20Handle%20and%20DefaultServeMux%20in%20Golang&description=Introduction%20My%20aim%20in%20this%20post%20is%20to%20discuss%20three%20%26ldquo%3bconcepts%26rdquo%3b%20in%20Golang%20that%20I%20come%20across%20while%20writing%20HTTP%20servers.%20Through%20this%20post%2c%20my%20aim%20to%20get%20rid%20of%20my%20own%20lack%20of%20understanding%20%28at%20least%20to%20a%20certain%20degree%29%20about%20these.%20Hopefully%2c%20it%20will%20be%20of%20use%20to%20others%20too..%20The%20understanding%20will%20help%20you%20write%20better%20unit%20tests%20for%20your%20handlers%20as%20well%20as%20shown%20in%20this%20blog%20post.">
+      <i class="fab fa-tumblr " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fechorand.me%2fposts%2fgolang-dissecting-listen-and-serve%2f&t=HandlerFunc%2c%20Handle%20and%20DefaultServeMux%20in%20Golang">
+      <i class="fab fa-hacker-news " aria-hidden="true"></i>
+    </a>
+  </li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <nav id="TableOfContents">
+  <ul>
+    <li><a href="#the-handlefunc-type">The HandleFunc() type</a></li>
+  </ul>
+</nav>
+    </div>
+  </span>
+</div>
+
+
+  <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+    <header>
+      <h1 class="posttitle" itemprop="name headline">
+        HandlerFunc, Handle and DefaultServeMux in Golang
+      </h1>
+      <div class="meta">
+        
+        <div class="postdate">
+          
+          <time datetime="2017-04-26 00:00:00 &#43;0000 UTC" itemprop="datePublished">2017-04-26</time>
+          
+        </div>
+        
+        <div class="article-category">
+            <i class="fas fa-archive"></i>
+            
+            
+            <a class="category-link" href="/categories/golang">golang</a>
+            
+        </div>
+        
+        
+      </div>
+    </header>
+
+  
+    <div class="content" itemprop="articleBody">
+      <h1 id="introduction">Introduction</h1>
+<p>My aim in this post is to discuss three &ldquo;concepts&rdquo; in Golang that I come across while writing HTTP servers. Through this
+post, my aim to get rid of my own lack of understanding (at least to a certain degree) about these. <del>Hopefully, it will
+be of use to others too.</del>. The understanding will help you write better unit tests for your handlers as well as shown
+in this <a href="https://www.digitalflapjack.com/blog/2018/4/10/better-testing-for-golang-http-handlers">blog post</a>.
+The code references are from <a href="https://golang.org/src/net/http/server.go">src/net/http/server.go</a>.</p>
+<p>The <a href="https://golang.org/pkg/net/http/#ListenAndServe%3E">http.ListenAndServe(..)</a> function is the most straightforward
+approach to start a HTTP 1.1 server. The following code does just that:</p>
+<pre><code>   package main
+   
+   import (
+   	&quot;log&quot;
+   	&quot;net/http&quot;
+   )
+   
+   func main() {
+   	log.Fatal(http.ListenAndServe(&quot;:8080&quot;, nil))
+   }
+</code></pre><p>What is the <code>nil</code> second argument above? The documentation states that the second argument to the function should be a
+&ldquo;handler&rdquo; and if it is specified as <code>nil</code>, it defaults to <code>DefaultServeMux</code>.</p>
+<h1 id="what-is-defaultservemux">What is <code>DefaultServeMux</code>?</h1>
+<p>If we run our server above via <code>go run server1.go</code>, and send a couple of HTTP GET requests, we will see the following:</p>
+<pre><code>   
+   $ curl localhost:8080
+   404 page not found
+   
+   $ curl localhost:8080/status/
+   404 page not found
+</code></pre><p>This is because, we haven&rsquo;t specified how our server should handle requests to GET the root (&quot;/&quot;) - our first request or
+requests to GET the &ldquo;/status/&rdquo; resource - our second request. Before we see how we could fix that, let&rsquo;s understand
+<em>how</em> the error message &ldquo;404 page not found&rdquo; is generated.</p>
+<p>The error message is generated from the function below in <code>src/net/http/server.go</code> specifically the <code>NotFoundHandler()</code>
+&ldquo;handler&rdquo; function:</p>
+<pre><code>
+   // handler is the main implementation of Handler.
+   // The path is known to be in canonical form, except for CONNECT methods.
+   func (mux *ServeMux) handler(host, path string) (h Handler, pattern string) {
+   	mux.mu.RLock()
+   	defer mux.mu.RUnlock()
+   
+   	// Host-specific pattern takes precedence over generic ones
+   	if mux.hosts {
+   		h, pattern = mux.match(host + path)
+   	}
+   	if h == nil {
+   		h, pattern = mux.match(path)
+   	}
+   	if h == nil {
+   		h, pattern = NotFoundHandler(), &quot;&quot;
+   	}
+   	return
+   }
+   
+</code></pre><p>Now, let&rsquo;s roughly see how our GET request above reaches the above function.</p>
+<p>Let us consider the function signature of the above handler function: <code>func (mux *ServeMux) handler(host, path string) (h Handler, pattern string)</code>. This function is a method belonging to the type <code>ServeMux</code>:</p>
+<pre><code>
+   // ServeMux also takes care of sanitizing the URL request path,
+   // redirecting any request containing . or .. elements or repeated slashes
+   // to an equivalent, cleaner URL.
+   type ServeMux struct {
+   	mu    sync.RWMutex
+   	m     map[string]muxEntry
+   	hosts bool // whether any patterns contain hostnames
+   }
+   
+   type muxEntry struct {
+   	explicit bool
+   	h        Handler
+   	pattern  string
+   }
+   
+   // NewServeMux allocates and returns a new ServeMux.
+   func NewServeMux() *ServeMux { return new(ServeMux) }
+   
+   // DefaultServeMux is the default ServeMux used by Serve.
+   var DefaultServeMux = &amp;defaultServeMux
+   
+   var defaultServeMux ServeMux
+    
+</code></pre><p>So, how does <code>DefaultServeMux</code> get set when the second argument to <code>ListenAndServe()</code> is <code>nil</code>? The following code
+snippet has the answer:</p>
+<pre><code>
+   func (sh serverHandler) ServeHTTP(rw ResponseWriter, req *Request) {
+   	handler := sh.srv.Handler
+   	if handler == nil {
+   		handler = DefaultServeMux
+   	}
+   	if req.RequestURI == &quot;*&quot; &amp;&amp; req.Method == &quot;OPTIONS&quot; {
+   		handler = globalOptionsHandler{}
+   	}
+   	handler.ServeHTTP(rw, req)
+   }
+</code></pre><p>The above call to <code>ServeHTTP()</code> calls the following implementation of <code>ServeHTTP()</code>:</p>
+<pre><code>
+   // ServeHTTP dispatches the request to the handler whose
+   // pattern most closely matches the request URL.
+   func (mux *ServeMux) ServeHTTP(w ResponseWriter, r *Request) {
+   	if r.RequestURI == &quot;*&quot; {
+   		if r.ProtoAtLeast(1, 1) {
+   			w.Header().Set(&quot;Connection&quot;, &quot;close&quot;)
+   		}
+   		w.WriteHeader(StatusBadRequest)
+   		return
+   	}
+   	h, _ := mux.Handler(r)
+   	h.ServeHTTP(w, r)
+   }
+</code></pre><p>The call to <code>Handler()</code> function then calls the following implementation:</p>
+<pre><code>
+   // If there is no registered handler that applies to the request,
+   // Handler returns a ``page not found'' handler and an empty pattern.
+   func (mux *ServeMux) Handler(r *Request) (h Handler, pattern string) {
+   	if r.Method != &quot;CONNECT&quot; {
+   		if p := cleanPath(r.URL.Path); p != r.URL.Path {
+   			_, pattern = mux.handler(r.Host, p)
+   			url := *r.URL
+   			url.Path = p
+   			return RedirectHandler(url.String(), StatusMovedPermanently), pattern
+   		}
+   	}
+   
+   	return mux.handler(r.Host, r.URL.Path)
+   }
+   
+   // handler is the main implementation of Handler.
+   // The path is known to be in canonical form, except for CONNECT methods.
+   func (mux *ServeMux) handler(host, path string) (h Handler, pattern string) {
+   	mux.mu.RLock()
+   	defer mux.mu.RUnlock()
+   
+   	// Host-specific pattern takes precedence over generic ones
+   	if mux.hosts {
+   		h, pattern = mux.match(host + path)
+   	}
+   	if h == nil {
+   		h, pattern = mux.match(path)
+   	}
+   	if h == nil {
+   		h, pattern = NotFoundHandler(), &quot;&quot;
+   	}
+   	return
+   }
+   
+</code></pre><p>Now, when we make a request to &ldquo;/&rdquo; or &ldquo;/status/&rdquo;, no match is found by the <code>mux.match()</code> call above and hence the
+handler returned is the <code>NotFoundHandler</code> whose <code>ServeHTTP()</code> function is then called to return the &ldquo;404 page not found&rdquo;
+error message:</p>
+<pre><code>
+   // NotFound replies to the request with an HTTP 404 not found error.
+   func NotFound(w ResponseWriter, r *Request) { Error(w, &quot;404 page not found&quot;, StatusNotFound) }
+   
+   // NotFoundHandler returns a simple request handler
+   // that replies to each request with a ``404 page not found'' reply.
+   func NotFoundHandler() Handler { return HandlerFunc(NotFound) }
+</code></pre><p>We will discuss how this &ldquo;magic&rdquo; happens in the next section.</p>
+<h1 id="registering-handlers">Registering handlers</h1>
+<p>Let&rsquo;s now update our server code to handle &ldquo;/&rdquo; and &ldquo;/status/&quot;:</p>
+<pre><code>
+   package main
+   
+   import &quot;net/http&quot;
+   import &quot;fmt&quot;
+   
+   type mytype struct{}
+   
+   func (t *mytype) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+   	fmt.Fprintf(w, &quot;Hello there from mytype&quot;)
+   }
+   
+   
+   func StatusHandler(w http.ResponseWriter, r *http.Request) {
+   	fmt.Fprintf(w, &quot;OK&quot;)
+   }
+   
+   func main() {
+   
+   	t := new(mytype)
+   	http.Handle(&quot;/&quot;, t)
+   	
+   	http.HandleFunc(&quot;/status/&quot;, StatusHandler)
+           
+   	http.ListenAndServe(&quot;:8080&quot;, nil)
+   }
+</code></pre><p>If we run the server and send the two requests above, we will see the following responses:</p>
+<pre><code>
+   $ curl localhost:8080
+   Hello there from mytype 
+
+   $ curl localhost:8080/status/
+   OK
+</code></pre><p>Let&rsquo;s now revisit how the right handler function gets called. In a code snippet above, we saw a call to the <code>match()</code> function which given a path returns the most appropriate registered handler for the path:</p>
+<pre><code>
+   // Find a handler on a handler map given a path string
+   // Most-specific (longest) pattern wins
+   func (mux *ServeMux) match(path string) (h Handler, pattern string) {
+   	var n = 0
+   	for k, v := range mux.m {
+   		if !pathMatch(k, path) {
+   			continue
+   		}
+   		if h == nil || len(k) &gt; n {
+   			n = len(k)
+   			h = v.h
+   			pattern = v.pattern
+   		}
+   	}
+   	return
+   }
+</code></pre><p><code>mux.m</code> is a a <code>map</code> data structure defined in the <code>ServeMux</code> structure (snippet earlier in the post) which stores a mapping of a path and the handler we have registered for it.</p>
+<h2 id="the-handlefunc-type">The HandleFunc() type</h2>
+<p>Let&rsquo;s go back to the idea of &ldquo;converting&rdquo; any function with the signature <code>func aFunction(w http.ResponseWriter, r *http.Request)</code> to the type &ldquo;HandlerFunc&rdquo;.</p>
+<p>Any type which has a ServeHTTP() method is said to implement the <code>Handler</code> interface:</p>
+<pre><code>
+    type HandlerFunc func(ResponseWriter, *Request)
+
+    // ServeHTTP calls f(w, req).
+    func (f HandlerFunc) ServeHTTP(w ResponseWriter, req *Request) {
+        f(w, req)
+    }
+
+</code></pre><p>Going back to the previous version of our server, we see how we do that:</p>
+<pre><code>
+    type mytype struct{}
+
+    func (t *mytype) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+        fmt.Fprintf(w, &quot;Hello there from mytype&quot;)
+    }
+</code></pre><p>The <code>ServeHTTP()</code> method of a Handler is invoked when it has been registered as handling a particular path.</p>
+<p>Let&rsquo;s look at what the call to <code>Handle()</code> function does:</p>
+<pre><code>
+   
+   // Handle registers the handler for the given pattern
+   // in the DefaultServeMux.
+   // The documentation for ServeMux explains how patterns are matched.
+   func Handle(pattern string, handler Handler) { DefaultServeMux.Handle(pattern, handler) }
+   
+   // Handle registers the handler for the given pattern.
+   // If a handler already exists for pattern, Handle panics.
+   func (mux *ServeMux) Handle(pattern string, handler Handler) {
+   	mux.mu.Lock()
+   	defer mux.mu.Unlock()
+   
+   	if pattern == &quot;&quot; {
+   		panic(&quot;http: invalid pattern &quot; + pattern)
+   	}
+   	if handler == nil {
+   		panic(&quot;http: nil handler&quot;)
+   	}
+   	if mux.m[pattern].explicit {
+   		panic(&quot;http: multiple registrations for &quot; + pattern)
+   	}
+   
+   	if mux.m == nil {
+   		mux.m = make(map[string]muxEntry)
+   	}
+   	mux.m[pattern] = muxEntry{explicit: true, h: handler, pattern: pattern}
+   
+   	if pattern[0] != '/' {
+   		mux.hosts = true
+   	}
+   
+   	// Helpful behavior:
+   	// If pattern is /tree/, insert an implicit permanent redirect for /tree.
+   	// It can be overridden by an explicit registration.
+   	n := len(pattern)
+   	if n &gt; 0 &amp;&amp; pattern[n-1] == '/' &amp;&amp; !mux.m[pattern[0:n-1]].explicit {
+   		// If pattern contains a host name, strip it and use remaining
+   		// path for redirect.
+   		path := pattern
+   		if pattern[0] != '/' {
+   			// In pattern, at least the last character is a '/', so
+   			// strings.Index can't be -1.
+   			path = pattern[strings.Index(pattern, &quot;/&quot;):]
+   		}
+   		url := &amp;url.URL{Path: path}
+   		mux.m[pattern[0:n-1]] = muxEntry{h: RedirectHandler(url.String(), StatusMovedPermanently), pattern: pattern}
+   	}
+   }
+    
+</code></pre><p>It can feel cumbersome to define a type implementing the <code>Handler</code> interface for every path we want to register a handler for. Hence, a convenience function, <code>HandleFunc()</code> is provided to register any function which has a specified signature as a Handler function. For example:</p>
+<pre><code>    http.HandleFunc(&quot;/status/&quot;, StatusHandler)
+</code></pre><p>Now, let&rsquo;s look at what the call to <code>HandleFunc()</code> function does:</p>
+<pre><code>   
+   // HandleFunc registers the handler function for the given pattern
+   // in the DefaultServeMux.
+   // The documentation for ServeMux explains how patterns are matched.
+   func HandleFunc(pattern string, handler func(ResponseWriter, *Request)) {
+   	DefaultServeMux.HandleFunc(pattern, handler)
+   }
+   
+   
+   // HandleFunc registers the handler function for the given pattern.
+   func (mux *ServeMux) HandleFunc(pattern string, handler func(ResponseWriter, *Request)) {
+   	mux.Handle(pattern, HandlerFunc(handler))
+   }
+   
+   // The HandlerFunc type is an adapter to allow the use of
+   // ordinary functions as HTTP handlers.  If f is a function
+   // with the appropriate signature, HandlerFunc(f) is a
+   // Handler object that calls f.
+   type HandlerFunc func(ResponseWriter, *Request)
+   
+   // ServeHTTP calls f(w, req).
+   func (f HandlerFunc) ServeHTTP(w ResponseWriter, req *Request) {
+       f(w, req)
+   }
+</code></pre><p>The call to the <code>http.HandleFunc()</code> function &ldquo;converts&rdquo; the provided function to the <code>HandleFunc()</code> type and then calls the <code>(mux *ServeMux) Handle()</code> function similar to what happens when we call the <code>Handle()</code> function. The idea of this conversion is explained in the <a href="https://golang.org/doc/effective_go.html#interface_methods">Effective Go guide</a> and
+this <a href="http://jordanorelli.com/post/42369331748/function-types-in-go-golang">blog post</a>.</p>
+<h1 id="using-your-own-handler-with-listenandserve">Using your own Handler with ListenAndServe()</h1>
+<p>Earlier in this post, we saw how passsing <code>nil</code> to <code>ListenAndServe()</code> function sets the handler to
+<code>DefaultServeMux</code>. The handlers we register via <code>Handle()</code> and <code>HandleFunc()</code> are then added to this
+object. Hence, we could without changing any functionality rewrite our server as follows:</p>
+<pre><code>
+   package main
+   
+   import &quot;net/http&quot;
+   import &quot;fmt&quot;
+   
+   type mytype struct{}
+   
+   func (t *mytype) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+   	fmt.Fprintf(w, &quot;Hello there from mytype&quot;)
+   }
+   
+   func StatusHandler(w http.ResponseWriter, r *http.Request) {
+   	fmt.Fprintf(w, &quot;OK&quot;)
+   }
+   
+   func main() {
+   
+   	mux := http.NewServeMux()
+   
+   	t := new(mytype)
+   	mux.Handle(&quot;/&quot;, t)
+   	mux.HandleFunc(&quot;/status/&quot;, StatusHandler)
+   
+   	http.ListenAndServe(&quot;:8080&quot;, mux)
+   }
+</code></pre><p>We create an object of type <code>ServeMux</code> via <code>mux := http.NewServeMux()</code>, register our handlers calling the same two functions, but those that are defined for the <code>ServeMux</code> object we created.</p>
+<p>The reason we may want to use our own Handler with <code>ListenAndServe()</code> is demonstrated in the next section.</p>
+<h1 id="writing-middleware">Writing Middleware</h1>
+<p>In our latest version of the server, we have specified our own handler to <code>ListenAndServe()</code>. One reason for doing so is when you want to execute some code for <em>every</em> request. That is:</p>
+<ol>
+<li>Server gets a request for &ldquo;/path/&rdquo;</li>
+<li>Execute some code</li>
+<li>Handler for &ldquo;/path/&rdquo; gets called</li>
+<li>Execute some code</li>
+<li>Return the response to the client</li>
+</ol>
+<p>Either of steps 2 or 4 or both may occur and this is where &ldquo;middleware&rdquo; comes in. Our next version of the server demonstrates how we may implement this:</p>
+<pre><code>
+   package main
+   
+   import &quot;net/http&quot;
+   import &quot;fmt&quot;
+   import &quot;log&quot;
+   
+   type mytype struct{}
+   
+   func (t *mytype) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+   	fmt.Fprintf(w, &quot;Hello there from mytype&quot;)
+   }
+   
+   func StatusHandler(w http.ResponseWriter, r *http.Request) {
+   	fmt.Fprintf(w, &quot;OK&quot;)
+   }
+   
+   func RunSomeCode(handler http.Handler) http.Handler {
+   	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+   		log.Printf(&quot;Got a %s request for: %v&quot;, r.Method, r.URL)
+   		handler.ServeHTTP(w, r)
+   		// At this stage, our handler has &quot;handled&quot; the request
+   		// but we can still write to the client there
+   		// but we won't do that
+   		// XXX: We have the HTTP status here, but we cannot access
+   		// it directly here
+   		// See next example (server5.go)
+   		log.Println(&quot;Handler finished processing request&quot;)
+   	})
+   }
+   
+   func main() {
+   
+   	mux := http.NewServeMux()
+   
+   	t := new(mytype)
+   	mux.Handle(&quot;/&quot;, t)
+   	mux.HandleFunc(&quot;/status/&quot;, StatusHandler)
+   
+   	WrappedMux := RunSomeCode(mux)
+   	http.ListenAndServe(&quot;:8080&quot;, WrappedMux)
+   }
+</code></pre><p>When we run the server and send it a couple of requests as above, we will see:</p>
+<pre><code>
+    2017/04/24 17:53:03 Got a GET request for: /
+    2017/04/24 17:53:03 Handler finished processing request
+    2017/04/24 17:53:05 Got a GET request for: /status
+    2017/04/24 17:53:05 Handler finished processing request
+</code></pre><p>What we are doing above is we are &ldquo;wrapping&rdquo; our actual handler in another function <code>RunSomeCode(handler http.Handler) http.Handler</code> which satisfies the <code>Handler</code> interface. In this function, we print a log message, then call the <code>ServeHTTP()</code> method of our original
+handler, <code>mux</code>. Once it returns from there, we are then printing another log message.</p>
+<p>As part of this middleware writing exercise, I also wanted to be able to print the HTTP status of the response that we are sending but as the comment in the code states, there is no direct way to get the status via the <code>ResponseWriter</code> object. Our next server example will fix this.</p>
+<h1 id="rewrapping-httpresponsewriter">Rewrapping <code>http.ResponseWriter</code></h1>
+<p>It took me a while to write the next version of the server, and after reading through some mailing list postings and example code,
+i have a version which achieves what I wanted to be able to do via my middleware:</p>
+<pre><code>
+   package main
+   
+   import &quot;net/http&quot;
+   import &quot;fmt&quot;
+   import &quot;log&quot;
+   
+   type MyResponseWriter struct {
+   	http.ResponseWriter
+   	code int
+   }
+   
+   
+   func (mw *MyResponseWriter) WriteHeader(code int) {
+   	mw.code = code
+   	mw.ResponseWriter.WriteHeader(code)
+   }
+   
+   type mytype struct{}
+   
+   func (t *mytype) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+   	w.WriteHeader(http.StatusOK)
+   	fmt.Fprintf(w, &quot;Hello there from mytype&quot;)
+   }
+   
+   func StatusHandler(w http.ResponseWriter, r *http.Request) {
+   	w.WriteHeader(http.StatusOK)
+   	fmt.Fprintf(w, &quot;OK&quot;)
+   }
+   
+   func RunSomeCode(handler http.Handler) http.Handler {
+   	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+   		log.Printf(&quot;Got a %s request for: %v&quot;, r.Method, r.URL)
+   		myrw := &amp;MyResponseWriter{ResponseWriter: w, code: -1}
+   		handler.ServeHTTP(myrw, r)
+   		log.Println(&quot;Response status: &quot;, myrw.code)
+   	})
+   }
+   
+   func main() {
+   
+   	mux := http.NewServeMux()
+   
+   	t := new(mytype)
+   	mux.Handle(&quot;/&quot;, t)
+   	mux.HandleFunc(&quot;/status/&quot;, StatusHandler)
+   
+   	WrappedMux := RunSomeCode(mux)
+   	log.Fatal(http.ListenAndServe(&quot;:8080&quot;, WrappedMux))
+   }
+    
+</code></pre><p>In the example above, I define a new type <code>MyResponseWriter</code> which wraps the <code>http.ResponseWriter</code> type and adds
+a new field, <code>code</code> to store the HTTP status code and implements a <code>WriteHeader()</code> method. Then, in <code>RunSomeCode()</code>,
+instead of using the standard <code>http.ResponseWriter()</code> object that it was passed, I wrap it in a <code>MyResponseWriter</code> type as
+follows:</p>
+<pre><code>    
+    myrw := &amp;MyResponseWriter{ResponseWriter: w, code: -1}
+    handler.ServeHTTP(myrw, r)
+</code></pre><p>Now, if we run the server, we will see log messages on the server as follows when we send it HTTP get requests:</p>
+<pre><code>
+    2017/04/25 17:33:06 Got a GET request for: /status/
+    2017/04/25 17:33:06 Response status:  200
+    2017/04/25 17:33:07 Got a GET request for: /status
+    2017/04/25 17:33:07 Response status:  301
+    2017/04/25 17:33:10 Got a GET request for: /
+    2017/04/25 17:33:10 Response status:  200
+</code></pre><p>I will end this post with a question and perhaps the possible explanation:</p>
+<p>As I write above, it took me a while to figure out how to wrap <code>http.ResponseWriter</code> correctly so that I could get access
+to the HTTP status that was being set. It looks like there may be a <a href="https://github.com/golang/go/issues/18997">way</a>
+to get the HTTP response status.</p>
+<h1 id="references">References</h1>
+<p>The following links helped me understand the above and write this post:</p>
+<ul>
+<li><a href="http://jordanorelli.com/post/42369331748/function-types-in-go-golang">http://jordanorelli.com/post/42369331748/function-types-in-go-golang</a></li>
+<li><a href="https://golang.org/doc/effective_go.html#interface_methods">https://golang.org/doc/effective_go.html#interface_methods</a></li>
+<li><a href="https://gocodecloud.com/blog/2016/11/15/simple-golang-http-request-context-example/">https://gocodecloud.com/blog/2016/11/15/simple-golang-http-request-context-example/</a></li>
+<li><a href="https://www.slideshare.net/blinkingsquirrel/customising-your-own-web-framework-in-go">https://www.slideshare.net/blinkingsquirrel/customising-your-own-web-framework-in-go</a></li>
+</ul>
+
+    </div>
+  </article>
+
+  
+  
+
+
+
+
+
+  <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/about">About</a></li>
+         
+          <li><a href="/articles">Articles</a></li>
+         
+          <li><a href="/books">Books</a></li>
+         
+          <li><a href="/posts">Posts</a></li>
+         
+          <li><a href="/talks">Talks</a></li>
+         
+          <li><a href="/categories/">Categories</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <nav id="TableOfContents">
+  <ul>
+    <li><a href="#the-handlefunc-type">The HandleFunc() type</a></li>
+  </ul>
+</nav>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      
+      <ul>
+  
+  
+    
+  
+  
+  <li>
+    <a class="icon" href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fechorand.me%2fposts%2fgolang-dissecting-listen-and-serve%2f">
+      <i class="fab fa-facebook fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://twitter.com/share?url=https%3a%2f%2fechorand.me%2fposts%2fgolang-dissecting-listen-and-serve%2f&text=HandlerFunc%2c%20Handle%20and%20DefaultServeMux%20in%20Golang">
+      <i class="fab fa-twitter fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fechorand.me%2fposts%2fgolang-dissecting-listen-and-serve%2f&title=HandlerFunc%2c%20Handle%20and%20DefaultServeMux%20in%20Golang">
+      <i class="fab fa-linkedin fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fechorand.me%2fposts%2fgolang-dissecting-listen-and-serve%2f&is_video=false&description=HandlerFunc%2c%20Handle%20and%20DefaultServeMux%20in%20Golang">
+      <i class="fab fa-pinterest fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="mailto:?subject=HandlerFunc%2c%20Handle%20and%20DefaultServeMux%20in%20Golang&body=Check out this article: https%3a%2f%2fechorand.me%2fposts%2fgolang-dissecting-listen-and-serve%2f">
+      <i class="fas fa-envelope fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://getpocket.com/save?url=https%3a%2f%2fechorand.me%2fposts%2fgolang-dissecting-listen-and-serve%2f&title=HandlerFunc%2c%20Handle%20and%20DefaultServeMux%20in%20Golang">
+      <i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://reddit.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fgolang-dissecting-listen-and-serve%2f&title=HandlerFunc%2c%20Handle%20and%20DefaultServeMux%20in%20Golang">
+      <i class="fab fa-reddit fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.stumbleupon.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fgolang-dissecting-listen-and-serve%2f&title=HandlerFunc%2c%20Handle%20and%20DefaultServeMux%20in%20Golang">
+      <i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://digg.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fgolang-dissecting-listen-and-serve%2f&title=HandlerFunc%2c%20Handle%20and%20DefaultServeMux%20in%20Golang">
+      <i class="fab fa-digg fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.tumblr.com/share/link?url=https%3a%2f%2fechorand.me%2fposts%2fgolang-dissecting-listen-and-serve%2f&name=HandlerFunc%2c%20Handle%20and%20DefaultServeMux%20in%20Golang&description=Introduction%20My%20aim%20in%20this%20post%20is%20to%20discuss%20three%20%26ldquo%3bconcepts%26rdquo%3b%20in%20Golang%20that%20I%20come%20across%20while%20writing%20HTTP%20servers.%20Through%20this%20post%2c%20my%20aim%20to%20get%20rid%20of%20my%20own%20lack%20of%20understanding%20%28at%20least%20to%20a%20certain%20degree%29%20about%20these.%20Hopefully%2c%20it%20will%20be%20of%20use%20to%20others%20too..%20The%20understanding%20will%20help%20you%20write%20better%20unit%20tests%20for%20your%20handlers%20as%20well%20as%20shown%20in%20this%20blog%20post.">
+      <i class="fab fa-tumblr fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fechorand.me%2fposts%2fgolang-dissecting-listen-and-serve%2f&t=HandlerFunc%2c%20Handle%20and%20DefaultServeMux%20in%20Golang">
+      <i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+      
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;">
+          <i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;">
+          <i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;">
+          <i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');">
+          <i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+
+  <footer id="footer">
+  <div class="footer-left">
+    Copyright  &copy; 2020  Exploring Software 
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+        <li><a href="/about">About</a></li>
+         
+        <li><a href="/articles">Articles</a></li>
+         
+        <li><a href="/books">Books</a></li>
+         
+        <li><a href="/posts">Posts</a></li>
+         
+        <li><a href="/talks">Talks</a></li>
+         
+        <li><a href="/categories/">Categories</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+
+  </div>
+</body>
+
+<link rel="stylesheet" href=/lib/font-awesome/css/all.min.css>
+<script src=/lib/jquery/jquery.min.js></script>
+<script src=/js/main.js></script>
+
+
+
+</html>

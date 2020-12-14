@@ -1,0 +1,1463 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title> How to Set up Log Forwarding in a Kubernetes Cluster Using Fluent Bit | Exploring Software</title>
+  <meta name="description" content="echo $RANDOM. Exploring Software and writing about it.">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="all,follow">
+  <meta name="googlebot" content="index,follow,snippet,archive">
+  <meta property="og:title" content="How to Set up Log Forwarding in a Kubernetes Cluster Using Fluent Bit" />
+<meta property="og:description" content="Metadata I have posted this article on dev.to where I welcome comments and discussions.
+Introduction Log forwarding is an essential ingredient of a production logging pipeline in any organization. As an application author, you don&rsquo;t want to be bothered with the responsibility of ensuring the application logs are being processed a certain way and then stored in a central log storage. As an operations personnel, you don&rsquo;t want to have to hack your way around different applications to process and ship logs." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://echorand.me/posts/fluentbit-kubernetes/" />
+<meta property="article:published_time" content="2020-05-07T00:00:00+00:00" />
+<meta property="article:modified_time" content="2020-05-07T11:07:41+10:00" />
+
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="How to Set up Log Forwarding in a Kubernetes Cluster Using Fluent Bit"/>
+<meta name="twitter:description" content="Metadata I have posted this article on dev.to where I welcome comments and discussions.
+Introduction Log forwarding is an essential ingredient of a production logging pipeline in any organization. As an application author, you don&rsquo;t want to be bothered with the responsibility of ensuring the application logs are being processed a certain way and then stored in a central log storage. As an operations personnel, you don&rsquo;t want to have to hack your way around different applications to process and ship logs."/>
+
+  
+  
+  
+  <link rel="stylesheet" href="https://echorand.me/css/style-white.css">
+  
+  
+  
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  
+
+  
+<link rel="icon" type="image/png" href="https://echorand.me/images/favicon.ico" />
+
+  
+  
+  
+  
+  
+    
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-108901610-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+  
+  
+</head>
+
+<body class="max-width mx-auto px3 ltr">
+  <div class="content index py4">
+
+  <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+        <li><a href="/about">About</a></li>
+         
+        <li><a href="/articles">Articles</a></li>
+         
+        <li><a href="/books">Books</a></li>
+         
+        <li><a href="/posts">Posts</a></li>
+         
+        <li><a href="/talks">Talks</a></li>
+         
+        <li><a href="/categories/">Categories</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li>
+          <a class="icon" href=" https://echorand.me/posts/hugo-reverse-sort-modified/">
+            <i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i>
+          </a>
+        </li>
+        
+        
+        <li>
+          <a class="icon" href="https://echorand.me/posts/kubernetes-pod-security-policies/">
+            <i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i>
+          </a>
+        </li>
+        
+        <li>
+          <a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');">
+            <i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i>
+          </a>
+        </li>
+        <li>
+          <a class="icon" href="#">
+            <i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i>
+          </a>
+        </li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      
+      <ul>
+  
+  
+    
+  
+  
+  <li>
+    <a class="icon" href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fechorand.me%2fposts%2ffluentbit-kubernetes%2f">
+      <i class="fab fa-facebook " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://twitter.com/share?url=https%3a%2f%2fechorand.me%2fposts%2ffluentbit-kubernetes%2f&text=How%20to%20Set%20up%20Log%20Forwarding%20in%20a%20Kubernetes%20Cluster%20Using%20Fluent%20Bit">
+      <i class="fab fa-twitter " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fechorand.me%2fposts%2ffluentbit-kubernetes%2f&title=How%20to%20Set%20up%20Log%20Forwarding%20in%20a%20Kubernetes%20Cluster%20Using%20Fluent%20Bit">
+      <i class="fab fa-linkedin " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fechorand.me%2fposts%2ffluentbit-kubernetes%2f&is_video=false&description=How%20to%20Set%20up%20Log%20Forwarding%20in%20a%20Kubernetes%20Cluster%20Using%20Fluent%20Bit">
+      <i class="fab fa-pinterest " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="mailto:?subject=How%20to%20Set%20up%20Log%20Forwarding%20in%20a%20Kubernetes%20Cluster%20Using%20Fluent%20Bit&body=Check out this article: https%3a%2f%2fechorand.me%2fposts%2ffluentbit-kubernetes%2f">
+      <i class="fas fa-envelope " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://getpocket.com/save?url=https%3a%2f%2fechorand.me%2fposts%2ffluentbit-kubernetes%2f&title=How%20to%20Set%20up%20Log%20Forwarding%20in%20a%20Kubernetes%20Cluster%20Using%20Fluent%20Bit">
+      <i class="fab fa-get-pocket " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://reddit.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2ffluentbit-kubernetes%2f&title=How%20to%20Set%20up%20Log%20Forwarding%20in%20a%20Kubernetes%20Cluster%20Using%20Fluent%20Bit">
+      <i class="fab fa-reddit " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.stumbleupon.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2ffluentbit-kubernetes%2f&title=How%20to%20Set%20up%20Log%20Forwarding%20in%20a%20Kubernetes%20Cluster%20Using%20Fluent%20Bit">
+      <i class="fab fa-stumbleupon " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://digg.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2ffluentbit-kubernetes%2f&title=How%20to%20Set%20up%20Log%20Forwarding%20in%20a%20Kubernetes%20Cluster%20Using%20Fluent%20Bit">
+      <i class="fab fa-digg " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.tumblr.com/share/link?url=https%3a%2f%2fechorand.me%2fposts%2ffluentbit-kubernetes%2f&name=How%20to%20Set%20up%20Log%20Forwarding%20in%20a%20Kubernetes%20Cluster%20Using%20Fluent%20Bit&description=Metadata%20I%20have%20posted%20this%20article%20on%20dev.to%20where%20I%20welcome%20comments%20and%20discussions.%0aIntroduction%20Log%20forwarding%20is%20an%20essential%20ingredient%20of%20a%20production%20logging%20pipeline%20in%20any%20organization.%20As%20an%20application%20author%2c%20you%20don%26rsquo%3bt%20want%20to%20be%20bothered%20with%20the%20responsibility%20of%20ensuring%20the%20application%20logs%20are%20being%20processed%20a%20certain%20way%20and%20then%20stored%20in%20a%20central%20log%20storage.%20As%20an%20operations%20personnel%2c%20you%20don%26rsquo%3bt%20want%20to%20have%20to%20hack%20your%20way%20around%20different%20applications%20to%20process%20and%20ship%20logs.">
+      <i class="fab fa-tumblr " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fechorand.me%2fposts%2ffluentbit-kubernetes%2f&t=How%20to%20Set%20up%20Log%20Forwarding%20in%20a%20Kubernetes%20Cluster%20Using%20Fluent%20Bit">
+      <i class="fab fa-hacker-news " aria-hidden="true"></i>
+    </a>
+  </li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <nav id="TableOfContents"></nav>
+    </div>
+  </span>
+</div>
+
+
+  <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+    <header>
+      <h1 class="posttitle" itemprop="name headline">
+        How to Set up Log Forwarding in a Kubernetes Cluster Using Fluent Bit
+      </h1>
+      <div class="meta">
+        
+        <div class="postdate">
+          
+          <time datetime="2020-05-07 00:00:00 &#43;0000 UTC" itemprop="datePublished">2020-05-07</time>
+          
+        </div>
+        
+        <div class="article-category">
+            <i class="fas fa-archive"></i>
+            
+            
+            <a class="category-link" href="/categories/infrastructure">infrastructure</a>
+            
+        </div>
+        
+        
+      </div>
+    </header>
+
+  
+    <div class="content" itemprop="articleBody">
+      <h1 id="metadata">Metadata</h1>
+<p>I have posted this article on <a href="https://dev.to/amitsaha/how-to-set-up-log-forwarding-in-a-kubernetes-cluster-using-fluent-bit-3bgk">dev.to</a> where I welcome comments and discussions.</p>
+<h1 id="introduction">Introduction</h1>
+<p>Log forwarding is an essential ingredient of a production logging pipeline in any organization.
+As an application author, you don&rsquo;t want to be bothered with the responsibility of ensuring the
+application logs are being processed a certain way and then stored in a central log storage.
+As an operations personnel, you don&rsquo;t want to have to hack your way around different applications
+to process and ship logs. Essentially, log forwarding decouples the application
+emitting logs and what needs to be done with those logs. This decoupling only works of course, if the
+logs emitted by the application is in a format (JSON for example) understood by the log forwarder. The
+job of the log forwarder is thus to read logs from one or multiple sources, perform any  processing on
+it and then forward them to a log storage system or another log forwarder.</p>
+<p>Setting up log forwarding in a Kubernetes cluster allows all applications and system services that
+are deployed in the cluster to automatically get their logs processed and stored in a preconfigured
+central log storage. The application authors only need to ensure that their logs are being emitted
+to the standard output and error streams.</p>
+<p>There are various options when it comes to selecting a log forwarding software. Two of the most popular ones
+are <a href="https://www.fluentd.org">fluentd</a> and <a href="https://www.elastic.co/products/logstash">logstash</a>. A relatively
+new contender is <a href="https://docs.fluentbit.io/manual/">fluentbit</a>. It is written in C which makes it very lightweight
+in terms of its resource consumption as compared to both <code>fluentd</code> and <code>logstash</code>. This makes it an excellent
+alternative. Fluent bit has a pluggable architecture and supports a large collection of input sources, multiple ways
+to process the logs and a wide variety of output targets.</p>
+<p>The following figure depicts the logging architecture we will setup and the role of fluent
+bit in it:</p>
+<p><img src="https://i.imgur.com/MWs2Ggr.png" alt="Fluent bit in a logging pipeline"></p>
+<p>In this tutorial, we will setup fluent bit (release 1.3.8) as a Kubernetes <a href="https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/">daemonset</a> which will
+ensure that we will have a fluent bit instance running on every node of the cluster. The fluent bit
+instance will be configured to automatically read the logs of all pods running on the node as well as read
+the system logs from the systemd journal. These logs will be read by fluent bit, one line at a time, processed
+as per the configuration we specify and then forwarded to the configured output, Elasticsearch. After
+setting up fluent bit, we will deploy a Python web application and demonstrate how the logs
+are automatically parsed, filtered and forwarded to be searched and analyzed.</p>
+<h1 id="prerequisites">Prerequisites</h1>
+<p>The article assumes that you have the following setup:</p>
+<ul>
+<li>Docker installed locally and a free Docker hub account to push docker image</li>
+<li>A Kubernetes cluster with RBAC enabled
+<ul>
+<li>One node with 4vCPUs, 8 GB RAM and 160 GB disk should be sufficient to work through this tutorial</li>
+</ul>
+</li>
+<li><code>kubectl</code> installed locally and configured to connect to the cluster</li>
+</ul>
+<p>If you do not have an existing Elasticsearch cluster reachable from the Kubernetes cluster, you can follow
+steps 1-3 of <a href="https://www.digitalocean.com/community/tutorials/how-to-set-up-an-elasticsearch-fluentd-and-kibana-efk-logging-stack-on-kubernetes">this guide</a> to run your own Elasticsearch cluster in Kubernetes.</p>
+<h1 id="step-0---checking-your-kibana-and-elasticsearch-setup">Step 0 - Checking Your Kibana and Elasticsearch Setup</h1>
+<p>If you are using an already available Elasticsearch cluster, you can skip this step.</p>
+<p>If you followed the above guide to setup Kibana and Elasticsearch, let&rsquo;s check all the pods related to
+elasticsearch and kibana are running in the <code>kube-logging</code> namespace:</p>
+<pre><code class="language-command" data-lang="command">kubectl get pods -n kube-logging
+</code></pre><p>You&rsquo;ll see the following output:</p>
+<pre><code>NAME                      READY   STATUS    RESTARTS   AGE
+es-cluster-0              1/1     Running   0          2d23h
+es-cluster-1              1/1     Running   0          2d23h
+es-cluster-2              1/1     Running   0          2d23h
+kibana-7946bc7b94-9gq47   1/1     Running   0          2d22h
+</code></pre><p>Before we move on let&rsquo;s setup access to Kibana from our local workstation using port forwarding:</p>
+<pre><code class="language-command" data-lang="command">kubectl -n kube-logging port-forward pod/kibana-7946bc7b94-9gq47 5601:5601
+</code></pre><p>You will see the following output:</p>
+<pre><code>Forwarding from 127.0.0.1:5601 -&gt; 5601
+Forwarding from [::1]:5601 -&gt; 5601
+</code></pre><p>The Kibana pod name will be different for your case, so make sure to use the correct pod name.
+Once the port forwarding is setup, go to <code>http://127.0.0.1:5601/</code> to access kibana.</p>
+<p>We have successfully set up elasticsearch and kibana in the cluster. At this stage, there is no data in elasticsearch as there is nothing sending logs to it. Let&rsquo;s fix that and setup fluent bit.</p>
+<p><strong>Note</strong>: Keep the above port forward running in a terminal session and use a new terminal session for
+running the commands in the the rest of the tutorial.</p>
+<h1 id="step-1--setting-up-fluent-bit-service-account-and-permissions">Step 1 — Setting Up Fluent Bit Service Account and Permissions</h1>
+<p>In Kubernetes, it is considered a best practice to use dedicated <a href="https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/">service account</a>
+to run pods. Hence, we will setup a new service account for fluent bit daemonset:</p>
+<p>First create a new logging directory:</p>
+<pre><code class="language-command" data-lang="command">mkdir logging
+</code></pre><p>Now inside that directory make a <code>fluent-bit</code> directory:</p>
+<pre><code class="language-command" data-lang="command">mkdir logging/fluent-bit
+</code></pre><p>Within the <code>fluent-bit</code> directory create and open a <code>service-account.yaml</code> file to create a dedicated service account:</p>
+<pre><code class="language-command" data-lang="command">nano logging/fluent-bit/service-account.yaml
+</code></pre><p>Add the following content to the file:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">v1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">ServiceAccount</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">fluent-bit</span>
+  <span style="color:#f92672">namespace</span>: <span style="color:#ae81ff">kube-logging</span>
+</code></pre></div><p>Save and close the file.</p>
+<p>The two key bits of information here are under the <code>metadata</code> field:</p>
+<ul>
+<li><code>name</code>: The service account will be called <code>fluent-bit</code></li>
+<li><code>namespace</code>: The service account will be created in the <code>kube-logging</code> namespace created as part of the last prerequisite</li>
+</ul>
+<p>Let&rsquo;s create the service account:</p>
+<pre><code class="language-command" data-lang="command">kubectl apply -f logging/fluent-bit/service-account.yaml
+</code></pre><p>You should see the following output:</p>
+<pre><code>serviceaccount/fluent-bit created
+</code></pre><p>One of the useful features of fluent bit is that it automatically associates various kubernetes metadata to
+the logs before it sends it to the configured destination. To allow the fluent bit service account to read
+these metadata by making API calls to the Kubernetes server, we will associate this service account
+with a set of permissions. This will be implemented by creating a cluster role and a cluster role binding.</p>
+<p>Within the <code>logging/fluent-bit</code> directory create and open a <code>role.yaml</code> file to create a cluster role:</p>
+<pre><code class="language-command" data-lang="command">nano logging/fluent-bit/role.yaml
+</code></pre><p>Add the following content to the file:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">rbac.authorization.k8s.io/v1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">ClusterRole</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">fluent-bit-read</span>
+<span style="color:#f92672">rules</span>:
+- <span style="color:#f92672">apiGroups</span>: [<span style="color:#e6db74">&#34;&#34;</span>]
+  <span style="color:#f92672">resources</span>:
+  - <span style="color:#ae81ff">namespaces</span>
+  - <span style="color:#ae81ff">pods</span>
+  <span style="color:#f92672">verbs</span>: [<span style="color:#e6db74">&#34;get&#34;</span>, <span style="color:#e6db74">&#34;list&#34;</span>, <span style="color:#e6db74">&#34;watch&#34;</span>]
+
+</code></pre></div><p>Save and close the file.</p>
+<p>A <code>ClusterRole</code> is a specification of the permissions of the API operations that we want to grant to the
+<code>fluent-bit</code> service account. The role is called <code>fluent-bit-read</code> specified by the <code>name</code> field inside <code>metadata</code>.
+Inside <code>rules</code>, we specify that we want to allow all <code>get</code>, <code>list</code> and <code>watch</code> verbs on <code>pods</code> and <code>namespaces</code>
+across the core API group.</p>
+<p>To create the <code>ClusterRole</code>:</p>
+<pre><code class="language-command" data-lang="command">kubectl apply -f logging/fluent-bit/role.yaml
+</code></pre><p>You should see the following output:</p>
+<pre><code>clusterrole.rbac.authorization.k8s.io/fluent-bit-read created
+</code></pre><p>The second and final step in granting the <code>fluent-bit</code> service account the necessary permissions is to
+create a cluster role binding to associate the <code>fluent-bit-role</code> we created above with the <code>fluent-bit</code>
+service account in the <code>kube-logging</code> namespace.</p>
+<p>Within the <code>logging/fluent-bit</code> directory create and open a <code>role-binding.yaml</code> file to create a cluster
+role binding:</p>
+<pre><code class="language-command" data-lang="command">nano logging/fluent-bit/role-binding.yaml
+</code></pre><p>Add the following content to the file:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">rbac.authorization.k8s.io/v1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">ClusterRoleBinding</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">fluent-bit-read</span>
+<span style="color:#f92672">roleRef</span>:
+  <span style="color:#f92672">apiGroup</span>: <span style="color:#ae81ff">rbac.authorization.k8s.io</span>
+  <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">ClusterRole</span>
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">fluent-bit-read</span>
+<span style="color:#f92672">subjects</span>:
+- <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">ServiceAccount</span>
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">fluent-bit</span>
+  <span style="color:#f92672">namespace</span>: <span style="color:#ae81ff">kube-logging</span>
+
+</code></pre></div><p>Save and close the file.</p>
+<p>We are creating a <code>ClusterRoleBinding</code> named <code>fluent-bit-read</code>, specified via the <code>name</code> field inside metadata.
+We specify the cluster role we are binding to via the <code>roleRef</code> field. The <code>apiGroup</code> refers to the API
+group for kubernetes RBAC  resource <code>rbac.authorization.k8s.io</code>, the <code>Kind</code> of role we are binding to
+is a <code>ClusterRole</code> and the <code>name</code> of the role we are binding to is <code>fluent-bit-read</code>. The service account
+we are creating the binding for is specified in <code>subjects</code>. We specify that we want to create the binding to the <code>fluent-bit</code> service account in the <code>kube-logging</code> namespace.</p>
+<p>Run the following command to create the role binding:</p>
+<pre><code class="language-command" data-lang="command">kubectl apply -f logging/fluent-bit/role-binding.yaml
+</code></pre><p>You should see the following output:</p>
+<pre><code>clusterrolebinding.rbac.authorization.k8s.io/fluent-bit-read created
+</code></pre><p>In this step, we have created a <code>fluent-bit</code> service account in the <code>kube-logging</code> namespace and given it
+permissions to read various metadata about the pods and namespaces in the cluster. Fluent bit needs these permissions
+to associate metadata to the logs such as pod labels and namespace a log is originating from.</p>
+<p>Next, we will create a <code>ConfigMap</code> resource to specify configuration for fluent bit.</p>
+<h1 id="step-2--creating-a-configmap-for-fluent-bit">Step 2 — Creating a ConfigMap for Fluent Bit</h1>
+<p>To configure fluent bit we will create a configmap specifying various configuration sections, parameters
+and attributes. When we create the daemonset, Kubernetes will make this config map available as files to
+fluent bit at startup. We will create three versions of this <code>ConfigMap</code> as we progress through this
+tutorial. We will create the first version now.</p>
+<p>Within the <code>logging/fluent-bit</code> directory create and open a <code>configmap-1.yaml</code> file:</p>
+<pre><code class="language-command" data-lang="command">nano logging/fluent-bit/configmap-1.yaml
+</code></pre><p>Add the following content to the file:</p>
+<pre><code>apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fluent-bit-config
+  namespace: kube-logging
+  labels:
+    k8s-app: fluent-bit
+data:
+  fluent-bit.conf: |
+    [SERVICE]
+        Flush         1
+        Log_Level     info
+        Daemon        off
+        Parsers_File  parsers.conf
+
+    @INCLUDE input-kubernetes.conf
+    @INCLUDE output-elasticsearch.conf
+</code></pre><p>The manifest specifies that we are creating a <code>ConfigMap</code> - <code>fluent-bit-config</code> in the <code>logging</code>
+namespace. <code>data</code> specifies the actual contents of the <code>ConfigMap</code> which is composed
+of three files - <code>fluent-bit.conf</code>, <code>input-kubernetes.conf</code>, <code>output-elasticsearch.conf</code>
+and <code>parsers.conf</code>. The <code>fluent-bit.conf</code> is the primary configuration file read by
+fluent bit at startup. This file then uses the <code>@INCLUDE</code> specifier to include other
+configuration files - <code>input-kubernetes.conf</code> and <code>output-elasticsearch.conf</code> in this case.
+The <code>parsers.conf</code> file is referred to in the <code>fluent-bit.conf</code> file and is expected to be
+in the same directory as the <code>fluent-bit.conf</code> file.</p>
+<p>Let&rsquo;s look at the <code>fluent.bit.conf</code> file contents:</p>
+<pre><code>[SERVICE]
+        Flush         1
+        Log_Level     info
+        Daemon        off
+        Parsers_File  parsers.conf
+</code></pre><p>The <code>[Service]</code> section of a fluent bit configuration <a href="https://docs.fluentbit.io/manual/service">specifies configuration</a>
+regarding the fluent bit engine itself. Here we specify the following options:</p>
+<ul>
+<li><code>Flush</code>: This specifies how often (in seconds) fluent bit will flush the output</li>
+<li><code>Log_Level</code>: This specifies the kind of logs we want fluent bit to emit. Other possible choices are <code>error</code>, <code>warning</code>, <code>debug</code> and <code>trace</code>.</li>
+<li><code>Daemon</code>: If this set to <code>true</code>, this will make <code>fluent-bit</code> go to background on start.</li>
+<li><code>Parsers_File</code>: This specifies the file where fluent bit will look up for a specified parser (discussed later)</li>
+</ul>
+<p>Next, add the following contents to the file at the same nesting level as <code>fluent-bit.conf</code>:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"> <span style="color:#ae81ff">...</span>
+ <span style="color:#f92672">input-kubernetes.conf</span>: |<span style="color:#e6db74">
+</span><span style="color:#e6db74">    [INPUT]
+</span><span style="color:#e6db74">        Name              tail
+</span><span style="color:#e6db74">        Tag               kube.*
+</span><span style="color:#e6db74">        Path              /var/log/containers/*.log
+</span><span style="color:#e6db74">        Parser            docker
+</span><span style="color:#e6db74">        DB                /var/log/flb_kube.db
+</span><span style="color:#e6db74">        Mem_Buf_Limit     5MB
+</span><span style="color:#e6db74">        Skip_Long_Lines   On
+</span><span style="color:#e6db74">        Refresh_Interval  10</span>    
+</code></pre></div><p>The <code>input-kubernetes.conf</code> file&rsquo;s contents uses the <code>tail</code> input plugin (specified via <code>Name</code>) to
+read all files matching the pattern <code>/var/log/containers/*.log</code> (specified via <code>Path</code>):</p>
+<p>Let&rsquo;s look at the other fields in the configuration:</p>
+<ul>
+<li><code>Tag</code>: All logs read via this input configuration will be tagged with <code>kube.*</code>.</li>
+<li><code>Parser</code>: We specify that each line that fluent bit reads from the files should be parsed via a parser named <code>docker</code></li>
+<li><code>DB</code>: This is a path to a local SQlite database that fluent bit will use to keep records related to the files it&rsquo;s reading</li>
+<li><code>Mem_Buf_Limit</code>: Set a maximum memory limit that fluent bit will allow the buffer to grow to before it flushes the output</li>
+<li><code>Skip_Long_Lines</code>: Setting this to <code>On</code> ensures that if a certain line in a specific monitored file exceeds a configurable max buffer size, it
+will skip that line and continue reading the file.</li>
+<li><code>Refresh_Interval</code>: When a pattern is specified, this is the time interval in seconds, fluent bit will refresh the file list it monitors.</li>
+</ul>
+<p>You can learn more about the tail input plugin <a href="https://docs.fluentbit.io/manual/input/tail">here</a>.</p>
+<p>Next, add the following contents to the file at the same nesting level as <code>input-kubernetes.conf</code>:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">  <span style="color:#ae81ff">...</span>
+  <span style="color:#f92672">output-elasticsearch.conf</span>: |<span style="color:#e6db74">
+</span><span style="color:#e6db74">    [OUTPUT]
+</span><span style="color:#e6db74">        Name            es
+</span><span style="color:#e6db74">        Match           *
+</span><span style="color:#e6db74">        Host            ${FLUENT_ELASTICSEARCH_HOST}
+</span><span style="color:#e6db74">        Port            ${FLUENT_ELASTICSEARCH_PORT}
+</span><span style="color:#e6db74">        Logstash_Format On
+</span><span style="color:#e6db74">        Logstash_Prefix fluent-bit
+</span><span style="color:#e6db74">        Retry_Limit     False</span>    
+</code></pre></div><p>The above configuration will create the output configuration in the file <code>output-elasticsearch.conf</code>.
+We specify that we want to use <a href="https://docs.fluentbit.io/manual/output/elasticsearch">es</a> output
+plugin in the <code>Name</code> field. The <code>Match</code> field specifies the tag pattern of log messages that
+will be sent to the output being configure — the <code>*</code> pattern matches all logs. Next, we specify
+the hostname and port for the elasticsearch cluster via the <code>Host</code> and <code>Port</code> fields respectively.
+Note how we can use the <code>FLUENT_ELASTISEARCH_HOST</code> and <code>FLUENT_ELASTICSEARCH_PORT</code> environment variables
+that we specify in the <code>DaemonSet</code> in the fluent bit configuration. Being able to use environment variables
+as values in the configuration files is a feature of fluent bit&rsquo;s configuration system. We then specify
+that we want to use the <code>Logstash_Format</code> for the elasticsearch indexes that fluent bit will create.
+This will create the index in the format <code>logstash-YYYY.MM.DD</code> where <code>YYYY.MM.DD</code> is the date when
+the index is being created. The <code>Logstash_Prefix</code> field can be specified to change the  default <code>logstash</code> prefix
+to something else, like <code>fluent-bit</code>. The logstash format is useful when you are using a tool like
+elasticsearch <a href="https://www.elastic.co/guide/en/elasticsearch/client/curator/current/index.html">curator</a>
+to manage cleanup of your elasticsearch indices.</p>
+<p>The <code>Retry_Limit</code> is a generic output configuration that specifies the retry behavior of
+<a href="https://docs.fluentbit.io/manual/configuration/scheduler#configuring-retries">fluent bit</a> if there is a failure
+in sending logs to the output destination.</p>
+<p>Finally, add the following contents to the file at the same nesting level as <code>ouput-elasticsearch.conf</code>:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">  <span style="color:#ae81ff">...</span>
+  <span style="color:#f92672">parsers.conf</span>: |<span style="color:#e6db74">
+</span><span style="color:#e6db74">    [PARSER]
+</span><span style="color:#e6db74">        Name        docker
+</span><span style="color:#e6db74">        Format      json
+</span><span style="color:#e6db74">        Time_Key    time
+</span><span style="color:#e6db74">        Time_Format %Y-%m-%dT%H:%M:%S.%L
+</span><span style="color:#e6db74">        Time_Keep   On</span>    
+</code></pre></div><p>When a parser name is specified in the input section, fluent bit will lookup the parser in the specified
+<code>parsers.conf</code> file. Above, we define a parser named <code>docker</code> (via the <code>Name</code> field) which we want to use to
+parse a docker container&rsquo;s logs which are JSON formatted (specified via <code>Format</code> field). The <code>Time_Key</code>
+specifies the field in the JSON log that will have the timestamp of the log, <code>Time_Format</code> specifes
+the format the value of this field should be parsed as and <code>Time_Keep</code> specifies whether the original
+field should be preserved in the log. The fluent bit documentation has <a href="https://docs.fluentbit.io/manual/parser">more information</a> on these fields.</p>
+<p>Save and close the file.</p>
+<p>The final content of the file should look as follows:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">v1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">ConfigMap</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">fluent-bit-config</span>
+  <span style="color:#f92672">namespace</span>: <span style="color:#ae81ff">kube-logging</span>
+  <span style="color:#f92672">labels</span>:
+    <span style="color:#f92672">k8s-app</span>: <span style="color:#ae81ff">fluent-bit</span>
+<span style="color:#f92672">data</span>:
+  <span style="color:#f92672">fluent-bit.conf</span>: |<span style="color:#e6db74">
+</span><span style="color:#e6db74">    [SERVICE]
+</span><span style="color:#e6db74">        Flush         1
+</span><span style="color:#e6db74">        Log_Level     info
+</span><span style="color:#e6db74">        Daemon        off
+</span><span style="color:#e6db74">        Parsers_File  parsers.conf
+</span><span style="color:#e6db74">
+</span><span style="color:#e6db74">    @INCLUDE input-kubernetes.conf
+</span><span style="color:#e6db74">    @INCLUDE output-elasticsearch.conf</span>    
+  <span style="color:#f92672">input-kubernetes.conf</span>: |<span style="color:#e6db74">
+</span><span style="color:#e6db74">    [INPUT]
+</span><span style="color:#e6db74">        Name              tail
+</span><span style="color:#e6db74">        Tag               kube.*
+</span><span style="color:#e6db74">        Path              /var/log/containers/*.log
+</span><span style="color:#e6db74">        Parser            docker
+</span><span style="color:#e6db74">        DB                /var/log/flb_kube.db
+</span><span style="color:#e6db74">        Mem_Buf_Limit     5MB
+</span><span style="color:#e6db74">        Skip_Long_Lines   On
+</span><span style="color:#e6db74">        Refresh_Interval  10</span>    
+
+  <span style="color:#f92672">output-elasticsearch.conf</span>: |<span style="color:#e6db74">
+</span><span style="color:#e6db74">    [OUTPUT]
+</span><span style="color:#e6db74">        Name            es
+</span><span style="color:#e6db74">        Match           *
+</span><span style="color:#e6db74">        Host            ${FLUENT_ELASTICSEARCH_HOST}
+</span><span style="color:#e6db74">        Port            ${FLUENT_ELASTICSEARCH_PORT}
+</span><span style="color:#e6db74">        Logstash_Format On
+</span><span style="color:#e6db74">        Logstash_Prefix fluent-bit
+</span><span style="color:#e6db74">        Retry_Limit     False</span>    
+
+  <span style="color:#f92672">parsers.conf</span>: |<span style="color:#e6db74">
+</span><span style="color:#e6db74">    [PARSER]
+</span><span style="color:#e6db74">        Name        docker
+</span><span style="color:#e6db74">        Format      json
+</span><span style="color:#e6db74">        Time_Key    time
+</span><span style="color:#e6db74">        Time_Format %Y-%m-%dT%H:%M:%S.%L
+</span><span style="color:#e6db74">        Time_Keep   On</span>    
+
+</code></pre></div><p>Let&rsquo;s now create the first version of the <code>ConfigMap</code>:</p>
+<pre><code class="language-command" data-lang="command">kubectl apply -f logging/fluent-bit/configmap-1.yaml
+</code></pre><p>You should see the following output:</p>
+<pre><code>configmap/fluent-bit-config created
+</code></pre><p>In this step, we have created a <code>fluent-bit-config</code> config map in the <code>kube-logging</code> namespace. It specifies
+where we want the logs to be read from, how we want to process it and where to send them off to after processing.
+We will use it to configure the fluent bit daemonset which we look at next.</p>
+<h1 id="step-3--creating-the-fluent-bit-daemonset">Step 3 — Creating the Fluent Bit Daemonset</h1>
+<p>A Daemonset will be used to run one fluent bit pod per node of the cluster. Within the <code>logging/fluent-bit</code>
+directory create and open a <code>daemonset.yaml</code> file:</p>
+<pre><code class="language-command" data-lang="command">nano logging/fluent-bit/daemonset.yaml
+</code></pre><p>Add the following content to the file:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">apps/v1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">DaemonSet</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">fluent-bit</span>
+  <span style="color:#f92672">namespace</span>: <span style="color:#ae81ff">kube-logging</span>
+<span style="color:#f92672">spec</span>:
+  <span style="color:#f92672">selector</span>:
+    <span style="color:#f92672">matchLabels</span>:
+      <span style="color:#f92672">k8s-app</span>: <span style="color:#ae81ff">fluent-bit-logging</span>
+</code></pre></div><p>Using the above declaration, we are going to configure a <code>DaemonSet</code> named <code>fluent-bit</code> in the
+<code>kube-logging</code> namespace. In the <code>spec</code> section, we declare that the daemonset will contain
+pods which has the <code>k8s-app</code> label set to <code>fluent-bit-logging</code>.</p>
+<p>Next, add the following contents at the same nesting level as <code>selector</code>:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">  <span style="color:#ae81ff">...</span>
+  <span style="color:#f92672">template</span>:
+    <span style="color:#f92672">metadata</span>:
+      <span style="color:#f92672">labels</span>:
+        <span style="color:#f92672">k8s-app</span>: <span style="color:#ae81ff">fluent-bit-logging</span>
+    <span style="color:#f92672">spec</span>:
+      <span style="color:#f92672">containers</span>:
+      - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">fluent-bit</span>
+        <span style="color:#f92672">image</span>: <span style="color:#ae81ff">fluent/fluent-bit:1.3.8</span>
+        <span style="color:#f92672">imagePullPolicy</span>: <span style="color:#ae81ff">Always</span>
+        <span style="color:#f92672">env</span>:
+        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">FLUENT_ELASTICSEARCH_HOST</span>
+          <span style="color:#f92672">value</span>: <span style="color:#e6db74">&#34;elasticsearch&#34;</span>
+        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">FLUENT_ELASTICSEARCH_PORT</span>
+          <span style="color:#f92672">value</span>: <span style="color:#e6db74">&#34;9200&#34;</span>
+        <span style="color:#f92672">volumeMounts</span>:
+        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">varlog</span>
+          <span style="color:#f92672">mountPath</span>: <span style="color:#ae81ff">/var/log</span>
+        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">varlibdockercontainers</span>
+          <span style="color:#f92672">mountPath</span>: <span style="color:#ae81ff">/var/lib/docker/containers</span>
+          <span style="color:#f92672">readOnly</span>: <span style="color:#66d9ef">true</span>
+        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">journal</span>
+          <span style="color:#f92672">mountPath</span>: <span style="color:#ae81ff">/journal</span>
+          <span style="color:#f92672">readOnly</span>: <span style="color:#66d9ef">true</span>
+        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">fluent-bit-config</span>
+          <span style="color:#f92672">mountPath</span>: <span style="color:#ae81ff">/fluent-bit/etc/</span>
+      <span style="color:#f92672">terminationGracePeriodSeconds</span>: <span style="color:#ae81ff">10</span>
+      <span style="color:#f92672">volumes</span>:
+      - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">varlog</span>
+        <span style="color:#f92672">hostPath</span>:
+          <span style="color:#f92672">path</span>: <span style="color:#ae81ff">/var/log</span>
+      - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">journal</span>
+        <span style="color:#f92672">hostPath</span>:
+          <span style="color:#f92672">path</span>: <span style="color:#ae81ff">/var/log/journal</span>
+      - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">varlibdockercontainers</span>
+        <span style="color:#f92672">hostPath</span>:
+          <span style="color:#f92672">path</span>: <span style="color:#ae81ff">/var/lib/docker/containers</span>
+      - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">fluent-bit-config</span>
+        <span style="color:#f92672">configMap</span>:
+          <span style="color:#f92672">name</span>: <span style="color:#ae81ff">fluent-bit-config</span>
+      <span style="color:#f92672">serviceAccountName</span>: <span style="color:#ae81ff">fluent-bit</span>
+      <span style="color:#f92672">tolerations</span>:
+      - <span style="color:#f92672">key</span>: <span style="color:#ae81ff">node-role.kubernetes.io/master</span>
+        <span style="color:#f92672">operator</span>: <span style="color:#ae81ff">Exists</span>
+        <span style="color:#f92672">effect</span>: <span style="color:#ae81ff">NoSchedule</span>
+</code></pre></div><p>The most important bits of the above specification are:</p>
+<p><strong>Elasticsearch configuration</strong></p>
+<p>We specify the Elasticsearch host and port via the <code>FLUENT_ELASTICSEARCH_HOST</code> and
+<code>FLUENT_ELASTICSEARCH_PORT</code> environment variables. These are referred to in the fluent bit
+output configuration (discussed later on). If you are using an existing Elasticsearch cluster,
+this is where you would specify the DNS for it.</p>
+<p><strong>Volume mounts</strong></p>
+<p>We mount three host filesystem paths inside the fluent bit pods:</p>
+<ul>
+<li>
+<p><code>/var/log/</code>: The standard error and output of all the pods are stored as files  with <code>.log</code> extension
+in the <code>/var/log/containers</code> directory. That said, these files are symbolic links to the actual files
+in the <code>/var/lib/docker/containers</code> directory.</p>
+</li>
+<li>
+<p><code>/var/lib/docker/containers</code>: This directory is mounted since we need access to individual container&rsquo;s
+log files.</p>
+</li>
+<li>
+<p><code>/var/log/journal</code>: For Linux systems running <code>systemd</code>, systemd journal stores logs related to the systemd services
+in this directory. Kubernetes system components also log to the systemd journal.</p>
+</li>
+</ul>
+<p>The fourth volume mount inside the pod is from the <code>ConfigMap</code> resource <code>fluent-bit-config</code> which is mounted
+at <code>/fluent-bit/etc</code> - the default location where the fluent bit docker image looks for configuration
+files in.</p>
+<p><strong>Service Account</strong></p>
+<p>We specify the service account we want to run the daemonset as using the following:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">      <span style="color:#f92672">serviceAccountName</span>: <span style="color:#ae81ff">fluent-bit</span>
+</code></pre></div><p><strong>Don&rsquo;t run on master node</strong></p>
+<p>Since we want to run fluent bit only on the cluster nodes, we add a toleration to specify
+that we don&rsquo;t want a pod to be scheduled on the Kubernetes master:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">      <span style="color:#f92672">tolerations</span>:
+      - <span style="color:#f92672">key</span>: <span style="color:#ae81ff">node-role.kubernetes.io/master</span>
+        <span style="color:#f92672">operator</span>: <span style="color:#ae81ff">Exists</span>
+        <span style="color:#f92672">effect</span>: <span style="color:#ae81ff">NoSchedule</span>
+</code></pre></div><p>The entire contents of the file is as follows:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">
+<span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">apps/v1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">DaemonSet</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">fluent-bit</span>
+  <span style="color:#f92672">namespace</span>: <span style="color:#ae81ff">kube-logging</span>
+<span style="color:#f92672">spec</span>:
+  <span style="color:#f92672">selector</span>:
+    <span style="color:#f92672">matchLabels</span>:
+      <span style="color:#f92672">k8s-app</span>: <span style="color:#ae81ff">fluent-bit-logging</span>
+  <span style="color:#f92672">template</span>:
+    <span style="color:#f92672">metadata</span>:
+      <span style="color:#f92672">labels</span>:
+        <span style="color:#f92672">k8s-app</span>: <span style="color:#ae81ff">fluent-bit-logging</span>
+    <span style="color:#f92672">spec</span>:
+      <span style="color:#f92672">containers</span>:
+      - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">fluent-bit</span>
+        <span style="color:#f92672">image</span>: <span style="color:#ae81ff">fluent/fluent-bit:1.3.8</span>
+        <span style="color:#f92672">imagePullPolicy</span>: <span style="color:#ae81ff">Always</span>
+        <span style="color:#f92672">env</span>:
+        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">FLUENT_ELASTICSEARCH_HOST</span>
+          <span style="color:#f92672">value</span>: <span style="color:#e6db74">&#34;elasticsearch&#34;</span>
+        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">FLUENT_ELASTICSEARCH_PORT</span>
+          <span style="color:#f92672">value</span>: <span style="color:#e6db74">&#34;9200&#34;</span>
+        <span style="color:#f92672">volumeMounts</span>:
+        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">varlog</span>
+          <span style="color:#f92672">mountPath</span>: <span style="color:#ae81ff">/var/log</span>
+        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">varlibdockercontainers</span>
+          <span style="color:#f92672">mountPath</span>: <span style="color:#ae81ff">/var/lib/docker/containers</span>
+          <span style="color:#f92672">readOnly</span>: <span style="color:#66d9ef">true</span>
+        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">journal</span>
+          <span style="color:#f92672">mountPath</span>: <span style="color:#ae81ff">/journal</span>
+          <span style="color:#f92672">readOnly</span>: <span style="color:#66d9ef">true</span>
+        - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">fluent-bit-config</span>
+          <span style="color:#f92672">mountPath</span>: <span style="color:#ae81ff">/fluent-bit/etc/</span>
+      <span style="color:#f92672">terminationGracePeriodSeconds</span>: <span style="color:#ae81ff">10</span>
+      <span style="color:#f92672">volumes</span>:
+      - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">varlog</span>
+        <span style="color:#f92672">hostPath</span>:
+          <span style="color:#f92672">path</span>: <span style="color:#ae81ff">/var/log</span>
+      - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">journal</span>
+        <span style="color:#f92672">hostPath</span>:
+          <span style="color:#f92672">path</span>: <span style="color:#ae81ff">/var/log/journal</span>
+      - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">varlibdockercontainers</span>
+        <span style="color:#f92672">hostPath</span>:
+          <span style="color:#f92672">path</span>: <span style="color:#ae81ff">/var/lib/docker/containers</span>
+      - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">fluent-bit-config</span>
+        <span style="color:#f92672">configMap</span>:
+          <span style="color:#f92672">name</span>: <span style="color:#ae81ff">fluent-bit-config</span>
+      <span style="color:#f92672">serviceAccountName</span>: <span style="color:#ae81ff">fluent-bit</span>
+      <span style="color:#f92672">tolerations</span>:
+      - <span style="color:#f92672">key</span>: <span style="color:#ae81ff">node-role.kubernetes.io/master</span>
+        <span style="color:#f92672">effect</span>: <span style="color:#ae81ff">NoSchedule</span>
+</code></pre></div><p>Let&rsquo;s now create the <code>DaemonSet</code> that will deploy fluent bit to the Kubernetes cluster:</p>
+<pre><code class="language-command" data-lang="command">kubectl apply -f logging/fluent-bit/daemonset.yaml
+</code></pre><p>You will see the following output:</p>
+<pre><code>daemonset.apps/fluent-bit created
+</code></pre><p>Let&rsquo;s wait for the daemonset to be rolled out:</p>
+<pre><code class="language-command" data-lang="command">kubectl rollout status daemonset/fluent-bit -n kube-logging
+</code></pre><p>You should see the following output when the command exits:</p>
+<pre><code>daemon set &quot;fluent-bit&quot; successfully rolled out
+</code></pre><p>Next, in our browser, we will  go to the Kibana URL <code>http://127.0.0.1:5601/app/kibana#/management/kibana/index_pattern?_g=()</code> to create an index pattern. You will see that an elasticsearch index
+is present, but no Kibana index patterns matching it exists:</p>
+<p><img src="https://i.imgur.com/oWf1FVS.png" alt="Kibana index management"></p>
+<p>Type in <code>fluent-bit*</code> as the index pattern:</p>
+<p><img src="https://i.imgur.com/6uPzyuQ.png" alt="Kibana index pattern setup"></p>
+<p>Click on &ldquo;Next Step&rdquo;, select <code>@timestamp</code> as the Time
+filter field name and click on &ldquo;Create index pattern&rdquo;:</p>
+<p><img src="https://i.imgur.com/RLM5HAS.png" alt="Kibana index creation"></p>
+<p>Once the index creation has been completed, if you visit the URL <code>http://127.0.0.1:5601/app/kibana#/discover</code> you should see logs
+from the currently running containers - elasticsearch, kibana as well as fluent bit itself.</p>
+<p><img src="https://i.imgur.com/ZSn5MZu.png" alt="Logs from the running containers"></p>
+<p>In this step, we successfully deployed fluent bit in the cluster, configured it to read logs emitted by various pods running in the cluster and then send those logs to Elasticsearch.</p>
+<p>It is worth noting here that there was no need to configure fluent bit specifically for reading logs emitted by Elasticsearch, Kibana or fluent bit itself.
+Similarly, we didn&rsquo;t need to configure the applications to send their logs to Elasticsearch. This decoupling is a major benefit of setting up
+log forwarding. If we expand any of the log entries and look at the JSON version, we will see an entry looks similar to:</p>
+<pre><code>{
+  &quot;_index&quot;: &quot;fluent-bit-2020.03.25&quot;,
+  &quot;_type&quot;: &quot;flb_type&quot;,
+  &quot;_id&quot;: &quot;zsksEHEBxb--hvB5vgJi&quot;,
+  &quot;_version&quot;: 1,
+  &quot;_score&quot;: null,
+  &quot;_source&quot;: {
+    &quot;@timestamp&quot;: &quot;2020-03-25T05:31:39.122Z&quot;,
+    &quot;log&quot;: &quot;{\&quot;type\&quot;:\&quot;response\&quot;,\&quot;@timestamp\&quot;:\&quot;2020-03-25T05:31:39Z\&quot;,\&quot;tags\&quot;:[],\&quot;pid\&quot;:1,\&quot;method\&quot;:\&quot;get\&quot;,\&quot;statusCode\&quot;:200,\&quot;req\&quot;:{\&quot;url\&quot;:\&quot;/ui/fonts/roboto_mono/RobotoMono-Bold.ttf\&quot;,\&quot;method\&quot;:\&quot;get\&quot;,\&quot;headers\&quot;:{\&quot;host\&quot;:\&quot;127.0.0.1:5601\&quot;,\&quot;user-agent\&quot;:\&quot;Mozilla/5.0 (X11; Linux x86_64; rv:72.0) Gecko/20100101 Firefox/72.0\&quot;,\&quot;accept\&quot;:\&quot;application/font-woff2;q=1.0,application/font-woff;q=0.9,*/*;q=0.8\&quot;,\&quot;accept-language\&quot;:\&quot;en-US,en;q=0.5\&quot;,\&quot;accept-encoding\&quot;:\&quot;identity\&quot;,\&quot;connection\&quot;:\&quot;keep-alive\&quot;,\&quot;referer\&quot;:\&quot;http://127.0.0.1:5601/app/kibana\&quot;},\&quot;remoteAddress\&quot;:\&quot;127.0.0.1\&quot;,\&quot;userAgent\&quot;:\&quot;127.0.0.1\&quot;,\&quot;referer\&quot;:\&quot;http://127.0.0.1:5601/app/kibana\&quot;},\&quot;res\&quot;:{\&quot;statusCode\&quot;:200,\&quot;responseTime\&quot;:10,\&quot;contentLength\&quot;:9},\&quot;message\&quot;:\&quot;GET /ui/fonts/roboto_mono/RobotoMono-Bold.ttf 200 10ms - 9.0B\&quot;}\n&quot;,
+    &quot;stream&quot;: &quot;stdout&quot;,
+    &quot;time&quot;: &quot;2020-03-25T05:31:39.122786572Z&quot;
+  },
+  &quot;fields&quot;: {
+    &quot;@timestamp&quot;: [
+      &quot;2020-03-25T05:31:39.122Z&quot;
+    ],
+    &quot;time&quot;: [
+      &quot;2020-03-25T05:31:39.122Z&quot;
+    ]
+  },
+  &quot;sort&quot;: [
+    1585114299122
+  ]
+}
+</code></pre><p>The most important field in the above JSON object is <code>_source</code>. The value of this field corresponds to a line read by fluent bit
+from the configured input source. It has three fields:</p>
+<ul>
+<li><code>log</code>: The value of this field corresponds to a single line emitted by the application to the standard output (<code>stdout</code>) or standard error (<code>stderr</code>)</li>
+<li><code>stream</code>: The value of this field identifies the output stream - <code>stdout</code> or <code>stderr</code>. This added by the Kubernetes runtime.</li>
+<li><code>time</code>: This field corresponds to the date time in UTC when the log was read by the Kubernetes runtime</li>
+<li><code>@timestamp</code>: This field is derived by fluent bit by parsing the value of  field
+specified via <code>Time_Key</code> using the format specified in <code>Time_Format</code> emitted by the application.</li>
+</ul>
+<p>Next, we will deploy an web application inside the cluster which emits JSON formatted logs to the standard output and error
+streams. We will see that fluent bit automatically forwards these logs to Elasticsearch without requiring any additional
+configuration either in fluent bit or on the application side.</p>
+<h1 id="step-4--write-and-deploy-a-web-application-on-kubernetes">Step 4 — Write and deploy a web application on kubernetes</h1>
+<p>We will use the Python programming language to write a basic web application using <a href="https://palletsprojects.com/p/flask/">Flask</a>.
+To deploy the application in the kubernetes cluster, we will build a docker image containing the application
+source code and publish it to docker hub. First, create a new directory, <code>application</code></p>
+<pre><code class="language-command" data-lang="command">mkdir application
+</code></pre><p>Now inside that directory, create and open a file called <code>app.py</code>:</p>
+<pre><code class="language-command" data-lang="command">nano application/app.py
+</code></pre><p>Add the following contents to it:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">from</span> flask <span style="color:#f92672">import</span> Flask
+
+app <span style="color:#f92672">=</span> Flask(__name__)
+
+<span style="color:#a6e22e">@app.route</span>(<span style="color:#e6db74">&#39;/test/&#39;</span>)
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">test</span>():
+    <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#39;rest&#39;</span>
+
+<span style="color:#a6e22e">@app.route</span>(<span style="color:#e6db74">&#39;/honeypot/&#39;</span>)
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">test1</span>():
+    <span style="color:#ae81ff">1</span><span style="color:#f92672">/</span><span style="color:#ae81ff">0</span>
+    <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#39;lol&#39;</span>
+
+</code></pre></div><p>The first two statements imports the <code>Flask</code> class from <code>flask</code> package and then creates the application using the current module name (via the special <code>__name__</code> variable). Then,
+we define two endpoints - <code>/test/</code> and <code>/honeypot/</code> using the <code>app.route</code> decorator. The <code>/test/</code> endpoint will return a text, <code>rest</code> as response and the <code>/honeypot/</code> endpoint will raise an exception upon being called due to the <code>1/0</code> statement.</p>
+<p>To run the application, we will use <a href="https://gunicorn.org/">gunicorn</a>.</p>
+<p>Inside the application directory, create and open a new file, <code>Dockerfile</code>:</p>
+<pre><code class="language-command" data-lang="command">nano application/Dockerfile
+</code></pre><p>Add the following contents to the file:</p>
+<pre><code>FROM python:3.7-alpine
+ADD app.py /app.py
+
+RUN set -e; \
+	apk add --no-cache --virtual .build-deps \
+		gcc \
+		libc-dev \
+		linux-headers \
+	; \
+	pip install flask gunicorn ; \
+	apk del .build-deps;
+
+WORKDIR /
+CMD [&quot;gunicorn&quot;, &quot;--workers&quot;, &quot;5&quot;, &quot;--bind&quot;, &quot;0.0.0.0:8000&quot;, &quot;app:app&quot;]
+
+</code></pre><p>The above <code>Dockerfile</code> will create a docker image containing the application code, install
+Flask, gunicorn and configure the image to start <code>gunicorn</code> on startup. We are running 5 worker
+processes and listening on port 8000 for HTTP requests with the WSGI application entrypoint object
+as <code>app</code> inside the <code>app</code> Python module.</p>
+<p>From within the <code>application</code> directory, let&rsquo;s build the docker image:</p>
+<pre><code class="language-command" data-lang="command">cd application
+docker build -t sammy/do-webapp .
+..
+Successfully built &lt;^&gt;ec7bd4635bc7&lt;^&gt;
+Successfully tagged sammy/do-webapp:latest
+
+</code></pre><p>Let&rsquo;s run a docker container using the above image:</p>
+<pre><code class="language-command" data-lang="command">docker run -p 8000:8000 -ti sammy/do-webapp
+</code></pre><p>Now, if we visit the URL <code>http://127.0.0.1:8000/honeypot/</code> from the browser, we will see logs such as
+these on the terminal we ran the container from:</p>
+<pre><code>
+[2019-09-05 04:42:53 +0000] [1] [INFO] Starting gunicorn 19.9.0
+[2019-09-05 04:42:53 +0000] [1] [INFO] Listening at: http://0.0.0.0:8000 (1)
+[2019-09-05 04:42:53 +0000] [1] [INFO] Using worker: sync
+[2019-09-05 04:42:53 +0000] [9] [INFO] Booting worker with pid: 9
+[2019-09-05 04:42:53 +0000] [10] [INFO] Booting worker with pid: 10
+[2019-09-05 04:42:53 +0000] [11] [INFO] Booting worker with pid: 11
+[2019-09-05 04:42:53 +0000] [12] [INFO] Booting worker with pid: 12
+[2019-09-05 04:42:53 +0000] [13] [INFO] Booting worker with pid: 13
+[2019-09-05 04:43:05,289] ERROR in app: Exception on /honeypot/ [GET]
+Traceback (most recent call last):
+  File &quot;/usr/local/lib/python3.7/site-packages/flask/app.py&quot;, line 2446, in wsgi_app
+    response = self.full_dispatch_request()
+  File &quot;/usr/local/lib/python3.7/site-packages/flask/app.py&quot;, line 1951, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File &quot;/usr/local/lib/python3.7/site-packages/flask/app.py&quot;, line 1820, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File &quot;/usr/local/lib/python3.7/site-packages/flask/_compat.py&quot;, line 39, in reraise
+    raise value
+  File &quot;/usr/local/lib/python3.7/site-packages/flask/app.py&quot;, line 1949, in full_dispatch_request
+    rv = self.dispatch_request()
+  File &quot;/usr/local/lib/python3.7/site-packages/flask/app.py&quot;, line 1935, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File &quot;/app.py&quot;, line 15, in test1
+    1/0
+ZeroDivisionError: division by zero
+</code></pre><p>The first few lines are startup messages from <code>gunicorn</code>. Then, we see the exception that occurs
+when we make a request to the <code>/honeypot/</code> endpoint. Tracebacks like these present a problem
+for logging since they are spread over multiple lines. We want the entire traceback as a single
+log message. One way to achieve that is to log messages in a JSON format. Press <code>CTRL + C</code> to terminate
+the container.</p>
+<p>Let&rsquo;s now configure <code>gunicorn</code> to emit the logs in a JSON format. In the <code>application</code> directory,
+create and open a new file, <code>gunicorn_logging.conf</code>:</p>
+<pre><code class="language-command" data-lang="command">nano application/gunicorn_logging.conf
+</code></pre><p>Add the following contents to it:</p>
+<pre><code>[loggers]
+keys=root, gunicorn_error, gunicorn_access
+
+[handlers]
+keys=console
+
+[formatters]
+keys=json
+
+[logger_root]
+level=INFO
+handlers=console
+
+[logger_gunicorn.error]
+level=DEBUG
+handlers=console
+propagate=0
+qualname=gunicorn.error
+
+[logger_gunicorn.access]
+level=INFO
+handlers=console
+propagate=0
+qualname=gunicorn.access
+
+[handler_console]
+class=StreamHandler
+formatter=json
+args=(sys.stdout, )
+
+[formatter_json]
+class=pythonjsonlogger.jsonlogger.JsonFormatter
+
+</code></pre><p>To understand the above logging configuration completely, please refer to the
+<a href="https://docs.python.org/3/library/logging.config.html">Python logging module documentation</a>. The
+most relevant parts for us is the <code>formatter_json</code> section where we set the logging
+formatter close to the <code>JsonFormatter</code> class which is part of the <a href="https://github.com/madzak/python-json-logger">python-json-logger</a>
+package.</p>
+<p>To use the above logging configuration, we will update the <code>application/Dockerfile</code> as follows:</p>
+<pre><code>FROM python:3.7-alpine
+
+ADD app.py /app.py
+ADD gunicorn_logging.conf /gunicorn_logging.conf
+
+RUN set -e; \
+	apk add --no-cache --virtual .build-deps \
+		gcc \
+		libc-dev \
+		linux-headers \
+	; \
+	pip install flask &lt;^&gt;python-json-logger&lt;^&gt; gunicorn ; \
+	apk del .build-deps;
+EXPOSE 8000
+WORKDIR /
+CMD [&quot;gunicorn&quot;, &quot;--log-config&quot;, &quot;gunicorn_logging.conf&quot;, &quot;--workers&quot;, &quot;5&quot;, &quot;--bind&quot;, &quot;0.0.0.0:8000&quot;, &quot;app:app&quot;]
+</code></pre><p>The key changes in the above Dockerfile are:</p>
+<ul>
+<li>Since we are using a custom gunicorn logging configuration, we copy the gunicorn logging configuration using: <code>ADD gunicorn_logging.conf /gunicorn_logging.conf</code></li>
+<li>We are now using a new Python package for JSON logging, so we add <code>python-json-logger</code> to the list of packages being installed using <code>pip install</code></li>
+<li>To specify the custom logging configuration file to <code>gunicorn</code>, we specify the configuration file path to the  <code>--log-config</code> option</li>
+</ul>
+<p>Rebuild the  image using the updated Dockerfile:</p>
+<pre><code class="language-command" data-lang="command">docker build -t sammy/do-webapp .
+..
+Successfully built &lt;^&gt;ec7bd4635bc7&lt;^&gt;
+Successfully tagged sammy/do-webapp:latest
+
+</code></pre><p>Let&rsquo;s run the image:</p>
+<pre><code class="language-command" data-lang="command">docker run -p 8000:8000 -ti sammy/do-webapp
+</code></pre><p>Now, if we revisit the URL <code>http://127.0.0.1:8000/honeypot/</code>, we will see logs are now emitted in a JSON format
+in Terminal 1:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">{<span style="color:#f92672">&#34;message&#34;</span>: <span style="color:#e6db74">&#34;Starting gunicorn 19.9.0&#34;</span>}
+{<span style="color:#f92672">&#34;message&#34;</span>: <span style="color:#e6db74">&#34;Arbiter booted&#34;</span>}
+{<span style="color:#f92672">&#34;message&#34;</span>: <span style="color:#e6db74">&#34;Listening at: http://0.0.0.0:8000 (1)&#34;</span>}
+{<span style="color:#f92672">&#34;message&#34;</span>: <span style="color:#e6db74">&#34;Using worker: sync&#34;</span>}
+{<span style="color:#f92672">&#34;message&#34;</span>: <span style="color:#e6db74">&#34;Booting worker with pid: 8&#34;</span>}
+<span style="color:#960050;background-color:#1e0010">...</span>
+{<span style="color:#f92672">&#34;message&#34;</span>: <span style="color:#e6db74">&#34;5 workers&#34;</span>, <span style="color:#f92672">&#34;metric&#34;</span>: <span style="color:#e6db74">&#34;gunicorn.workers&#34;</span>, <span style="color:#f92672">&#34;value&#34;</span>: <span style="color:#ae81ff">5</span>, <span style="color:#f92672">&#34;mtype&#34;</span>: <span style="color:#e6db74">&#34;gauge&#34;</span>}
+{<span style="color:#f92672">&#34;message&#34;</span>: <span style="color:#e6db74">&#34;GET /honeypot/&#34;</span>}
+{<span style="color:#f92672">&#34;message&#34;</span>: <span style="color:#e6db74">&#34;Exception on /honeypot/ [GET]&#34;</span>, <span style="color:#f92672">&#34;exc_info&#34;</span>: <span style="color:#e6db74">&#34;Traceback (most recent call last):\n  File \&#34;/usr/local/lib/python3.7/site-packages/flask/app.py\&#34;, line 2446, in wsgi_app\n    response = self.full_dispatch_request()\n  File \&#34;/usr/local/lib/python3.7/site-packages/flask/app.py\&#34;, line 1951, in full_dispatch_request\n    rv = self.handle_user_exception(e)\n  File \&#34;/usr/local/lib/python3.7/site-packages/flask/app.py\&#34;, line 1820, in handle_user_exception\n    reraise(exc_type, exc_value, tb)\n  File \&#34;/usr/local/lib/python3.7/site-packages/flask/_compat.py\&#34;, line 39, in reraise\n    raise value\n  File \&#34;/usr/local/lib/python3.7/site-packages/flask/app.py\&#34;, line 1949, in full_dispatch_request\n    rv = self.dispatch_request()\n  File \&#34;/usr/local/lib/python3.7/site-packages/flask/app.py\&#34;, line 1935, in dispatch_request\n    return self.view_functions[rule.endpoint](**req.view_args)\n  File \&#34;/app.py\&#34;, line 13, in test1\n    1/0\nZeroDivisionError: division by zero&#34;</span>}
+{<span style="color:#f92672">&#34;message&#34;</span>: <span style="color:#e6db74">&#34;172.17.0.1 - - [05/Sep/2019:04:47:33 +0000] \&#34;GET /honeypot/ HTTP/1.1\&#34; 500 290 \&#34;-\&#34; \&#34;Mozilla/5.0 (X11; Fedora; Linux x86_64; rv:68.0) Gecko/20100101 Firefox/68.0\&#34;&#34;</span>}
+{<span style="color:#f92672">&#34;message&#34;</span>: <span style="color:#e6db74">&#34;GET /test/&#34;</span>}
+{<span style="color:#f92672">&#34;message&#34;</span>: <span style="color:#e6db74">&#34;172.17.0.1 - - [05/Sep/2019:04:47:47 +0000] \&#34;GET /test/ HTTP/1.1\&#34; 200 4 \&#34;-\&#34; \&#34;Mozilla/5.0 (X11; Fedora; Linux x86_64; rv:68.0) Gecko/20100101 Firefox/68.0\&#34;&#34;</span>}
+<span style="color:#960050;background-color:#1e0010">...</span>
+</code></pre></div><p><strong>Note:</strong> If you are building your own docker image, please replace <code>sammy</code> with your own docker hub username when you login
+as well as when you build and push the images. In addition, substitute any reference to <code>sammy/do-webapp</code> by your own
+image name for the rest of this article</p>
+<p>Now that we have our application emitting logs as JSON formatted strings, let&rsquo;s push the docker image
+to docker hub. You will need to login first:</p>
+<pre><code class="language-command" data-lang="command">docker login
+</code></pre><pre><code>
+Login with your Docker ID to push and pull images from Docker Hub. If you don't have a Docker ID, head over to https://hub.docker.com to create one.
+Username: sammy
+Password: 
+Login Succeeded
+</code></pre><p>Now, let&rsquo;s push the docker image to docker hub:</p>
+<pre><code class="language-command" data-lang="command">docker push sammy/do-webapp
+</code></pre><pre><code>
+The push refers to repository [docker.io/sammy/do-webapp]
+..
+latest: digest: sha256:&lt;^&gt;ba7719343e3430e88dc5257b8839c721d8865498603beb2e3161d57b50a72cbe&lt;^&gt; size: &lt;^&gt;1993&lt;^&gt;
+</code></pre><p>Now that we have pushed our docker image to docker hub, we will deploy it to our Kubernetes cluster
+using a <code>Deployment</code> in a new namespace, <code>demo</code>. Create and open a new file <code>namespace.yaml</code> inside
+the <code>application</code> directory:</p>
+<pre><code class="language-command" data-lang="command">nano application/namespace.yaml
+</code></pre><p>Add the following contents:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">v1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Namespace</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">demo</span>
+</code></pre></div><p>To create the namespace:</p>
+<pre><code class="language-command" data-lang="command">kubectl apply -f application/namespace.yaml
+</code></pre><p>You should see the following output:</p>
+<pre><code>namespace/demo created
+</code></pre><p>Next, create and open a new file <code>deployment.yaml</code> inside the <code>application</code> directory:</p>
+<pre><code class="language-command" data-lang="command">nano application/deployment.yaml
+</code></pre><p>Add the following contents to it:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">apps/v1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Deployment</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">webapp</span>
+  <span style="color:#f92672">namespace</span>: <span style="color:#ae81ff">demo</span>
+<span style="color:#f92672">spec</span>:
+  <span style="color:#f92672">replicas</span>: <span style="color:#ae81ff">2</span>
+  <span style="color:#f92672">selector</span>:
+    <span style="color:#f92672">matchLabels</span>:
+      <span style="color:#f92672">app</span>: <span style="color:#ae81ff">webapp</span>
+  <span style="color:#f92672">template</span>:
+    <span style="color:#f92672">metadata</span>:
+      <span style="color:#f92672">labels</span>:
+        <span style="color:#f92672">app</span>: <span style="color:#ae81ff">webapp</span>
+    <span style="color:#f92672">spec</span>:
+      <span style="color:#f92672">containers</span>:
+      - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">webapp</span>
+        <span style="color:#f92672">image</span>: <span style="color:#ae81ff">sammy/do-webapp</span>
+        <span style="color:#f92672">imagePullPolicy</span>: <span style="color:#ae81ff">Always</span>
+        <span style="color:#f92672">livenessProbe</span>:
+          <span style="color:#f92672">httpGet</span>:
+            <span style="color:#f92672">scheme</span>: <span style="color:#ae81ff">HTTP</span>
+            <span style="color:#f92672">path</span>: <span style="color:#ae81ff">/test/</span>
+            <span style="color:#f92672">port</span>: <span style="color:#ae81ff">8000</span>
+          <span style="color:#f92672">initialDelaySeconds</span>: <span style="color:#ae81ff">30</span>
+          <span style="color:#f92672">periodSeconds</span>: <span style="color:#ae81ff">10</span>
+        <span style="color:#f92672">readinessProbe</span>:
+          <span style="color:#f92672">httpGet</span>:
+            <span style="color:#f92672">scheme</span>: <span style="color:#ae81ff">HTTP</span>
+            <span style="color:#f92672">path</span>: <span style="color:#ae81ff">/test/</span>
+            <span style="color:#f92672">port</span>: <span style="color:#ae81ff">8000</span>
+          <span style="color:#f92672">initialDelaySeconds</span>: <span style="color:#ae81ff">30</span>
+          <span style="color:#f92672">periodSeconds</span>: <span style="color:#ae81ff">10</span>
+
+</code></pre></div><p>The web application is being deployed to the <code>demo</code> namespace and will run a container from the
+docker image, <code>sammy/do-webapp</code> we just pushed. The container has HTTP liveness and readiness
+probes configured for port 8000 and path <code>/test/</code>. These will make sure that kubernetes is able
+to check if the application is working as expected.</p>
+<p>Next, let&rsquo;s create the deployment:</p>
+<pre><code class="language-command" data-lang="command">kubectl apply -f application/deployment.yaml
+</code></pre><p>You shoud see the following output:</p>
+<pre><code>deployment.apps/webapp created
+</code></pre><p>Let&rsquo;s wait for the deployment rollout to complete:</p>
+<pre><code>kubectl rollout status deployment/webapp -n demo
+</code></pre><p>You should see the following output:</p>
+<pre><code>Waiting for deployment &quot;webapp&quot; rollout to finish: 0 of 2 updated replicas are available...
+Waiting for deployment &quot;webapp&quot; rollout to finish: 1 of 2 updated replicas are available...
+deployment &quot;webapp&quot; successfully rolled out
+</code></pre><p>Let&rsquo;s see if the pods are up and running successfully:</p>
+<pre><code class="language-command" data-lang="command">kubectl -n demo get pods
+</code></pre><p>You should see the following output:</p>
+<pre><code>NAME                           READY   STATUS    RESTARTS   AGE
+webapp-&lt;^&gt;65f6798978-8phqg&lt;^&gt;   1/1     Running   0          76s
+webapp-&lt;^&gt;65f6798978-f2jl9&lt;^&gt;   1/1     Running   0          76s
+</code></pre><p>To access the web application from our local workstation, we will use port
+forwarding specifying a pod name of one of the two pods above:</p>
+<pre><code class="language-command" data-lang="command">kubectl -n demo port-forward pod/webapp-&lt;^&gt;65f6798978-8phqg&lt;^&gt; 8000:8000
+</code></pre><p>You should see the following output:</p>
+<pre><code>Forwarding from 127.0.0.1:8000 -&gt; 8000
+Forwarding from [::1]:8000 -&gt; 8000
+</code></pre><p>Now, visit <code>http://127.0.0.1:8000/honeypot/</code> in the browser a few times.</p>
+<p>Now, if we go to kibana and use &ldquo;honeypot&rdquo; as the search query, we will see log documents
+emitted by our web application. The document&rsquo;s <code>log</code> field contains the entire log line:
+emitted by the application as a string:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">
+{
+<span style="color:#960050;background-color:#1e0010">...</span>
+<span style="color:#f92672">&#34;log&#34;</span>: {<span style="color:#f92672">&#34;message&#34;</span>: <span style="color:#e6db74">&#34;Exception on /honeypot/ [GET]&#34;</span>, <span style="color:#f92672">&#34;exc_info&#34;</span>: <span style="color:#e6db74">&#34;Traceback (most recent call last):\n  File \&#34;/usr/local/lib/python3.7/site-packages/flask/app.py\&#34;, line 2446, in wsgi_app\n    response = self.full_dispatch_request()\n  File \&#34;/usr/local/lib/python3.7/site-packages/flask/app.py\&#34;, line 1951, in full_dispatch_request\n    rv = self.handle_user_exception(e)\n  File \&#34;/usr/local/lib/python3.7/site-packages/flask/app.py\&#34;, line 1820, in handle_user_exception\n    reraise(exc_type, exc_value, tb)\n  File \&#34;/usr/local/lib/python3.7/site-packages/flask/_compat.py\&#34;, line 39, in reraise\n    raise value\n  File \&#34;/usr/local/lib/python3.7/site-packages/flask/app.py\&#34;, line 1949, in full_dispatch_request\n    rv = self.dispatch_request()\n  File \&#34;/usr/local/lib/python3.7/site-packages/flask/app.py\&#34;, line 1935, in dispatch_request\n    return self.view_functions[rule.endpoint](**req.view_args)\n  File \&#34;/app.py\&#34;, line 13, in test1\n    1/0\nZeroDivisionError: division by zero&#34;</span>}
+<span style="color:#960050;background-color:#1e0010">...</span>
+}
+</code></pre></div><p>In this step, we have seen how without any further work on the logging setup, we can view and search
+the application logs in Elasticsearch. Next, we will improve this in two ways:</p>
+<ol>
+<li>Parse the <code>log</code> field as JSON and add the JSON keys as top-level fields in the Elasticsearch document</li>
+<li>Add Kubernetes metadata to each log document so that we can have identifying information about where the log
+is being forwarded from</li>
+</ol>
+<p>(1) will allow us to search for logs with specific fields and (2) will give us information about
+the specific pod a log is being emitted from. Let&rsquo;s see how we can do both.</p>
+<p>&lt;$&gt;[note] Note: Keep the above port forward running in a terminal session and use a new terminal session for running the commands in the the rest of the tutorial. &lt;$&gt;</p>
+<h1 id="step-5--update-fluent-bit-configuration-to-apply-kubernetes-filter">Step 5 — Update fluent bit configuration to apply kubernetes filter</h1>
+<p>In fluent bit, a filter is used to alter the incoming log data in some way. The in-built
+<a href="https://docs.fluentbit.io/manual/filter/kubernetes">kubernetes filter</a> enriches logs
+with kubernetes data. In addition, it can also read the incoming data in the <code>log</code> field
+and if JSON can &ldquo;scoop out&rdquo; the keys and add them as top-level fields to the log entry.</p>
+<p>The second version of the fluent bit <code>ConfigMap</code> resource adds this filter. Create a copy
+of the existing <code>configmap-1.yaml</code> and name it <code>configmap-2.yaml</code> in the same
+directory:</p>
+<pre><code class="language-command" data-lang="command">cp logging/fluent-bit/configmap-1.yaml logging/fluent-bit/configmap-2.yaml
+</code></pre><p>Open the <code>logging/fluent-bit/configmap-2.yaml</code> file and update the <code>fluent-bit.conf</code> file definition to include:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">
+     @<span style="color:#ae81ff">INCLUDE filter-kubernetes.conf</span>
+</code></pre></div><p>In addition, add a new file declaration <code>filter-kubernetes.conf</code> after <code>input-kubernetes.conf</code>:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">
+    <span style="color:#f92672">filter-kubernetes.conf</span>: |<span style="color:#e6db74">
+</span><span style="color:#e6db74">       [FILTER]
+</span><span style="color:#e6db74">         Name                kubernetes
+</span><span style="color:#e6db74">         Match               kube.*
+</span><span style="color:#e6db74">         Keep_Log            Off
+</span><span style="color:#e6db74">         Merge_Log           On</span>       
+
+</code></pre></div><p>Save and close the file.</p>
+<p>We specify a section, <code>[FILTER]</code> in this file and refer to the <code>kubernetes</code> filter using
+the <code>Name</code> attribute. We use <code>Match</code> in <code>filter-kubernetes.conf</code> to only apply this filter to logs tagged with <code>kube.*</code>.
+Note that when we configured the input above in <code>input-kubernetes.conf</code>, we tagged all messages with
+<code>kube.*</code>.</p>
+<p>The entire file contents should be as follows:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">v1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">ConfigMap</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">fluent-bit-config</span>
+  <span style="color:#f92672">namespace</span>: <span style="color:#ae81ff">kube-logging</span>
+  <span style="color:#f92672">labels</span>:
+    <span style="color:#f92672">k8s-app</span>: <span style="color:#ae81ff">fluent-bit</span>
+<span style="color:#f92672">data</span>:
+  <span style="color:#f92672">fluent-bit.conf</span>: |<span style="color:#e6db74">
+</span><span style="color:#e6db74">    [SERVICE]
+</span><span style="color:#e6db74">        Flush         1
+</span><span style="color:#e6db74">        Log_Level     info
+</span><span style="color:#e6db74">        Daemon        off
+</span><span style="color:#e6db74">        Parsers_File  parsers.conf
+</span><span style="color:#e6db74">        HTTP_Server   On
+</span><span style="color:#e6db74">        HTTP_Listen   0.0.0.0
+</span><span style="color:#e6db74">        HTTP_Port     2020
+</span><span style="color:#e6db74">
+</span><span style="color:#e6db74">    @INCLUDE input-kubernetes.conf
+</span><span style="color:#e6db74">    @INCLUDE filter-kubernetes.conf
+</span><span style="color:#e6db74">    @INCLUDE output-elasticsearch.conf</span>    
+
+  <span style="color:#f92672">input-kubernetes.conf</span>: |<span style="color:#e6db74">
+</span><span style="color:#e6db74">    [INPUT]
+</span><span style="color:#e6db74">        Name              tail
+</span><span style="color:#e6db74">        Tag               kube.*
+</span><span style="color:#e6db74">        Path              /var/log/containers/*.log
+</span><span style="color:#e6db74">        Parser            docker
+</span><span style="color:#e6db74">        DB                /var/log/flb_kube.db
+</span><span style="color:#e6db74">        Mem_Buf_Limit     5MB
+</span><span style="color:#e6db74">        Skip_Long_Lines   On
+</span><span style="color:#e6db74">        Refresh_Interval  10</span>    
+
+  <span style="color:#f92672">filter-kubernetes.conf</span>: |<span style="color:#e6db74">
+</span><span style="color:#e6db74">    [FILTER]
+</span><span style="color:#e6db74">        Name                kubernetes
+</span><span style="color:#e6db74">        Match               kube.*
+</span><span style="color:#e6db74">        Keep_Log            Off
+</span><span style="color:#e6db74">        Merge_Log           On</span>    
+
+  <span style="color:#f92672">output-elasticsearch.conf</span>: |<span style="color:#e6db74">
+</span><span style="color:#e6db74">    [OUTPUT]
+</span><span style="color:#e6db74">        Name            es
+</span><span style="color:#e6db74">        Match           *
+</span><span style="color:#e6db74">        Host            ${FLUENT_ELASTICSEARCH_HOST}
+</span><span style="color:#e6db74">        Port            ${FLUENT_ELASTICSEARCH_PORT}
+</span><span style="color:#e6db74">        Logstash_Format On
+</span><span style="color:#e6db74">        Logstash_Prefix fluent-bit
+</span><span style="color:#e6db74">        Retry_Limit     False</span>    
+
+  <span style="color:#f92672">parsers.conf</span>: |<span style="color:#e6db74">
+</span><span style="color:#e6db74">    [PARSER]
+</span><span style="color:#e6db74">        Name        docker
+</span><span style="color:#e6db74">        Format      json
+</span><span style="color:#e6db74">        Time_Key    time
+</span><span style="color:#e6db74">        Time_Format %Y-%m-%dT%H:%M:%S.%L
+</span><span style="color:#e6db74">        Time_Keep   On</span>    
+</code></pre></div><p>Let&rsquo;s delete the existing <code>ConfigMap</code> and <code>DaemonSet</code> resources first:</p>
+<pre><code class="language-command" data-lang="command">kubectl delete -f logging/fluent-bit/configmap-1.yaml -f logging/fluent-bit/daemonset.yaml
+</code></pre><p>You should see the following output:</p>
+<pre><code>configmap &quot;fluent-bit-config&quot; deleted
+daemonset.apps &quot;fluent-bit&quot; deleted
+</code></pre><p>Next, we recreate the new version of the <code>ConfigMap</code> and the fluent bit <code>DaemonSet</code>:</p>
+<pre><code class="language-command" data-lang="command">kubectl apply -f logging/fluent-bit/configmap-2.yaml -f logging/fluent-bit/daemonset.yaml
+</code></pre><p>You should see the following output:</p>
+<pre><code>configmap/fluent-bit-config created
+daemonset.apps/fluent-bit created
+</code></pre><p>Now, visit the URL <code>http://127.0.0.1:8080/honeypot/</code> in you browser once more and then in Kibana,
+use the following search query: <code>kubernetes.labels.app: &quot;webapp&quot;</code>. You will see a few documents show up
+in the results. Each log document has kubernetes metadata
+associated with it - we used one in our search query under the <code>kubernetes</code> object. In addition,
+<code>message</code> and <code>exc_info</code> are now searchable fields. For example, the Kibana query
+<code>kubernetes.labels.app: &quot;webapp&quot;  AND exc_info: &quot;ZeroDivisionError&quot;</code> will return log documents
+containing <code>ZeroDivisionError</code> in the <code>exc_info</code> field.</p>
+<p>Here&rsquo;s an example log document with the exception info logged in a separate field:</p>
+<p><img src="https://i.imgur.com/IH0OIBO.png" alt="Kibana index creation"></p>
+<p>In this step, we improved the application logging by making use of fluent bit&rsquo;s features. We used the
+Kubernetes filter to add Kubernetes metadata to the log messages and
+parsed the JSON log emitted by the application to make the individual fields
+searchable in Elasticsearch.</p>
+<p>In the next step, we see how we can forward system logs via fluent bit.</p>
+<h1 id="step-6--update-fluent-bit-configuration-to-forward-system-logs">Step 6 — Update fluent bit configuration to forward system logs</h1>
+<p>In addition to application logs, it is a good idea to also forward logs from the system services. These logs
+are useful when we may want to debug the behavior of services such as <code>ssh</code> daemon, kubernetes node management
+services such as <code>kubelet</code> and the docker daemon. Most linux systems available today run <code>systemd</code> and logs
+from these services are logged to the systemd journal. We already mount the <code>/var/log/journal</code> directory inside fluent bit.
+However, we have couple of additional steps to perform before we can see our journal logs being forwarded by fluent bit.</p>
+<p>The final version of the fluent bit <code>ConfigMap</code> resource adds this filter. Create a copy of the existing <code>configmap-2.yaml</code> and
+name it <code>configmap-final.yaml</code> in the same directory:</p>
+<pre><code class="language-command" data-lang="command">cp logging/fluent-bit/configmap-2.yaml logging/fluent-bit/configmap-final.yaml
+</code></pre><p>The first step is to add an additional <code>[INPUT]</code> section to the the fluent bit configuration. fluent bit has a dedicated <code>input</code> <a href="https://docs.fluentbit.io/manual/input/systemd">plugin</a> for systemd which can be specified as follows:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">  [<span style="color:#ae81ff">INPUT]</span>
+      <span style="color:#ae81ff">Name            systemd</span>
+      <span style="color:#ae81ff">Path            /journal</span>
+      <span style="color:#ae81ff">Tag             systemd.*</span>
+</code></pre></div><p>Logs read by the systemd input plugin will be tagged with <code>systemd.*</code>. This tag is then use to define
+two filters. Add the following to the <code>configmap-final.yaml</code> file at the same nesting level as
+<code>filter-kubernetes.conf</code>:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">filter-systemd.conf</span>: |<span style="color:#e6db74">
+</span><span style="color:#e6db74">    [FILTER]
+</span><span style="color:#e6db74">        Name modify
+</span><span style="color:#e6db74">        Match systemd.*
+</span><span style="color:#e6db74">        Rename _SYSTEMD_UNIT systemd_unit
+</span><span style="color:#e6db74">        Rename _HOSTNAME hostname
+</span><span style="color:#e6db74">
+</span><span style="color:#e6db74">    [FILTER]
+</span><span style="color:#e6db74">        Name record_modifier
+</span><span style="color:#e6db74">        Match systemd.*
+</span><span style="color:#e6db74">
+</span><span style="color:#e6db74">        Remove_Key _CURSOR
+</span><span style="color:#e6db74">        Remove_Key _REALTIME_TIMESTAMP
+</span><span style="color:#e6db74">        Remove_Key _MONOTONIC_TIMESTAMP
+</span><span style="color:#e6db74">        Remove_Key _BOOT_ID
+</span><span style="color:#e6db74">        Remove_Key _MACHINE_ID</span>    
+
+</code></pre></div><p>The first is a <code>modify</code> filter which renames the <code>_SYSTEMD_UNIT</code> field to <code>systemd_unit</code>. The second is
+a <code>record_modifier</code> filter which removes keys which we may not care about logging. We can also
+use this filter to add fields to the log using <code>Add_Key</code> configuration. For both filters, we use
+<code>Match</code> to only apply them to logs which are tagged <code>systemd.*</code>.</p>
+<p>The final contents of the file will look as follows:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">v1</span>
+<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">ConfigMap</span>
+<span style="color:#f92672">metadata</span>:
+  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">fluent-bit-config</span>
+  <span style="color:#f92672">namespace</span>: <span style="color:#ae81ff">kube-logging</span>
+  <span style="color:#f92672">labels</span>:
+    <span style="color:#f92672">k8s-app</span>: <span style="color:#ae81ff">fluent-bit</span>
+<span style="color:#f92672">data</span>:
+  <span style="color:#f92672">fluent-bit.conf</span>: |<span style="color:#e6db74">
+</span><span style="color:#e6db74">    [SERVICE]
+</span><span style="color:#e6db74">        Flush         1
+</span><span style="color:#e6db74">        Log_Level     info
+</span><span style="color:#e6db74">        Daemon        off
+</span><span style="color:#e6db74">        Parsers_File  parsers.conf
+</span><span style="color:#e6db74">
+</span><span style="color:#e6db74">    @INCLUDE input-systemd.conf
+</span><span style="color:#e6db74">    @INCLUDE input-kubernetes.conf
+</span><span style="color:#e6db74">    @INCLUDE filter-kubernetes.conf
+</span><span style="color:#e6db74">    @INCLUDE filter-systemd.conf
+</span><span style="color:#e6db74">    @INCLUDE output-elasticsearch.conf</span>    
+
+  <span style="color:#f92672">input-systemd.conf</span>: |<span style="color:#e6db74">
+</span><span style="color:#e6db74">    [INPUT]
+</span><span style="color:#e6db74">      Name            systemd
+</span><span style="color:#e6db74">      Path            /journal
+</span><span style="color:#e6db74">      Tag             systemd.*</span>    
+
+  <span style="color:#f92672">input-kubernetes.conf</span>: |<span style="color:#e6db74">
+</span><span style="color:#e6db74">    [INPUT]
+</span><span style="color:#e6db74">        Name              tail
+</span><span style="color:#e6db74">        Tag               kube.*
+</span><span style="color:#e6db74">        Path              /var/log/containers/*.log
+</span><span style="color:#e6db74">        Parser            docker
+</span><span style="color:#e6db74">        DB                /var/log/flb_kube.db
+</span><span style="color:#e6db74">        Mem_Buf_Limit     5MB
+</span><span style="color:#e6db74">        Skip_Long_Lines   On
+</span><span style="color:#e6db74">        Refresh_Interval  10</span>    
+
+  <span style="color:#f92672">filter-kubernetes.conf</span>: |<span style="color:#e6db74">
+</span><span style="color:#e6db74">    [FILTER]
+</span><span style="color:#e6db74">        Name                kubernetes
+</span><span style="color:#e6db74">        Match               kube.*
+</span><span style="color:#e6db74">        Keep_Log            Off
+</span><span style="color:#e6db74">        Merge_Log           On</span>    
+
+  <span style="color:#f92672">filter-systemd.conf</span>: |<span style="color:#e6db74">
+</span><span style="color:#e6db74">    [FILTER]
+</span><span style="color:#e6db74">        Name modify
+</span><span style="color:#e6db74">        Match systemd.*
+</span><span style="color:#e6db74">        Rename _SYSTEMD_UNIT systemd_unit
+</span><span style="color:#e6db74">        Rename _HOSTNAME hostname
+</span><span style="color:#e6db74">
+</span><span style="color:#e6db74">    [FILTER]
+</span><span style="color:#e6db74">        Name record_modifier
+</span><span style="color:#e6db74">        Match systemd.*
+</span><span style="color:#e6db74">        Remove_Key _CURSOR
+</span><span style="color:#e6db74">        Remove_Key _REALTIME_TIMESTAMP
+</span><span style="color:#e6db74">        Remove_Key _MONOTONIC_TIMESTAMP
+</span><span style="color:#e6db74">        Remove_Key _BOOT_ID
+</span><span style="color:#e6db74">        Remove_Key _MACHINE_ID</span>    
+
+  <span style="color:#f92672">output-elasticsearch.conf</span>: |<span style="color:#e6db74">
+</span><span style="color:#e6db74">    [OUTPUT]
+</span><span style="color:#e6db74">        Name            es
+</span><span style="color:#e6db74">        Match           *
+</span><span style="color:#e6db74">        Host            ${FLUENT_ELASTICSEARCH_HOST}
+</span><span style="color:#e6db74">        Port            ${FLUENT_ELASTICSEARCH_PORT}
+</span><span style="color:#e6db74">
+</span><span style="color:#e6db74">        Logstash_Format On
+</span><span style="color:#e6db74">        Logstash_Prefix fluent-bit
+</span><span style="color:#e6db74">        Retry_Limit     False</span>    
+
+  <span style="color:#f92672">parsers.conf</span>: <span style="color:#ae81ff">|</span>
+
+    [<span style="color:#ae81ff">PARSER]</span>
+        <span style="color:#ae81ff">Name        docker</span>
+        <span style="color:#ae81ff">Format      json</span>
+        <span style="color:#ae81ff">Time_Key    time</span>
+        <span style="color:#ae81ff">Time_Format %Y-%m-%dT%H:%M:%S.%L</span>
+        <span style="color:#ae81ff">Time_Keep   On</span>
+
+</code></pre></div><p>Let&rsquo;s delete the existing <code>ConfigMap</code> and <code>DaemonSet</code> resources first:</p>
+<pre><code class="language-command" data-lang="command">kubectl delete -f logging/fluent-bit/configmap-2.yaml -f logging/fluent-bit/daemonset.yaml
+</code></pre><p>You should see the following output:</p>
+<pre><code>
+configmap &quot;fluent-bit-config&quot; deleted
+daemonset.apps &quot;fluent-bit&quot; deleted
+</code></pre><p>Next, let&rsquo;s recreate the configmap using the final manifest and the fluent bit
+<code>DaemonSet</code> again:</p>
+<pre><code class="language-command" data-lang="command">kubectl apply -f logging/fluent-bit/configmap-final.yaml -f logging/fluent-bit/daemonset.yaml
+</code></pre><p>You should see the following output:</p>
+<pre><code>configmap/fluent-bit-config created
+daemonset.apps/fluent-bit created
+</code></pre><p>Fluent bit will now forward logs from various system services to Elastic search. However, before we can
+search for them in Kibana, we will have to perform a &ldquo;Refresh field list&rdquo; operation in Kibana. Go to
+the page <code>http://127.0.0.1:5601/app/kibana#/management/kibana/index_patterns</code> in your browser and click
+on <code>fluent-bit*</code> - the index pattern we created earlier. This will take us to the page as shown below:</p>
+<p><img src="https://i.imgur.com/HId42sj.png" alt="fluent-bit* index pattern page"></p>
+<p>Click on the &ldquo;refresh&rdquo; icon (the second icon on the top right) and in the pop up dialog box, click on &ldquo;Refresh&rdquo;:</p>
+<p><img src="https://i.imgur.com/3gWCOMH.png" alt="Refreshing the index pattern"></p>
+<p>Now, in addition to the logs of all the different pods, we will be able to search for logs related
+to the systemd units as well. For example, to view all logs related to the <code>kubelet</code> service, we will use the
+kibana query <code>systemd_unit: kubelet.service</code>:</p>
+<p><img src="https://i.imgur.com/ikBPxvo.png" alt="Example logs from kubelet.service"></p>
+<h1 id="conclusion">Conclusion</h1>
+<p>In this post we discussed how we can setup log fowarding in a Kubernetes cluster using fluent bit. We
+learned how we can read logs, parse them, modify them and forward them to an Elasticsearch cluster.
+This article although should get you started, only scratches the basics of fluent bit and I encourage you to
+look at the other fluent bit features such as <a href="https://docs.fluentbit.io/manual/configuration/monitoring">monitoring fluent bit itself</a>, <a href="https://docs.fluentbit.io/manual/configuration/stream_processor">stream processing</a> and the
+variety of <a href="https://docs.fluentbit.io/manual/input">inputs</a> and <a href="https://docs.fluentbit.io/manual/output">outputs</a>
+it supports.</p>
+<p>The <a href="https://groups.google.com/forum/#!forum/fluent-bit">fluent bit</a> google group is a great forum for
+seeking help if you are stuck with something.</p>
+<h1 id="cleaning-up">Cleaning up</h1>
+<p>If you want to delete all the resources we created as part of this article, you can delete the two namespaces
+we created:</p>
+<pre><code class="language-command" data-lang="command">kubectl delete namespace kube-logging demo
+</code></pre>
+    </div>
+  </article>
+
+  
+  
+
+
+
+
+
+  <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/about">About</a></li>
+         
+          <li><a href="/articles">Articles</a></li>
+         
+          <li><a href="/books">Books</a></li>
+         
+          <li><a href="/posts">Posts</a></li>
+         
+          <li><a href="/talks">Talks</a></li>
+         
+          <li><a href="/categories/">Categories</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <nav id="TableOfContents"></nav>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      
+      <ul>
+  
+  
+    
+  
+  
+  <li>
+    <a class="icon" href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fechorand.me%2fposts%2ffluentbit-kubernetes%2f">
+      <i class="fab fa-facebook fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://twitter.com/share?url=https%3a%2f%2fechorand.me%2fposts%2ffluentbit-kubernetes%2f&text=How%20to%20Set%20up%20Log%20Forwarding%20in%20a%20Kubernetes%20Cluster%20Using%20Fluent%20Bit">
+      <i class="fab fa-twitter fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fechorand.me%2fposts%2ffluentbit-kubernetes%2f&title=How%20to%20Set%20up%20Log%20Forwarding%20in%20a%20Kubernetes%20Cluster%20Using%20Fluent%20Bit">
+      <i class="fab fa-linkedin fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fechorand.me%2fposts%2ffluentbit-kubernetes%2f&is_video=false&description=How%20to%20Set%20up%20Log%20Forwarding%20in%20a%20Kubernetes%20Cluster%20Using%20Fluent%20Bit">
+      <i class="fab fa-pinterest fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="mailto:?subject=How%20to%20Set%20up%20Log%20Forwarding%20in%20a%20Kubernetes%20Cluster%20Using%20Fluent%20Bit&body=Check out this article: https%3a%2f%2fechorand.me%2fposts%2ffluentbit-kubernetes%2f">
+      <i class="fas fa-envelope fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://getpocket.com/save?url=https%3a%2f%2fechorand.me%2fposts%2ffluentbit-kubernetes%2f&title=How%20to%20Set%20up%20Log%20Forwarding%20in%20a%20Kubernetes%20Cluster%20Using%20Fluent%20Bit">
+      <i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://reddit.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2ffluentbit-kubernetes%2f&title=How%20to%20Set%20up%20Log%20Forwarding%20in%20a%20Kubernetes%20Cluster%20Using%20Fluent%20Bit">
+      <i class="fab fa-reddit fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.stumbleupon.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2ffluentbit-kubernetes%2f&title=How%20to%20Set%20up%20Log%20Forwarding%20in%20a%20Kubernetes%20Cluster%20Using%20Fluent%20Bit">
+      <i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://digg.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2ffluentbit-kubernetes%2f&title=How%20to%20Set%20up%20Log%20Forwarding%20in%20a%20Kubernetes%20Cluster%20Using%20Fluent%20Bit">
+      <i class="fab fa-digg fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.tumblr.com/share/link?url=https%3a%2f%2fechorand.me%2fposts%2ffluentbit-kubernetes%2f&name=How%20to%20Set%20up%20Log%20Forwarding%20in%20a%20Kubernetes%20Cluster%20Using%20Fluent%20Bit&description=Metadata%20I%20have%20posted%20this%20article%20on%20dev.to%20where%20I%20welcome%20comments%20and%20discussions.%0aIntroduction%20Log%20forwarding%20is%20an%20essential%20ingredient%20of%20a%20production%20logging%20pipeline%20in%20any%20organization.%20As%20an%20application%20author%2c%20you%20don%26rsquo%3bt%20want%20to%20be%20bothered%20with%20the%20responsibility%20of%20ensuring%20the%20application%20logs%20are%20being%20processed%20a%20certain%20way%20and%20then%20stored%20in%20a%20central%20log%20storage.%20As%20an%20operations%20personnel%2c%20you%20don%26rsquo%3bt%20want%20to%20have%20to%20hack%20your%20way%20around%20different%20applications%20to%20process%20and%20ship%20logs.">
+      <i class="fab fa-tumblr fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fechorand.me%2fposts%2ffluentbit-kubernetes%2f&t=How%20to%20Set%20up%20Log%20Forwarding%20in%20a%20Kubernetes%20Cluster%20Using%20Fluent%20Bit">
+      <i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+      
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;">
+          <i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;">
+          <i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;">
+          <i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');">
+          <i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+
+  <footer id="footer">
+  <div class="footer-left">
+    Copyright  &copy; 2020  Exploring Software 
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+        <li><a href="/about">About</a></li>
+         
+        <li><a href="/articles">Articles</a></li>
+         
+        <li><a href="/books">Books</a></li>
+         
+        <li><a href="/posts">Posts</a></li>
+         
+        <li><a href="/talks">Talks</a></li>
+         
+        <li><a href="/categories/">Categories</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+
+  </div>
+</body>
+
+<link rel="stylesheet" href=/lib/font-awesome/css/all.min.css>
+<script src=/lib/jquery/jquery.min.js></script>
+<script src=/js/main.js></script>
+
+
+
+</html>

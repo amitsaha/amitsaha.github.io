@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Rust on Exploring Software</title>
+    <link>https://echorand.me/categories/rust/</link>
+    <description>Recent content in Rust on Exploring Software</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 04 May 2016 00:00:00 +0000</lastBuildDate><atom:link href="https://echorand.me/categories/rust/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>New article Write a program to tee output using Rust</title>
+      <link>https://echorand.me/posts/tee-in-rust/</link>
+      <pubDate>Wed, 04 May 2016 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/tee-in-rust/</guid>
+      <description>My article &amp;quot;Write a program to tee output using Rust&amp;quot; is out in Linux Voice (Issue 27).
+When I first set out to learning Rust, I really liked how the Rust programming language book took the approach of introducing the language via small projects. In a recent &amp;quot;New Rustacean&amp;quot; bonus episode, Chris Krycho urges &amp;quot;to build anything&amp;quot; in Rust while one is learning the language. If you like both of those things, I think you will find my article useful.</description>
+    </item>
+    
+  </channel>
+</rss>

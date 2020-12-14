@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title> How does ping roughly work over IPv4 on Linux? | Exploring Software</title>
+  <meta name="description" content="echo $RANDOM. Exploring Software and writing about it.">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="all,follow">
+  <meta name="googlebot" content="index,follow,snippet,archive">
+  <meta property="og:title" content="How does ping roughly work over IPv4 on Linux?" />
+<meta property="og:description" content="Introduction The ping program is one of the most common programs which is used to check the &ldquo;aliveness&rdquo; of a host and a typical execution looks as follows:
+$ ping 127.0.0.1 -c 1 -4 PING 127.0.0.1 (127.0.0.1) 56(84) bytes of data. 64 bytes from 127.0.0.1: icmp_seq=1 ttl=64 time=0.062 ms --- 127.0.0.1 ping statistics --- 1 packets transmitted, 1 received, 0% packet loss, time 0ms rtt min/avg/max/mdev = 0.062/0.062/0.062/0.000 ms The -c switch indicates that we want to send a single &ldquo;probe&rdquo;." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://echorand.me/posts/my-own-ping/" />
+<meta property="article:published_time" content="2018-04-27T00:00:00+00:00" />
+<meta property="article:modified_time" content="2019-07-11T16:52:00+10:00" />
+
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="How does ping roughly work over IPv4 on Linux?"/>
+<meta name="twitter:description" content="Introduction The ping program is one of the most common programs which is used to check the &ldquo;aliveness&rdquo; of a host and a typical execution looks as follows:
+$ ping 127.0.0.1 -c 1 -4 PING 127.0.0.1 (127.0.0.1) 56(84) bytes of data. 64 bytes from 127.0.0.1: icmp_seq=1 ttl=64 time=0.062 ms --- 127.0.0.1 ping statistics --- 1 packets transmitted, 1 received, 0% packet loss, time 0ms rtt min/avg/max/mdev = 0.062/0.062/0.062/0.000 ms The -c switch indicates that we want to send a single &ldquo;probe&rdquo;."/>
+
+  
+  
+  
+  <link rel="stylesheet" href="https://echorand.me/css/style-white.css">
+  
+  
+  
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  
+
+  
+<link rel="icon" type="image/png" href="https://echorand.me/images/favicon.ico" />
+
+  
+  
+  
+  
+  
+    
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-108901610-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+  
+  
+</head>
+
+<body class="max-width mx-auto px3 ltr">
+  <div class="content index py4">
+
+  <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+        <li><a href="/about">About</a></li>
+         
+        <li><a href="/articles">Articles</a></li>
+         
+        <li><a href="/books">Books</a></li>
+         
+        <li><a href="/posts">Posts</a></li>
+         
+        <li><a href="/talks">Talks</a></li>
+         
+        <li><a href="/categories/">Categories</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li>
+          <a class="icon" href=" https://echorand.me/posts/cloudflare-dns-over-https/">
+            <i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i>
+          </a>
+        </li>
+        
+        
+        <li>
+          <a class="icon" href="https://echorand.me/posts/fedora-scientific-28/">
+            <i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i>
+          </a>
+        </li>
+        
+        <li>
+          <a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');">
+            <i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i>
+          </a>
+        </li>
+        <li>
+          <a class="icon" href="#">
+            <i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i>
+          </a>
+        </li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      
+      <ul>
+  
+  
+    
+  
+  
+  <li>
+    <a class="icon" href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fechorand.me%2fposts%2fmy-own-ping%2f">
+      <i class="fab fa-facebook " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://twitter.com/share?url=https%3a%2f%2fechorand.me%2fposts%2fmy-own-ping%2f&text=How%20does%20ping%20roughly%20work%20over%20IPv4%20on%20Linux%3f">
+      <i class="fab fa-twitter " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fechorand.me%2fposts%2fmy-own-ping%2f&title=How%20does%20ping%20roughly%20work%20over%20IPv4%20on%20Linux%3f">
+      <i class="fab fa-linkedin " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fechorand.me%2fposts%2fmy-own-ping%2f&is_video=false&description=How%20does%20ping%20roughly%20work%20over%20IPv4%20on%20Linux%3f">
+      <i class="fab fa-pinterest " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="mailto:?subject=How%20does%20ping%20roughly%20work%20over%20IPv4%20on%20Linux%3f&body=Check out this article: https%3a%2f%2fechorand.me%2fposts%2fmy-own-ping%2f">
+      <i class="fas fa-envelope " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://getpocket.com/save?url=https%3a%2f%2fechorand.me%2fposts%2fmy-own-ping%2f&title=How%20does%20ping%20roughly%20work%20over%20IPv4%20on%20Linux%3f">
+      <i class="fab fa-get-pocket " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://reddit.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fmy-own-ping%2f&title=How%20does%20ping%20roughly%20work%20over%20IPv4%20on%20Linux%3f">
+      <i class="fab fa-reddit " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.stumbleupon.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fmy-own-ping%2f&title=How%20does%20ping%20roughly%20work%20over%20IPv4%20on%20Linux%3f">
+      <i class="fab fa-stumbleupon " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://digg.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fmy-own-ping%2f&title=How%20does%20ping%20roughly%20work%20over%20IPv4%20on%20Linux%3f">
+      <i class="fab fa-digg " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.tumblr.com/share/link?url=https%3a%2f%2fechorand.me%2fposts%2fmy-own-ping%2f&name=How%20does%20ping%20roughly%20work%20over%20IPv4%20on%20Linux%3f&description=Introduction%20The%20ping%20program%20is%20one%20of%20the%20most%20common%20programs%20which%20is%20used%20to%20check%20the%20%26ldquo%3baliveness%26rdquo%3b%20of%20a%20host%20and%20a%20typical%20execution%20looks%20as%20follows%3a%0a%24%20ping%20127.0.0.1%20-c%201%20-4%20PING%20127.0.0.1%20%28127.0.0.1%29%2056%2884%29%20bytes%20of%20data.%2064%20bytes%20from%20127.0.0.1%3a%20icmp_seq%3d1%20ttl%3d64%20time%3d0.062%20ms%20---%20127.0.0.1%20ping%20statistics%20---%201%20packets%20transmitted%2c%201%20received%2c%200%25%20packet%20loss%2c%20time%200ms%20rtt%20min%2favg%2fmax%2fmdev%20%3d%200.062%2f0.062%2f0.062%2f0.000%20ms%20The%20-c%20switch%20indicates%20that%20we%20want%20to%20send%20a%20single%20%26ldquo%3bprobe%26rdquo%3b.">
+      <i class="fab fa-tumblr " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fechorand.me%2fposts%2fmy-own-ping%2f&t=How%20does%20ping%20roughly%20work%20over%20IPv4%20on%20Linux%3f">
+      <i class="fab fa-hacker-news " aria-hidden="true"></i>
+    </a>
+  </li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <nav id="TableOfContents">
+  <ul>
+    <li><a href="#resources">Resources</a></li>
+  </ul>
+</nav>
+    </div>
+  </span>
+</div>
+
+
+  <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+    <header>
+      <h1 class="posttitle" itemprop="name headline">
+        How does ping roughly work over IPv4 on Linux?
+      </h1>
+      <div class="meta">
+        
+        <div class="postdate">
+          
+          <time datetime="2018-04-27 00:00:00 &#43;0000 UTC" itemprop="datePublished">2018-04-27</time>
+          
+        </div>
+        
+        <div class="article-category">
+            <i class="fas fa-archive"></i>
+            
+            
+            <a class="category-link" href="/categories/software">software</a>
+            
+        </div>
+        
+        
+      </div>
+    </header>
+
+  
+    <div class="content" itemprop="articleBody">
+      <h1 id="introduction">Introduction</h1>
+<p>The <code>ping</code> program is one of the most common programs which is used to check the &ldquo;aliveness&rdquo; of a host and
+a typical execution looks as follows:</p>
+<pre><code>$ ping 127.0.0.1 -c 1 -4
+
+PING 127.0.0.1 (127.0.0.1) 56(84) bytes of data.
+64 bytes from 127.0.0.1: icmp_seq=1 ttl=64 time=0.062 ms
+
+--- 127.0.0.1 ping statistics ---
+1 packets transmitted, 1 received, 0% packet loss, time 0ms
+rtt min/avg/max/mdev = 0.062/0.062/0.062/0.000 ms
+</code></pre><p>The <code>-c</code> switch indicates that we want to send a single &ldquo;probe&rdquo;. The <code>-4</code> switch limits the <code>ping</code> program to stay
+confined to making network operations related to IPv4 only.</p>
+<p>It basically works by sending a special network packet to your destination host and waits for the host to
+reply back. Then, it prints if any packets were lost and the timing statistics. I wanted to understand
+how the program works - what does it send? what does it receive? The final product ideally would be a
+C program which will be a basic version of <code>ping</code>.</p>
+<h1 id="theory">Theory</h1>
+<p>This <a href="http://www.galaxyvisions.com/pdf/white-papers/How_does_Ping_Work_Style_1_GV.pdf">pdf</a> here has a good description
+of the working of ping. The non-detailed version is that we create a special ICMP packet, package it up within a IP
+packet and send it across to the destination. The destination Linux kernel receives the packet, and sends a reply
+ICMP packet embedded within a IP packet. The destination host doesn&rsquo;t have any user space program running to receive
+the &ldquo;ping&rdquo; packet. Each packet only has <code>header</code> information. You can embed specific data into the ICMP packet, but
+that&rsquo;s not required. The post <a href="http://www.genetech.com.au/blog/?p=970">here</a> describes the packet structure a bit
+more along with a graphical representation.</p>
+<p>With that bit of theory under our belt, let&rsquo;s look into what system calls are made as part of the above invocation
+of the <code>ping</code> program using <code>strace</code>.</p>
+<h1 id="system-calls-made-as-part-of-ping">System calls made as part of ping</h1>
+<p>If you don&rsquo;t have <code>strace</code> installed, please install it using your package manager. Let&rsquo;s now execute the above <code>ping</code> program under <code>strace</code>:</p>
+<pre><code>$ strace -e trace=network ping 127.0.0.1 -c 1 -4
+</code></pre><p>You will see the output of the above command similar to:</p>
+<pre><code>..
+socket(AF_INET, SOCK_DGRAM, IPPROTO_ICMP) = 3
+socket(AF_INET, SOCK_DGRAM, IPPROTO_IP) = 4
+connect(4, {sa_family=AF_INET, sin_port=htons(1025), sin_addr=inet_addr(&quot;127.0.0.1&quot;)}, 16) = 0
+getsockname(4, {sa_family=AF_INET, sin_port=htons(34117), sin_addr=inet_addr(&quot;127.0.0.1&quot;)}, [16]) = 0
+setsockopt(3, SOL_IP, IP_RECVERR, [1], 4) = 0
+setsockopt(3, SOL_IP, IP_RECVTTL, [1], 4) = 0
+setsockopt(3, SOL_IP, IP_RETOPTS, [1], 4) = 0
+setsockopt(3, SOL_SOCKET, SO_SNDBUF, [324], 4) = 0
+setsockopt(3, SOL_SOCKET, SO_RCVBUF, [65536], 4) = 0
+getsockopt(3, SOL_SOCKET, SO_RCVBUF, [131072], [4]) = 0
+PING 127.0.0.1 (127.0.0.1) 56(84) bytes of data.
+setsockopt(3, SOL_SOCKET, SO_TIMESTAMP, [1], 4) = 0
+setsockopt(3, SOL_SOCKET, SO_SNDTIMEO, &quot;\1\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0&quot;, 16) = 0
+setsockopt(3, SOL_SOCKET, SO_RCVTIMEO, &quot;\1\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0&quot;, 16) = 0
+sendto(3, &quot;\10\0q9\0\0\0\1\254k\331Z\0\0\0\0B,\0\0\0\0\0\0\20\21\22\23\24\25\26\27&quot;..., 64, 0, {sa_family=AF_INET, sin_port=htons(0), sin_addr=inet_addr(&quot;127.0.0.1&quot;)}, 16) = 64
+recvmsg(3, {msg_name={sa_family=AF_INET, sin_port=htons(0), sin_addr=inet_addr(&quot;127.0.0.1&quot;)}, msg_namelen=128-&gt;16, msg_iov=[{iov_base=&quot;\0\0x\314\0m\0\1\254k\331Z\0\0\0\0B,\0\0\0\0\0\0\20\21\22\23\24\25\26\27&quot;..., iov_len=192}], msg_iovlen=1, msg_control=[{cmsg_len=32, cmsg_level=SOL_SOCKET, cmsg_type=0x1d /* SCM_??? */}, {cmsg_len=20, cmsg_level=SOL_IP, cmsg_type=IP_TTL, cmsg_data=[64]}], msg_controllen=56, msg_flags=0}, 0) = 64
+64 bytes from 127.0.0.1: icmp_seq=1 ttl=64 time=0.188 ms
+
+--- 127.0.0.1 ping statistics ---
+1 packets transmitted, 1 received, 0% packet loss, time 0ms
+rtt min/avg/max/mdev = 0.188/0.188/0.188/0.000 ms
++++ exited with 0 +++
+a
+</code></pre><p>Let&rsquo;s first look at the first four lines of the trace:</p>
+<p><em>socket(AF_INET, SOCK_DGRAM, IPPROTO_ICMP) = 3</em></p>
+<p>The above creates a socket of type <code>SOCK_DGRAM</code> and the protocol as <code>IPPROTO_ICMP</code>. The IPPROTO_ICMP socket
+protocol was <a href="https://lwn.net/Articles/443051/">added</a> to allow a friendlier way to create ICMP packets. This
+eliminates the need to create &ldquo;RAW&rdquo; sockets which in turn eliminates the need to have the
+<a href="http://man7.org/linux/man-pages/man7/capabilities.7.html">CAP_NET_RAW</a> capability. The file descriptor
+returned is important to note here - <code>3</code>.</p>
+<p><em>socket(AF_INET, SOCK_DGRAM, IPPROTO_IP) = 4</em></p>
+<p>This creates another socket with <code>IPPROTO_IP</code> protocol and then uses it to connect to the UDP port 1025 on
+the target host:</p>
+<p><em>connect(4, {sa_family=AF_INET, sin_port=htons(1025), sin_addr=inet_addr(&ldquo;127.0.0.1&rdquo;)}, 16) = 0</em></p>
+<p>And then, uses <a href="http://man7.org/linux/man-pages/man2/getsockname.2.html">getsockname</a> to get the address
+the socket is bound to:</p>
+<p><em>getsockname(4, {sa_family=AF_INET, sin_port=htons(34117), sin_addr=inet_addr(&ldquo;127.0.0.1&rdquo;)}, [16]) = 0</em></p>
+<p>The above three steps are needed to figure out the IP address of the network interface that will be used
+to send the ICMP packets to the destination host.  I am not quite sure why we need the new socket, hence
+I created an <a href="https://github.com/iputils/iputils/issues/125">issue</a>  on the <code>iputils</code> project  to request a
+clarification.</p>
+<p>Let&rsquo;s now continue with the trace. We can see a bunch of <a href="https://linux.die.net/man/2/setsockopt">setsockopt</a> system
+calls, but they are all on the first socket that was created i.e. for <code>IPPROTO_ICMP</code> with the file descriptor, 3.</p>
+<p>Finally, we have the call to, <a href="https://linux.die.net/man/2/sendto">sendto</a> and <a href="https://linux.die.net/man/2/recvmsg">recvmsg</a>
+system calls which are used to send the IP packet (with the ICMP packet embedded in it) to the destination host and then
+receive the reply from the destination host respectively.</p>
+<h1 id="implementation">Implementation</h1>
+<p>We now know enough to copy bits and pieces from the <code>ping</code> implementation of the
+<a href="https://github.com/iputils/iputils">iputils</a> project to transform our above understanding into code.
+The C implementation is in <a href="https://github.com/amitsaha/ping/blob/master/ping.c">ping.c</a>. It just sends a single
+ping and does a blocking read to read the reply. It has a number of inline comments to help understand what&rsquo;s going on.</p>
+<p>One of the key comments there in is about the use of the ICMP identifier <a href="http://www.networksorcery.com/enp/rfc/rfc792.txt">RFC</a>.
+When use a RAW socket, i.e. <code>IPPROTO_RAW</code> as the protocol type, we have to set the ICMP identifier when sending and
+check if it&rsquo;s the same on receipt of an ICMP reply that whether it is meant for us or not. We don&rsquo;t need to do that
+for <code>IPPROTOCOL_ICMP</code> since the Kernel automatically does that for us.</p>
+<p>You can compile it on a Linux system as:</p>
+<pre><code>$ gcc ping.c
+</code></pre><p>If we now try to execute the created binary, we will likely get a permission denied error:</p>
+<pre><code>$ ./a.out 127.0.0.1
+Error creating socket: Permission denied
+</code></pre><p>That&rsquo;s because the IPPROTO_ICMP support was added to Linux along with a configurable <code>sysctl</code> parameter: <code>ping_group_Range</code>.
+To print the current value of this:</p>
+<pre><code>$ sudo sysctl net.ipv4.ping_group_range
+net.ipv4.ping_group_range = 1   0
+</code></pre><p>Now, we can update the parameter above to include our group ID:</p>
+<pre><code>$ id -g
+1000
+$ sudo sysctl -w net.ipv4.ping_group_range=&quot;0 1000&quot;
+net.ipv4.ping_group_range = 0 2000
+</code></pre><p>(If you are a member of multiple groups, the range has to include only one of the groups)</p>
+<p>Now, let&rsquo;s try sending a single ping:</p>
+<pre><code>$ ./a.out 127.0.0.1
+Sent 64 bytes
+127.0.0.1
+Reply of 64 bytes received
+icmp_seq = 1
+</code></pre><p>Or an external host:</p>
+<pre><code>04:48 $ ./a.out 8.8.8.8
+Sent 64 bytes
+8.8.8.8
+Reply of 64 bytes received
+icmp_seq = 1
+</code></pre><h1 id="parting-notes">Parting notes</h1>
+<p>If you have been following along starting from <code>strace</code> at the beginning you can see that I could run <code>ping</code> without
+needed <code>sudo</code> or having to set the group sysctl parameter. What happened? The <code>ping</code> program has the <a href="https://www.cyberciti.biz/faq/unix-bsd-linux-setuid-file/">setuid</a> bit set:</p>
+<pre><code> $ ls -lrt /bin/ping
+-rwsr-xr-x 1 root root 64424 Mar  9  2017 /bin/ping
+</code></pre><p>Hence, we could do the same for our <code>./a.out</code> file above:</p>
+<pre><code>05:30 $ sudo chown root:root ./a.out
+05:30 $ sudo chmod u+s ./a.out
+05:30 $ sudo chmod g+s ./a.out
+</code></pre><p>Then, we would not need to change the sysctl parameter.</p>
+<h2 id="resources">Resources</h2>
+<ul>
+<li><a href="https://stackoverflow.com/questions/8290046/icmp-sockets-linux">Stackoverflow</a></li>
+<li><a href="https://lwn.net/Articles/443051/">&ldquo;ping&rdquo; socket</a></li>
+<li><a href="https://github.com/iputils/iputils">ping source</a></li>
+</ul>
+
+    </div>
+  </article>
+
+  
+  
+
+
+
+
+
+  <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/about">About</a></li>
+         
+          <li><a href="/articles">Articles</a></li>
+         
+          <li><a href="/books">Books</a></li>
+         
+          <li><a href="/posts">Posts</a></li>
+         
+          <li><a href="/talks">Talks</a></li>
+         
+          <li><a href="/categories/">Categories</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <nav id="TableOfContents">
+  <ul>
+    <li><a href="#resources">Resources</a></li>
+  </ul>
+</nav>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      
+      <ul>
+  
+  
+    
+  
+  
+  <li>
+    <a class="icon" href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fechorand.me%2fposts%2fmy-own-ping%2f">
+      <i class="fab fa-facebook fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://twitter.com/share?url=https%3a%2f%2fechorand.me%2fposts%2fmy-own-ping%2f&text=How%20does%20ping%20roughly%20work%20over%20IPv4%20on%20Linux%3f">
+      <i class="fab fa-twitter fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fechorand.me%2fposts%2fmy-own-ping%2f&title=How%20does%20ping%20roughly%20work%20over%20IPv4%20on%20Linux%3f">
+      <i class="fab fa-linkedin fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fechorand.me%2fposts%2fmy-own-ping%2f&is_video=false&description=How%20does%20ping%20roughly%20work%20over%20IPv4%20on%20Linux%3f">
+      <i class="fab fa-pinterest fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="mailto:?subject=How%20does%20ping%20roughly%20work%20over%20IPv4%20on%20Linux%3f&body=Check out this article: https%3a%2f%2fechorand.me%2fposts%2fmy-own-ping%2f">
+      <i class="fas fa-envelope fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://getpocket.com/save?url=https%3a%2f%2fechorand.me%2fposts%2fmy-own-ping%2f&title=How%20does%20ping%20roughly%20work%20over%20IPv4%20on%20Linux%3f">
+      <i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://reddit.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fmy-own-ping%2f&title=How%20does%20ping%20roughly%20work%20over%20IPv4%20on%20Linux%3f">
+      <i class="fab fa-reddit fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.stumbleupon.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fmy-own-ping%2f&title=How%20does%20ping%20roughly%20work%20over%20IPv4%20on%20Linux%3f">
+      <i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://digg.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fmy-own-ping%2f&title=How%20does%20ping%20roughly%20work%20over%20IPv4%20on%20Linux%3f">
+      <i class="fab fa-digg fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.tumblr.com/share/link?url=https%3a%2f%2fechorand.me%2fposts%2fmy-own-ping%2f&name=How%20does%20ping%20roughly%20work%20over%20IPv4%20on%20Linux%3f&description=Introduction%20The%20ping%20program%20is%20one%20of%20the%20most%20common%20programs%20which%20is%20used%20to%20check%20the%20%26ldquo%3baliveness%26rdquo%3b%20of%20a%20host%20and%20a%20typical%20execution%20looks%20as%20follows%3a%0a%24%20ping%20127.0.0.1%20-c%201%20-4%20PING%20127.0.0.1%20%28127.0.0.1%29%2056%2884%29%20bytes%20of%20data.%2064%20bytes%20from%20127.0.0.1%3a%20icmp_seq%3d1%20ttl%3d64%20time%3d0.062%20ms%20---%20127.0.0.1%20ping%20statistics%20---%201%20packets%20transmitted%2c%201%20received%2c%200%25%20packet%20loss%2c%20time%200ms%20rtt%20min%2favg%2fmax%2fmdev%20%3d%200.062%2f0.062%2f0.062%2f0.000%20ms%20The%20-c%20switch%20indicates%20that%20we%20want%20to%20send%20a%20single%20%26ldquo%3bprobe%26rdquo%3b.">
+      <i class="fab fa-tumblr fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fechorand.me%2fposts%2fmy-own-ping%2f&t=How%20does%20ping%20roughly%20work%20over%20IPv4%20on%20Linux%3f">
+      <i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+      
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;">
+          <i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;">
+          <i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;">
+          <i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');">
+          <i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+
+  <footer id="footer">
+  <div class="footer-left">
+    Copyright  &copy; 2020  Exploring Software 
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+        <li><a href="/about">About</a></li>
+         
+        <li><a href="/articles">Articles</a></li>
+         
+        <li><a href="/books">Books</a></li>
+         
+        <li><a href="/posts">Posts</a></li>
+         
+        <li><a href="/talks">Talks</a></li>
+         
+        <li><a href="/categories/">Categories</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+
+  </div>
+</body>
+
+<link rel="stylesheet" href=/lib/font-awesome/css/all.min.css>
+<script src=/lib/jquery/jquery.min.js></script>
+<script src=/js/main.js></script>
+
+
+
+</html>

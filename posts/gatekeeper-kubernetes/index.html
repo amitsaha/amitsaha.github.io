@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title> Using Gatekeeper in Kubernetes | Exploring Software</title>
+  <meta name="description" content="echo $RANDOM. Exploring Software and writing about it.">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="all,follow">
+  <meta name="googlebot" content="index,follow,snippet,archive">
+  <meta property="og:title" content="Using Gatekeeper in Kubernetes" />
+<meta property="og:description" content="Introduction Gatekeeper allows a Kubernetes administrator to implement policies for ensuring compliance and best practices in their cluster. It makes use of Open Policy Agent (OPA) and is a validating admission controller. The policies are written in the Rego language. Gatekeeper embraces Kubernetes native concepts such as Custom Resource Definitions (CRDs) and hence the policies are managed as kubernetes resources. The GKE docs on this topic are a good place to learn more." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://echorand.me/posts/gatekeeper-kubernetes/" />
+<meta property="article:published_time" content="2020-05-28T00:00:00+00:00" />
+<meta property="article:modified_time" content="2020-06-03T17:03:18+10:00" />
+
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Using Gatekeeper in Kubernetes"/>
+<meta name="twitter:description" content="Introduction Gatekeeper allows a Kubernetes administrator to implement policies for ensuring compliance and best practices in their cluster. It makes use of Open Policy Agent (OPA) and is a validating admission controller. The policies are written in the Rego language. Gatekeeper embraces Kubernetes native concepts such as Custom Resource Definitions (CRDs) and hence the policies are managed as kubernetes resources. The GKE docs on this topic are a good place to learn more."/>
+
+  
+  
+  
+  <link rel="stylesheet" href="https://echorand.me/css/style-white.css">
+  
+  
+  
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  
+
+  
+<link rel="icon" type="image/png" href="https://echorand.me/images/favicon.ico" />
+
+  
+  
+  
+  
+  
+    
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-108901610-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+  
+  
+</head>
+
+<body class="max-width mx-auto px3 ltr">
+  <div class="content index py4">
+
+  <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+        <li><a href="/about">About</a></li>
+         
+        <li><a href="/articles">Articles</a></li>
+         
+        <li><a href="/books">Books</a></li>
+         
+        <li><a href="/posts">Posts</a></li>
+         
+        <li><a href="/talks">Talks</a></li>
+         
+        <li><a href="/categories/">Categories</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li>
+          <a class="icon" href=" https://echorand.me/posts/getting-started-with-golang-plugins/">
+            <i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i>
+          </a>
+        </li>
+        
+        
+        <li>
+          <a class="icon" href="https://echorand.me/posts/policy-enforcement-kubernetes/">
+            <i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i>
+          </a>
+        </li>
+        
+        <li>
+          <a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');">
+            <i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i>
+          </a>
+        </li>
+        <li>
+          <a class="icon" href="#">
+            <i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i>
+          </a>
+        </li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      
+      <ul>
+  
+  
+    
+  
+  
+  <li>
+    <a class="icon" href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fechorand.me%2fposts%2fgatekeeper-kubernetes%2f">
+      <i class="fab fa-facebook " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://twitter.com/share?url=https%3a%2f%2fechorand.me%2fposts%2fgatekeeper-kubernetes%2f&text=Using%20Gatekeeper%20in%20Kubernetes">
+      <i class="fab fa-twitter " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fechorand.me%2fposts%2fgatekeeper-kubernetes%2f&title=Using%20Gatekeeper%20in%20Kubernetes">
+      <i class="fab fa-linkedin " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fechorand.me%2fposts%2fgatekeeper-kubernetes%2f&is_video=false&description=Using%20Gatekeeper%20in%20Kubernetes">
+      <i class="fab fa-pinterest " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="mailto:?subject=Using%20Gatekeeper%20in%20Kubernetes&body=Check out this article: https%3a%2f%2fechorand.me%2fposts%2fgatekeeper-kubernetes%2f">
+      <i class="fas fa-envelope " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://getpocket.com/save?url=https%3a%2f%2fechorand.me%2fposts%2fgatekeeper-kubernetes%2f&title=Using%20Gatekeeper%20in%20Kubernetes">
+      <i class="fab fa-get-pocket " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://reddit.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fgatekeeper-kubernetes%2f&title=Using%20Gatekeeper%20in%20Kubernetes">
+      <i class="fab fa-reddit " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.stumbleupon.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fgatekeeper-kubernetes%2f&title=Using%20Gatekeeper%20in%20Kubernetes">
+      <i class="fab fa-stumbleupon " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://digg.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fgatekeeper-kubernetes%2f&title=Using%20Gatekeeper%20in%20Kubernetes">
+      <i class="fab fa-digg " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.tumblr.com/share/link?url=https%3a%2f%2fechorand.me%2fposts%2fgatekeeper-kubernetes%2f&name=Using%20Gatekeeper%20in%20Kubernetes&description=Introduction%20Gatekeeper%20allows%20a%20Kubernetes%20administrator%20to%20implement%20policies%20for%20ensuring%20compliance%20and%20best%20practices%20in%20their%20cluster.%20It%20makes%20use%20of%20Open%20Policy%20Agent%20%28OPA%29%20and%20is%20a%20validating%20admission%20controller.%20The%20policies%20are%20written%20in%20the%20Rego%20language.%20Gatekeeper%20embraces%20Kubernetes%20native%20concepts%20such%20as%20Custom%20Resource%20Definitions%20%28CRDs%29%20and%20hence%20the%20policies%20are%20managed%20as%20kubernetes%20resources.%20The%20GKE%20docs%20on%20this%20topic%20are%20a%20good%20place%20to%20learn%20more.">
+      <i class="fab fa-tumblr " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fechorand.me%2fposts%2fgatekeeper-kubernetes%2f&t=Using%20Gatekeeper%20in%20Kubernetes">
+      <i class="fab fa-hacker-news " aria-hidden="true"></i>
+    </a>
+  </li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <nav id="TableOfContents">
+  <ul>
+    <li><a href="#policy-with-two-conditions-in-a-rule">Policy with two conditions in a rule</a></li>
+    <li><a href="#or-rules">OR rules</a>
+      <ul>
+        <li><a href="#invalid-input---unspecified-namespace">Invalid input - Unspecified namespace</a></li>
+        <li><a href="#invalid-input---empty-namespace">Invalid input - Empty namespace</a></li>
+        <li><a href="#invalid-input---default-namespace">Invalid input - default namespace</a></li>
+        <li><a href="#valid-input">Valid Input</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+    </div>
+  </span>
+</div>
+
+
+  <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+    <header>
+      <h1 class="posttitle" itemprop="name headline">
+        Using Gatekeeper in Kubernetes
+      </h1>
+      <div class="meta">
+        
+        <div class="postdate">
+          
+          <time datetime="2020-05-28 00:00:00 &#43;0000 UTC" itemprop="datePublished">2020-05-28</time>
+          
+        </div>
+        
+        <div class="article-category">
+            <i class="fas fa-archive"></i>
+            
+            
+            <a class="category-link" href="/categories/infrastructure">infrastructure</a>
+            
+        </div>
+        
+        
+      </div>
+    </header>
+
+  
+    <div class="content" itemprop="articleBody">
+      <h1 id="introduction">Introduction</h1>
+<p><a href="https://github.com/open-policy-agent/gatekeeper/">Gatekeeper</a> allows a Kubernetes administrator
+to implement policies for ensuring compliance and best practices in their cluster. It makes use of
+Open Policy Agent (OPA) and is a <a href="https://kubernetes.io/docs/reference/access-authn-authz/admission-controllers/#validatingadmissionwebhook">validating admission controller</a>.
+The policies are written in the <a href="https://www.openpolicyagent.org/docs/latest/policy-language/">Rego</a> language.
+Gatekeeper embraces Kubernetes native concepts such as Custom Resource Definitions (CRDs) and hence the policies are managed
+as kubernetes resources.  The <a href="https://cloud.google.com/anthos-config-management/docs/concepts/policy-controller">GKE docs</a> on
+this topic are a good place to learn more.</p>
+<p>Before we dive deep into Gatekeeper itself, let&rsquo;s first familiarize
+ourselves with the Rego language. One point worth nothing is Rego and OPA can be used for policy
+enforcement beyond Kubernetes, however, we are going to focus on Kubernetes <em>objects</em>.</p>
+<h1 id="writing-our-first-policy">Writing our first policy</h1>
+<p>Let&rsquo;s look at a policy which will fail if the <code>namespace</code> of an object is <code>default</code>:</p>
+<pre><code>package k8svalidnamespace
+        
+violation[{&quot;msg&quot;: msg, &quot;details&quot;: {}}] {
+  value := input.review.object.metadata.namespace
+  value == &quot;default&quot;
+  msg := sprintf(&quot;Namespace should not be default: %v&quot;, [value])
+}
+</code></pre><p>The first line of this policy defines a namespace  or package for the policy. Each policy must reside in a package.</p>
+<p>Next, we define a <code>violation</code> <em>block</em> which &ldquo;returns&rdquo; two objects, &ldquo;msg&rdquo; and &ldquo;details&rdquo; to the calling framework.
+If you are coming to gatekepper from OPA documentation, you will notice that OPA has <code>deny</code> block, whereas
+<code>gatekeeper</code> has <code>violation</code> blocks. I am not sure why, but this was changed in
+<a href="https://github.com/open-policy-agent/gatekeeper/issues/168">gatekeeper</a> a while back. This is the &ldquo;entrypoint&rdquo; for
+a rule as per the <a href="https://github.com/open-policy-agent/frameworks/tree/master/constraint#opa-constraint-framework">OPA constraint framework guide</a>.</p>
+<p>The statements inside this block i.e. inside the <code>{}</code> are <a href="https://www.openpolicyagent.org/docs/latest/policy-language/#the-basics">Rego</a> expressions.</p>
+<p>The expression <code>value := input.review.object.metadata.namespace</code> assigns the value of <code>input.review.object.metadata.namespace</code>
+to the variable <code>value</code>. The <code>input</code> object contains the entire JSON object that Gatekeeper provides to the policy when evaluating
+it.</p>
+<p>Next, we check whether the value of this variable is &ldquo;default&rdquo; using <code>value == &quot;default&quot;</code>. Only if this condition
+evaluates to <code>true</code>, the policy will be violated. If we have more than one conditional statement, all the comparisons
+must evaluate to <code>true</code> for the policy to be evaluted (see next example below).</p>
+<p>In the final line of the policy, we use the <code>sprintf</code> function to construct an error message which is stored in the <code>msg</code>
+object and hence automatically &ldquo;returned&rdquo;.</p>
+<p>Given the above policy and an input document, let&rsquo;s test it out in the <a href="https://play.openpolicyagent.org/p/SI62cRuOEh">Rego playground</a>.</p>
+<p>For reference, the input is:</p>
+<pre><code>{
+    &quot;kind&quot;: &quot;AdmissionReview&quot;,
+    &quot;parameters&quot;: {},
+    &quot;review&quot;: {
+        &quot;kind&quot;: {
+            &quot;kind&quot;: &quot;Pod&quot;,
+            &quot;version&quot;: &quot;v1&quot;
+        },
+        &quot;object&quot;: {
+            &quot;metadata&quot;: {
+                &quot;name&quot;: &quot;myapp&quot;,
+                &quot;namespace&quot;: &quot;default&quot;
+            },
+            &quot;spec&quot;: {
+                &quot;containers&quot;: []
+            }
+        }
+    }
+}
+
+</code></pre><p>The output you will see is:</p>
+<pre><code>{
+    &quot;violation&quot;: [
+        {
+            &quot;details&quot;: {},
+            &quot;msg&quot;: &quot;Namespace should not be default: default&quot;
+        }
+    ]
+}
+</code></pre><h2 id="policy-with-two-conditions-in-a-rule">Policy with two conditions in a rule</h2>
+<p>Let&rsquo;s now say that in addition to check if the <code>namespace</code> is default, we also want to check if the namespace
+is an empty string. In other words, we want the policy to be violated if either the namespace is empty or the
+namespace is default. Here&rsquo;s the first version of the policy which doesn&rsquo;t work as expected:</p>
+<pre><code>package k8svalidnamespace
+        
+violation[{&quot;msg&quot;: msg, &quot;details&quot;: {}}] {          
+  value := input.review.object.metadata.namespace          
+  value == &quot;&quot;
+  value == &quot;default&quot;
+  msg := sprintf(&quot;Namespace should not be default: %v&quot;, [value])
+}
+</code></pre><p>I wrote this version in a hurry and I don&rsquo;t know what I was expecting. Someone in open policy agent slack then pointed me
+to the issue. Even then we can use the above wrong policy to understand a bit more about how policy evaluation works.
+Given the same input as the first policy, the policy evaluation will <em>stop</em> at the expression, <code>value == &quot;&quot;</code>. It evaluates
+to false and hence the above rule is not violated and hence we wouldn&rsquo;t see any violations.</p>
+<p>In addition, consider the following input document:</p>
+<pre><code>{
+    &quot;kind&quot;: &quot;AdmissionReview&quot;,
+    &quot;parameters&quot;: {},
+    &quot;review&quot;: {
+        &quot;kind&quot;: {
+            &quot;kind&quot;: &quot;Pod&quot;,
+            &quot;version&quot;: &quot;v1&quot;
+        },
+        &quot;object&quot;: {
+            &quot;metadata&quot;: {
+                &quot;name&quot;: &quot;myapp&quot;,
+                &quot;namespace&quot;: &quot;&quot;
+            },
+            &quot;spec&quot;: {
+                &quot;containers&quot;: []
+            }
+        }
+    }
+}
+</code></pre><p>When we evaluate the policy above with the above input document, the first comparison <code>(value == &quot;&quot;</code>) evaluates to <code>true</code>,
+but the second comparsion <code>(value == &quot;default&quot;)</code> evaluates to false. Hence, the policy isn&rsquo;t violated - not what
+we wanted.</p>
+<p>As the last case, let&rsquo;s consider an input document with no <code>namespace</code> defined at all:</p>
+<pre><code>{
+    &quot;kind&quot;: &quot;AdmissionReview&quot;,
+    &quot;parameters&quot;: {},
+    &quot;review&quot;: {
+        &quot;kind&quot;: {
+            &quot;kind&quot;: &quot;Pod&quot;,
+            &quot;version&quot;: &quot;v1&quot;
+        },
+        &quot;object&quot;: {
+            &quot;metadata&quot;: {
+                &quot;name&quot;: &quot;myapp&quot;                
+            },
+            &quot;spec&quot;: {
+                &quot;containers&quot;: []
+            }
+        }
+    }
+}
+</code></pre><p>When given this input document, via some Rego magic, the policy is not evaluated at all. Perhaps it detects that
+the input object doesn&rsquo;t have the <code>namespace</code> field defined and hence decides not to evaluate and hence there is
+no violation of the policy.</p>
+<h2 id="or-rules">OR rules</h2>
+<p>Let&rsquo;s now write the correct version of the policy to cause a violation if either the namespace is undefined,
+empty string or <code>default</code>:</p>
+<pre><code>package k8svalidnamespace
+     
+violation[{&quot;msg&quot;: msg, &quot;details&quot;: {}}] {
+  not input.review.object.metadata.namespace
+  msg := &quot;Namespace should not be unspecified&quot;          
+}
+        
+violation[{&quot;msg&quot;: msg, &quot;details&quot;: {}}] {
+  value := input.review.object.metadata.namespace
+  count(value) == 0
+  msg := sprintf(&quot;Namespace should not be empty: %v&quot;, [value])          
+}
+        
+violation[{&quot;msg&quot;: msg, &quot;details&quot;: {}}] {
+  value := input.input.review.object.metadata.namespace
+  value == &quot;default&quot;
+  msg := sprintf(&quot;Namespace should not be default: %v&quot;, [value])          
+}
+</code></pre><p>We have three <code>violation</code> blocks in the above policy each containing one conditional expression. The entire policy
+will be violated if any of the violation blocks are true.</p>
+<h3 id="invalid-input---unspecified-namespace">Invalid input - Unspecified namespace</h3>
+<p>Let&rsquo;s consider an input document with no namespace specified:</p>
+<pre><code>
+ {
+        &quot;kind&quot;: &quot;AdmissionReview&quot;,
+        &quot;parameters&quot;: {},
+        &quot;review&quot;: {
+            &quot;kind&quot;: {
+                &quot;kind&quot;: &quot;Pod&quot;,
+                &quot;version&quot;: &quot;v1&quot;
+            },
+            &quot;object&quot;: {
+                &quot;metadata&quot;: {
+                    &quot;name&quot;: &quot;myapp&quot;
+                },
+                &quot;spec&quot;: {
+                    &quot;containers&quot;: []
+                }
+            }
+        }
+    }
+
+</code></pre><p>When the above policy is evaluated given the above input document, the first rule evaluates to <code>true</code>
+and hence we have a violation. The other rules are not evaluated at all - not because the first rule
+evaluates to <code>true</code>, but because the object doesn&rsquo;t have the <code>namespace</code> field.</p>
+<h3 id="invalid-input---empty-namespace">Invalid input - Empty namespace</h3>
+<p>Let&rsquo;s now consider the following input document:</p>
+<pre><code>
+ {
+        &quot;kind&quot;: &quot;AdmissionReview&quot;,
+        &quot;parameters&quot;: {},
+        &quot;review&quot;: {
+            &quot;kind&quot;: {
+                &quot;kind&quot;: &quot;Pod&quot;,
+                &quot;version&quot;: &quot;v1&quot;
+            },
+            &quot;object&quot;: {
+                &quot;metadata&quot;: {
+                    &quot;name&quot;: &quot;myapp&quot;,
+                    &quot;namespace&quot;: &quot;&quot;
+                    
+                },
+                &quot;spec&quot;: {
+                    &quot;containers&quot;: []
+                }
+            }
+        }
+    }
+
+</code></pre><p>For this policy, the first rule is not violated, but the second rule is, and the third rule is not violated
+either.</p>
+<h3 id="invalid-input---default-namespace">Invalid input - default namespace</h3>
+<p>Now, consider the input document as:</p>
+<pre><code>
+ {
+        &quot;kind&quot;: &quot;AdmissionReview&quot;,
+        &quot;parameters&quot;: {},
+        &quot;review&quot;: {
+            &quot;kind&quot;: {
+                &quot;kind&quot;: &quot;Pod&quot;,
+                &quot;version&quot;: &quot;v1&quot;
+            },
+            &quot;object&quot;: {
+                &quot;metadata&quot;: {
+                    &quot;name&quot;: &quot;myapp&quot;,
+                    &quot;namespace&quot;: &quot;default&quot;
+                    
+                },
+                &quot;spec&quot;: {
+                    &quot;containers&quot;: []
+                }
+            }
+        }
+    }
+
+</code></pre><p>For this input document, only the last rule is violated and we get a violation from the policy.</p>
+<h3 id="valid-input">Valid Input</h3>
+<p>Now, consider the following input document:</p>
+<pre><code>
+ {
+        &quot;kind&quot;: &quot;AdmissionReview&quot;,
+        &quot;parameters&quot;: {},
+        &quot;review&quot;: {
+            &quot;kind&quot;: {
+                &quot;kind&quot;: &quot;Pod&quot;,
+                &quot;version&quot;: &quot;v1&quot;
+            },
+            &quot;object&quot;: {
+                &quot;metadata&quot;: {
+                    &quot;name&quot;: &quot;myapp&quot;,
+                    &quot;namespace&quot;: &quot;default1&quot;
+                    
+                },
+                &quot;spec&quot;: {
+                    &quot;containers&quot;: []
+                }
+            }
+        }
+    }
+
+</code></pre><p>For the above input, the policy will report no violations.</p>
+<h1 id="a-more-complicated-policy">A more complicated policy</h1>
+<p>Let&rsquo;s now write a policy to ensure that only containers from certain repositories
+should be allowed to run on the cluster:</p>
+<pre><code>package k8sallowedrepos
+
+violation[{&quot;msg&quot;: msg}] {
+  container := input.review.object.spec.containers[_]
+  satisfied := [good | repo = input.parameters.repos[_] ; good = startswith(container.image, repo)]
+  not any(satisfied)
+  msg := sprintf(&quot;container &lt;%v&gt; has an invalid image repo &lt;%v&gt;, allowed repos are %v&quot;, [container.name, container.image, input.parameters.repos])
+}
+</code></pre><p>The first line of the <code>violation</code> block is:</p>
+<pre><code>container := input.review.object.spec.containers[_]
+</code></pre><p>The above expression essentially boils down to the <code>container</code> variable containing
+a list of all elements in input the <code>containers</code> object. To learn more about
+the special <code>_</code> index, see the <a href="https://www.openpolicyagent.org/docs/latest/policy-language/#variable-keys">documentation</a>.</p>
+<p>The second line of the <code>violation</code> block is:</p>
+<pre><code>satisfied := [good | repo = input.parameters.repos[_] ; good = startswith(container.image, repo)]
+</code></pre><p>The above line is an example of <a href="https://www.openpolicyagent.org/docs/latest/policy-language/#comprehensions">comprehension</a> and it essentially executes the following pseudocode:</p>
+<pre><code>For each repo in the list of allowed repos
+  For each container in the list of container objects
+    Is container.image starting with any of the repos in the list of allowed repos?
+    If so, append &quot;true&quot; to the array &quot;satisfied&quot;, else append &quot;false&quot;
+  End For
+  # Evalute the rule not any(satisfied) and report violation if any
+End For
+</code></pre><p>The result of the above is an array <code>satisfied</code> with the same number of elements
+as the number of allowed repos in the <code>input.parameters.repos</code> object, with each value being <code>true</code>
+or <code>false</code>.</p>
+<p>The third line of the violation block is our condition, <code>not any(satisfied)</code>. <code>any(satisfied)</code>
+evaluates to <code>true</code> if any of the values in the <code>satisfied</code> list is <code>true</code> and <code>false</code> otherwise.
+It&rsquo;s really important to note here that lines 2-4 in the violation block are &ldquo;executed&rdquo; for
+each item in the <code>container</code> array.</p>
+<p>Hence, given the following input document:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">{
+  <span style="color:#f92672">&#34;kind&#34;</span>: <span style="color:#e6db74">&#34;AdmissionReview&#34;</span>,
+  <span style="color:#f92672">&#34;parameters&#34;</span>: {
+    <span style="color:#f92672">&#34;repos&#34;</span>: [      
+      <span style="color:#e6db74">&#34;quay.io/calico&#34;</span>,      
+      <span style="color:#e6db74">&#34;k8s.gcr.io&#34;</span>,
+      <span style="color:#e6db74">&#34;602401143452.dkr.ecr.us-west-2.amazonaws.com/amazon-k8s-cni&#34;</span>
+    ]
+  },
+  <span style="color:#f92672">&#34;review&#34;</span>: {
+    <span style="color:#f92672">&#34;kind&#34;</span>: {
+      <span style="color:#f92672">&#34;kind&#34;</span>: <span style="color:#e6db74">&#34;Pod&#34;</span>,
+      <span style="color:#f92672">&#34;version&#34;</span>: <span style="color:#e6db74">&#34;v1&#34;</span>
+    },
+    <span style="color:#f92672">&#34;object&#34;</span>: {
+      <span style="color:#f92672">&#34;spec&#34;</span>: {
+        <span style="color:#f92672">&#34;containers&#34;</span>: [
+          {
+            <span style="color:#f92672">&#34;image&#34;</span>: <span style="color:#e6db74">&#34;amazon-k8s-cni&#34;</span>,
+            <span style="color:#f92672">&#34;name&#34;</span>: <span style="color:#e6db74">&#34;mysql-backend&#34;</span>
+          },
+          {
+            <span style="color:#f92672">&#34;image&#34;</span>: <span style="color:#e6db74">&#34;nginx&#34;</span>,
+            <span style="color:#f92672">&#34;name&#34;</span>: <span style="color:#e6db74">&#34;nginx-frontend&#34;</span>
+          }          
+        ]
+      }
+    }
+  }
+}
+</code></pre></div><p>We will see the following as the output: (<a href="https://play.openpolicyagent.org/p/7zMy2YH8Pu">Rego playground link</a>)</p>
+<pre><code>{
+    &quot;violation&quot;: [
+        {
+            &quot;msg&quot;: &quot;container &lt;mysql-backend&gt; has an invalid image repo &lt;amazon-k8s-cni&gt;, allowed repos are [\&quot;277433404353.dkr.ecr.eu-central-1.amazonaws.com\&quot;, \&quot;quay.io/open-policy-agent\&quot;, \&quot;quay.io/calico\&quot;, \&quot;quay.io/kubernetes-ingress-controller\&quot;, \&quot;k8s.gcr.io\&quot;, \&quot;602401143452.dkr.ecr.us-west-2.amazonaws.com/amazon-k8s-cni\&quot;], satisfied: [false, false, false, false, false, false]&quot;
+        },
+        {
+            &quot;msg&quot;: &quot;container &lt;nginx-frontend&gt; has an invalid image repo &lt;nginx&gt;, allowed repos are [\&quot;277433404353.dkr.ecr.eu-central-1.amazonaws.com\&quot;, \&quot;quay.io/open-policy-agent\&quot;, \&quot;quay.io/calico\&quot;, \&quot;quay.io/kubernetes-ingress-controller\&quot;, \&quot;k8s.gcr.io\&quot;, \&quot;602401143452.dkr.ecr.us-west-2.amazonaws.com/amazon-k8s-cni\&quot;], satisfied: [false, false, false, false, false, false]&quot;
+        }
+    ]
+}
+</code></pre><h1 id="rego-unanswered-questions">Rego Unanswered Questions</h1>
+<p>I am still trying to get my head around Rego. Here&rsquo;s some questions I have:</p>
+<ol>
+<li>Difference between &ldquo;=&rdquo; and &ldquo;:=&rdquo;</li>
+<li>Lot more than I can write here, hopefully will be updated.</li>
+</ol>
+<h1 id="setting-up-gatekeeper">Setting up Gatekeeper</h1>
+<p>Install Gatekeeper as per instructions <a href="https://github.com/open-policy-agent/gatekeeper#installation-instructions">here</a>. The following resources are created:</p>
+<pre><code>ClusterRole:
+
+        - gatekeeper-manager-role from gatekeeper.yaml
+
+ClusterRoleBinding:
+
+        - gatekeeper-manager-rolebinding from gatekeeper.yaml
+
+CustomResourceDefinition:
+
+        - configs.config.gatekeeper.sh from gatekeeper.yaml
+        - constrainttemplates.templates.gatekeeper.sh from gatekeeper.yaml
+
+Deployment:
+
+        - gatekeeper-controller-manager in gatekeeper-system from gatekeeper.yaml
+
+Namespace:
+
+        - gatekeeper-system from gatekeeper.yaml
+
+Role:
+
+        - gatekeeper-manager-role in gatekeeper-system from gatekeeper.yaml
+
+RoleBinding:
+
+        - gatekeeper-manager-rolebinding in gatekeeper-system from gatekeeper.yaml
+
+Secret:
+
+        - gatekeeper-webhook-server-cert in gatekeeper-system from gatekeeper.yaml
+
+Service:
+
+        - gatekeeper-webhook-service in gatekeeper-system from gatekeeper.yaml
+
+ServiceAccount:
+
+        - gatekeeper-admin in gatekeeper-system from gatekeeper.yaml
+
+ValidatingWebhookConfiguration:
+
+        - gatekeeper-validating-webhook-configuration from gatekeeper.yaml
+
+</code></pre><p>In addition, you may need to create sync configuration for <a href="https://github.com/open-policy-agent/gatekeeper/#replicating-data">replicating data</a>.</p>
+<h1 id="creating-a-constraint-template">Creating a constraint template</h1>
+<p>Now that we have gatekeeper components installed, the first concept we need to learn is that of a
+<code>ConstraintTemplate</code> - which lays down the schema of the data as well as the policy itself in the
+<a href="https://www.openpolicyagent.org/docs/latest/policy-language/">Rego</a> language.</p>
+<p>The <code>ConstraintTemplate</code> kind is used to create a new constraint template with the name being <code>K8sRequiredLabels</code>:</p>
+<pre><code>apiVersion: templates.gatekeeper.sh/v1beta1
+kind: ConstraintTemplate
+metadata:
+  name: k8srequiredlabels
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sRequiredLabels
+        listKind: K8sRequiredLabelsList
+        plural: k8srequiredlabels
+        singular: k8srequiredlabels
+      validation:
+        # Schema for the `parameters` field
+        openAPIV3Schema:
+          properties:
+            labels:
+              type: array
+              items: string
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8srequiredlabels
+
+        violation[{&quot;msg&quot;: msg, &quot;details&quot;: {&quot;missing_labels&quot;: missing}}] {
+          provided := {label | input.review.object.metadata.labels[label]}
+          required := {label | label := input.parameters.labels[_]}
+          missing := required - provided
+          count(missing) &gt; 0
+          msg := sprintf(&quot;you must provide labels: %v&quot;, [missing])
+        }
+
+</code></pre><p>Once we create the above constraint template, we can list it using <code>kubectl</code>:</p>
+<pre><code>$ kubectl get constrainttemplates.templates.gatekeeper.sh                                                            │
+NAME                AGE                                                                                                                      
+k8srequiredlabels   99s   
+</code></pre><h1 id="creating-a-constraint">Creating a constraint</h1>
+<p>Let&rsquo;s now define a constraint using the constraint template, <code>K8sRequiredLabels</code> (<code>kind: K8sRequiredLabels</code>):</p>
+<pre><code>apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sRequiredLabels
+metadata:
+  name: ns-must-have-gk
+spec:
+  match:
+    kinds:
+      - apiGroups: [&quot;&quot;]
+        kinds: [&quot;Namespace&quot;]
+  parameters:
+    labels: [&quot;gatekeeper&quot;]
+</code></pre><p>Let&rsquo;s create the constraint:</p>
+<pre><code>$ kubectl apply -f required_labels.yaml 
+k8srequiredlabels.constraints.gatekeeper.sh/ns-must-have-gk created
+</code></pre><p>We can use <code>kubectl get</code> to fetch constraints of this template type:</p>
+<pre><code>$ kubectl get k8srequiredlabels.constraints.gatekeeper.sh
+NAME              AGE
+ns-must-have-gk   77s
+</code></pre><h1 id="testing-the-constraint">Testing the constraint</h1>
+<p>Let&rsquo;s now test this constraint by creating a namespace without the label:</p>
+<pre><code>apiVersion: v1
+kind: Namespace
+metadata:
+  name: test
+</code></pre><p>If we now run <code>kubectl apply</code> on the above definition, we will get:</p>
+<pre><code>$ kubectl apply -f ns.yaml 
+Error from server ([denied by ns-must-have-gk] you must provide labels: {&quot;gatekeeper&quot;}): error when creating &quot;ns.yaml&quot;: admission webhook &quot;validation.gatekeeper.sh&quot; denied the request: [denied by ns-must-have-gk] you must provide labels: {&quot;gatekeeper&quot;}
+
+</code></pre><h1 id="audit">Audit</h1>
+<p>Gatekeeper by default has an auditing functionality via which it evaluates the constraints and stores the audit
+results on the constraint&rsquo;s <code>status</code> field. For this purpose, Gatekeeper will query the Kubernetes API for the
+resources that your constraint specifies and validate the resources against the constraints.</p>
+<p>Here&rsquo;s an example:</p>
+<pre><code>$ kubectl get k8srequiredlabels.constraints.gatekeeper.sh -o yaml                                                    
+apiVersion: v1
+items:
+- apiVersion: constraints.gatekeeper.sh/v1beta1
+  kind: K8sRequiredLabels
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {&quot;apiVersion&quot;:&quot;constraints.gatekeeper.sh/v1beta1&quot;,&quot;kind&quot;:&quot;K8sRequiredLabels&quot;,&quot;metadata&quot;:{&quot;annotations&quot;:{},&quot;name&quot;:&quot;ns-must-have-gk&quot;},&quot;spec&quot;:{&quot;match&quot;:{&quot;kinds&quot;:[{&quot;apiGroups&quot;:[&quot;&quot;],&quot;kinds&quot;:[&quot;Namespace&quot;]}]},&quot;parameters&quot;:{&quot;labels&quot;:[&quot;gatekeeper&quot;]}}}
+    creationTimestamp: &quot;2020-05-21T04:21:17Z&quot;
+    generation: 1
+    name: ns-must-have-gk
+    resourceVersion: &quot;1722780&quot;
+    selfLink: /apis/constraints.gatekeeper.sh/v1beta1/k8srequiredlabels/ns-must-have-gk
+    uid: 640dee9f-8f3e-4f3a-9716-599f54cbd18b
+  spec:
+    match:
+      kinds:
+      - apiGroups:
+        - &quot;&quot;
+        kinds:
+        - Namespace
+    parameters:
+      labels:
+      - gatekeeper
+  status:
+    auditTimestamp: &quot;2020-05-21T04:40:17Z&quot;
+    byPod:
+    - enforced: true
+      id: gatekeeper-controller-manager-55bfb4d454-w6424
+      observedGeneration: 1
+    totalViolations: 7
+    violations:
+    - enforcementAction: deny
+      kind: Namespace
+      message: 'you must provide labels: {&quot;gatekeeper&quot;}'
+      name: default
+    - enforcementAction: deny
+      kind: Namespace
+      message: 'you must provide labels: {&quot;gatekeeper&quot;}'
+      name: gatekeeper-system
+    - enforcementAction: deny
+      kind: Namespace
+      message: 'you must provide labels: {&quot;gatekeeper&quot;}'
+      name: gitlab
+    - enforcementAction: deny
+      kind: Namespace
+      message: 'you must provide labels: {&quot;gatekeeper&quot;}'
+      name: kube-node-lease
+    - enforcementAction: deny
+      kind: Namespace
+      message: 'you must provide labels: {&quot;gatekeeper&quot;}'
+      name: kube-public
+    - enforcementAction: deny
+      kind: Namespace
+      message: 'you must provide labels: {&quot;gatekeeper&quot;}'
+      name: kube-system
+    - enforcementAction: deny
+      kind: Namespace
+      message: 'you must provide labels: {&quot;gatekeeper&quot;}'
+      name: logging
+kind: List
+metadata:
+  resourceVersion: &quot;&quot;
+  selfLink: &quot;&quot;
+
+</code></pre><p>The above shows us the audit results on all the existing namespaces.</p>
+<h1 id="rego-playground-and-gatekeeper-policies">Rego playground and gatekeeper policies</h1>
+<p>To test a gatekeeper policy on the <a href="https://play.openpolicyagent.org/">Rego playground</a>, copy the entire rego
+policy in the <code>rego</code> object above. Now, for the input, we need to have an object like this:</p>
+<pre><code>{
+  &quot;kind&quot;: &quot;AdmissionReview&quot;,
+  &quot;parameters&quot;: {
+    &quot;cpu&quot;: &quot;300m&quot;,
+    &quot;memory&quot;: &quot;2Gi&quot;
+  },
+  &quot;review&quot;: {
+    &quot;kind&quot;: {
+      &quot;kind&quot;: &quot;Pod&quot;,
+      &quot;version&quot;: &quot;v1&quot;
+    },
+    &quot;object&quot;: {
+      &quot;spec&quot;: {
+        &quot;containers&quot;: [
+          {
+            &quot;image&quot;: &quot;quay.io/calico/nginx&quot;,
+            &quot;name&quot;: &quot;nginx-frontend&quot;,
+            &quot;resources&quot;: {
+              &quot;limits&quot;: {
+                &quot;cpu&quot;: &quot;290m&quot;
+                
+              }
+            }
+          },
+          {
+            &quot;image&quot;: &quot;602401143452.dkr.ecr.us-west-2.amazonaws.com/amazon-k8s-cni&quot;,
+            &quot;name&quot;: &quot;mysql-backend&quot;,
+            &quot;resources&quot;: {
+              &quot;limits&quot;: {
+                &quot;cpu&quot;: &quot;400m&quot;,
+                &quot;memory&quot;: &quot;1Gi&quot;
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}
+
+
+
+</code></pre><p>The above object is available to your rego code as <code>input</code> object.</p>
+<h1 id="gatekeeper-constraint-library">Gatekeeper constraint library</h1>
+<p>The gatekeeper <a href="https://github.com/open-policy-agent/gatekeeper/tree/master/library/general">library</a> contains
+a few examples of constraint templates and constraints to enforce in your cluster.</p>
+<h1 id="pod-security-policies">Pod security policies</h1>
+<p>In a <a href="https://echorand.me/posts/kubernetes-pod-security-policies/">previous post</a>, I discussed
+using pod security policies to enforce compliance and restrictions in a cluster. We can do the same
+making use of Gatekeeper constraints. The repository has a few examples <a href="https://echorand.me/posts/kubernetes-pod-security-policies/">here</a>.</p>
+<h1 id="dry-run-mode">Dry run mode</h1>
+<p>For any constraint, we can add the <code>enforcementAction: dryrun</code> to the spec to enforce it in a audit mode for
+existing and new resources. This will not disallow non-conformant resoures. This can be especially useful when
+rolling out constraints to an environment with existing workloads.</p>
+<p>Example constraint spec:</p>
+<pre><code>apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sValidNamespace
+metadata:
+  name: namespace-must-be-valid
+spec:
+  enforcementAction: dryrun
+  ..
+
+</code></pre><p>For constraints created with the enforcement action as <code>dryrun</code>, we can then find out the audit results in
+the output of <code>kubectel get</code>, like so:</p>
+<pre><code>kubectl describe k8svalidnamespace.constraints.gatekeeper.sh namespace-must-be-valid
+Name:         namespace-must-be-valid
+Namespace:    
+Labels:       &lt;none&gt;
+Annotations:  kubectl.kubernetes.io/last-applied-configuration:
+                {&quot;apiVersion&quot;:&quot;constraints.gatekeeper.sh/v1beta1&quot;,&quot;kind&quot;:&quot;K8sValidNamespace&quot;,&quot;metadata&quot;:{&quot;annotations&quot;:{},&quot;name&quot;:&quot;namespace-must-be-valid&quot;...
+API Version:  constraints.gatekeeper.sh/v1beta1
+Kind:         K8sValidNamespace
+Metadata:
+  Creation Timestamp:  2020-06-03T01:49:24Z
+  Generation:          1
+  Resource Version:    3421798
+  Self Link:           /apis/constraints.gatekeeper.sh/v1beta1/k8svalidnamespace/namespace-must-be-valid
+  UID:                 d9c171b2-9451-4a45-98c7-24a2d4e8a3e4
+Spec:
+  Enforcement Action:  dryrun
+  Match:
+    Kinds:
+      API Groups:
+        
+      Kinds:
+        ConfigMap
+        CronJob
+        DaemonSet
+        Deployment
+        Job
+        NetworkPolicy
+        PodDisruptionBudget
+        Role
+        RoleBinding
+        StatefulSet
+        Service
+        Secret
+        ServiceAccount
+      API Groups:
+        extensions
+        networking.k8s.io
+      Kinds:
+        Ingress
+Status:
+  Audit Timestamp:  2020-06-03T04:05:45Z
+  By Pod:
+    Enforced:             true
+    Id:                   gatekeeper-controller-manager-ff7c87585-h7cjh
+    Observed Generation:  1
+  Total Violations:       3
+  Violations:
+    Enforcement Action:  dryrun
+    Kind:                Secret
+    Message:             Namespace should not be default: default
+    Name:                default-token-9xvts
+    Namespace:           default
+    Enforcement Action:  dryrun
+    Kind:                ServiceAccount
+    Message:             Namespace should not be default: default
+    Name:                default
+    Namespace:           default
+    Enforcement Action:  dryrun
+    Kind:                Service
+    Message:             Namespace should not be default: default
+    Name:                kubernetes
+    Namespace:           default
+Events:                  &lt;none&gt;
+</code></pre><p>The <code>Violations</code> section above results all the violations of the constraint that were found.</p>
+<h1 id="monitoring-and-alerting">Monitoring and Alerting</h1>
+<p>Gatekeeper exports several prometheus metrics covering various aspects of the behavior. If you have an existing
+prometheus setup in your cluster, all you need to do is add the following annotations to Gatekeeper&rsquo;s <code>controller-manager</code>
+deployment:</p>
+<pre><code>apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gatekeeper-controller-manager
+  namespace: gatekeeper-system
+spec:
+  ..
+  template:
+    metadata:
+      annotations:
+        prometheus.io/port: &quot;8888&quot;
+        prometheus.io/scrape: &quot;true&quot;
+        ..
+</code></pre><p>Some of the key counter metrics to monitor are:</p>
+<ul>
+<li>gatekeeper_constraints: Total number of constraints</li>
+<li>gatekeeper_constraint_templates: Total number of constraint templates</li>
+<li>gatekeeper_violations: Total number of constraint violations</li>
+<li>request_count: Total number of requests to gatekeeper</li>
+</ul>
+<p>The <code>enforcement_action</code> label is available for the <code>gatekeeper_constraints</code> and <code>gatekeeper_violations</code>  constraints
+and can have a value of <code>dryrun</code>, <code>active</code> and <code>error</code>.</p>
+<p>The <code>status</code> label is available for the <code>gatekeeper_constraint_templates</code> metric and can take the value of <code>active</code>
+and <code>error</code>.</p>
+<p>The <code>request_count</code> metric has a label, <code>admission_status</code> which is useful for understanding the distribution of
+<code>allow</code> and <code>deny</code> requests.</p>
+<p>Metrics related to the sync/replicating data are available in the v3.1.0-beta.9 release.</p>
+<p>All the available metrics are documented <a href="https://github.com/open-policy-agent/gatekeeper/blob/master/docs/Metrics.md">here</a>.</p>
+<p>Some useful prometheus alerts can be:</p>
+<ul>
+<li>Alert when we have a spike of active constraints violated</li>
+<li>Alert when the last audit run was X minutes back</li>
+</ul>
+<h1 id="learn-more">Learn more</h1>
+<ul>
+<li><a href="https://www.openpolicyagent.org/docs/latest/">Open Policy Agent documentation</a></li>
+<li><a href="https://github.com/open-policy-agent/frameworks/tree/master/constraint#opa-constraint-framework">OPA constraint framework</a></li>
+<li><a href="https://www.stackrox.com/post/2020/05/custom-kubernetes-controls-with-open-policy-agent-opa-part-2/">Introductory article on OPA and Gatekeeper</a></li>
+</ul>
+
+    </div>
+  </article>
+
+  
+  
+
+
+
+
+
+  <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/about">About</a></li>
+         
+          <li><a href="/articles">Articles</a></li>
+         
+          <li><a href="/books">Books</a></li>
+         
+          <li><a href="/posts">Posts</a></li>
+         
+          <li><a href="/talks">Talks</a></li>
+         
+          <li><a href="/categories/">Categories</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <nav id="TableOfContents">
+  <ul>
+    <li><a href="#policy-with-two-conditions-in-a-rule">Policy with two conditions in a rule</a></li>
+    <li><a href="#or-rules">OR rules</a>
+      <ul>
+        <li><a href="#invalid-input---unspecified-namespace">Invalid input - Unspecified namespace</a></li>
+        <li><a href="#invalid-input---empty-namespace">Invalid input - Empty namespace</a></li>
+        <li><a href="#invalid-input---default-namespace">Invalid input - default namespace</a></li>
+        <li><a href="#valid-input">Valid Input</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      
+      <ul>
+  
+  
+    
+  
+  
+  <li>
+    <a class="icon" href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fechorand.me%2fposts%2fgatekeeper-kubernetes%2f">
+      <i class="fab fa-facebook fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://twitter.com/share?url=https%3a%2f%2fechorand.me%2fposts%2fgatekeeper-kubernetes%2f&text=Using%20Gatekeeper%20in%20Kubernetes">
+      <i class="fab fa-twitter fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fechorand.me%2fposts%2fgatekeeper-kubernetes%2f&title=Using%20Gatekeeper%20in%20Kubernetes">
+      <i class="fab fa-linkedin fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fechorand.me%2fposts%2fgatekeeper-kubernetes%2f&is_video=false&description=Using%20Gatekeeper%20in%20Kubernetes">
+      <i class="fab fa-pinterest fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="mailto:?subject=Using%20Gatekeeper%20in%20Kubernetes&body=Check out this article: https%3a%2f%2fechorand.me%2fposts%2fgatekeeper-kubernetes%2f">
+      <i class="fas fa-envelope fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://getpocket.com/save?url=https%3a%2f%2fechorand.me%2fposts%2fgatekeeper-kubernetes%2f&title=Using%20Gatekeeper%20in%20Kubernetes">
+      <i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://reddit.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fgatekeeper-kubernetes%2f&title=Using%20Gatekeeper%20in%20Kubernetes">
+      <i class="fab fa-reddit fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.stumbleupon.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fgatekeeper-kubernetes%2f&title=Using%20Gatekeeper%20in%20Kubernetes">
+      <i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://digg.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fgatekeeper-kubernetes%2f&title=Using%20Gatekeeper%20in%20Kubernetes">
+      <i class="fab fa-digg fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.tumblr.com/share/link?url=https%3a%2f%2fechorand.me%2fposts%2fgatekeeper-kubernetes%2f&name=Using%20Gatekeeper%20in%20Kubernetes&description=Introduction%20Gatekeeper%20allows%20a%20Kubernetes%20administrator%20to%20implement%20policies%20for%20ensuring%20compliance%20and%20best%20practices%20in%20their%20cluster.%20It%20makes%20use%20of%20Open%20Policy%20Agent%20%28OPA%29%20and%20is%20a%20validating%20admission%20controller.%20The%20policies%20are%20written%20in%20the%20Rego%20language.%20Gatekeeper%20embraces%20Kubernetes%20native%20concepts%20such%20as%20Custom%20Resource%20Definitions%20%28CRDs%29%20and%20hence%20the%20policies%20are%20managed%20as%20kubernetes%20resources.%20The%20GKE%20docs%20on%20this%20topic%20are%20a%20good%20place%20to%20learn%20more.">
+      <i class="fab fa-tumblr fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fechorand.me%2fposts%2fgatekeeper-kubernetes%2f&t=Using%20Gatekeeper%20in%20Kubernetes">
+      <i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+      
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;">
+          <i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;">
+          <i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;">
+          <i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');">
+          <i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+
+  <footer id="footer">
+  <div class="footer-left">
+    Copyright  &copy; 2020  Exploring Software 
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+        <li><a href="/about">About</a></li>
+         
+        <li><a href="/articles">Articles</a></li>
+         
+        <li><a href="/books">Books</a></li>
+         
+        <li><a href="/posts">Posts</a></li>
+         
+        <li><a href="/talks">Talks</a></li>
+         
+        <li><a href="/categories/">Categories</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+
+  </div>
+</body>
+
+<link rel="stylesheet" href=/lib/font-awesome/css/all.min.css>
+<script src=/lib/jquery/jquery.min.js></script>
+<script src=/js/main.js></script>
+
+
+
+</html>

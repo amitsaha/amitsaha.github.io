@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title> Download a file using `curl` - How hard can it get? | Exploring Software</title>
+  <meta name="description" content="echo $RANDOM. Exploring Software and writing about it.">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="all,follow">
+  <meta name="googlebot" content="index,follow,snippet,archive">
+  <meta property="og:title" content="Download a file using `curl` - How hard can it get?" />
+<meta property="og:description" content="I wanted to download the prometheus binary using curl. My first attempt:
+$ curl https://github.com/prometheus/prometheus/releases/download/v2.4.0/prometheus-2.4.0.linux-amd64.tar.gz &lt;html&gt;&lt;body&gt; You are being &lt;a href=&quot;https://github-production-release-asset-2e65be.s3.amazonaws.com/6838921/5c87dc00-b5d1-11e8-8a3a-fd29b54e0c60?X-Amz-Algorithm=AWS4-HMAC-SHA256&amp;amp;X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20180914%2Fus-east-1%2Fs3%2Faws4_request&amp;amp;X-Amz-Date=20180914T004135Z&amp;amp;X-Amz-Expires=300&amp;amp;X-Amz-Signature=5a4887918cf75526c045d236dd5a8b22dace657900a1d131a7ffa947be66fc81&amp;amp;X-Amz-SignedHeaders=host&amp;amp;actor_id=0&amp;amp;response-content-disposition=attachment%3B%20filename%3Dprometheus-2.4.0.linux-amd64.tar.gz&amp;amp;response-content-type=application%2Foctet-stream&quot;&gt;redirected&lt;/a&gt;. Sure, that&rsquo;s a redirect, let&rsquo;s try:
+$ curl --location https://github.com/prometheus/prometheus/releases/download/v2.4.0/prometheus-2.4.0.linux-amd64.tar.gz curl: (23) Failed writing body (0 != 16360) What does that mean? I frantically then google, &ldquo;download prometheus using curl&rdquo; and hit upon this link.
+So, the -O option will help:
+$ curl --remote-name --location https://github.com/prometheus/prometheus/releases/download/v2.4.0/prometheus-2.4.0.linux-amd64.tar.gz &lt;file downloaded&gt; The -O option is equivalent to --remote-name which basically says two things:" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://echorand.me/posts/curl-download-redirect/" />
+<meta property="article:published_time" content="2018-09-14T00:00:00+00:00" />
+<meta property="article:modified_time" content="2019-07-11T16:52:00+10:00" />
+
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Download a file using `curl` - How hard can it get?"/>
+<meta name="twitter:description" content="I wanted to download the prometheus binary using curl. My first attempt:
+$ curl https://github.com/prometheus/prometheus/releases/download/v2.4.0/prometheus-2.4.0.linux-amd64.tar.gz &lt;html&gt;&lt;body&gt; You are being &lt;a href=&quot;https://github-production-release-asset-2e65be.s3.amazonaws.com/6838921/5c87dc00-b5d1-11e8-8a3a-fd29b54e0c60?X-Amz-Algorithm=AWS4-HMAC-SHA256&amp;amp;X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20180914%2Fus-east-1%2Fs3%2Faws4_request&amp;amp;X-Amz-Date=20180914T004135Z&amp;amp;X-Amz-Expires=300&amp;amp;X-Amz-Signature=5a4887918cf75526c045d236dd5a8b22dace657900a1d131a7ffa947be66fc81&amp;amp;X-Amz-SignedHeaders=host&amp;amp;actor_id=0&amp;amp;response-content-disposition=attachment%3B%20filename%3Dprometheus-2.4.0.linux-amd64.tar.gz&amp;amp;response-content-type=application%2Foctet-stream&quot;&gt;redirected&lt;/a&gt;. Sure, that&rsquo;s a redirect, let&rsquo;s try:
+$ curl --location https://github.com/prometheus/prometheus/releases/download/v2.4.0/prometheus-2.4.0.linux-amd64.tar.gz curl: (23) Failed writing body (0 != 16360) What does that mean? I frantically then google, &ldquo;download prometheus using curl&rdquo; and hit upon this link.
+So, the -O option will help:
+$ curl --remote-name --location https://github.com/prometheus/prometheus/releases/download/v2.4.0/prometheus-2.4.0.linux-amd64.tar.gz &lt;file downloaded&gt; The -O option is equivalent to --remote-name which basically says two things:"/>
+
+  
+  
+  
+  <link rel="stylesheet" href="https://echorand.me/css/style-white.css">
+  
+  
+  
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  
+
+  
+<link rel="icon" type="image/png" href="https://echorand.me/images/favicon.ico" />
+
+  
+  
+  
+  
+  
+    
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-108901610-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+  
+  
+</head>
+
+<body class="max-width mx-auto px3 ltr">
+  <div class="content index py4">
+
+  <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+        <li><a href="/about">About</a></li>
+         
+        <li><a href="/articles">Articles</a></li>
+         
+        <li><a href="/books">Books</a></li>
+         
+        <li><a href="/posts">Posts</a></li>
+         
+        <li><a href="/talks">Talks</a></li>
+         
+        <li><a href="/categories/">Categories</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li>
+          <a class="icon" href=" https://echorand.me/posts/docker-user-namespacing-remap-system-user/">
+            <i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i>
+          </a>
+        </li>
+        
+        
+        <li>
+          <a class="icon" href="https://echorand.me/posts/golang-templates/">
+            <i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i>
+          </a>
+        </li>
+        
+        <li>
+          <a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');">
+            <i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i>
+          </a>
+        </li>
+        <li>
+          <a class="icon" href="#">
+            <i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i>
+          </a>
+        </li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      
+      <ul>
+  
+  
+    
+  
+  
+  <li>
+    <a class="icon" href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fechorand.me%2fposts%2fcurl-download-redirect%2f">
+      <i class="fab fa-facebook " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://twitter.com/share?url=https%3a%2f%2fechorand.me%2fposts%2fcurl-download-redirect%2f&text=Download%20a%20file%20using%20%60curl%60%20-%20How%20hard%20can%20it%20get%3f">
+      <i class="fab fa-twitter " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fechorand.me%2fposts%2fcurl-download-redirect%2f&title=Download%20a%20file%20using%20%60curl%60%20-%20How%20hard%20can%20it%20get%3f">
+      <i class="fab fa-linkedin " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fechorand.me%2fposts%2fcurl-download-redirect%2f&is_video=false&description=Download%20a%20file%20using%20%60curl%60%20-%20How%20hard%20can%20it%20get%3f">
+      <i class="fab fa-pinterest " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="mailto:?subject=Download%20a%20file%20using%20%60curl%60%20-%20How%20hard%20can%20it%20get%3f&body=Check out this article: https%3a%2f%2fechorand.me%2fposts%2fcurl-download-redirect%2f">
+      <i class="fas fa-envelope " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://getpocket.com/save?url=https%3a%2f%2fechorand.me%2fposts%2fcurl-download-redirect%2f&title=Download%20a%20file%20using%20%60curl%60%20-%20How%20hard%20can%20it%20get%3f">
+      <i class="fab fa-get-pocket " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://reddit.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fcurl-download-redirect%2f&title=Download%20a%20file%20using%20%60curl%60%20-%20How%20hard%20can%20it%20get%3f">
+      <i class="fab fa-reddit " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.stumbleupon.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fcurl-download-redirect%2f&title=Download%20a%20file%20using%20%60curl%60%20-%20How%20hard%20can%20it%20get%3f">
+      <i class="fab fa-stumbleupon " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://digg.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fcurl-download-redirect%2f&title=Download%20a%20file%20using%20%60curl%60%20-%20How%20hard%20can%20it%20get%3f">
+      <i class="fab fa-digg " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.tumblr.com/share/link?url=https%3a%2f%2fechorand.me%2fposts%2fcurl-download-redirect%2f&name=Download%20a%20file%20using%20%60curl%60%20-%20How%20hard%20can%20it%20get%3f&description=I%20wanted%20to%20download%20the%20prometheus%20binary%20using%20curl.%20My%20first%20attempt%3a%0a%24%20curl%20https%3a%2f%2fgithub.com%2fprometheus%2fprometheus%2freleases%2fdownload%2fv2.4.0%2fprometheus-2.4.0.linux-amd64.tar.gz%20%26lt%3bhtml%26gt%3b%26lt%3bbody%26gt%3b%20You%20are%20being%20%26lt%3ba%20href%3d%26quot%3bhttps%3a%2f%2fgithub-production-release-asset-2e65be.s3.amazonaws.com%2f6838921%2f5c87dc00-b5d1-11e8-8a3a-fd29b54e0c60%3fX-Amz-Algorithm%3dAWS4-HMAC-SHA256%26amp%3bamp%3bX-Amz-Credential%3dAKIAIWNJYAX4CSVEH53A%252F20180914%252Fus-east-1%252Fs3%252Faws4_request%26amp%3bamp%3bX-Amz-Date%3d20180914T004135Z%26amp%3bamp%3bX-Amz-Expires%3d300%26amp%3bamp%3bX-Amz-Signature%3d5a4887918cf75526c045d236dd5a8b22dace657900a1d131a7ffa947be66fc81%26amp%3bamp%3bX-Amz-SignedHeaders%3dhost%26amp%3bamp%3bactor_id%3d0%26amp%3bamp%3bresponse-content-disposition%3dattachment%253B%2520filename%253Dprometheus-2.4.0.linux-amd64.tar.gz%26amp%3bamp%3bresponse-content-type%3dapplication%252Foctet-stream%26quot%3b%26gt%3bredirected%26lt%3b%2fa%26gt%3b.%20Sure%2c%20that%26rsquo%3bs%20a%20redirect%2c%20let%26rsquo%3bs%20try%3a%0a%24%20curl%20--location%20https%3a%2f%2fgithub.com%2fprometheus%2fprometheus%2freleases%2fdownload%2fv2.4.0%2fprometheus-2.4.0.linux-amd64.tar.gz%20curl%3a%20%2823%29%20Failed%20writing%20body%20%280%20%21%3d%2016360%29%20What%20does%20that%20mean%3f%20I%20frantically%20then%20google%2c%20%26ldquo%3bdownload%20prometheus%20using%20curl%26rdquo%3b%20and%20hit%20upon%20this%20link.%0aSo%2c%20the%20-O%20option%20will%20help%3a%0a%24%20curl%20--remote-name%20--location%20https%3a%2f%2fgithub.com%2fprometheus%2fprometheus%2freleases%2fdownload%2fv2.4.0%2fprometheus-2.4.0.linux-amd64.tar.gz%20%26lt%3bfile%20downloaded%26gt%3b%20The%20-O%20option%20is%20equivalent%20to%20--remote-name%20which%20basically%20says%20two%20things%3a">
+      <i class="fab fa-tumblr " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fechorand.me%2fposts%2fcurl-download-redirect%2f&t=Download%20a%20file%20using%20%60curl%60%20-%20How%20hard%20can%20it%20get%3f">
+      <i class="fab fa-hacker-news " aria-hidden="true"></i>
+    </a>
+  </li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <nav id="TableOfContents"></nav>
+    </div>
+  </span>
+</div>
+
+
+  <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+    <header>
+      <h1 class="posttitle" itemprop="name headline">
+        Download a file using `curl` - How hard can it get?
+      </h1>
+      <div class="meta">
+        
+        <div class="postdate">
+          
+          <time datetime="2018-09-14 00:00:00 &#43;0000 UTC" itemprop="datePublished">2018-09-14</time>
+          
+        </div>
+        
+        <div class="article-category">
+            <i class="fas fa-archive"></i>
+            
+            
+            <a class="category-link" href="/categories/software">software</a>
+            
+        </div>
+        
+        
+      </div>
+    </header>
+
+  
+    <div class="content" itemprop="articleBody">
+      <p>I wanted to download the <a href="https://prometheus.io/download/">prometheus binary</a> using <code>curl</code>. My first attempt:</p>
+<pre><code>$ curl https://github.com/prometheus/prometheus/releases/download/v2.4.0/prometheus-2.4.0.linux-amd64.tar.gz
+&lt;html&gt;&lt;body&gt;
+You are being &lt;a href=&quot;https://github-production-release-asset-2e65be.s3.amazonaws.com/6838921/5c87dc00-b5d1-11e8-8a3a-fd29b54e0c60?X-Amz-Algorithm=AWS4-HMAC-SHA256&amp;amp;X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20180914%2Fus-east-1%2Fs3%2Faws4_request&amp;amp;X-Amz-Date=20180914T004135Z&amp;amp;X-Amz-Expires=300&amp;amp;X-Amz-Signature=5a4887918cf75526c045d236dd5a8b22dace657900a1d131a7ffa947be66fc81&amp;amp;X-Amz-SignedHeaders=host&amp;amp;actor_id=0&amp;amp;response-content-disposition=attachment%3B%20filename%3Dprometheus-2.4.0.linux-amd64.tar.gz&amp;amp;response-content-type=application%2Foctet-stream&quot;&gt;redirected&lt;/a&gt;.
+</code></pre><p>Sure, that&rsquo;s a redirect, let&rsquo;s try:</p>
+<pre><code>$ curl --location https://github.com/prometheus/prometheus/releases/download/v2.4.0/prometheus-2.4.0.linux-amd64.tar.gz
+curl: (23) Failed writing body (0 != 16360)
+</code></pre><p>What does that mean? I frantically then google, &ldquo;download prometheus using curl&rdquo; and hit upon this
+<a href="https://www.techrepublic.com/article/how-to-install-the-prometheus-monitoring-system-on-ubuntu-16-04/">link</a>.</p>
+<p>So, the <code>-O</code> option will help:</p>
+<pre><code>$ curl --remote-name --location https://github.com/prometheus/prometheus/releases/download/v2.4.0/prometheus-2.4.0.linux-amd64.tar.gz
+&lt;file downloaded&gt;
+</code></pre><p>The <code>-O</code> option is equivalent to <code>--remote-name</code> which basically says two things:</p>
+<ul>
+<li>Implicitly, save the content to a file</li>
+<li>Use the file part of the remote URL as the local file name</li>
+</ul>
+<h1 id="whats-that-error-above">What&rsquo;s that error above?</h1>
+<p>The <code>Failed wrtiting body</code> error seems to surface in different circumstances. It certainly didn&rsquo;t help my debugging. However,
+I was running <a href="https://docs.microsoft.com/en-us/windows/wsl/install-win10">WSL</a>, and a older <code>curl</code> version:</p>
+<pre><code>$ curl --version
+curl 7.47.0 (x86_64-pc-linux-gnu) libcurl/7.47.0 GnuTLS/3.4.10 zlib/1.2.8 libidn/1.32 librtmp/2.3
+</code></pre><p>On Linux with a newer curl version, the error becomes:</p>
+<pre><code>$ curl 7.58.0 (x86_64-pc-linux-gnu) libcurl/7.58.0 OpenSSL/1.1.0g zlib/1.2.11 libidn2/2.0.4 libpsl/0.19.1 (+libidn2/2.0.4) nghttp2/1.30.0 librtmp/2.3
+Release-Date: 2018-01-24
+..
+
+~$ curl --location https://github.com/prometheus/prometheus/releases/download/v2.4.0/prometheus-2.4.0.linux-amd64.tar.gz
+Warning: Binary output can mess up your terminal. Use &quot;--output -&quot; to tell
+Warning: curl to output it to your terminal anyway, or consider &quot;--output
+Warning: &lt;FILE&gt;&quot; to save to a file.
+</code></pre><p>That error certainly makes a lot more sense. So basically, error messages are super helpful and software can test you a lot
+even when trying to do the simplest of things.</p>
+
+    </div>
+  </article>
+
+  
+  
+
+
+
+
+
+  <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/about">About</a></li>
+         
+          <li><a href="/articles">Articles</a></li>
+         
+          <li><a href="/books">Books</a></li>
+         
+          <li><a href="/posts">Posts</a></li>
+         
+          <li><a href="/talks">Talks</a></li>
+         
+          <li><a href="/categories/">Categories</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <nav id="TableOfContents"></nav>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      
+      <ul>
+  
+  
+    
+  
+  
+  <li>
+    <a class="icon" href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fechorand.me%2fposts%2fcurl-download-redirect%2f">
+      <i class="fab fa-facebook fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://twitter.com/share?url=https%3a%2f%2fechorand.me%2fposts%2fcurl-download-redirect%2f&text=Download%20a%20file%20using%20%60curl%60%20-%20How%20hard%20can%20it%20get%3f">
+      <i class="fab fa-twitter fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fechorand.me%2fposts%2fcurl-download-redirect%2f&title=Download%20a%20file%20using%20%60curl%60%20-%20How%20hard%20can%20it%20get%3f">
+      <i class="fab fa-linkedin fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fechorand.me%2fposts%2fcurl-download-redirect%2f&is_video=false&description=Download%20a%20file%20using%20%60curl%60%20-%20How%20hard%20can%20it%20get%3f">
+      <i class="fab fa-pinterest fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="mailto:?subject=Download%20a%20file%20using%20%60curl%60%20-%20How%20hard%20can%20it%20get%3f&body=Check out this article: https%3a%2f%2fechorand.me%2fposts%2fcurl-download-redirect%2f">
+      <i class="fas fa-envelope fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://getpocket.com/save?url=https%3a%2f%2fechorand.me%2fposts%2fcurl-download-redirect%2f&title=Download%20a%20file%20using%20%60curl%60%20-%20How%20hard%20can%20it%20get%3f">
+      <i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://reddit.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fcurl-download-redirect%2f&title=Download%20a%20file%20using%20%60curl%60%20-%20How%20hard%20can%20it%20get%3f">
+      <i class="fab fa-reddit fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.stumbleupon.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fcurl-download-redirect%2f&title=Download%20a%20file%20using%20%60curl%60%20-%20How%20hard%20can%20it%20get%3f">
+      <i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://digg.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fcurl-download-redirect%2f&title=Download%20a%20file%20using%20%60curl%60%20-%20How%20hard%20can%20it%20get%3f">
+      <i class="fab fa-digg fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.tumblr.com/share/link?url=https%3a%2f%2fechorand.me%2fposts%2fcurl-download-redirect%2f&name=Download%20a%20file%20using%20%60curl%60%20-%20How%20hard%20can%20it%20get%3f&description=I%20wanted%20to%20download%20the%20prometheus%20binary%20using%20curl.%20My%20first%20attempt%3a%0a%24%20curl%20https%3a%2f%2fgithub.com%2fprometheus%2fprometheus%2freleases%2fdownload%2fv2.4.0%2fprometheus-2.4.0.linux-amd64.tar.gz%20%26lt%3bhtml%26gt%3b%26lt%3bbody%26gt%3b%20You%20are%20being%20%26lt%3ba%20href%3d%26quot%3bhttps%3a%2f%2fgithub-production-release-asset-2e65be.s3.amazonaws.com%2f6838921%2f5c87dc00-b5d1-11e8-8a3a-fd29b54e0c60%3fX-Amz-Algorithm%3dAWS4-HMAC-SHA256%26amp%3bamp%3bX-Amz-Credential%3dAKIAIWNJYAX4CSVEH53A%252F20180914%252Fus-east-1%252Fs3%252Faws4_request%26amp%3bamp%3bX-Amz-Date%3d20180914T004135Z%26amp%3bamp%3bX-Amz-Expires%3d300%26amp%3bamp%3bX-Amz-Signature%3d5a4887918cf75526c045d236dd5a8b22dace657900a1d131a7ffa947be66fc81%26amp%3bamp%3bX-Amz-SignedHeaders%3dhost%26amp%3bamp%3bactor_id%3d0%26amp%3bamp%3bresponse-content-disposition%3dattachment%253B%2520filename%253Dprometheus-2.4.0.linux-amd64.tar.gz%26amp%3bamp%3bresponse-content-type%3dapplication%252Foctet-stream%26quot%3b%26gt%3bredirected%26lt%3b%2fa%26gt%3b.%20Sure%2c%20that%26rsquo%3bs%20a%20redirect%2c%20let%26rsquo%3bs%20try%3a%0a%24%20curl%20--location%20https%3a%2f%2fgithub.com%2fprometheus%2fprometheus%2freleases%2fdownload%2fv2.4.0%2fprometheus-2.4.0.linux-amd64.tar.gz%20curl%3a%20%2823%29%20Failed%20writing%20body%20%280%20%21%3d%2016360%29%20What%20does%20that%20mean%3f%20I%20frantically%20then%20google%2c%20%26ldquo%3bdownload%20prometheus%20using%20curl%26rdquo%3b%20and%20hit%20upon%20this%20link.%0aSo%2c%20the%20-O%20option%20will%20help%3a%0a%24%20curl%20--remote-name%20--location%20https%3a%2f%2fgithub.com%2fprometheus%2fprometheus%2freleases%2fdownload%2fv2.4.0%2fprometheus-2.4.0.linux-amd64.tar.gz%20%26lt%3bfile%20downloaded%26gt%3b%20The%20-O%20option%20is%20equivalent%20to%20--remote-name%20which%20basically%20says%20two%20things%3a">
+      <i class="fab fa-tumblr fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fechorand.me%2fposts%2fcurl-download-redirect%2f&t=Download%20a%20file%20using%20%60curl%60%20-%20How%20hard%20can%20it%20get%3f">
+      <i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+      
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;">
+          <i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;">
+          <i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;">
+          <i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');">
+          <i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+
+  <footer id="footer">
+  <div class="footer-left">
+    Copyright  &copy; 2020  Exploring Software 
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+        <li><a href="/about">About</a></li>
+         
+        <li><a href="/articles">Articles</a></li>
+         
+        <li><a href="/books">Books</a></li>
+         
+        <li><a href="/posts">Posts</a></li>
+         
+        <li><a href="/talks">Talks</a></li>
+         
+        <li><a href="/categories/">Categories</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+
+  </div>
+</body>
+
+<link rel="stylesheet" href=/lib/font-awesome/css/all.min.css>
+<script src=/lib/jquery/jquery.min.js></script>
+<script src=/js/main.js></script>
+
+
+
+</html>

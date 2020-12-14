@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title> Bash function and exiting early | Exploring Software</title>
+  <meta name="description" content="echo $RANDOM. Exploring Software and writing about it.">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="all,follow">
+  <meta name="googlebot" content="index,follow,snippet,archive">
+  <meta property="og:title" content="Bash function and exiting early" />
+<meta property="og:description" content="Monday was just beginning to roll on as Monday does, I had managed to work out the VPN issues and had just started to do some planned work. Then, slack tells me that new deployment had just been pushed out successfully, but the service was actually down. Now, we had HTTP healthchecks which was hitting a specific endpoint but apparently that was successful, but functionally the service was down. So I check the service logs, which shows something like this:" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://echorand.me/posts/bash-functions-exit/" />
+<meta property="article:published_time" content="2019-10-18T00:00:00+00:00" />
+<meta property="article:modified_time" content="2019-10-18T15:57:16+11:00" />
+
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Bash function and exiting early"/>
+<meta name="twitter:description" content="Monday was just beginning to roll on as Monday does, I had managed to work out the VPN issues and had just started to do some planned work. Then, slack tells me that new deployment had just been pushed out successfully, but the service was actually down. Now, we had HTTP healthchecks which was hitting a specific endpoint but apparently that was successful, but functionally the service was down. So I check the service logs, which shows something like this:"/>
+
+  
+  
+  
+  <link rel="stylesheet" href="https://echorand.me/css/style-white.css">
+  
+  
+  
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  
+
+  
+<link rel="icon" type="image/png" href="https://echorand.me/images/favicon.ico" />
+
+  
+  
+  
+  
+  
+    
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-108901610-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+  
+  
+</head>
+
+<body class="max-width mx-auto px3 ltr">
+  <div class="content index py4">
+
+  <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+        <li><a href="/about">About</a></li>
+         
+        <li><a href="/articles">Articles</a></li>
+         
+        <li><a href="/books">Books</a></li>
+         
+        <li><a href="/posts">Posts</a></li>
+         
+        <li><a href="/talks">Talks</a></li>
+         
+        <li><a href="/categories/">Categories</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li>
+          <a class="icon" href=" https://echorand.me/ssh-with-private-key/">
+            <i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i>
+          </a>
+        </li>
+        
+        
+        <li>
+          <a class="icon" href="https://echorand.me/posts/jenkins-docker-workflow-inside/">
+            <i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i>
+          </a>
+        </li>
+        
+        <li>
+          <a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');">
+            <i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i>
+          </a>
+        </li>
+        <li>
+          <a class="icon" href="#">
+            <i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i>
+          </a>
+        </li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      
+      <ul>
+  
+  
+    
+  
+  
+  <li>
+    <a class="icon" href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fechorand.me%2fposts%2fbash-functions-exit%2f">
+      <i class="fab fa-facebook " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://twitter.com/share?url=https%3a%2f%2fechorand.me%2fposts%2fbash-functions-exit%2f&text=Bash%20function%20and%20exiting%20early">
+      <i class="fab fa-twitter " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fechorand.me%2fposts%2fbash-functions-exit%2f&title=Bash%20function%20and%20exiting%20early">
+      <i class="fab fa-linkedin " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fechorand.me%2fposts%2fbash-functions-exit%2f&is_video=false&description=Bash%20function%20and%20exiting%20early">
+      <i class="fab fa-pinterest " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="mailto:?subject=Bash%20function%20and%20exiting%20early&body=Check out this article: https%3a%2f%2fechorand.me%2fposts%2fbash-functions-exit%2f">
+      <i class="fas fa-envelope " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://getpocket.com/save?url=https%3a%2f%2fechorand.me%2fposts%2fbash-functions-exit%2f&title=Bash%20function%20and%20exiting%20early">
+      <i class="fab fa-get-pocket " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://reddit.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fbash-functions-exit%2f&title=Bash%20function%20and%20exiting%20early">
+      <i class="fab fa-reddit " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.stumbleupon.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fbash-functions-exit%2f&title=Bash%20function%20and%20exiting%20early">
+      <i class="fab fa-stumbleupon " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://digg.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fbash-functions-exit%2f&title=Bash%20function%20and%20exiting%20early">
+      <i class="fab fa-digg " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.tumblr.com/share/link?url=https%3a%2f%2fechorand.me%2fposts%2fbash-functions-exit%2f&name=Bash%20function%20and%20exiting%20early&description=Monday%20was%20just%20beginning%20to%20roll%20on%20as%20Monday%20does%2c%20I%20had%20managed%20to%20work%20out%20the%20VPN%20issues%20and%20had%20just%20started%20to%20do%20some%20planned%20work.%20Then%2c%20slack%20tells%20me%20that%20new%20deployment%20had%20just%20been%20pushed%20out%20successfully%2c%20but%20the%20service%20was%20actually%20down.%20Now%2c%20we%20had%20HTTP%20healthchecks%20which%20was%20hitting%20a%20specific%20endpoint%20but%20apparently%20that%20was%20successful%2c%20but%20functionally%20the%20service%20was%20down.%20So%20I%20check%20the%20service%20logs%2c%20which%20shows%20something%20like%20this%3a">
+      <i class="fab fa-tumblr " aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fechorand.me%2fposts%2fbash-functions-exit%2f&t=Bash%20function%20and%20exiting%20early">
+      <i class="fab fa-hacker-news " aria-hidden="true"></i>
+    </a>
+  </li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <nav id="TableOfContents"></nav>
+    </div>
+  </span>
+</div>
+
+
+  <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+    <header>
+      <h1 class="posttitle" itemprop="name headline">
+        Bash function and exiting early
+      </h1>
+      <div class="meta">
+        
+        <div class="postdate">
+          
+          <time datetime="2019-10-18 00:00:00 &#43;0000 UTC" itemprop="datePublished">2019-10-18</time>
+          
+        </div>
+        
+        <div class="article-category">
+            <i class="fas fa-archive"></i>
+            
+            
+            <a class="category-link" href="/categories/infrastructure">infrastructure</a>
+            
+        </div>
+        
+        
+      </div>
+    </header>
+
+  
+    <div class="content" itemprop="articleBody">
+      <p>Monday was just beginning to roll on as Monday does, I had managed to work out the VPN issues and had
+just started to do some planned work. Then, slack tells me that new deployment had just been pushed out successfully, but
+the service was actually down. Now, we had HTTP healthchecks which was hitting a specific endpoint but apparently
+that was successful, but functionally the service was down. So I check the service logs, which shows something like this:</p>
+<pre><code>Oct 14 00:03:35 ip-192-168-6-113.eu-central-1.compute.internal docker[20833]: The environment file is invalid!
+Oct 14 00:03:35 ip-192-168-6-113.eu-central-1.compute.internal docker[20833]: Failed to parse dotenv file due to an unexpected escape sequence..
+</code></pre><p>This was a PHP service which was using <a href="https://github.com/vlucas/phpdotenv">phpdotenv</a> to load the environment variables
+from a file. Okay, so we have found the issue which we can now fix.</p>
+<p>However, I think why didn&rsquo;t the whole startup script just abort when it got this error? This is how our startup script
+looked like at this stage:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e">#!/usr/bin/env bash
+</span><span style="color:#75715e"></span>
+CHOWN_BIN<span style="color:#f92672">=</span>/usr/bin/chown
+GREP_BIN<span style="color:#f92672">=</span>/usr/bin/grep
+
+
+<span style="color:#66d9ef">function</span> _check_migrations<span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+  php$PHP_VERSION $APPLICATION_ROOT/artisan migrate:status | $GREP_BIN -c <span style="color:#e6db74">&#39;No&#39;</span>
+<span style="color:#f92672">}</span>
+
+FAILED_MIGRATIONS_COUNT<span style="color:#f92672">=</span><span style="color:#66d9ef">$(</span>_check_migrations<span style="color:#66d9ef">)</span>
+<span style="color:#66d9ef">if</span> <span style="color:#f92672">[</span> $FAILED_MIGRATIONS_COUNT !<span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;0&#34;</span> <span style="color:#f92672">]</span>
+<span style="color:#66d9ef">then</span>
+  echo <span style="color:#e6db74">&#34;ERROR: Cannot start while there are </span>$FAILED_MIGRATIONS_COUNT<span style="color:#e6db74"> unapplied migrations!!!&#34;</span>
+  exit <span style="color:#ae81ff">1</span>
+<span style="color:#66d9ef">fi</span>
+
+
+$CHOWN_BIN -R $PHP_FPM_USER:$PHP_FPM_GROUP $APPLICATION_ROOT
+$PHP_FPM_BIN -y $PHP_FPM_CONF --nodaemonize &amp;
+
+CHILD_PID<span style="color:#f92672">=</span>$!
+wait $CHILD_PID
+
+</code></pre></div><p>The error above was happening when the <code>_check_migrations</code> function was being called. Since we didn&rsquo;t have a
+<code>-e</code> in the Bash script, the script continued executing (hence starting the <code>php-fpm</code> workers) even though the <code>php artisan</code>
+command had failed to execute successfully.</p>
+<p>So I thought ok, i will just add a <code>set -e</code> to the script above:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-diff" data-lang="diff">diff --git a/scripts/app.sh b/scripts/app.sh
+index 6df3af8..3553eff 100755
+<span style="color:#f92672">--- a/scripts/app.sh
+</span><span style="color:#f92672"></span><span style="color:#a6e22e">+++ b/scripts/app.sh
+</span><span style="color:#a6e22e"></span><span style="color:#75715e">@@ -1,4 +1,5 @@
+</span><span style="color:#75715e"></span> #!/usr/bin/env bash
+<span style="color:#a6e22e">+set -e
+</span><span style="color:#a6e22e"></span> 
+ CHOWN_BIN=/usr/bin/chown
+ GREP_BIN=/usr/bin/grep
+</code></pre></div><p>So, I tried the above and what happened? The script will error out if the <code>php</code> command above runs successfully and
+if the output doensn&rsquo;t have the word <code>No</code> (i.e. no migrations need to be applied). Why? That&rsquo;s how <code>grep</code> works. If it
+doesn&rsquo;t find a match, the exit code is non-zero. Frantic googling later, I next have another fix:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-diff" data-lang="diff">index 3553eff..64d0f60 100755
+<span style="color:#f92672">--- a/scripts/app.sh
+</span><span style="color:#f92672"></span><span style="color:#a6e22e">+++ b/scripts/app.sh
+</span><span style="color:#a6e22e"></span><span style="color:#75715e">@@ -11,7 +11,9 @@ function _term() {
+</span><span style="color:#75715e"></span> }
+ 
+ function _check_migrations() {
+<span style="color:#f92672">-  php$PHP_VERSION $APPLICATION_ROOT/artisan migrate:status | $GREP_BIN -c &#39;No&#39;
+</span><span style="color:#f92672"></span><span style="color:#a6e22e">+  # we have the last | cat so that the overall exit code is that of cat in case
+</span><span style="color:#a6e22e">+  # of the first two commands executing successfully
+</span><span style="color:#a6e22e">+  php$PHP_VERSION $APPLICATION_ROOT/artisan migrate:status | $GREP_BIN -c &#39;No&#39; | cat
+</span><span style="color:#a6e22e"></span> }
+ 
+</code></pre></div><p>This fails again, since <code>grep</code> was the problem, but obviously I was in a hurry to think. Then I think i know of this
+thing called, <code>-o pipefail</code>, let me try that:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-diff" data-lang="diff">index 64d0f60..150fd76 100755
+<span style="color:#f92672">--- a/scripts/app.sh
+</span><span style="color:#f92672"></span><span style="color:#a6e22e">+++ b/scripts/app.sh
+</span><span style="color:#a6e22e"></span><span style="color:#75715e">@@ -1,5 +1,5 @@
+</span><span style="color:#75715e"></span> #!/usr/bin/env bash
+<span style="color:#f92672">-set -e
+</span><span style="color:#f92672"></span><span style="color:#a6e22e">+set -eo pipefail
+</span><span style="color:#a6e22e"></span> 
+ CHOWN_BIN=/usr/bin/chown
+ GREP_BIN=/usr/bin/grep
+</code></pre></div><p>But that doesn&rsquo;t work either since <code>grep</code> is the problem! So, I decide to lose the conciseness and do this:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-diff" data-lang="diff">index 150fd76..6a9457a 100755
+<span style="color:#f92672">--- a/scripts/app.sh
+</span><span style="color:#f92672"></span><span style="color:#a6e22e">+++ b/scripts/app.sh
+</span><span style="color:#a6e22e"></span><span style="color:#75715e">@@ -1,5 +1,4 @@
+</span><span style="color:#75715e"></span> #!/usr/bin/env bash
+<span style="color:#f92672">-set -eo pipefail
+</span><span style="color:#f92672"></span> 
+ CHOWN_BIN=/usr/bin/chown
+ GREP_BIN=/usr/bin/grep
+<span style="color:#75715e">@@ -13,7 +12,12 @@ function _term() {
+</span><span style="color:#75715e"></span> function _check_migrations() {
+   # we have the last | cat so that the overall exit code is that of cat in case
+   # of the first two commands executing successfully
+<span style="color:#f92672">-  php$PHP_VERSION $APPLICATION_ROOT/artisan migrate:status | $GREP_BIN -c &#39;No&#39; | cat
+</span><span style="color:#f92672"></span><span style="color:#a6e22e">+  status=`php$PHP_VERSION $APPLICATION_ROOT/artisan migrate:status`
+</span><span style="color:#a6e22e">+  exit_status=$?
+</span><span style="color:#a6e22e">+  if [ $exit_status -ne 0 ]; then
+</span><span style="color:#a6e22e">+    exit $exit_status
+</span><span style="color:#a6e22e">+  fi
+</span><span style="color:#a6e22e">+  echo $status | $GREP_BIN -c &#39;No&#39;
+</span><span style="color:#a6e22e"></span> }
+</code></pre></div><p>This works as in it will exit the script if there is an error running the <code>php</code> command which is what we want, else proceed
+as earlier. Or so I thougt.</p>
+<p>It turns out when you cal a Bash function using the syntax <code>$()</code> you are actually invoking a subshell (duh!) which means
+exiting in the Bash function, only exits from that shell - which makes sense but I didn&rsquo;t know that. That means,
+the original issue I sought out to fix wouldn&rsquo;t actually be fixed. Anyway, here&rsquo;s the fixed version:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e">#!/usr/bin/env bash
+</span><span style="color:#75715e"></span>
+CHOWN_BIN<span style="color:#f92672">=</span>/usr/bin/chown
+GREP_BIN<span style="color:#f92672">=</span>/usr/bin/grep
+
+<span style="color:#75715e"># Helper functions</span>
+<span style="color:#66d9ef">function</span> _term<span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+ echo <span style="color:#e6db74">&#39;Caught SIGTERM signal!&#39;</span>
+ kill -15 $CHILD_PID
+<span style="color:#f92672">}</span>
+
+php$PHP_VERSION $APPLICATION_ROOT/artisan migrate:status
+exit_status<span style="color:#f92672">=</span>$?
+<span style="color:#66d9ef">if</span> <span style="color:#f92672">[[</span> $exit_status -ne <span style="color:#ae81ff">0</span> <span style="color:#f92672">]]</span>; <span style="color:#66d9ef">then</span>
+ exit $exit_status
+<span style="color:#66d9ef">fi</span>
+FAILED_MIGRATION_COUNT<span style="color:#f92672">=</span><span style="color:#e6db74">`</span>php$PHP_VERSION $APPLICATION_ROOT/artisan migrate:status | $GREP_BIN -c <span style="color:#e6db74">&#39;No&#39;</span><span style="color:#e6db74">`</span>
+<span style="color:#66d9ef">if</span> <span style="color:#f92672">[</span> $FAILED_MIGRATION_COUNT !<span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;0&#34;</span> <span style="color:#f92672">]</span>; <span style="color:#66d9ef">then</span>
+ echo <span style="color:#e6db74">&#34;ERROR: Cannot start while there are </span>$FAILED_MIGRATIONS_COUNT<span style="color:#e6db74"> unapplied migrations!!!&#34;</span>
+ exit <span style="color:#ae81ff">1</span>
+<span style="color:#66d9ef">fi</span>
+
+trap _term SIGTERM
+
+$CHOWN_BIN -R $PHP_FPM_USER:$PHP_FPM_GROUP $APPLICATION_ROOT
+$PHP_FPM_BIN -y $PHP_FPM_CONF --nodaemonize &amp;
+
+CHILD_PID<span style="color:#f92672">=</span>$!
+
+wait $CHILD_PID
+</code></pre></div><p>Essentially, i have now running <code>php artisan migrate:status</code> twice. First to check if the <code>.env</code> file can be read
+successfully and error out if not. Second, actually check for the migrations. We can make it more concise, but who
+knows what will break?</p>
+<p>If you really want to use a Bash function and also exit early, this <a href="https://stackoverflow.com/a/9894126">link</a> will help.</p>
+<p>Here&rsquo;s some test code:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#66d9ef">function</span> foo<span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+	echo <span style="color:#e6db74">&#34;in foo, exiting&#34;</span>
+	exit <span style="color:#ae81ff">1</span>
+<span style="color:#f92672">}</span>
+
+<span style="color:#66d9ef">function</span> bar<span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+	echo <span style="color:#e6db74">&#34;In bar&#34;</span>
+<span style="color:#f92672">}</span>
+
+bar
+<span style="color:#75715e"># this invocation will exit the script</span>
+foo
+<span style="color:#75715e"># this invocation will not exit the script</span>
+f<span style="color:#f92672">=</span><span style="color:#66d9ef">$(</span> foo <span style="color:#66d9ef">)</span>
+echo $f
+echo <span style="color:#e6db74">&#34;hi there&#34;</span>
+</code></pre></div>
+    </div>
+  </article>
+
+  
+  
+
+
+
+
+
+  <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/about">About</a></li>
+         
+          <li><a href="/articles">Articles</a></li>
+         
+          <li><a href="/books">Books</a></li>
+         
+          <li><a href="/posts">Posts</a></li>
+         
+          <li><a href="/talks">Talks</a></li>
+         
+          <li><a href="/categories/">Categories</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <nav id="TableOfContents"></nav>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      
+      <ul>
+  
+  
+    
+  
+  
+  <li>
+    <a class="icon" href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fechorand.me%2fposts%2fbash-functions-exit%2f">
+      <i class="fab fa-facebook fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://twitter.com/share?url=https%3a%2f%2fechorand.me%2fposts%2fbash-functions-exit%2f&text=Bash%20function%20and%20exiting%20early">
+      <i class="fab fa-twitter fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fechorand.me%2fposts%2fbash-functions-exit%2f&title=Bash%20function%20and%20exiting%20early">
+      <i class="fab fa-linkedin fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fechorand.me%2fposts%2fbash-functions-exit%2f&is_video=false&description=Bash%20function%20and%20exiting%20early">
+      <i class="fab fa-pinterest fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="mailto:?subject=Bash%20function%20and%20exiting%20early&body=Check out this article: https%3a%2f%2fechorand.me%2fposts%2fbash-functions-exit%2f">
+      <i class="fas fa-envelope fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://getpocket.com/save?url=https%3a%2f%2fechorand.me%2fposts%2fbash-functions-exit%2f&title=Bash%20function%20and%20exiting%20early">
+      <i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://reddit.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fbash-functions-exit%2f&title=Bash%20function%20and%20exiting%20early">
+      <i class="fab fa-reddit fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.stumbleupon.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fbash-functions-exit%2f&title=Bash%20function%20and%20exiting%20early">
+      <i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://digg.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fbash-functions-exit%2f&title=Bash%20function%20and%20exiting%20early">
+      <i class="fab fa-digg fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="http://www.tumblr.com/share/link?url=https%3a%2f%2fechorand.me%2fposts%2fbash-functions-exit%2f&name=Bash%20function%20and%20exiting%20early&description=Monday%20was%20just%20beginning%20to%20roll%20on%20as%20Monday%20does%2c%20I%20had%20managed%20to%20work%20out%20the%20VPN%20issues%20and%20had%20just%20started%20to%20do%20some%20planned%20work.%20Then%2c%20slack%20tells%20me%20that%20new%20deployment%20had%20just%20been%20pushed%20out%20successfully%2c%20but%20the%20service%20was%20actually%20down.%20Now%2c%20we%20had%20HTTP%20healthchecks%20which%20was%20hitting%20a%20specific%20endpoint%20but%20apparently%20that%20was%20successful%2c%20but%20functionally%20the%20service%20was%20down.%20So%20I%20check%20the%20service%20logs%2c%20which%20shows%20something%20like%20this%3a">
+      <i class="fab fa-tumblr fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+  <li>
+    <a class="icon" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fechorand.me%2fposts%2fbash-functions-exit%2f&t=Bash%20function%20and%20exiting%20early">
+      <i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i>
+    </a>
+  </li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+      
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;">
+          <i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;">
+          <i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;">
+          <i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');">
+          <i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+
+  <footer id="footer">
+  <div class="footer-left">
+    Copyright  &copy; 2020  Exploring Software 
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+        <li><a href="/about">About</a></li>
+         
+        <li><a href="/articles">Articles</a></li>
+         
+        <li><a href="/books">Books</a></li>
+         
+        <li><a href="/posts">Posts</a></li>
+         
+        <li><a href="/talks">Talks</a></li>
+         
+        <li><a href="/categories/">Categories</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+
+  </div>
+</body>
+
+<link rel="stylesheet" href=/lib/font-awesome/css/all.min.css>
+<script src=/lib/jquery/jquery.min.js></script>
+<script src=/js/main.js></script>
+
+
+
+</html>
