@@ -231,9 +231,8 @@ Application Logs -&amp;gt; Fluentd (logging) -&amp;gt; Nginx -&amp;gt; ElasticSe
       <pubDate>Sun, 16 Jun 2019 10:53:16 +1000</pubDate>
       
       <guid>https://echorand.me/about/</guid>
-      <description>This blog This blog is generated using Hugo and hosted on GitHub pages.
-About me Hello, My name is Amit Saha (or, @echorand).
-I work as a software engineer and I explore software via programming, writing articles and books and giving talks.
+      <description>This blog This blog is generated using Hugo and hosted on GitHub pages powered via GitHub actions.
+About me Hello, My name is Amit Saha. I work as a software engineer and I explore software via programming, writing articles and books and giving talks.
 Open source contributions Over the years, I have contributed code/docs to various projects in various programming languages:
  NetBeans IDE (Java) SymPy (Python) CPython (Python) NLog (C sharp) Statsd exporter (Golang) Vector (Rust) Inspec (Ruby)  (My email address for these commits would be amitsaha.</description>
     </item>
