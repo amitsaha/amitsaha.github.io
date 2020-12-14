@@ -10,20 +10,18 @@
   <meta name="googlebot" content="index,follow,snippet,archive">
   <meta property="og:title" content="About" />
 <meta property="og:description" content="This blog This blog is generated using Hugo and hosted on GitHub pages powered via GitHub actions.
-About me Hello, My name is Amit Saha. I work as a software engineer and I explore software via programming, writing articles and books and giving talks.
-Open source contributions Over the years, I have contributed code/docs to various projects in various programming languages:
- NetBeans IDE (Java) SymPy (Python) CPython (Python) NLog (C sharp) Statsd exporter (Golang) Vector (Rust) Inspec (Ruby)  (My email address for these commits would be amitsaha." />
+Basically the publishing flow for me looks like this:
+ I write my new content as a Markdown file and push a new commit with my changes (1) triggers a build - a GitHub action action A Docker image containing hugo is built using a custom Dockerfile The image is then run to generate the website source The generated website source is then pushed to amitsaha." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://echorand.me/about/" />
 <meta property="article:published_time" content="2019-06-16T10:53:16+10:00" />
-<meta property="article:modified_time" content="2020-12-14T15:40:05+11:00" />
+<meta property="article:modified_time" content="2020-12-14T15:48:08+11:00" />
 
   <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="About"/>
 <meta name="twitter:description" content="This blog This blog is generated using Hugo and hosted on GitHub pages powered via GitHub actions.
-About me Hello, My name is Amit Saha. I work as a software engineer and I explore software via programming, writing articles and books and giving talks.
-Open source contributions Over the years, I have contributed code/docs to various projects in various programming languages:
- NetBeans IDE (Java) SymPy (Python) CPython (Python) NLog (C sharp) Statsd exporter (Golang) Vector (Rust) Inspec (Ruby)  (My email address for these commits would be amitsaha."/>
+Basically the publishing flow for me looks like this:
+ I write my new content as a Markdown file and push a new commit with my changes (1) triggers a build - a GitHub action action A Docker image containing hugo is built using a custom Dockerfile The image is then run to generate the website source The generated website source is then pushed to amitsaha."/>
 
   
   
@@ -107,7 +105,15 @@ if (!doNotTrack) {
   
     <h1 id="this-blog">This blog</h1>
 <p>This blog is generated using <a href="https://gohugo.io">Hugo</a> and hosted on
-<a href="https://github.com/amitsaha/amitsaha.github.io">GitHub pages</a> powered via <a href="./github/workflows/main.yaml">GitHub actions</a>.</p>
+<a href="https://github.com/amitsaha/amitsaha.github.io">GitHub pages</a> powered via <a href="https://github.com/amitsaha/echorand.me/blob/master/.github/workflows/main.yml">GitHub actions</a>.</p>
+<p>Basically the publishing flow for me looks like this:</p>
+<ol>
+<li>I write my new content as a Markdown file and push a new commit with my changes</li>
+<li>(1) triggers a build - a GitHub action action</li>
+<li>A Docker image containing <code>hugo</code> is built using a custom <a href="https://github.com/amitsaha/echorand.me/blob/master/Dockerfile">Dockerfile</a></li>
+<li>The image is then run to generate the website source</li>
+<li>The generated website source is then pushed to <a href="https://github.com/amitsaha/amitsaha.github.io">amitsaha.github.io</a></li>
+</ol>
 <h1 id="about-me">About me</h1>
 <p>Hello, My name is Amit Saha. I work as a software engineer and I <a href="https://github.com/amitsaha">explore software</a>
 via programming, writing <a href="../articles">articles</a> and <a href="../books">books</a> and giving <a href="../talks">talks</a>.</p>

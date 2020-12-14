@@ -232,9 +232,8 @@ Application Logs -&amp;gt; Fluentd (logging) -&amp;gt; Nginx -&amp;gt; ElasticSe
       
       <guid>https://echorand.me/about/</guid>
       <description>This blog This blog is generated using Hugo and hosted on GitHub pages powered via GitHub actions.
-About me Hello, My name is Amit Saha. I work as a software engineer and I explore software via programming, writing articles and books and giving talks.
-Open source contributions Over the years, I have contributed code/docs to various projects in various programming languages:
- NetBeans IDE (Java) SymPy (Python) CPython (Python) NLog (C sharp) Statsd exporter (Golang) Vector (Rust) Inspec (Ruby)  (My email address for these commits would be amitsaha.</description>
+Basically the publishing flow for me looks like this:
+ I write my new content as a Markdown file and push a new commit with my changes (1) triggers a build - a GitHub action action A Docker image containing hugo is built using a custom Dockerfile The image is then run to generate the website source The generated website source is then pushed to amitsaha.</description>
     </item>
     
     <item>
