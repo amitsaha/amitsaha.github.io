@@ -8,7 +8,7 @@
     <language>en-us</language>
     <lastBuildDate>Sun, 20 Dec 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://echorand.me/categories/go/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Embedding files in Go using &#34;embed&#34;</title>
+      <title>Embedding files in Go using the &#34;embed&#34; package</title>
       <link>https://echorand.me/posts/go-embed/</link>
       <pubDate>Sun, 20 Dec 2020 00:00:00 +0000</pubDate>
       
