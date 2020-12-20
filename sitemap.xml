@@ -3,27 +3,37 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>https://echorand.me/categories/</loc>
+    <lastmod>2020-12-20T14:10:05+11:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://echorand.me/posts/go-embed/</loc>
+    <lastmod>2020-12-20T14:10:05+11:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://echorand.me/</loc>
+    <lastmod>2020-12-20T14:10:05+11:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://echorand.me/categories/go/</loc>
+    <lastmod>2020-12-20T14:10:05+11:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://echorand.me/posts/</loc>
+    <lastmod>2020-12-20T14:10:05+11:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://echorand.me/posts/micros-auth-kubernetes/</loc>
     <lastmod>2020-12-13T15:11:32+11:00</lastmod>
   </url>
   
   <url>
-    <loc>https://echorand.me/categories/</loc>
-    <lastmod>2020-12-13T15:11:32+11:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://echorand.me/</loc>
-    <lastmod>2020-12-13T15:11:32+11:00</lastmod>
-  </url>
-  
-  <url>
     <loc>https://echorand.me/categories/infrastructure/</loc>
-    <lastmod>2020-12-13T15:11:32+11:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://echorand.me/posts/</loc>
     <lastmod>2020-12-13T15:11:32+11:00</lastmod>
   </url>
   
@@ -115,11 +125,6 @@
   <url>
     <loc>https://echorand.me/posts/user-management-aws-eks-cluster/</loc>
     <lastmod>2019-08-23T18:24:25+10:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://echorand.me/categories/go/</loc>
-    <lastmod>2020-12-12T14:06:00+11:00</lastmod>
   </url>
   
   <url>

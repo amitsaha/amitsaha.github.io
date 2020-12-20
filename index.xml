@@ -6,7 +6,17 @@
     <description>Recent content on Exploring Software</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 13 Dec 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://echorand.me/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 20 Dec 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://echorand.me/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Embedding files in Go using &#34;embed&#34;</title>
+      <link>https://echorand.me/posts/go-embed/</link>
+      <pubDate>Sun, 20 Dec 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/go-embed/</guid>
+      <description>Go 1.16 Beta 1 was announced recently and the most exciting feature for me in this release is the new &amp;ldquo;embed&amp;rdquo; package which allows you to embed a file contents as part of the Go application binary.
+This ability so far was most easily available via using various third party packages and they worked great. You could also use go generate to roll out your own solution, if needed. However, now having this facility in the form of a standard library package is great news.</description>
+    </item>
+    
     <item>
       <title>Authentication between services using Kubernetes primitives</title>
       <link>https://echorand.me/posts/micros-auth-kubernetes/</link>
