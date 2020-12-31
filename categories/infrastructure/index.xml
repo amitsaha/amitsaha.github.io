@@ -6,7 +6,20 @@
     <description>Recent content in infrastructure on Exploring Software</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 13 Dec 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://echorand.me/categories/infrastructure/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 31 Dec 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://echorand.me/categories/infrastructure/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Notes on Chaos Engineering</title>
+      <link>https://echorand.me/posts/chaos-engineering/</link>
+      <pubDate>Thu, 31 Dec 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/chaos-engineering/</guid>
+      <description>I have been exploring Chaos engineering as it applies to software systems this year.
+As I explored further, I really got interested into it.
+Next, I point to various references that I have found useful so far.
+Theory  Principles of Chaos Engineering describes the fundamental principles of chaos engineering. Chaos Engineering by Casey Rosenthal, Nora Jones  Talks Identifyingn Hidden Dependencies
+ Continuous verification Test your recover procedures Practice controlled experiments  Why SREs can&amp;rsquo;t afford to NOT do Chaos Engineering</description>
+    </item>
+    
     <item>
       <title>Authentication between services using Kubernetes primitives</title>
       <link>https://echorand.me/posts/micros-auth-kubernetes/</link>
