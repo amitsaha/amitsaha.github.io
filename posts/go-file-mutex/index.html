@@ -14,7 +14,7 @@ Let&rsquo;s see a pattern for implementing concurrency safe file access in Go us
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://echorand.me/posts/go-file-mutex/" />
 <meta property="article:published_time" content="2021-01-18T00:00:00+00:00" />
-<meta property="article:modified_time" content="2021-01-19T10:39:20+11:00" />
+<meta property="article:modified_time" content="2021-01-19T10:45:06+11:00" />
 
   <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Concurrency safe file access in Go"/>
@@ -182,8 +182,15 @@ if (!doNotTrack) {
     <div id="toc">
       <nav id="TableOfContents">
   <ul>
-    <li><a href="#writing-to-the-file">Writing to the file</a></li>
-    <li><a href="#reading-from-file">Reading from file</a></li>
+    <li><a href="#our-data-structure">Our data structure</a></li>
+    <li><a href="#a-reference-implementation">A reference implementation</a>
+      <ul>
+        <li><a href="#writing-to-the-file">Writing to the file</a></li>
+        <li><a href="#reading-from-file">Reading from file</a></li>
+      </ul>
+    </li>
+    <li><a href="#notes">Notes</a></li>
+    <li><a href="#learn-more">Learn more</a></li>
   </ul>
 </nav>
     </div>
@@ -202,7 +209,7 @@ if (!doNotTrack) {
           
           <time datetime="2021-01-18 00:00:00 &#43;0000 UTC" itemprop="datePublished">2021-01-18</time>
           
-            (Updated: <time datetime="2021-01-19 10:39:20 &#43;1100 &#43;1100" itemprop="dateModified">2021-01-19</time>)
+            (Updated: <time datetime="2021-01-19 10:45:06 &#43;1100 &#43;1100" itemprop="dateModified">2021-01-19</time>)
           
         </div>
         
@@ -225,7 +232,7 @@ For me, it brings back memories of writing a structure in C (programming languag
 a student record database. However, there may be situations where you may just get by using it especially
 when you just want to run a single copy of your application.</p>
 <p>Let&rsquo;s see a pattern for implementing concurrency safe file access in Go using <code>sync.Mutex</code>.</p>
-<h1 id="our-data-structure">Our data structure</h1>
+<h2 id="our-data-structure">Our data structure</h2>
 <p>Let&rsquo;s consider the following <code>struct</code> type:</p>
 <pre><code>type fileStore struct {
 	Mu    *sync.Mutex
@@ -244,7 +251,7 @@ help with our consistency goal, but let&rsquo;s ignore that for now.</p>
 <p>You have already realized that I am going to be persisting the <code>map</code> object as a JSON encoded object in the file.
 Of course, you could choose any other object type to persist, any other encoding mechanism instead of JSON, or
 a combination of the two. The implementation will vary then, but hopefully the ideas are transferable.</p>
-<h1 id="a-reference-implementation">A reference implementation</h1>
+<h2 id="a-reference-implementation">A reference implementation</h2>
 <p>We will create a new package to encapsulate all the file operations:</p>
 <pre><code>package filestore
 
@@ -296,7 +303,7 @@ the <code>fileStore</code> object:</p>
     Value string
 }
 </code></pre><p>This type will encapsulate a single data item we may want to read or write from the map, <code>Store</code>.</p>
-<h2 id="writing-to-the-file">Writing to the file</h2>
+<h3 id="writing-to-the-file">Writing to the file</h3>
 <p>The <code>Write()</code> function is called with an object of <code>myDataType</code> which contains
 both the key and value to store in the map and looks like this:</p>
 <pre><code>func (j fileStore) Write(data myDataType) error {
@@ -337,7 +344,7 @@ is exactly what we want here as we are writing the complete <code>Store</code> o
 </ol>
 <p>If we have another goroutine attempting to get a lock to write to the file, it will block
 till the previous goroutine has released the lock.</p>
-<h2 id="reading-from-file">Reading from file</h2>
+<h3 id="reading-from-file">Reading from file</h3>
 <p>The <code>Read()</code> function accepts a key, <code>id</code> whose value we are interested in. Recall that our key object here
 is a <code>map[string]string</code></p>
 <pre><code>func (j fileStore) Read(id string) (string, error) {
@@ -372,11 +379,11 @@ and overwrites the current <code>Store</code> object in memory:</p>
 	}
 	return nil
 }
-</code></pre><h1 id="notes">Notes</h1>
+</code></pre><h2 id="notes">Notes</h2>
 <p>It&rsquo;s worth noting though that in the <code>WriteToFile()</code> function, truncation operation removes the old file before creating
 the new one. Hence if the application is killed in the window between the removal and the creation, we have lost
 all the data. So we can improve upon this by using a <code>rename()</code> operation instead.</p>
-<h1 id="learn-more">Learn more</h1>
+<h2 id="learn-more">Learn more</h2>
 <ul>
 <li>An introduction to <a href="https://tour.golang.org/concurrency/9">sync.Mutex</a></li>
 <li><a href="https://tailscale.com/blog/an-unlikely-database-migration/">Tailscale - An unlikely database migration</a></li>
@@ -417,8 +424,15 @@ all the data. So we can improve upon this by using a <code>rename()</code> opera
     <div id="toc-footer" style="display: none">
       <nav id="TableOfContents">
   <ul>
-    <li><a href="#writing-to-the-file">Writing to the file</a></li>
-    <li><a href="#reading-from-file">Reading from file</a></li>
+    <li><a href="#our-data-structure">Our data structure</a></li>
+    <li><a href="#a-reference-implementation">A reference implementation</a>
+      <ul>
+        <li><a href="#writing-to-the-file">Writing to the file</a></li>
+        <li><a href="#reading-from-file">Reading from file</a></li>
+      </ul>
+    </li>
+    <li><a href="#notes">Notes</a></li>
+    <li><a href="#learn-more">Learn more</a></li>
   </ul>
 </nav>
     </div>
