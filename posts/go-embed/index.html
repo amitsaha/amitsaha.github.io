@@ -14,7 +14,7 @@ This ability so far was most easily available via using various third party pack
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://echorand.me/posts/go-embed/" />
 <meta property="article:published_time" content="2020-12-20T00:00:00+00:00" />
-<meta property="article:modified_time" content="2020-12-20T18:48:19+11:00" />
+<meta property="article:modified_time" content="2021-01-19T10:39:20+11:00" />
 
   <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Embedding files in Go using the &#34;embed&#34; package"/>
@@ -186,13 +186,7 @@ if (!doNotTrack) {
 
     </div>
     <div id="toc">
-      <nav id="TableOfContents">
-  <ul>
-    <li><a href="#getting-go-116-beta-1">Getting Go 1.16 Beta 1</a></li>
-    <li><a href="#demo---embedding-a-template">Demo - Embedding a template</a></li>
-    <li><a href="#notes">Notes</a></li>
-  </ul>
-</nav>
+      <nav id="TableOfContents"></nav>
     </div>
   </span>
 </div>
@@ -209,7 +203,7 @@ if (!doNotTrack) {
           
           <time datetime="2020-12-20 00:00:00 &#43;0000 UTC" itemprop="datePublished">2020-12-20</time>
           
-            (Updated: <time datetime="2020-12-20 18:48:19 &#43;1100 &#43;1100" itemprop="dateModified">2020-12-20</time>)
+            (Updated: <time datetime="2021-01-19 10:39:20 &#43;1100 &#43;1100" itemprop="dateModified">2021-01-19</time>)
           
         </div>
         
@@ -235,7 +229,7 @@ You could also use <code>go generate</code> to roll out your own solution, if ne
 in the form of a standard library package is great news.</p>
 <p>Let&rsquo;s see how we can use it. I will keep this post updated as the 1.16 release
 evolves.</p>
-<h2 id="getting-go-116-beta-1">Getting Go 1.16 Beta 1</h2>
+<h1 id="getting-go-116-beta-1">Getting Go 1.16 Beta 1</h1>
 <p>If you have Go installed already, run:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#960050;background-color:#1e0010">$</span> <span style="color:#66d9ef">go</span> <span style="color:#a6e22e">get</span> <span style="color:#a6e22e">golang</span>.<span style="color:#a6e22e">org</span><span style="color:#f92672">/</span><span style="color:#a6e22e">dl</span><span style="color:#f92672">/</span><span style="color:#a6e22e">go1</span><span style="color:#ae81ff">.16</span><span style="color:#a6e22e">beta1</span> 
 
@@ -249,7 +243,7 @@ evolves.</p>
 # one set explicitly
 $ ~/go/bin/go1.16beta1 version
 go version go1.16beta1 darwin/amd64
-</code></pre><h2 id="demo---embedding-a-template">Demo - Embedding a template</h2>
+</code></pre><h1 id="demo---embedding-a-template">Demo - Embedding a template</h1>
 <p>As an example of a file that we want to embed, let&rsquo;s consider a Go template
 which generates Go source code:</p>
 <pre><code># We want to embed this
@@ -278,7 +272,7 @@ the <code>tmplMainGo</code> variable.</p>
 <pre><code>tmpl, err := tmpl.Parse(string(tmplMainGo))
 ...
 </code></pre><p>You can see the working demo <a href="https://github.com/amitsaha/go-embed">here</a>.</p>
-<h2 id="notes">Notes</h2>
+<h1 id="notes">Notes</h1>
 <p>If you don&rsquo;t like the <code>embed</code> package being imported for its side-effects,
 this may change before the final release. See
 <a href="https://github.com/golang/go/issues/43217#issuecomment-748438637">here</a> for
@@ -319,13 +313,7 @@ the <code>embed.FS</code> type. See the package docs for the
     </div>
 
     <div id="toc-footer" style="display: none">
-      <nav id="TableOfContents">
-  <ul>
-    <li><a href="#getting-go-116-beta-1">Getting Go 1.16 Beta 1</a></li>
-    <li><a href="#demo---embedding-a-template">Demo - Embedding a template</a></li>
-    <li><a href="#notes">Notes</a></li>
-  </ul>
-</nav>
+      <nav id="TableOfContents"></nav>
     </div>
 
     <div id="share-footer" style="display: none">

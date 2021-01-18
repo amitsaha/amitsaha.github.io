@@ -6,22 +6,22 @@
     <description>Recent content in Categories on Exploring Software</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 31 Dec 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://echorand.me/categories/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 18 Jan 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://echorand.me/categories/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>infrastructure</title>
-      <link>https://echorand.me/categories/infrastructure/</link>
-      <pubDate>Thu, 31 Dec 2020 00:00:00 +0000</pubDate>
+      <title>go</title>
+      <link>https://echorand.me/categories/go/</link>
+      <pubDate>Mon, 18 Jan 2021 00:00:00 +0000</pubDate>
       
-      <guid>https://echorand.me/categories/infrastructure/</guid>
+      <guid>https://echorand.me/categories/go/</guid>
       <description></description>
     </item>
     
     <item>
-      <title>go</title>
-      <link>https://echorand.me/categories/go/</link>
-      <pubDate>Sun, 20 Dec 2020 00:00:00 +0000</pubDate>
+      <title>infrastructure</title>
+      <link>https://echorand.me/categories/infrastructure/</link>
+      <pubDate>Fri, 15 Jan 2021 00:00:00 +0000</pubDate>
       
-      <guid>https://echorand.me/categories/go/</guid>
+      <guid>https://echorand.me/categories/infrastructure/</guid>
       <description></description>
     </item>
     
