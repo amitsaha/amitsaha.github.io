@@ -6,18 +6,7 @@
     <description>Recent content in infrastructure on Exploring Software</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 15 Jan 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://echorand.me/categories/infrastructure/index.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>Mutual TLS Authentication in Kubernetes</title>
-      <link>https://echorand.me/posts/mutual-tls-kubernetes/</link>
-      <pubDate>Fri, 15 Jan 2021 00:00:00 +0000</pubDate>
-      
-      <guid>https://echorand.me/posts/mutual-tls-kubernetes/</guid>
-      <description>I watched this presentation titled Achieving Mutual TLS: Secure Pod-to-Pod Communication Without the Hassle and that led me to explore a bit more on the state of Mutual TLS in Kubernetes. Here are some notes with explorations and references I came across that helped me learn more.
-I will be using a cluster provisioned via minikube
-What is Mutual TLS Authentication? Okay, so first up what is it that we are trying to solve?</description>
-    </item>
-    
+    <lastBuildDate>Thu, 31 Dec 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://echorand.me/categories/infrastructure/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Notes on Chaos Engineering</title>
       <link>https://echorand.me/posts/chaos-engineering/</link>
