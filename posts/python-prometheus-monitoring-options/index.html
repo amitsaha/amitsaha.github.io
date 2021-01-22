@@ -14,7 +14,7 @@ Limitation of native prometheus exporting prometheus was built with single proce
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://echorand.me/posts/python-prometheus-monitoring-options/" />
 <meta property="article:published_time" content="2018-01-24T00:00:00+00:00" />
-<meta property="article:modified_time" content="2019-07-11T16:52:00+10:00" />
+<meta property="article:modified_time" content="2021-01-22T14:24:42+11:00" />
 
   <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Your options for monitoring multi-process Python applications with Prometheus"/>
@@ -186,7 +186,19 @@ if (!doNotTrack) {
 
     </div>
     <div id="toc">
-      <nav id="TableOfContents"></nav>
+      <nav id="TableOfContents">
+  <ul>
+    <li><a href="#limitation-of-native-prometheus-exporting">Limitation of native prometheus exporting</a></li>
+    <li><a href="#option-1---add-a-unique-label-to-each-metric">Option #1 - Add a unique label to each metric</a></li>
+    <li><a href="#option-2-multi-process-mode">Option #2: Multi-process mode</a></li>
+    <li><a href="#option-3-the-django-way">Option #3: The Django way</a></li>
+    <li><a href="#option-4-statsd-exporter">Option #4: StatsD exporter</a></li>
+    <li><a href="#exporting-metrics-for-non-http-applications">Exporting metrics for non-HTTP applications</a></li>
+    <li><a href="#conclusion">Conclusion</a></li>
+    <li><a href="#learn-more">Learn more</a></li>
+    <li><a href="#acknowledgements">Acknowledgements</a></li>
+  </ul>
+</nav>
     </div>
   </span>
 </div>
@@ -203,7 +215,7 @@ if (!doNotTrack) {
           
           <time datetime="2018-01-24 00:00:00 &#43;0000 UTC" itemprop="datePublished">2018-01-24</time>
           
-            (Updated: <time datetime="2019-07-11 16:52:00 &#43;1000 &#43;1000" itemprop="dateModified">2019-07-11</time>)
+            (Updated: <time datetime="2021-01-22 14:24:42 &#43;1100 &#43;1100" itemprop="dateModified">2021-01-22</time>)
           
         </div>
         
@@ -222,7 +234,7 @@ if (!doNotTrack) {
   
     <div class="content" itemprop="articleBody">
       <p>In an earlier article, <a href="https://blog.codeship.com/monitoring-your-synchronous-python-web-applications-using-prometheus/">Monitoring Your Synchronous Python Web Applications Using Prometheus</a>, I discussed a limitation of using the Python client for prometheus.</p>
-<h1 id="limitation-of-native-prometheus-exporting">Limitation of native prometheus exporting</h1>
+<h2 id="limitation-of-native-prometheus-exporting">Limitation of native prometheus exporting</h2>
 <p><a href="https://prometheus.io">prometheus</a> was built with single process multi-threaded applications in mind.
 I use the term multi-threaded here to also include coroutine based concurrent applications such as
 those written in <code>golang</code> or using Python&rsquo;s asynchronous primitives
@@ -242,7 +254,7 @@ The same inconsistent behaviour can happen with a <code>gauge</code> or a <code>
 metric rather worker level. (Aside: this is each worker behaving in <a href="https://jeffreysaltzman.wordpress.com/2013/04/08/wysiati/">WYSIATI</a> manner
 ).</p>
 <p>What can we do? We have a few options.</p>
-<h1 id="option-1---add-a-unique-label-to-each-metric">Option #1 - Add a unique label to each metric</h1>
+<h2 id="option-1---add-a-unique-label-to-each-metric">Option #1 - Add a unique label to each metric</h2>
 <p>To work around this problem, you can add a unique <code>worker_id</code> as a label such that each metric as scraped
 by prometheus is unique for one application instance (by virtue of having different value for the
 label, <code>worker_id</code>). Then we can perform aggregation such as:</p>
@@ -254,7 +266,7 @@ of interest.</p>
 of metrics: for a single metric we now have <code># of workers x metric</code> number of
 metrics per application instance.</p>
 <p>A demo of this approach can be found <a href="https://github.com/amitsaha/python-prometheus-demo/tree/master/flask_app_prometheus_worker_id">here</a>.</p>
-<h1 id="option-2-multi-process-mode">Option #2: Multi-process mode</h1>
+<h2 id="option-2-multi-process-mode">Option #2: Multi-process mode</h2>
 <p>The prometheus <a href="https://github.com/prometheus/client_python">Python Client</a>
 has a multi-processing mode which essentially creates a shared prometheus registry and shares
 it among all the processes and hence the <a href="https://github.com/prometheus/client_python/blob/master/prometheus_client/multiprocess.py">aggregation</a> happens at the application level. When,
@@ -262,15 +274,15 @@ prometheus scrapes the application instance, no matter which worker responds to 
 request, the metrics reported back describes the application&rsquo;s behaviour, rather than
 the worker responding.</p>
 <p>A demo of this approach can be found <a href="https://github.com/amitsaha/python-prometheus-demo/tree/master/flask_app_prometheus_multiprocessing">here</a>.</p>
-<h1 id="option-3-the-django-way">Option #3: The Django way</h1>
+<h2 id="option-3-the-django-way">Option #3: The Django way</h2>
 <p>The Django prometheus client adopts an approach where you basically have each <a href="https://github.com/korfuri/django-prometheus/blob/master/documentation/exports.md">worker listening</a> on a unique
 port for prometheus&rsquo;s scraping requests. Thus, to prometheus, each of these workers are different targets
 as if they were running on different instances of the application.</p>
-<h1 id="option-4-statsd-exporter">Option #4: StatsD exporter</h1>
+<h2 id="option-4-statsd-exporter">Option #4: StatsD exporter</h2>
 <p>I discussed this solution in <a href="https://blog.codeship.com/monitoring-your-synchronous-python-web-applications-using-prometheus/">Monitoring Your Synchronous Python Web Applications Using Prometheus</a>. Essentially, instead of exporting native prometheus metrics from your
 application and prometheus scraping our application, we push our metrics to a locally running <a href="https://github.com/prometheus/statsd_exporter">statsd exporter</a> instance. Then, we setup prometheus to scrape the statsd exporter instance.</p>
 <p>For Django, we can use a similar approach as well.</p>
-<h1 id="exporting-metrics-for-non-http-applications">Exporting metrics for non-HTTP applications</h1>
+<h2 id="exporting-metrics-for-non-http-applications">Exporting metrics for non-HTTP applications</h2>
 <p>For non-HTTP applications (such as Thrift or gRPC servers), we have two options as far as I see it.</p>
 <p>The first option is to setup a basic HTTP server (in a separate thread or process) which responds
 to requests for the <code>/metrics</code> endpoint. If we have a master process which then forks the child
@@ -278,7 +290,7 @@ processes from within the application, we may be able to get native prometheus m
 the limitation that Python HTTP applications (in this context) suffer.</p>
 <p>The second option is to push the metrics to the statsd exporter. This is simpler since we don&rsquo;t have
 to have a HTTP server running.</p>
-<h1 id="conclusion">Conclusion</h1>
+<h2 id="conclusion">Conclusion</h2>
 <p>Option #4 (using the <code>statsd exporter</code>) seems to be the best option to me especially when we have to manage/work with
 both WSGI and non-HTTP multi-process applications. Combined with the <a href="https://github.com/DataDog/datadogpy">dogstatsd-py</a>
 client for StatsD, I think it is a really powerful option and the most straightforward. You just run
@@ -290,13 +302,13 @@ we are done.</p>
 <li>Point the DNS for the statsd host to the <code>statsd exporter</code> instance instead</li>
 </ul>
 <p>If I am wrong in my thinking here, please let me know.</p>
-<h1 id="learn-more">Learn more</h1>
+<h2 id="learn-more">Learn more</h2>
 <ul>
 <li><a href="https://blog.codeship.com/monitoring-your-synchronous-python-web-applications-using-prometheus/">Monitoring Your Synchronous Python Web Applications Using Prometheus</a></li>
 <li><a href="https://github.com/prometheus/client_python">Python prometheus client</a></li>
 <li><a href="https://www.robustperception.io/common-query-patterns-in-promql/">Common query patterns in PromQL</a></li>
 </ul>
-<h1 id="acknowledgements">Acknowledgements</h1>
+<h2 id="acknowledgements">Acknowledgements</h2>
 <p>Thanks to Hynek Schlawack for a private email discussion on Python + prometheus. On their suggestion
 I tried using the <code>worker_id</code> approach and took another look at the multiprocessing support in
 the Python client.</p>
@@ -333,7 +345,19 @@ the Python client.</p>
     </div>
 
     <div id="toc-footer" style="display: none">
-      <nav id="TableOfContents"></nav>
+      <nav id="TableOfContents">
+  <ul>
+    <li><a href="#limitation-of-native-prometheus-exporting">Limitation of native prometheus exporting</a></li>
+    <li><a href="#option-1---add-a-unique-label-to-each-metric">Option #1 - Add a unique label to each metric</a></li>
+    <li><a href="#option-2-multi-process-mode">Option #2: Multi-process mode</a></li>
+    <li><a href="#option-3-the-django-way">Option #3: The Django way</a></li>
+    <li><a href="#option-4-statsd-exporter">Option #4: StatsD exporter</a></li>
+    <li><a href="#exporting-metrics-for-non-http-applications">Exporting metrics for non-HTTP applications</a></li>
+    <li><a href="#conclusion">Conclusion</a></li>
+    <li><a href="#learn-more">Learn more</a></li>
+    <li><a href="#acknowledgements">Acknowledgements</a></li>
+  </ul>
+</nav>
     </div>
 
     <div id="share-footer" style="display: none">
