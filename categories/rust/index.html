@@ -1,155 +1,684 @@
 <!DOCTYPE html>
-<html lang="en-us">
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>Exploring Software</title>
-  <meta name="description" content="echo $RANDOM. Exploring Software and writing about it.">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="robots" content="all,follow">
-  <meta name="googlebot" content="index,follow,snippet,archive">
-  <meta property="og:title" content="Rust" />
-<meta property="og:description" content="echo $RANDOM. Exploring Software and writing about it." />
-<meta property="og:type" content="website" />
-<meta property="og:url" content="https://echorand.me/categories/rust/" />
-<meta property="og:updated_time" content="2019-06-17T14:58:57+10:00" />
-
-  <meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="Rust"/>
-<meta name="twitter:description" content="echo $RANDOM. Exploring Software and writing about it."/>
-
-  
-  
-  
-  <link rel="stylesheet" href="https://echorand.me/css/style-white.css">
-  
-  
-  
-    <!--[if lt IE 9]>
-      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-    <![endif]-->
-  
-
-  
-<link rel="icon" type="image/png" href="https://echorand.me/images/favicon.ico" />
-
-  
-  
-    <link href="https://echorand.me/categories/rust/index.xml" rel="alternate" type="application/rss+xml" title="Exploring Software" />
-  
-  
-  
-  
+<html><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="echo $RANDOM. Exploring Software and writing about it.">
     
-<script type="application/javascript">
-var doNotTrack = false;
-if (!doNotTrack) {
-	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-	ga('create', 'UA-108901610-1', 'auto');
-	
-	ga('send', 'pageview');
-}
-</script>
+    <link rel="shortcut icon" href="https://echorand.me/favicon.ico">
+    <link rel="alternate" type="application/rss+xml" href="https://echorand.me/categories/rust/index.xml" title="Exploring Software">
+    
+    <link rel="stylesheet" href="/css/style.min.css">
 
-  
-  
+    <title>Rust</title>
 </head>
-
-<body class="max-width mx-auto px3 ltr">
-  <div class="content index py4">
-
-    <header id="header">
-  <a href="https://echorand.me">
-  
-    <div id="logo" style="background-image: url(https://echorand.me/images/logo.png)"></div>
-  
-  <div id="title">
-    <h1>Exploring Software</h1>
-  </div>
-  </a>
-  <div id="nav">
-    <ul>
-      <li class="icon">
-        <a href="#"><i class="fas fa-bars fa-2x"></i></a>
-      </li>
-      
-        <li><a href="/about">About</a></li>
-      
-        <li><a href="/articles">Articles</a></li>
-      
-        <li><a href="/books">Books</a></li>
-      
-        <li><a href="/posts">Posts</a></li>
-      
-        <li><a href="/talks">Talks</a></li>
-      
-        <li><a href="/categories/">Categories</a></li>
-      
-    </ul>
-  </div>
-</header>
-
-
-
-    
-<div id="archive">
-  <ul class="post-list">
-  
-    
-    
-    
-    <h2>2016</h2>
-    
-    <li class="post-item">
-      <div class="meta">
-        <time datetime="2016-05-04 00:00:00 &#43;0000 UTC" itemprop="datePublished">2016-05-04</time>
-      </div>
-      <span>    
-        <a class="" href="https://echorand.me/posts/tee-in-rust/"> New article Write a program to tee output using Rust </a>
-      </span>
-    </li>
-    
-  </ul>
-  
-
-
-</div>
-
-
-    <footer id="footer">
-  <div class="footer-left">
-    Copyright  &copy; 2021  Exploring Software 
-  </div>
-  <div class="footer-right">
+<body><header id="banner">
+    <h2><a href="https://echorand.me">Exploring Software</a></h2>
     <nav>
-      <ul>
-         
-        <li><a href="/about">About</a></li>
-         
-        <li><a href="/articles">Articles</a></li>
-         
-        <li><a href="/books">Books</a></li>
-         
-        <li><a href="/posts">Posts</a></li>
-         
-        <li><a href="/talks">Talks</a></li>
-         
-        <li><a href="/categories/">Categories</a></li>
-        
-      </ul>
+        <ul>
+            <li>
+                <a href="/about" title="">About</a>
+            </li><li>
+                <a href="/articles" title="">Articles</a>
+            </li><li>
+                <a href="/books" title="">Books</a>
+            </li><li>
+                <a href="/posts" title="">Posts</a>
+            </li><li>
+                <a href="/talks" title="">Talks</a>
+            </li><li>
+                <a href="/categories/" title="">Categories</a>
+            </li>
+        </ul>
     </nav>
-  </div>
+</header>
+<main id="content"><h3>Posts</h3>
+<ul id="posts">
+    <li>
+        <a href="https://echorand.me/posts/go-file-mutex/">
+            Concurrency safe file access in Go
+            <small><time>Jan 18, 2021</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/chaos-engineering/">
+            Notes on Chaos Engineering
+            <small><time>Dec 31, 2020</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/go-embed/">
+            Embedding files in Go using the &#34;embed&#34; package
+            <small><time>Dec 20, 2020</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/micros-auth-kubernetes/">
+            Authentication between services using Kubernetes primitives
+            <small><time>Dec 13, 2020</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/policy-enforcement-kubernetes/">
+            Static and dynamic checks for your Kubernetes workloads
+            <small><time>Jul 27, 2020</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/gatekeeper-kubernetes/">
+            Using Gatekeeper in Kubernetes
+            <small><time>May 28, 2020</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/getting-started-with-golang-plugins/">
+            Getting started with Golang plugins
+            <small><time>May 26, 2020</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/kubernetes-pod-security-policies/">
+            Kubernetes pod security policies
+            <small><time>May 20, 2020</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/fluentbit-kubernetes/">
+            How to Set up Log Forwarding in a Kubernetes Cluster Using Fluent Bit
+            <small><time>May 7, 2020</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/hugo-reverse-sort-modified/">
+            Sorting pages by last modified date in Hugo
+            <small><time>May 5, 2020</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/cloud-custodian-aws/">
+            Using cloud custodian to ensure compliance across AWS resources
+            <small><time>Apr 28, 2020</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/python-restrict-attributes/">
+            Restricting attributes that can be set in Python
+            <small><time>Jan 2, 2020</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/kubernetes-manifest-management/">
+            On managing Kubernetes YAML manifests
+            <small><time>Dec 20, 2019</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/correlated-error-logging/">
+            Correlated error logging
+            <small><time>Dec 12, 2019</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/golang-ops-automation/">
+            Using Golang for automating infrastructure and operations work
+            <small><time>Dec 7, 2019</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/jenkins-docker-workflow-inside/">
+            Jenkins Docker Workflow plugin - A look inside `inside()`
+            <small><time>Nov 26, 2019</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/bash-functions-exit/">
+            Bash function and exiting early
+            <small><time>Oct 18, 2019</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/user-management-aws-eks-cluster/">
+            User access management on AWS Kubernetes cluster
+            <small><time>Aug 23, 2019</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/go-notes/">
+            Notes on Go
+            <small><time>Aug 7, 2019</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/kubernetes-notes/">
+            Notes on Kubernetes
+            <small><time>Aug 2, 2019</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/nginx-non-www-www-redirect/">
+            Nginx - redirecting non-www to www hostnames
+            <small><time>Jul 19, 2019</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/linux_shell_autocompletion/">
+            Notes on Bash auto-completion on Linux
+            <small><time>Jul 3, 2019</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/pg-sql-notes/">
+            Notes on PostgreSQL
+            <small><time>Jun 27, 2019</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/strace-nginx/">
+            Nginx &#43; strace
+            <small><time>Jun 19, 2019</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/nginx-geoip2-mmdblookup/">
+            Nginx and geoip lookup with geoip2 module
+            <small><time>May 24, 2019</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/terraform_from_toml/">
+            Generate yourself some Terraform code from TOML
+            <small><time>Apr 4, 2019</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/docker_logs_variable/">
+            Getting a docker container&#39;s stdout logs into a variable on Linux
+            <small><time>Mar 11, 2019</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/aspnet_compiler_node_modules/">
+            ASP.NET Compilation and other files don&#39;t mix
+            <small><time>Mar 5, 2019</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/traefik-aspnet/">
+            Poor man&#39;s zero downtime deployment setup using Traefik
+            <small><time>Jan 21, 2019</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/scheduled-task-docker-prune/">
+            Scheduled task to prune docker images on Windows server
+            <small><time>Jan 21, 2019</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/docker-build-and-ephemeral-port-issues/">
+            Ephemeral source port ranges and docker build
+            <small><time>Jan 14, 2019</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/aws-codedeploy-autoscaling-group/">
+            AWS CodeDeploy Deployment Group and Initial Auto Scaling lifecycle hook
+            <small><time>Dec 19, 2018</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/hard-links-soft-links-linux/">
+            Hard Links and Soft/Symbolic Links on Linux
+            <small><time>Nov 9, 2018</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/manual-letsencrypt-dns-challenge/">
+            Let&#39;s Encrypt, GoDadday DNS and IIS server
+            <small><time>Nov 8, 2018</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/fedora-29-scientific-vagrant-boxes/">
+            Fedora Scientific Vagrant boxes are here!
+            <small><time>Nov 1, 2018</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/on-sane-defaults/">
+            On sane defaults in sofware tools
+            <small><time>Oct 26, 2018</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/aws-vpc-internet-connectivity-subnets/">
+            AWS VPC subnets and Internet connectivity over IPv4
+            <small><time>Oct 15, 2018</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/flyway-baseline-migration/">
+            flyway baseline Introducing flyway migrations into existing database
+            <small><time>Oct 12, 2018</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/git-only-stage-partial-changes/">
+            Git Staging partial changes in a file
+            <small><time>Oct 11, 2018</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/building-fedora-vagrant-boxes-for-virtualbox-with-packer/">
+            Building Fedora Vagrant boxes for VirtualBox using Packer
+            <small><time>Oct 10, 2018</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/sql-server-flyway-non-empty-schema/">
+            flyway, SQL server and non-empty schema?
+            <small><time>Sep 28, 2018</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/golang-templates/">
+            Examples of consuming data in Golang templates
+            <small><time>Sep 18, 2018</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/curl-download-redirect/">
+            Download a file using `curl` - How hard can it get?
+            <small><time>Sep 14, 2018</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/docker-user-namespacing-remap-system-user/">
+            Docker userns-remap and system users on Linux
+            <small><time>Aug 24, 2018</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/aws-vpc-private-dns/">
+            AWS Private Route53 DNS and Docker containers
+            <small><time>Aug 15, 2018</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/aws-network-acl-docker/">
+            AWS Network ACLs and ephemeral port ranges
+            <small><time>Aug 14, 2018</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/managing-aws-lambda-functions-terraform/">
+            Managing AWS lambda functions from start to finish with Terraform
+            <small><time>Aug 2, 2018</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/windows-docker-containers/">
+            On running Windows Docker containers
+            <small><time>Jul 26, 2018</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/measuring-seconds-elapsed-powershell/">
+            Powershell Measuring seconds elapsed
+            <small><time>Jul 25, 2018</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/terraform-remote-state-consul/">
+            Using Terraform with consul remote backend
+            <small><time>Jun 27, 2018</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/fedora-29-scientific-rawhide-vagrant-box/">
+            Pre-release Fedora Scientific Vagrant Boxes
+            <small><time>Jun 18, 2018</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/py-ast-straightplugin-nox/">
+            A demo plugin based Python code analyser
+            <small><time>May 13, 2018</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/video-counter-gauge-oh-my/">
+            Video PYCON US 2018 Talk - Counter, Gauge, Oh my!
+            <small><time>May 13, 2018</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/pycon-counter-gauge-oh-my/">
+            PYCON US 2018 talk Counter, Gauge, Upper 90 - Oh my!
+            <small><time>May 9, 2018</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/fedora-scientific-28/">
+            Fedora Scientific 28 is here!
+            <small><time>May 2, 2018</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/my-own-ping/">
+            How does ping roughly work over IPv4 on Linux?
+            <small><time>Apr 27, 2018</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/cloudflare-dns-over-https/">
+            Notes on using Cloudflare DNS over HTTPS
+            <small><time>Apr 10, 2018</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/fedora-scientific-28-beta/">
+            Fedora Scientific 28 Beta
+            <small><time>Apr 9, 2018</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/aws-assume-iam-role-from-another/">
+            Setting up AWS EC2 Assume Role with Terraform
+            <small><time>Feb 27, 2018</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/automate-deb-package-packagecloud/">
+            Automatic building and publishing DEB packages for Golang applications
+            <small><time>Feb 24, 2018</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/python-rlo/">
+            Detecting RLO character in Python
+            <small><time>Feb 19, 2018</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/redis-sorted-sets/">
+            Sorted Sets in Redis from CLI, Python and Golang
+            <small><time>Feb 19, 2018</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/python-using-specific-git-commits-of-packages/">
+            Python Using specific git commits of third party packages
+            <small><time>Feb 16, 2018</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/rest-or-rpc-for-microservices/">
+            Why RPC in Microservices instead of HTTP?
+            <small><time>Feb 11, 2018</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/c_cplus_scientific_programming/">
+            C/C&#43;&#43; Scientific Programming Libraries and Tools
+            <small><time>Jan 26, 2018</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/data-in-c/">
+            Data in C
+            <small><time>Jan 26, 2018</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/data-in-c-cpython/">
+            Data in C and CPython
+            <small><time>Jan 26, 2018</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/data-in-cpython/">
+            Data in CPython
+            <small><time>Jan 26, 2018</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/clean_up_variable_attribute/">
+            Resource Acquisition Is Initialization (RAII) in C
+            <small><time>Jan 26, 2018</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/building-golang-deb-packages/">
+            Quick and dirty debian packages for your Golang application
+            <small><time>Jan 25, 2018</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/python-prometheus-monitoring-options/">
+            Your options for monitoring multi-process Python applications with Prometheus
+            <small><time>Jan 24, 2018</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/linux-system-mining/">
+            Linux System Mining with Python
+            <small><time>Jan 22, 2018</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/systemd-supervisord/">
+            Doing something before systemd shuts your supervisord down
+            <small><time>Jan 12, 2018</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/fedora-openvpn-systemd/">
+            Setting up OpenVPN client with systemd template unit files
+            <small><time>Jan 12, 2018</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/compilation-interpretation-c-python/">
+            Compilation and Interpretation in C and CPython
+            <small><time>Jan 5, 2018</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/vim-notes/">
+            Notes on Vim
+            <small><time>Jan 5, 2018</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/tip-terraform-security-group-existing/">
+            Tip Terraform and AWS Security Group rules in EC2 classic
+            <small><time>Jan 5, 2018</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/mysql-too-many-connection/">
+            Tip MySQL - Too many connections
+            <small><time>Jan 4, 2018</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/github-pages-custom-domain-travis-ci/">
+            Using Travis CI to publish to GitHub pages with custom domain
+            <small><time>Jan 3, 2018</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/python-grpc/">
+            Getting started with gRPC and Python
+            <small><time>Jan 1, 2018</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/imovie-rotate-video/">
+            Tip Rotating video frames using iMovie
+            <small><time>Jan 1, 2018</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/consul-tags/">
+            Brief overview of using consul tags
+            <small><time>Dec 1, 2017</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/docker-extra-hosts/">
+            Add an additional host entry to docker container
+            <small><time>Oct 29, 2017</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/python-prometheus/">
+            Monitoring Python applications with Prometheus
+            <small><time>Oct 26, 2017</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/docker-user-defined-networks/">
+            User-defined networks in Docker for inter-container communication on Linux
+            <small><time>Oct 26, 2017</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/golang-dissecting-listen-and-serve/">
+            HandlerFunc, Handle and DefaultServeMux in Golang
+            <small><time>Apr 26, 2017</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/doing-math-humble-bundle/">
+            Doing Math with Python Humble Bundle
+            <small><time>Apr 6, 2017</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/python-zipkin/">
+            Introducing distributed tracing in your Python application via Zipkin
+            <small><time>Mar 28, 2017</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/golang-notes-gitbackup/">
+            Notes on using Go to write gitbackup
+            <small><time>Mar 26, 2017</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/queue-logger-python-json-logging/">
+            QueueLogger and Python JSON Logger
+            <small><time>Mar 1, 2017</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/golang-setup-1.8/">
+            Setup Golang 1.8 and gb on Fedora (and other Linux distributions)
+            <small><time>Mar 1, 2017</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/golang-setup/">
+            Setup Golang on Fedora 24 (and other Linux distributions)
+            <small><time>Jun 23, 2016</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/slides-jupyter-notebook/">
+            Presentation slides with Jupyter Notebook
+            <small><time>May 31, 2016</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/tee-in-rust/">
+            New article Write a program to tee output using Rust
+            <small><time>May 4, 2016</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/libcontainer-runc-fedora-24/">
+            runC and libcontainer on Fedora 23/24
+            <small><time>Apr 27, 2016</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/go_image_cropping/">
+            New article Write an Image Cropping program with Go
+            <small><time>Apr 17, 2016</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/fedora_koji_livecd_builds/">
+            Did your Fedora live cd build fail?
+            <small><time>Feb 17, 2016</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/mocking_s3_with_moto_in_python/">
+            Replacing boto S3 mocks using moto in Python
+            <small><time>Jan 25, 2016</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/named_temporary_file/">
+            tempfile.NamedTemporaryFile() in Python
+            <small><time>Jan 20, 2016</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/mock_and_attribute_error/">
+            Mock objects and non-existent attributes/methods in Python
+            <small><time>Jan 11, 2016</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/data-containers-in-docker/">
+            Data only Docker containers
+            <small><time>Dec 13, 2015</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/virtualenv-first-python/">
+            A virtualenv first approach to Python projects
+            <small><time>Nov 30, 2015</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/python-hashseed/">
+            PYTHONHASHSEED and your tests
+            <small><time>Nov 19, 2015</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/docker-volume-mount-selinux/">
+            Mounting a docker volume on SELinux enabled host
+            <small><time>Oct 5, 2015</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/puppet-on-fedora-23/">
+            Standalone open source puppet setup on Fedora
+            <small><time>Oct 1, 2015</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/fedora-22-scientific/">
+            Fedora 22 Scientific
+            <small><time>Jun 11, 2015</time></small>
+        </a>
+    </li>
+    <li>
+        <a href="https://echorand.me/posts/hello/">
+            Remapping http//echorand.me
+            <small><time>Apr 30, 2015</time></small>
+        </a>
+    </li>
+</ul>
+
+        </main><footer id="footer">
+    
 </footer>
-
-
-  </div>
 </body>
-
-<link rel="stylesheet" href=/lib/font-awesome/css/all.min.css>
-<script src=/lib/jquery/jquery.min.js></script>
-<script src=/js/main.js></script>
 </html>

@@ -1,231 +1,39 @@
 <!DOCTYPE html>
-<html lang="en-us">
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title> How does ping roughly work over IPv4 on Linux? | Exploring Software</title>
-  <meta name="description" content="echo $RANDOM. Exploring Software and writing about it.">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="robots" content="all,follow">
-  <meta name="googlebot" content="index,follow,snippet,archive">
-  <meta property="og:title" content="How does ping roughly work over IPv4 on Linux?" />
-<meta property="og:description" content="Introduction The ping program is one of the most common programs which is used to check the &ldquo;aliveness&rdquo; of a host and a typical execution looks as follows:
-$ ping 127.0.0.1 -c 1 -4 PING 127.0.0.1 (127.0.0.1) 56(84) bytes of data. 64 bytes from 127.0.0.1: icmp_seq=1 ttl=64 time=0.062 ms --- 127.0.0.1 ping statistics --- 1 packets transmitted, 1 received, 0% packet loss, time 0ms rtt min/avg/max/mdev = 0.062/0.062/0.062/0.000 ms The -c switch indicates that we want to send a single &ldquo;probe&rdquo;." />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://echorand.me/posts/my-own-ping/" />
-<meta property="article:published_time" content="2018-04-27T00:00:00+00:00" />
-<meta property="article:modified_time" content="2019-07-11T16:52:00+10:00" />
-
-  <meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="How does ping roughly work over IPv4 on Linux?"/>
-<meta name="twitter:description" content="Introduction The ping program is one of the most common programs which is used to check the &ldquo;aliveness&rdquo; of a host and a typical execution looks as follows:
-$ ping 127.0.0.1 -c 1 -4 PING 127.0.0.1 (127.0.0.1) 56(84) bytes of data. 64 bytes from 127.0.0.1: icmp_seq=1 ttl=64 time=0.062 ms --- 127.0.0.1 ping statistics --- 1 packets transmitted, 1 received, 0% packet loss, time 0ms rtt min/avg/max/mdev = 0.062/0.062/0.062/0.000 ms The -c switch indicates that we want to send a single &ldquo;probe&rdquo;."/>
-
-  
-  
-  
-  <link rel="stylesheet" href="https://echorand.me/css/style-white.css">
-  
-  
-  
-    <!--[if lt IE 9]>
-      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-    <![endif]-->
-  
-
-  
-<link rel="icon" type="image/png" href="https://echorand.me/images/favicon.ico" />
-
-  
-  
-  
-  
-  
+<html><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="echo $RANDOM. Exploring Software and writing about it.">
     
-<script type="application/javascript">
-var doNotTrack = false;
-if (!doNotTrack) {
-	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-	ga('create', 'UA-108901610-1', 'auto');
-	
-	ga('send', 'pageview');
-}
-</script>
+    <link rel="shortcut icon" href="https://echorand.me/favicon.ico">
+    
+    <link rel="stylesheet" href="/css/style.min.css">
 
-  
-  
+    <title>How does ping roughly work over IPv4 on Linux?</title>
 </head>
-
-<body class="max-width mx-auto px3 ltr">
-  <div class="content index py4">
-
-  <div id="header-post">
-  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
-  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
-  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
-  <span id="menu">
-    <span id="nav">
-      <ul>
-         
-        <li><a href="/about">About</a></li>
-         
-        <li><a href="/articles">Articles</a></li>
-         
-        <li><a href="/books">Books</a></li>
-         
-        <li><a href="/posts">Posts</a></li>
-         
-        <li><a href="/talks">Talks</a></li>
-         
-        <li><a href="/categories/">Categories</a></li>
-        
-      </ul>
-    </span>
-    <br/>
-    <span id="actions">
-      <ul>
-        
-        <li>
-          <a class="icon" href=" https://echorand.me/posts/cloudflare-dns-over-https/">
-            <i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i>
-          </a>
-        </li>
-        
-        
-        <li>
-          <a class="icon" href="https://echorand.me/posts/fedora-scientific-28/">
-            <i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i>
-          </a>
-        </li>
-        
-        <li>
-          <a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');">
-            <i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i>
-          </a>
-        </li>
-        <li>
-          <a class="icon" href="#">
-            <i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i>
-          </a>
-        </li>
-      </ul>
-      <span id="i-prev" class="info" style="display:none;">Previous post</span>
-      <span id="i-next" class="info" style="display:none;">Next post</span>
-      <span id="i-top" class="info" style="display:none;">Back to top</span>
-      <span id="i-share" class="info" style="display:none;">Share post</span>
-    </span>
-    <br/>
-    <div id="share" style="display: none">
-      
-      <ul>
-  
-  
-    
-  
-  
-  <li>
-    <a class="icon" href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fechorand.me%2fposts%2fmy-own-ping%2f">
-      <i class="fab fa-facebook " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="https://twitter.com/share?url=https%3a%2f%2fechorand.me%2fposts%2fmy-own-ping%2f&text=How%20does%20ping%20roughly%20work%20over%20IPv4%20on%20Linux%3f">
-      <i class="fab fa-twitter " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fechorand.me%2fposts%2fmy-own-ping%2f&title=How%20does%20ping%20roughly%20work%20over%20IPv4%20on%20Linux%3f">
-      <i class="fab fa-linkedin " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fechorand.me%2fposts%2fmy-own-ping%2f&is_video=false&description=How%20does%20ping%20roughly%20work%20over%20IPv4%20on%20Linux%3f">
-      <i class="fab fa-pinterest " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="mailto:?subject=How%20does%20ping%20roughly%20work%20over%20IPv4%20on%20Linux%3f&body=Check out this article: https%3a%2f%2fechorand.me%2fposts%2fmy-own-ping%2f">
-      <i class="fas fa-envelope " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="https://getpocket.com/save?url=https%3a%2f%2fechorand.me%2fposts%2fmy-own-ping%2f&title=How%20does%20ping%20roughly%20work%20over%20IPv4%20on%20Linux%3f">
-      <i class="fab fa-get-pocket " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://reddit.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fmy-own-ping%2f&title=How%20does%20ping%20roughly%20work%20over%20IPv4%20on%20Linux%3f">
-      <i class="fab fa-reddit " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://www.stumbleupon.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fmy-own-ping%2f&title=How%20does%20ping%20roughly%20work%20over%20IPv4%20on%20Linux%3f">
-      <i class="fab fa-stumbleupon " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://digg.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fmy-own-ping%2f&title=How%20does%20ping%20roughly%20work%20over%20IPv4%20on%20Linux%3f">
-      <i class="fab fa-digg " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://www.tumblr.com/share/link?url=https%3a%2f%2fechorand.me%2fposts%2fmy-own-ping%2f&name=How%20does%20ping%20roughly%20work%20over%20IPv4%20on%20Linux%3f&description=Introduction%20The%20ping%20program%20is%20one%20of%20the%20most%20common%20programs%20which%20is%20used%20to%20check%20the%20%26ldquo%3baliveness%26rdquo%3b%20of%20a%20host%20and%20a%20typical%20execution%20looks%20as%20follows%3a%0a%24%20ping%20127.0.0.1%20-c%201%20-4%20PING%20127.0.0.1%20%28127.0.0.1%29%2056%2884%29%20bytes%20of%20data.%2064%20bytes%20from%20127.0.0.1%3a%20icmp_seq%3d1%20ttl%3d64%20time%3d0.062%20ms%20---%20127.0.0.1%20ping%20statistics%20---%201%20packets%20transmitted%2c%201%20received%2c%200%25%20packet%20loss%2c%20time%200ms%20rtt%20min%2favg%2fmax%2fmdev%20%3d%200.062%2f0.062%2f0.062%2f0.000%20ms%20The%20-c%20switch%20indicates%20that%20we%20want%20to%20send%20a%20single%20%26ldquo%3bprobe%26rdquo%3b.">
-      <i class="fab fa-tumblr " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fechorand.me%2fposts%2fmy-own-ping%2f&t=How%20does%20ping%20roughly%20work%20over%20IPv4%20on%20Linux%3f">
-      <i class="fab fa-hacker-news " aria-hidden="true"></i>
-    </a>
-  </li>
-</ul>
-
-    </div>
-    <div id="toc">
-      <nav id="TableOfContents">
-  <ul>
-    <li><a href="#resources">Resources</a></li>
-  </ul>
-</nav>
-    </div>
-  </span>
-</div>
-
-
-  <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
-    <header>
-      <h1 class="posttitle" itemprop="name headline">
-        How does ping roughly work over IPv4 on Linux?
-      </h1>
-      <div class="meta">
-        
-        <div class="postdate">
-          
-          <time datetime="2018-04-27 00:00:00 &#43;0000 UTC" itemprop="datePublished">2018-04-27</time>
-          
-            (Updated: <time datetime="2019-07-11 16:52:00 &#43;1000 &#43;1000" itemprop="dateModified">2019-07-11</time>)
-          
-        </div>
-        
-        <div class="article-category">
-            <i class="fas fa-archive"></i>
-            
-            
-            <a class="category-link" href="/categories/software">software</a>
-            
-        </div>
-        
-        
-      </div>
-    </header>
-
-  
-    <div class="content" itemprop="articleBody">
-      <h1 id="introduction">Introduction</h1>
+<body><header id="banner">
+    <h2><a href="https://echorand.me">Exploring Software</a></h2>
+    <nav>
+        <ul>
+            <li>
+                <a href="/about" title="">About</a>
+            </li><li>
+                <a href="/articles" title="">Articles</a>
+            </li><li>
+                <a href="/books" title="">Books</a>
+            </li><li>
+                <a href="/posts" title="">Posts</a>
+            </li><li>
+                <a href="/talks" title="">Talks</a>
+            </li><li>
+                <a href="/categories/" title="">Categories</a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main id="content">
+<article>
+    <header id="post-header">
+        <h1>How does ping roughly work over IPv4 on Linux?</h1><time>April 27, 2018</time></header><h1 id="introduction">Introduction</h1>
 <p>The <code>ping</code> program is one of the most common programs which is used to check the &ldquo;aliveness&rdquo; of a host and
 a typical execution looks as follows:</p>
 <pre><code>$ ping 127.0.0.1 -c 1 -4
@@ -355,162 +163,10 @@ needed <code>sudo</code> or having to set the group sysctl parameter. What happe
 <li><a href="https://lwn.net/Articles/443051/">&ldquo;ping&rdquo; socket</a></li>
 <li><a href="https://github.com/iputils/iputils">ping source</a></li>
 </ul>
+</article>
 
-    </div>
-  </article>
-
-  
-  
-
-
-
-
-
-  <div id="footer-post-container">
-  <div id="footer-post">
-
-    <div id="nav-footer" style="display: none">
-      <ul>
-         
-          <li><a href="/about">About</a></li>
-         
-          <li><a href="/articles">Articles</a></li>
-         
-          <li><a href="/books">Books</a></li>
-         
-          <li><a href="/posts">Posts</a></li>
-         
-          <li><a href="/talks">Talks</a></li>
-         
-          <li><a href="/categories/">Categories</a></li>
-        
-      </ul>
-    </div>
-
-    <div id="toc-footer" style="display: none">
-      <nav id="TableOfContents">
-  <ul>
-    <li><a href="#resources">Resources</a></li>
-  </ul>
-</nav>
-    </div>
-
-    <div id="share-footer" style="display: none">
-      
-      <ul>
-  
-  
+        </main><footer id="footer">
     
-  
-  
-  <li>
-    <a class="icon" href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fechorand.me%2fposts%2fmy-own-ping%2f">
-      <i class="fab fa-facebook fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="https://twitter.com/share?url=https%3a%2f%2fechorand.me%2fposts%2fmy-own-ping%2f&text=How%20does%20ping%20roughly%20work%20over%20IPv4%20on%20Linux%3f">
-      <i class="fab fa-twitter fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fechorand.me%2fposts%2fmy-own-ping%2f&title=How%20does%20ping%20roughly%20work%20over%20IPv4%20on%20Linux%3f">
-      <i class="fab fa-linkedin fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fechorand.me%2fposts%2fmy-own-ping%2f&is_video=false&description=How%20does%20ping%20roughly%20work%20over%20IPv4%20on%20Linux%3f">
-      <i class="fab fa-pinterest fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="mailto:?subject=How%20does%20ping%20roughly%20work%20over%20IPv4%20on%20Linux%3f&body=Check out this article: https%3a%2f%2fechorand.me%2fposts%2fmy-own-ping%2f">
-      <i class="fas fa-envelope fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="https://getpocket.com/save?url=https%3a%2f%2fechorand.me%2fposts%2fmy-own-ping%2f&title=How%20does%20ping%20roughly%20work%20over%20IPv4%20on%20Linux%3f">
-      <i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://reddit.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fmy-own-ping%2f&title=How%20does%20ping%20roughly%20work%20over%20IPv4%20on%20Linux%3f">
-      <i class="fab fa-reddit fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://www.stumbleupon.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fmy-own-ping%2f&title=How%20does%20ping%20roughly%20work%20over%20IPv4%20on%20Linux%3f">
-      <i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://digg.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fmy-own-ping%2f&title=How%20does%20ping%20roughly%20work%20over%20IPv4%20on%20Linux%3f">
-      <i class="fab fa-digg fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://www.tumblr.com/share/link?url=https%3a%2f%2fechorand.me%2fposts%2fmy-own-ping%2f&name=How%20does%20ping%20roughly%20work%20over%20IPv4%20on%20Linux%3f&description=Introduction%20The%20ping%20program%20is%20one%20of%20the%20most%20common%20programs%20which%20is%20used%20to%20check%20the%20%26ldquo%3baliveness%26rdquo%3b%20of%20a%20host%20and%20a%20typical%20execution%20looks%20as%20follows%3a%0a%24%20ping%20127.0.0.1%20-c%201%20-4%20PING%20127.0.0.1%20%28127.0.0.1%29%2056%2884%29%20bytes%20of%20data.%2064%20bytes%20from%20127.0.0.1%3a%20icmp_seq%3d1%20ttl%3d64%20time%3d0.062%20ms%20---%20127.0.0.1%20ping%20statistics%20---%201%20packets%20transmitted%2c%201%20received%2c%200%25%20packet%20loss%2c%20time%200ms%20rtt%20min%2favg%2fmax%2fmdev%20%3d%200.062%2f0.062%2f0.062%2f0.000%20ms%20The%20-c%20switch%20indicates%20that%20we%20want%20to%20send%20a%20single%20%26ldquo%3bprobe%26rdquo%3b.">
-      <i class="fab fa-tumblr fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fechorand.me%2fposts%2fmy-own-ping%2f&t=How%20does%20ping%20roughly%20work%20over%20IPv4%20on%20Linux%3f">
-      <i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-</ul>
-
-    </div>
-
-    <div id="actions-footer">
-      
-        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;">
-          <i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
-        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;">
-          <i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
-        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;">
-          <i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> share</a>
-        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');">
-          <i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
-    </div>
-
-  </div>
-</div>
-
-
-  <footer id="footer">
-  <div class="footer-left">
-    Copyright  &copy; 2021  Exploring Software 
-  </div>
-  <div class="footer-right">
-    <nav>
-      <ul>
-         
-        <li><a href="/about">About</a></li>
-         
-        <li><a href="/articles">Articles</a></li>
-         
-        <li><a href="/books">Books</a></li>
-         
-        <li><a href="/posts">Posts</a></li>
-         
-        <li><a href="/talks">Talks</a></li>
-         
-        <li><a href="/categories/">Categories</a></li>
-        
-      </ul>
-    </nav>
-  </div>
 </footer>
-
-
-  </div>
 </body>
-
-<link rel="stylesheet" href=/lib/font-awesome/css/all.min.css>
-<script src=/lib/jquery/jquery.min.js></script>
-<script src=/js/main.js></script>
-
-
-
 </html>

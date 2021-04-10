@@ -1,232 +1,39 @@
 <!DOCTYPE html>
-<html lang="en-us">
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title> Hard Links and Soft/Symbolic Links on Linux | Exploring Software</title>
-  <meta name="description" content="echo $RANDOM. Exploring Software and writing about it.">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="robots" content="all,follow">
-  <meta name="googlebot" content="index,follow,snippet,archive">
-  <meta property="og:title" content="Hard Links and Soft/Symbolic Links on Linux" />
-<meta property="og:description" content="Much has been written (and asked) on the topic of hard links and soft links (a.k.a symbolic links) on Linux. I have read a few of those more than once. However, I end up getting confused between the two, specifically the differences between the two. So, here&rsquo;s my post on the topic with the hope that I will stop getting confused ever again.
-Our setup Let&rsquo;s create a file and write a line into it:" />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://echorand.me/posts/hard-links-soft-links-linux/" />
-<meta property="article:published_time" content="2018-11-09T00:00:00+00:00" />
-<meta property="article:modified_time" content="2020-01-09T13:57:20+11:00" />
-
-  <meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="Hard Links and Soft/Symbolic Links on Linux"/>
-<meta name="twitter:description" content="Much has been written (and asked) on the topic of hard links and soft links (a.k.a symbolic links) on Linux. I have read a few of those more than once. However, I end up getting confused between the two, specifically the differences between the two. So, here&rsquo;s my post on the topic with the hope that I will stop getting confused ever again.
-Our setup Let&rsquo;s create a file and write a line into it:"/>
-
-  
-  
-  
-  <link rel="stylesheet" href="https://echorand.me/css/style-white.css">
-  
-  
-  
-    <!--[if lt IE 9]>
-      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-    <![endif]-->
-  
-
-  
-<link rel="icon" type="image/png" href="https://echorand.me/images/favicon.ico" />
-
-  
-  
-  
-  
-  
+<html><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="echo $RANDOM. Exploring Software and writing about it.">
     
-<script type="application/javascript">
-var doNotTrack = false;
-if (!doNotTrack) {
-	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-	ga('create', 'UA-108901610-1', 'auto');
-	
-	ga('send', 'pageview');
-}
-</script>
+    <link rel="shortcut icon" href="https://echorand.me/favicon.ico">
+    
+    <link rel="stylesheet" href="/css/style.min.css">
 
-  
-  
+    <title>Hard Links and Soft/Symbolic Links on Linux</title>
 </head>
-
-<body class="max-width mx-auto px3 ltr">
-  <div class="content index py4">
-
-  <div id="header-post">
-  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
-  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
-  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
-  <span id="menu">
-    <span id="nav">
-      <ul>
-         
-        <li><a href="/about">About</a></li>
-         
-        <li><a href="/articles">Articles</a></li>
-         
-        <li><a href="/books">Books</a></li>
-         
-        <li><a href="/posts">Posts</a></li>
-         
-        <li><a href="/talks">Talks</a></li>
-         
-        <li><a href="/categories/">Categories</a></li>
-        
-      </ul>
-    </span>
-    <br/>
-    <span id="actions">
-      <ul>
-        
-        <li>
-          <a class="icon" href=" https://echorand.me/posts/manual-letsencrypt-dns-challenge/">
-            <i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i>
-          </a>
-        </li>
-        
-        
-        <li>
-          <a class="icon" href="https://echorand.me/posts/aws-codedeploy-autoscaling-group/">
-            <i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i>
-          </a>
-        </li>
-        
-        <li>
-          <a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');">
-            <i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i>
-          </a>
-        </li>
-        <li>
-          <a class="icon" href="#">
-            <i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i>
-          </a>
-        </li>
-      </ul>
-      <span id="i-prev" class="info" style="display:none;">Previous post</span>
-      <span id="i-next" class="info" style="display:none;">Next post</span>
-      <span id="i-top" class="info" style="display:none;">Back to top</span>
-      <span id="i-share" class="info" style="display:none;">Share post</span>
-    </span>
-    <br/>
-    <div id="share" style="display: none">
-      
-      <ul>
-  
-  
-    
-  
-  
-  <li>
-    <a class="icon" href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fechorand.me%2fposts%2fhard-links-soft-links-linux%2f">
-      <i class="fab fa-facebook " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="https://twitter.com/share?url=https%3a%2f%2fechorand.me%2fposts%2fhard-links-soft-links-linux%2f&text=Hard%20Links%20and%20Soft%2fSymbolic%20Links%20on%20Linux">
-      <i class="fab fa-twitter " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fechorand.me%2fposts%2fhard-links-soft-links-linux%2f&title=Hard%20Links%20and%20Soft%2fSymbolic%20Links%20on%20Linux">
-      <i class="fab fa-linkedin " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fechorand.me%2fposts%2fhard-links-soft-links-linux%2f&is_video=false&description=Hard%20Links%20and%20Soft%2fSymbolic%20Links%20on%20Linux">
-      <i class="fab fa-pinterest " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="mailto:?subject=Hard%20Links%20and%20Soft%2fSymbolic%20Links%20on%20Linux&body=Check out this article: https%3a%2f%2fechorand.me%2fposts%2fhard-links-soft-links-linux%2f">
-      <i class="fas fa-envelope " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="https://getpocket.com/save?url=https%3a%2f%2fechorand.me%2fposts%2fhard-links-soft-links-linux%2f&title=Hard%20Links%20and%20Soft%2fSymbolic%20Links%20on%20Linux">
-      <i class="fab fa-get-pocket " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://reddit.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fhard-links-soft-links-linux%2f&title=Hard%20Links%20and%20Soft%2fSymbolic%20Links%20on%20Linux">
-      <i class="fab fa-reddit " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://www.stumbleupon.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fhard-links-soft-links-linux%2f&title=Hard%20Links%20and%20Soft%2fSymbolic%20Links%20on%20Linux">
-      <i class="fab fa-stumbleupon " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://digg.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fhard-links-soft-links-linux%2f&title=Hard%20Links%20and%20Soft%2fSymbolic%20Links%20on%20Linux">
-      <i class="fab fa-digg " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://www.tumblr.com/share/link?url=https%3a%2f%2fechorand.me%2fposts%2fhard-links-soft-links-linux%2f&name=Hard%20Links%20and%20Soft%2fSymbolic%20Links%20on%20Linux&description=Much%20has%20been%20written%20%28and%20asked%29%20on%20the%20topic%20of%20hard%20links%20and%20soft%20links%20%28a.k.a%20symbolic%20links%29%20on%20Linux.%20I%20have%20read%20a%20few%20of%20those%20more%20than%20once.%20However%2c%20I%20end%20up%20getting%20confused%20between%20the%20two%2c%20specifically%20the%20differences%20between%20the%20two.%20So%2c%20here%26rsquo%3bs%20my%20post%20on%20the%20topic%20with%20the%20hope%20that%20I%20will%20stop%20getting%20confused%20ever%20again.%0aOur%20setup%20Let%26rsquo%3bs%20create%20a%20file%20and%20write%20a%20line%20into%20it%3a">
-      <i class="fab fa-tumblr " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fechorand.me%2fposts%2fhard-links-soft-links-linux%2f&t=Hard%20Links%20and%20Soft%2fSymbolic%20Links%20on%20Linux">
-      <i class="fab fa-hacker-news " aria-hidden="true"></i>
-    </a>
-  </li>
-</ul>
-
-    </div>
-    <div id="toc">
-      <nav id="TableOfContents">
-  <ul>
-    <li><a href="#is-it-a-symbolic-link-or-a-hard-link">Is it a symbolic link or a hard link?</a></li>
-    <li><a href="#links-and-filesystem-boundaries">Links and Filesystem Boundaries</a></li>
-  </ul>
-</nav>
-    </div>
-  </span>
-</div>
-
-
-  <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
-    <header>
-      <h1 class="posttitle" itemprop="name headline">
-        Hard Links and Soft/Symbolic Links on Linux
-      </h1>
-      <div class="meta">
-        
-        <div class="postdate">
-          
-          <time datetime="2018-11-09 00:00:00 &#43;0000 UTC" itemprop="datePublished">2018-11-09</time>
-          
-            (Updated: <time datetime="2020-01-09 13:57:20 &#43;1100 &#43;1100" itemprop="dateModified">2020-01-09</time>)
-          
-        </div>
-        
-        <div class="article-category">
-            <i class="fas fa-archive"></i>
-            
-            
-            <a class="category-link" href="/categories/software">software</a>
-            
-        </div>
-        
-        
-      </div>
-    </header>
-
-  
-    <div class="content" itemprop="articleBody">
-      <p><a href="https://medium.com/@wendymayorgasegura/what-is-the-difference-between-a-hard-link-and-a-symbolic-link-8c0493041b62">Much</a>
+<body><header id="banner">
+    <h2><a href="https://echorand.me">Exploring Software</a></h2>
+    <nav>
+        <ul>
+            <li>
+                <a href="/about" title="">About</a>
+            </li><li>
+                <a href="/articles" title="">Articles</a>
+            </li><li>
+                <a href="/books" title="">Books</a>
+            </li><li>
+                <a href="/posts" title="">Posts</a>
+            </li><li>
+                <a href="/talks" title="">Talks</a>
+            </li><li>
+                <a href="/categories/" title="">Categories</a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main id="content">
+<article>
+    <header id="post-header">
+        <h1>Hard Links and Soft/Symbolic Links on Linux</h1><time>November 9, 2018</time></header><p><a href="https://medium.com/@wendymayorgasegura/what-is-the-difference-between-a-hard-link-and-a-symbolic-link-8c0493041b62">Much</a>
 <a href="https://medium.com/@meghamohan/hard-link-and-symbolic-link-3cad74e5b5dc">has</a> <a href="https://medium.com/meatandmachines/explaining-the-difference-between-hard-links-symbolic-links-using-bruce-lee-32828832e8d3">been</a> written (and <a href="https://stackoverflow.com/questions/185899/what-is-the-difference-between-a-symbolic-link-and-a-hard-link">asked</a>)
 on the topic of hard links and soft links (a.k.a symbolic links) on Linux. I have read a few of those more than once.
 However, I end up getting confused between the two, specifically the differences between the two. So, here&rsquo;s
@@ -360,163 +167,10 @@ we end up losing the data. So, it depends on the use-case.</p>
 <ul>
 <li><a href="http://man7.org/linux/man-pages/man7/inode.7.html">inode man page</a></li>
 </ul>
+</article>
 
-    </div>
-  </article>
-
-  
-  
-
-
-
-
-
-  <div id="footer-post-container">
-  <div id="footer-post">
-
-    <div id="nav-footer" style="display: none">
-      <ul>
-         
-          <li><a href="/about">About</a></li>
-         
-          <li><a href="/articles">Articles</a></li>
-         
-          <li><a href="/books">Books</a></li>
-         
-          <li><a href="/posts">Posts</a></li>
-         
-          <li><a href="/talks">Talks</a></li>
-         
-          <li><a href="/categories/">Categories</a></li>
-        
-      </ul>
-    </div>
-
-    <div id="toc-footer" style="display: none">
-      <nav id="TableOfContents">
-  <ul>
-    <li><a href="#is-it-a-symbolic-link-or-a-hard-link">Is it a symbolic link or a hard link?</a></li>
-    <li><a href="#links-and-filesystem-boundaries">Links and Filesystem Boundaries</a></li>
-  </ul>
-</nav>
-    </div>
-
-    <div id="share-footer" style="display: none">
-      
-      <ul>
-  
-  
+        </main><footer id="footer">
     
-  
-  
-  <li>
-    <a class="icon" href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fechorand.me%2fposts%2fhard-links-soft-links-linux%2f">
-      <i class="fab fa-facebook fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="https://twitter.com/share?url=https%3a%2f%2fechorand.me%2fposts%2fhard-links-soft-links-linux%2f&text=Hard%20Links%20and%20Soft%2fSymbolic%20Links%20on%20Linux">
-      <i class="fab fa-twitter fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fechorand.me%2fposts%2fhard-links-soft-links-linux%2f&title=Hard%20Links%20and%20Soft%2fSymbolic%20Links%20on%20Linux">
-      <i class="fab fa-linkedin fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fechorand.me%2fposts%2fhard-links-soft-links-linux%2f&is_video=false&description=Hard%20Links%20and%20Soft%2fSymbolic%20Links%20on%20Linux">
-      <i class="fab fa-pinterest fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="mailto:?subject=Hard%20Links%20and%20Soft%2fSymbolic%20Links%20on%20Linux&body=Check out this article: https%3a%2f%2fechorand.me%2fposts%2fhard-links-soft-links-linux%2f">
-      <i class="fas fa-envelope fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="https://getpocket.com/save?url=https%3a%2f%2fechorand.me%2fposts%2fhard-links-soft-links-linux%2f&title=Hard%20Links%20and%20Soft%2fSymbolic%20Links%20on%20Linux">
-      <i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://reddit.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fhard-links-soft-links-linux%2f&title=Hard%20Links%20and%20Soft%2fSymbolic%20Links%20on%20Linux">
-      <i class="fab fa-reddit fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://www.stumbleupon.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fhard-links-soft-links-linux%2f&title=Hard%20Links%20and%20Soft%2fSymbolic%20Links%20on%20Linux">
-      <i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://digg.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fhard-links-soft-links-linux%2f&title=Hard%20Links%20and%20Soft%2fSymbolic%20Links%20on%20Linux">
-      <i class="fab fa-digg fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://www.tumblr.com/share/link?url=https%3a%2f%2fechorand.me%2fposts%2fhard-links-soft-links-linux%2f&name=Hard%20Links%20and%20Soft%2fSymbolic%20Links%20on%20Linux&description=Much%20has%20been%20written%20%28and%20asked%29%20on%20the%20topic%20of%20hard%20links%20and%20soft%20links%20%28a.k.a%20symbolic%20links%29%20on%20Linux.%20I%20have%20read%20a%20few%20of%20those%20more%20than%20once.%20However%2c%20I%20end%20up%20getting%20confused%20between%20the%20two%2c%20specifically%20the%20differences%20between%20the%20two.%20So%2c%20here%26rsquo%3bs%20my%20post%20on%20the%20topic%20with%20the%20hope%20that%20I%20will%20stop%20getting%20confused%20ever%20again.%0aOur%20setup%20Let%26rsquo%3bs%20create%20a%20file%20and%20write%20a%20line%20into%20it%3a">
-      <i class="fab fa-tumblr fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fechorand.me%2fposts%2fhard-links-soft-links-linux%2f&t=Hard%20Links%20and%20Soft%2fSymbolic%20Links%20on%20Linux">
-      <i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-</ul>
-
-    </div>
-
-    <div id="actions-footer">
-      
-        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;">
-          <i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
-        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;">
-          <i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
-        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;">
-          <i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> share</a>
-        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');">
-          <i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
-    </div>
-
-  </div>
-</div>
-
-
-  <footer id="footer">
-  <div class="footer-left">
-    Copyright  &copy; 2021  Exploring Software 
-  </div>
-  <div class="footer-right">
-    <nav>
-      <ul>
-         
-        <li><a href="/about">About</a></li>
-         
-        <li><a href="/articles">Articles</a></li>
-         
-        <li><a href="/books">Books</a></li>
-         
-        <li><a href="/posts">Posts</a></li>
-         
-        <li><a href="/talks">Talks</a></li>
-         
-        <li><a href="/categories/">Categories</a></li>
-        
-      </ul>
-    </nav>
-  </div>
 </footer>
-
-
-  </div>
 </body>
-
-<link rel="stylesheet" href=/lib/font-awesome/css/all.min.css>
-<script src=/lib/jquery/jquery.min.js></script>
-<script src=/js/main.js></script>
-
-
-
 </html>

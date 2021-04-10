@@ -1,229 +1,39 @@
 <!DOCTYPE html>
-<html lang="en-us">
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title> Doing something before systemd shuts your supervisord down | Exploring Software</title>
-  <meta name="description" content="echo $RANDOM. Exploring Software and writing about it.">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="robots" content="all,follow">
-  <meta name="googlebot" content="index,follow,snippet,archive">
-  <meta property="og:title" content="Doing something before systemd shuts your supervisord down" />
-<meta property="og:description" content="If you are running your server applications via supervisord on a Linux distro running systemd, you may find this post useful.
-Problem Scenario An example scenario to help us establish the utility for this post is as follows:
- systemd starts the shutdown process systemd stops supervisord supervisord stops your processes You see in-flight requests being dropped  Solution What we want to do is prevent in-flight requests being dropped when a system is shutting down as part of a power off cycle (AWS instance termination, for example)." />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://echorand.me/posts/systemd-supervisord/" />
-<meta property="article:published_time" content="2018-01-12T00:00:00+00:00" />
-<meta property="article:modified_time" content="2019-07-11T16:52:00+10:00" />
-
-  <meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="Doing something before systemd shuts your supervisord down"/>
-<meta name="twitter:description" content="If you are running your server applications via supervisord on a Linux distro running systemd, you may find this post useful.
-Problem Scenario An example scenario to help us establish the utility for this post is as follows:
- systemd starts the shutdown process systemd stops supervisord supervisord stops your processes You see in-flight requests being dropped  Solution What we want to do is prevent in-flight requests being dropped when a system is shutting down as part of a power off cycle (AWS instance termination, for example)."/>
-
-  
-  
-  
-  <link rel="stylesheet" href="https://echorand.me/css/style-white.css">
-  
-  
-  
-    <!--[if lt IE 9]>
-      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-    <![endif]-->
-  
-
-  
-<link rel="icon" type="image/png" href="https://echorand.me/images/favicon.ico" />
-
-  
-  
-  
-  
-  
+<html><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="echo $RANDOM. Exploring Software and writing about it.">
     
-<script type="application/javascript">
-var doNotTrack = false;
-if (!doNotTrack) {
-	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-	ga('create', 'UA-108901610-1', 'auto');
-	
-	ga('send', 'pageview');
-}
-</script>
+    <link rel="shortcut icon" href="https://echorand.me/favicon.ico">
+    
+    <link rel="stylesheet" href="/css/style.min.css">
 
-  
-  
+    <title>Doing something before systemd shuts your supervisord down</title>
 </head>
-
-<body class="max-width mx-auto px3 ltr">
-  <div class="content index py4">
-
-  <div id="header-post">
-  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
-  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
-  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
-  <span id="menu">
-    <span id="nav">
-      <ul>
-         
-        <li><a href="/about">About</a></li>
-         
-        <li><a href="/articles">Articles</a></li>
-         
-        <li><a href="/books">Books</a></li>
-         
-        <li><a href="/posts">Posts</a></li>
-         
-        <li><a href="/talks">Talks</a></li>
-         
-        <li><a href="/categories/">Categories</a></li>
-        
-      </ul>
-    </span>
-    <br/>
-    <span id="actions">
-      <ul>
-        
-        <li>
-          <a class="icon" href=" https://echorand.me/posts/fedora-openvpn-systemd/">
-            <i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i>
-          </a>
-        </li>
-        
-        
-        <li>
-          <a class="icon" href="https://echorand.me/posts/linux-system-mining/">
-            <i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i>
-          </a>
-        </li>
-        
-        <li>
-          <a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');">
-            <i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i>
-          </a>
-        </li>
-        <li>
-          <a class="icon" href="#">
-            <i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i>
-          </a>
-        </li>
-      </ul>
-      <span id="i-prev" class="info" style="display:none;">Previous post</span>
-      <span id="i-next" class="info" style="display:none;">Next post</span>
-      <span id="i-top" class="info" style="display:none;">Back to top</span>
-      <span id="i-share" class="info" style="display:none;">Share post</span>
-    </span>
-    <br/>
-    <div id="share" style="display: none">
-      
-      <ul>
-  
-  
-    
-  
-  
-  <li>
-    <a class="icon" href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fechorand.me%2fposts%2fsystemd-supervisord%2f">
-      <i class="fab fa-facebook " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="https://twitter.com/share?url=https%3a%2f%2fechorand.me%2fposts%2fsystemd-supervisord%2f&text=Doing%20something%20before%20systemd%20shuts%20your%20supervisord%20down">
-      <i class="fab fa-twitter " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fechorand.me%2fposts%2fsystemd-supervisord%2f&title=Doing%20something%20before%20systemd%20shuts%20your%20supervisord%20down">
-      <i class="fab fa-linkedin " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fechorand.me%2fposts%2fsystemd-supervisord%2f&is_video=false&description=Doing%20something%20before%20systemd%20shuts%20your%20supervisord%20down">
-      <i class="fab fa-pinterest " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="mailto:?subject=Doing%20something%20before%20systemd%20shuts%20your%20supervisord%20down&body=Check out this article: https%3a%2f%2fechorand.me%2fposts%2fsystemd-supervisord%2f">
-      <i class="fas fa-envelope " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="https://getpocket.com/save?url=https%3a%2f%2fechorand.me%2fposts%2fsystemd-supervisord%2f&title=Doing%20something%20before%20systemd%20shuts%20your%20supervisord%20down">
-      <i class="fab fa-get-pocket " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://reddit.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fsystemd-supervisord%2f&title=Doing%20something%20before%20systemd%20shuts%20your%20supervisord%20down">
-      <i class="fab fa-reddit " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://www.stumbleupon.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fsystemd-supervisord%2f&title=Doing%20something%20before%20systemd%20shuts%20your%20supervisord%20down">
-      <i class="fab fa-stumbleupon " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://digg.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fsystemd-supervisord%2f&title=Doing%20something%20before%20systemd%20shuts%20your%20supervisord%20down">
-      <i class="fab fa-digg " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://www.tumblr.com/share/link?url=https%3a%2f%2fechorand.me%2fposts%2fsystemd-supervisord%2f&name=Doing%20something%20before%20systemd%20shuts%20your%20supervisord%20down&description=If%20you%20are%20running%20your%20server%20applications%20via%20supervisord%20on%20a%20Linux%20distro%20running%20systemd%2c%20you%20may%20find%20this%20post%20useful.%0aProblem%20Scenario%20An%20example%20scenario%20to%20help%20us%20establish%20the%20utility%20for%20this%20post%20is%20as%20follows%3a%0a%20systemd%20starts%20the%20shutdown%20process%20systemd%20stops%20supervisord%20supervisord%20stops%20your%20processes%20You%20see%20in-flight%20requests%20being%20dropped%20%20Solution%20What%20we%20want%20to%20do%20is%20prevent%20in-flight%20requests%20being%20dropped%20when%20a%20system%20is%20shutting%20down%20as%20part%20of%20a%20power%20off%20cycle%20%28AWS%20instance%20termination%2c%20for%20example%29.">
-      <i class="fab fa-tumblr " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fechorand.me%2fposts%2fsystemd-supervisord%2f&t=Doing%20something%20before%20systemd%20shuts%20your%20supervisord%20down">
-      <i class="fab fa-hacker-news " aria-hidden="true"></i>
-    </a>
-  </li>
-</ul>
-
-    </div>
-    <div id="toc">
-      <nav id="TableOfContents"></nav>
-    </div>
-  </span>
-</div>
-
-
-  <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
-    <header>
-      <h1 class="posttitle" itemprop="name headline">
-        Doing something before systemd shuts your supervisord down
-      </h1>
-      <div class="meta">
-        
-        <div class="postdate">
-          
-          <time datetime="2018-01-12 00:00:00 &#43;0000 UTC" itemprop="datePublished">2018-01-12</time>
-          
-            (Updated: <time datetime="2019-07-11 16:52:00 &#43;1000 &#43;1000" itemprop="dateModified">2019-07-11</time>)
-          
-        </div>
-        
-        <div class="article-category">
-            <i class="fas fa-archive"></i>
-            
-            
-            <a class="category-link" href="/categories/infrastructure">infrastructure</a>
-            
-        </div>
-        
-        
-      </div>
-    </header>
-
-  
-    <div class="content" itemprop="articleBody">
-      <p>If you are running your server applications via <a href="http://supervisord.org/">supervisord</a> on a Linux distro running
+<body><header id="banner">
+    <h2><a href="https://echorand.me">Exploring Software</a></h2>
+    <nav>
+        <ul>
+            <li>
+                <a href="/about" title="">About</a>
+            </li><li>
+                <a href="/articles" title="">Articles</a>
+            </li><li>
+                <a href="/books" title="">Books</a>
+            </li><li>
+                <a href="/posts" title="">Posts</a>
+            </li><li>
+                <a href="/talks" title="">Talks</a>
+            </li><li>
+                <a href="/categories/" title="">Categories</a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main id="content">
+<article>
+    <header id="post-header">
+        <h1>Doing something before systemd shuts your supervisord down</h1><time>January 12, 2018</time></header><p>If you are running your server applications via <a href="http://supervisord.org/">supervisord</a> on a Linux distro running
 <a href="https://www.freedesktop.org/wiki/Software/systemd/">systemd</a>, you may find this post useful.</p>
 <h1 id="problem-scenario">Problem Scenario</h1>
 <p>An example scenario to help us establish the utility for this post is as follows:</p>
@@ -306,158 +116,10 @@ Wants=drain-connections.service
 <p>What if <code>drain-connections</code> is stopped first? That is okay, because that will execute the necessary commands
 we would want to be executed. Then, <code>supervisord</code> can be stopped which will stop our application server, but
 the <code>drain-connections</code> unit has already done its job by that time.</p>
+</article>
 
-    </div>
-  </article>
-
-  
-  
-
-
-
-
-
-  <div id="footer-post-container">
-  <div id="footer-post">
-
-    <div id="nav-footer" style="display: none">
-      <ul>
-         
-          <li><a href="/about">About</a></li>
-         
-          <li><a href="/articles">Articles</a></li>
-         
-          <li><a href="/books">Books</a></li>
-         
-          <li><a href="/posts">Posts</a></li>
-         
-          <li><a href="/talks">Talks</a></li>
-         
-          <li><a href="/categories/">Categories</a></li>
-        
-      </ul>
-    </div>
-
-    <div id="toc-footer" style="display: none">
-      <nav id="TableOfContents"></nav>
-    </div>
-
-    <div id="share-footer" style="display: none">
-      
-      <ul>
-  
-  
+        </main><footer id="footer">
     
-  
-  
-  <li>
-    <a class="icon" href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fechorand.me%2fposts%2fsystemd-supervisord%2f">
-      <i class="fab fa-facebook fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="https://twitter.com/share?url=https%3a%2f%2fechorand.me%2fposts%2fsystemd-supervisord%2f&text=Doing%20something%20before%20systemd%20shuts%20your%20supervisord%20down">
-      <i class="fab fa-twitter fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fechorand.me%2fposts%2fsystemd-supervisord%2f&title=Doing%20something%20before%20systemd%20shuts%20your%20supervisord%20down">
-      <i class="fab fa-linkedin fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fechorand.me%2fposts%2fsystemd-supervisord%2f&is_video=false&description=Doing%20something%20before%20systemd%20shuts%20your%20supervisord%20down">
-      <i class="fab fa-pinterest fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="mailto:?subject=Doing%20something%20before%20systemd%20shuts%20your%20supervisord%20down&body=Check out this article: https%3a%2f%2fechorand.me%2fposts%2fsystemd-supervisord%2f">
-      <i class="fas fa-envelope fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="https://getpocket.com/save?url=https%3a%2f%2fechorand.me%2fposts%2fsystemd-supervisord%2f&title=Doing%20something%20before%20systemd%20shuts%20your%20supervisord%20down">
-      <i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://reddit.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fsystemd-supervisord%2f&title=Doing%20something%20before%20systemd%20shuts%20your%20supervisord%20down">
-      <i class="fab fa-reddit fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://www.stumbleupon.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fsystemd-supervisord%2f&title=Doing%20something%20before%20systemd%20shuts%20your%20supervisord%20down">
-      <i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://digg.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fsystemd-supervisord%2f&title=Doing%20something%20before%20systemd%20shuts%20your%20supervisord%20down">
-      <i class="fab fa-digg fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://www.tumblr.com/share/link?url=https%3a%2f%2fechorand.me%2fposts%2fsystemd-supervisord%2f&name=Doing%20something%20before%20systemd%20shuts%20your%20supervisord%20down&description=If%20you%20are%20running%20your%20server%20applications%20via%20supervisord%20on%20a%20Linux%20distro%20running%20systemd%2c%20you%20may%20find%20this%20post%20useful.%0aProblem%20Scenario%20An%20example%20scenario%20to%20help%20us%20establish%20the%20utility%20for%20this%20post%20is%20as%20follows%3a%0a%20systemd%20starts%20the%20shutdown%20process%20systemd%20stops%20supervisord%20supervisord%20stops%20your%20processes%20You%20see%20in-flight%20requests%20being%20dropped%20%20Solution%20What%20we%20want%20to%20do%20is%20prevent%20in-flight%20requests%20being%20dropped%20when%20a%20system%20is%20shutting%20down%20as%20part%20of%20a%20power%20off%20cycle%20%28AWS%20instance%20termination%2c%20for%20example%29.">
-      <i class="fab fa-tumblr fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fechorand.me%2fposts%2fsystemd-supervisord%2f&t=Doing%20something%20before%20systemd%20shuts%20your%20supervisord%20down">
-      <i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-</ul>
-
-    </div>
-
-    <div id="actions-footer">
-      
-        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;">
-          <i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
-        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;">
-          <i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
-        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;">
-          <i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> share</a>
-        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');">
-          <i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
-    </div>
-
-  </div>
-</div>
-
-
-  <footer id="footer">
-  <div class="footer-left">
-    Copyright  &copy; 2021  Exploring Software 
-  </div>
-  <div class="footer-right">
-    <nav>
-      <ul>
-         
-        <li><a href="/about">About</a></li>
-         
-        <li><a href="/articles">Articles</a></li>
-         
-        <li><a href="/books">Books</a></li>
-         
-        <li><a href="/posts">Posts</a></li>
-         
-        <li><a href="/talks">Talks</a></li>
-         
-        <li><a href="/categories/">Categories</a></li>
-        
-      </ul>
-    </nav>
-  </div>
 </footer>
-
-
-  </div>
 </body>
-
-<link rel="stylesheet" href=/lib/font-awesome/css/all.min.css>
-<script src=/lib/jquery/jquery.min.js></script>
-<script src=/js/main.js></script>
-
-
-
 </html>

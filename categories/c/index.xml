@@ -6,7 +6,801 @@
     <description>Recent content in C on Exploring Software</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 26 Jan 2018 00:00:00 +0000</lastBuildDate><atom:link href="https://echorand.me/categories/c/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 26 Jan 2018 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://echorand.me/categories/c/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    
+    <item>
+      <title>Concurrency safe file access in Go</title>
+      <link>https://echorand.me/posts/go-file-mutex/</link>
+      <pubDate>Mon, 18 Jan 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/go-file-mutex/</guid>
+      <description>Using a file for persistent storage (and not a database - datastore/object store) sounds like an academic exercise. For me, it brings back memories of writing a structure in C (programming language) to a file to simulate a student record database. However, there may be situations where you may just get by using it especially when you just want to run a single copy of your application.
+Let&amp;rsquo;s see a pattern for implementing concurrency safe file access in Go using sync.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Notes on Chaos Engineering</title>
+      <link>https://echorand.me/posts/chaos-engineering/</link>
+      <pubDate>Thu, 31 Dec 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/chaos-engineering/</guid>
+      <description>I have been exploring Chaos engineering as it applies to software systems this year.
+As I explored further, I really got interested into it.
+Next, I point to various references that I have found useful so far.
+Theory  Principles of Chaos Engineering describes the fundamental principles of chaos engineering. Chaos Engineering by Casey Rosenthal, Nora Jones  Talks Identifyingn Hidden Dependencies
+ Continuous verification Test your recover procedures Practice controlled experiments  Why SREs can&amp;rsquo;t afford to NOT do Chaos Engineering</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Embedding files in Go using the &#34;embed&#34; package</title>
+      <link>https://echorand.me/posts/go-embed/</link>
+      <pubDate>Sun, 20 Dec 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/go-embed/</guid>
+      <description>The most exciting feature for me in the Go 1.16 release is the new &amp;ldquo;embed&amp;rdquo; package which allows you to embed a file contents as part of the Go application binary.
+This ability so far was most easily available via using various third party packages and they worked great. You could also use go generate to roll out your own solution, if needed. However, now having this facility in the form of a standard library package is great news.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Authentication between services using Kubernetes primitives</title>
+      <link>https://echorand.me/posts/micros-auth-kubernetes/</link>
+      <pubDate>Sun, 13 Dec 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/micros-auth-kubernetes/</guid>
+      <description>In my latest article for the folks at learnk8s, I write about establishing authentication between services deployed in Kubernetes.
+Specifically, we discuss how you can use the Kubernetes primitives - Service accounts with a new feature - Service Account Token Volume Projection to setup authentication between two HTTP services.
+You can find the article here with the accompanying code repository here.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Static and dynamic checks for your Kubernetes workloads</title>
+      <link>https://echorand.me/posts/policy-enforcement-kubernetes/</link>
+      <pubDate>Mon, 27 Jul 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/policy-enforcement-kubernetes/</guid>
+      <description>My two recent articles, Validating Kubernetes YAML for best practice and policies and Enforcing policies and governance for Kubernetes workloads looks at the topic of enforcing policies for your Kubernetes workloads. Check them out and let me know if you have any comments.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Using Gatekeeper in Kubernetes</title>
+      <link>https://echorand.me/posts/gatekeeper-kubernetes/</link>
+      <pubDate>Thu, 28 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/gatekeeper-kubernetes/</guid>
+      <description>Introduction Gatekeeper allows a Kubernetes administrator to implement policies for ensuring compliance and best practices in their cluster. It makes use of Open Policy Agent (OPA) and is a validating admission controller. The policies are written in the Rego language. Gatekeeper embraces Kubernetes native concepts such as Custom Resource Definitions (CRDs) and hence the policies are managed as kubernetes resources. The GKE docs on this topic are a good place to learn more.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Getting started with Golang plugins</title>
+      <link>https://echorand.me/posts/getting-started-with-golang-plugins/</link>
+      <pubDate>Tue, 26 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/getting-started-with-golang-plugins/</guid>
+      <description>Introduction In this post, I will share some of my learnings and explorations on plugins in Golang. We will write a &amp;ldquo;driver&amp;rdquo; program which will load two plugins and execute a certain function which are present in both of them. The driver program will feed an integer into the first plugin, which will run some processing on it. The result of the first plugin is fed into the second plugin and finally the driver program will print the result.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Kubernetes pod security policies</title>
+      <link>https://echorand.me/posts/kubernetes-pod-security-policies/</link>
+      <pubDate>Wed, 20 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/kubernetes-pod-security-policies/</guid>
+      <description>Introduction Pod security policies are cluster level resources. The Google cloud docs has some basic human friendly docs. A psp is a way to enforce certain policies that pod needs to comply with before it&amp;rsquo;s allowed to be scheduled to be run on the cluster - create or an update operation (perhaps a restart of the pod?). Essentially, it is a type of a validating admission controller.
+I should mention that I found it (later on) to think about pod security policies as a way to &amp;ldquo;control&amp;rdquo; various attributes of a pod.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>How to Set up Log Forwarding in a Kubernetes Cluster Using Fluent Bit</title>
+      <link>https://echorand.me/posts/fluentbit-kubernetes/</link>
+      <pubDate>Thu, 07 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/fluentbit-kubernetes/</guid>
+      <description>Metadata I have posted this article on dev.to where I welcome comments and discussions.
+Introduction Log forwarding is an essential ingredient of a production logging pipeline in any organization. As an application author, you don&amp;rsquo;t want to be bothered with the responsibility of ensuring the application logs are being processed a certain way and then stored in a central log storage. As an operations personnel, you don&amp;rsquo;t want to have to hack your way around different applications to process and ship logs.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Sorting pages by last modified date in Hugo</title>
+      <link>https://echorand.me/posts/hugo-reverse-sort-modified/</link>
+      <pubDate>Tue, 05 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/hugo-reverse-sort-modified/</guid>
+      <description>This blog is managed as a git repository and I use Hugo as the framework for managing it. I am using the Hugo classic theme which I have tweaked slightly and store it along with the blog source.
+I wanted to modify the sorting of the blog post titles on the index page so that the most recently modified page was displayed first. The support was added to Hugo 4 years back, so the following template worked for me:</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Using cloud custodian to ensure compliance across AWS resources</title>
+      <link>https://echorand.me/posts/cloud-custodian-aws/</link>
+      <pubDate>Tue, 28 Apr 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/cloud-custodian-aws/</guid>
+      <description>Introduction In this post, I will describe my experiments with using Cloud Custodian to perform various tasks usually falling into the bucket of compliance and sometimes convention. I encourage you to take a look at some of the example policies.
+Some of the areas I will cover are resource tagging and unused resources across multiple AWS accounts.
+Installation and setup Cloud Custodian is a Python 3 application, so you will need that installed.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Restricting attributes that can be set in Python</title>
+      <link>https://echorand.me/posts/python-restrict-attributes/</link>
+      <pubDate>Thu, 02 Jan 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/python-restrict-attributes/</guid>
+      <description>A reader of my book &amp;ldquo;Doing Math with Python&amp;rdquo; wrote to me a few weeks back about a strange problem they were having. They were trying to create an animated projectile motion from the code listing in the book. However, they were not seeing the expected results. Worse, there were no errors. They figured the issue on their own eventually since I didn&amp;rsquo;t get the time to reply back and the issue was there was an attribute center on a class that was being set in the correct version.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>On managing Kubernetes YAML manifests</title>
+      <link>https://echorand.me/posts/kubernetes-manifest-management/</link>
+      <pubDate>Fri, 20 Dec 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/kubernetes-manifest-management/</guid>
+      <description>Introduction There are two broad discussion points in this post:
+ Managing the lifecycle of Kubernetes YAML manifests Static guarantees/best practices enforcements around Kubernetes YAML files before they are applied to a cluster  Prior art and background Please read this article to get a more holistic view of this space. What follows is my summary of what I think is the state at this stage and how it fits in with my two gols above.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Correlated error logging</title>
+      <link>https://echorand.me/posts/correlated-error-logging/</link>
+      <pubDate>Thu, 12 Dec 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/correlated-error-logging/</guid>
+      <description>Please note this document is currently in progress. You may read this other post instead which illustrates what I wanted to discuss in this post with an implementation in Go.
+Introduction In a service oriented architecture, more popular these days as a microservice oriented architecture it&amp;rsquo;s notoriously difficult and time consuming to find out whether a certain error observed in a particular service may have been caused to an error in another service.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Using Golang for automating infrastructure and operations work</title>
+      <link>https://echorand.me/posts/golang-ops-automation/</link>
+      <pubDate>Sat, 07 Dec 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/golang-ops-automation/</guid>
+      <description>Since around 1.5 years ago, I have been working in roles which has required to automate various things usually classified as &amp;ldquo;infrastructure and operations&amp;rdquo; work. Sometimes they have involved working with cloud infrastructure and at other times they have involved interacting with databases and other services via HTTP APIs. During this period, to solve such tasks I have started using the Go programming language to implement these things.
+I shared my experience and some examples in a talk at the combined Golang/Women who Go and Infrastructure as code meetup in Sydney.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Jenkins Docker Workflow plugin - A look inside `inside()`</title>
+      <link>https://echorand.me/posts/jenkins-docker-workflow-inside/</link>
+      <pubDate>Tue, 26 Nov 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/jenkins-docker-workflow-inside/</guid>
+      <description>Introduction The docker workflow plugin enables leveraging Docker containers for CI/CD workflows in Jenkins. There are two broad patterns one would generally use containers in their CI/CD environment. The first would be as &amp;ldquo;side car&amp;rdquo; containers - these are containers which run alongside your tests/other workflow and provide services such as a database server, memory store and such. The second would be as base execution environments for the tests/builds. The documentation for the plugin explains these two patterns and how to achieve either using Jenkins workflow plugin.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Bash function and exiting early</title>
+      <link>https://echorand.me/posts/bash-functions-exit/</link>
+      <pubDate>Fri, 18 Oct 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/bash-functions-exit/</guid>
+      <description>Monday was just beginning to roll on as Monday does, I had managed to work out the VPN issues and had just started to do some planned work. Then, slack tells me that new deployment had just been pushed out successfully, but the service was actually down. Now, we had HTTP healthchecks which was hitting a specific endpoint but apparently that was successful, but functionally the service was down. So I check the service logs, which shows something like this:</description>
+    </item>
+    
+    
+    
+    
+    
+    <item>
+      <title>User access management on AWS Kubernetes cluster</title>
+      <link>https://echorand.me/posts/user-management-aws-eks-cluster/</link>
+      <pubDate>Fri, 23 Aug 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/user-management-aws-eks-cluster/</guid>
+      <description>Introduction When implementing a solution for allowing users other than the cluster creator to access the cluster resources we are faced with two fairly old generic problems - authentication and authorization. There are various ways one can solve these problems. I will discuss one such solution in this post. It makes use of AWS Identity and access management (IAM) features. This in my humble opinion is the simplest and hopefully secure enough solution when it comes to EKS.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Notes on Go</title>
+      <link>https://echorand.me/posts/go-notes/</link>
+      <pubDate>Wed, 07 Aug 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/go-notes/</guid>
+      <description>Repeating the same argument to Printf If we wanted to repeat the same argument to a call to fmt.Printf(), we can make use of &amp;ldquo;indexed&amp;rdquo; arguments. That is, instead of writing fmt.Printf(&amp;quot;%s %s&amp;quot;, &amp;quot;Hello&amp;quot;, &amp;quot;Hello&amp;quot;), we can write fmt.Printf(&amp;quot;%[1]s %[1]s&amp;quot;, &amp;quot;Hello&amp;quot;). Learn about it in the docs.
+Multi-line strings Things are hassle free on the multi-line strings front:
+package main import ( &amp;quot;fmt&amp;quot; ) func main() { s := `Multi line strings are easy.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Notes on Kubernetes</title>
+      <link>https://echorand.me/posts/kubernetes-notes/</link>
+      <pubDate>Fri, 02 Aug 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/kubernetes-notes/</guid>
+      <description>Introduction This in-progress page lists some of my findings while working with Kubernetes.
+EKS cluster setup This section will have findings that are relevant when working with an AWS EKS cluster.
+Terraform configuration for master This is based on the tutorial from the Terraform folks here. Unlike the tutorial though, I assume that you already have the VPC and subnets you want to setup your EKS master in.
+First up, the master.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Nginx - redirecting non-www to www hostnames</title>
+      <link>https://echorand.me/posts/nginx-non-www-www-redirect/</link>
+      <pubDate>Fri, 19 Jul 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/nginx-non-www-www-redirect/</guid>
+      <description>Introduction I wanted a Nginx configuration which would satisfy the following requirements:
+ Any example.com requests should be redirected to www.example.com The above should happen for http and https http://example.com should redirect directly to https://www.example.com  Solution We will need four server blocks:
+ http - example.com (listen on 80) http - www.example.com (listen on 80) https - example.com (listen on 443) https - www.example.com (listen on 443)  I obviously went through a bit of hit and trial, but my main issue was around how I would setup (3) correctly.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Notes on Bash auto-completion on Linux</title>
+      <link>https://echorand.me/posts/linux_shell_autocompletion/</link>
+      <pubDate>Wed, 03 Jul 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/linux_shell_autocompletion/</guid>
+      <description>Introduction What happens when you press &amp;lt;command&amp;gt; &amp;lt;TAB&amp;gt; or &amp;lt;command&amp;gt; &amp;lt;TAB&amp;gt;&amp;lt;TAB&amp;gt;? You get a bunch of suggestions with one of them just the one you had in mind you were going to type. Auto completions in shells are super helpful and as we will find out, quite a bit goes on behind the scenes. Before we go too further into my investigations and findings, I must credit the author of this blog post - it triggered my curiosity and made me find time out to learn more about something I use everyday, but didn&amp;rsquo;t know much about how it worked.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Notes on PostgreSQL</title>
+      <link>https://echorand.me/posts/pg-sql-notes/</link>
+      <pubDate>Thu, 27 Jun 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/pg-sql-notes/</guid>
+      <description>Some notes on PostgreSQL which you may find useful. Thanks to all those numerous StackOverflow answers that helped me do my job at hand.
+Schemas and Database The database is the highest level of organization. A database can have one or more schemas. The public schema is present by default and all tables created are created in this schema, if not otherwise specified. Learn more about it in the documentation</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Nginx &#43; strace</title>
+      <link>https://echorand.me/posts/strace-nginx/</link>
+      <pubDate>Wed, 19 Jun 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/strace-nginx/</guid>
+      <description>I was debugging a issue where we were getting truncated logs in ElasticSearch in the context of a setup as follows:
+Application Logs -&amp;gt; Fluentd (logging) -&amp;gt; Nginx -&amp;gt; ElasticSearch The original problem turned out to be on the application side, but my first point of investigation was what are we getting on the nginx side? Do we get the entire message that we are expecting and something is going on the ElasticSearch side?</description>
+    </item>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <item>
+      <title>Nginx and geoip lookup with geoip2 module</title>
+      <link>https://echorand.me/posts/nginx-geoip2-mmdblookup/</link>
+      <pubDate>Fri, 24 May 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/nginx-geoip2-mmdblookup/</guid>
+      <description>I wanted to setup Nginx logging so that it would perform GeoIP lookup on the IPv4 address in the X-Forwarded-For header. Here&amp;rsquo;s how I went about doing it on CentOS 7.
+This nginx module integrates Maxmind GeoIP2 database with the RPMs being available by getpagespeed.com.
+Once I had installed the module, the hard part for me was how to get the data I wanted - city, timezone information and others from nginx and the geoip2 module integration.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Generate yourself some Terraform code from TOML</title>
+      <link>https://echorand.me/posts/terraform_from_toml/</link>
+      <pubDate>Thu, 04 Apr 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/terraform_from_toml/</guid>
+      <description>In this post, we will see how we can use Golang to generate Terraform configuration from a TOML specification. That is, given a TOML file, like:
+subnet_name = &amp;quot;SubnetA&amp;quot; rules = [ {rule_no=101, egress = false, protocol = &amp;quot;tcp&amp;quot;, rule_action = &amp;quot;allow&amp;quot;, cidr_block = &amp;quot;127.0.0.1/32&amp;quot;, from_port = 22, to_port = 30}, ] We will generate:
+# This is a generated file, do not hand edit. See README at the # root of the repository resource &amp;quot;aws_network_acl_rule&amp;quot; &amp;quot;rule_SubnetA_ingress_101&amp;quot; { network_acl_id = &amp;quot;${lookup(local.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Getting a docker container&#39;s stdout logs into a variable on Linux</title>
+      <link>https://echorand.me/posts/docker_logs_variable/</link>
+      <pubDate>Mon, 11 Mar 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/docker_logs_variable/</guid>
+      <description>docker logs by default shows the container&amp;rsquo;s stdout and stderr logs. However, what I discovered was that the stderr logs from the container are output to the host system&amp;rsquo;s stderr as well. I was expecting everything from the container to be on the host&amp;rsquo;s stdout.
+Let&amp;rsquo;s see a demo. Consider the Dockerfile:
+FROM alpine:3.7 CMD echo &amp;quot;I echoed to stdout&amp;quot; &amp;amp;&amp;amp; &amp;gt;&amp;amp;2 echo &amp;quot;I echoed to stderr&amp;quot; Let&amp;rsquo;s build it and run it:</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>ASP.NET Compilation and other files don&#39;t mix</title>
+      <link>https://echorand.me/posts/aspnet_compiler_node_modules/</link>
+      <pubDate>Tue, 05 Mar 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/aspnet_compiler_node_modules/</guid>
+      <description>I love working in software. Mostly things work as expected, but at times no. I changed A, how can Z be affected - after all they are all miles apart. Right? Wrong. Z can be affected. Today&amp;rsquo;s story is the latest - totally unexpected, but not surprising.
+Background We run ASP.NET compilation on our code base as part of every build in our Continuous Integration (CI) pipeline. I changed some part of the pipeline so that we started caching node_modules directory between different parts of a pipeline.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Poor man&#39;s zero downtime deployment setup using Traefik</title>
+      <link>https://echorand.me/posts/traefik-aspnet/</link>
+      <pubDate>Mon, 21 Jan 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/traefik-aspnet/</guid>
+      <description>Recently, I wrote two articles about using traefik as a reverse proxy. The first article discussed deploying a ASP.NET framework application and the second discussed deploying ASP.NET core applications.
+In both cases, I demonstrated the following:
+ Docker native integration In-built support for LetsEncrypt SSL certificates  One of the things I didn&amp;rsquo;t discuss was how we could setup an architecture which allowed us to do zero-downtime deployments without any external help.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Scheduled task to prune docker images on Windows server</title>
+      <link>https://echorand.me/posts/scheduled-task-docker-prune/</link>
+      <pubDate>Mon, 21 Jan 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/scheduled-task-docker-prune/</guid>
+      <description>Windows docker images can be bulky and on a server that you are deploying your application as docker images, the free disk space becomes a metric to watch out for. The following script will setup a Scheduled tasks to be run at a 7.0 PM UTC which will prune all unused images:
+# Scheduled tasks if (-Not (Test-Path &amp;quot;C:\ScheduledScripts&amp;quot;)) { mkdir C:\ScheduledScripts } $command=&amp;quot;docker image prune --all -f&amp;quot; $command | Out-File -encoding ASCII C:\ScheduledScripts\DockerImagePrune.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Ephemeral source port ranges and docker build</title>
+      <link>https://echorand.me/posts/docker-build-and-ephemeral-port-issues/</link>
+      <pubDate>Mon, 14 Jan 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/docker-build-and-ephemeral-port-issues/</guid>
+      <description>TLDR; If you are having trouble with docker build and ephemeral port ranges, we can use iptables to solve the issue:
+$ sudo iptables -t nat -I POSTROUTING -p tcp -m tcp --sport 32768:61000 -j MASQUERADE --to-ports 49152-61000 I have written previously about how things get interesting with ephemeral port ranges in a Windows and Linux environment and AWS network acls. Today’s post is related to the same topic but specifically relevant if you are building docker images in such an environment.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>AWS CodeDeploy Deployment Group and Initial Auto Scaling lifecycle hook</title>
+      <link>https://echorand.me/posts/aws-codedeploy-autoscaling-group/</link>
+      <pubDate>Wed, 19 Dec 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/aws-codedeploy-autoscaling-group/</guid>
+      <description>When we create an AWS Code Deploy deployment group via Terraform or CloudFormation and integrate with an Auto Scaling Group, it also by default creates an initial lifecycle hook which ensuresthat a new code deployment gets triggered when a scale-out event occurs.
+It is all very &amp;ldquo;magical&amp;rdquo; and it is one of those cases where you have troublesome behavior especially when you are managing your infrastructure as code. The troublesome behavior happens as a result of the lifecycle hook creation being a side-effect of creating a deployment group rather than an explicit operation that the user performs.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Hard Links and Soft/Symbolic Links on Linux</title>
+      <link>https://echorand.me/posts/hard-links-soft-links-linux/</link>
+      <pubDate>Fri, 09 Nov 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/hard-links-soft-links-linux/</guid>
+      <description>Much has been written (and asked) on the topic of hard links and soft links (a.k.a symbolic links) on Linux. I have read a few of those more than once. However, I end up getting confused between the two, specifically the differences between the two. So, here&amp;rsquo;s my post on the topic with the hope that I will stop getting confused ever again.
+Our setup Let&amp;rsquo;s create a file and write a line into it:</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Let&#39;s Encrypt, GoDadday DNS and IIS server</title>
+      <link>https://echorand.me/posts/manual-letsencrypt-dns-challenge/</link>
+      <pubDate>Thu, 08 Nov 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/manual-letsencrypt-dns-challenge/</guid>
+      <description>I wanted to create a new SSL certificate for IIS hosted ASP.NET framework application. The key data that may make this post relevant to you are:
+ Let&amp;rsquo;s Encrypt Challenge mode: DNS TXT record DNS provider: GoDaddy Target web server: IIS Target operating system: Windows Local operating environment/system: Linux (including Windows Subsystem for Linux).  Why I chose certbot? I decided to use certbot since it allowed me do create the DNS TXT entries manually.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Fedora Scientific Vagrant boxes are here!</title>
+      <link>https://echorand.me/posts/fedora-29-scientific-vagrant-boxes/</link>
+      <pubDate>Thu, 01 Nov 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/fedora-29-scientific-vagrant-boxes/</guid>
+      <description>Fedora Scientific brings together the most useful open source scientific and numerical tools atop the goodness of the KDE desktop environment. From the beginning, our focus has been to provide scientists, engineers and programmers in numerical/scientific computing a Linux distribution which has most of the tools that they would need to use as part of their work.
+With the Fedora 29 release, we have also started to provide Vagrant boxes for Fedora Scientific to make it even easier to use Fedora Scientific while not doing away with your present operating system.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>On sane defaults in sofware tools</title>
+      <link>https://echorand.me/posts/on-sane-defaults/</link>
+      <pubDate>Fri, 26 Oct 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/on-sane-defaults/</guid>
+      <description>My task at hand was simple. Build a Docker image of a ASP.NET application (full framework) hosted in IIS on a build host (host1) and move it to a deployment host (host2) and run it. This is a story of how I spent close to two full working days trying to debug a simple issue which sane default behavior of a tool would have cut it to seconds.
+Key details The key details that are important to my story are:</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>AWS VPC subnets and Internet connectivity over IPv4</title>
+      <link>https://echorand.me/posts/aws-vpc-internet-connectivity-subnets/</link>
+      <pubDate>Mon, 15 Oct 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/aws-vpc-internet-connectivity-subnets/</guid>
+      <description>We can have two kinds of subnets inside a AWS VPC - private and public. A public subnet is one which is attached to an Internet Gateway. This essentially adds a routing table entry to the subnet&amp;rsquo;s routing table sending all Internet traffic to an Internet Gateway. On the other hand, if traffic from a subnet destined for the &amp;ldquo;Internet&amp;rdquo; is sent to either a NAT instance, or a AWS managed NAT device, the subnet is a private subnet.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>flyway baseline Introducing flyway migrations into existing database</title>
+      <link>https://echorand.me/posts/flyway-baseline-migration/</link>
+      <pubDate>Fri, 12 Oct 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/flyway-baseline-migration/</guid>
+      <description>If you are trying to introduce flyway to an existing database with the schemas and tables already created, you may find flyway baseline command useful.
+Let&amp;rsquo;s say you already have the migration scripts written, or perhaps dumped out of your existing DB setup, and they are:
+V1__foo.sql V2__foo_new.sql. V3__bar.sql You basically want to say - flyway, ignore all scripts upto V3, but if there are newer migrations, run them. To do so, you run the baseline command, like so:</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Git Staging partial changes in a file</title>
+      <link>https://echorand.me/posts/git-only-stage-partial-changes/</link>
+      <pubDate>Thu, 11 Oct 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/git-only-stage-partial-changes/</guid>
+      <description>Let&amp;rsquo;s say you have made a few changes to a file and only want to stage only some of those changes for commit. You may want to do so either to create a nice commit history or may be you just want to discard some of the changes. Either way, git add -p is our friend. Let&amp;rsquo;s see an example:
+$ git add -p file1 ... index b82819b..a281865 100644 --- file1 +++ file2 @@ -139,8 +139,14 @@ else docker run \ -e ConnectionStrings__Db=&amp;quot;Data Source=\&amp;quot;tcp:$SQL_SERVER_IP\&amp;quot;;Persist Security Info=True;Initial Catalog=$DB_NAME;User ID=$APPLICATION_USER_NAME;Password=$DB_APPLICATION_PASSWORD&amp;quot; \ - -e App__RedisCS=&amp;quot;$REDIS_IP&amp;quot; \ + -e &amp;quot;${APPLICATION_NAME}_Web__CI__ConnectionStrings__Db&amp;quot;=&amp;quot;Data Source=\&amp;quot;tcp:$SQL_SERVER_IP\&amp;quot;;Persist Security Info=True;Initial Catalog=$DB_NAME;User ID=$APPLICATION_USER_NAME;Password=$DB_APPLICATION_PASSWORD&amp;quot; \ --sysctl net.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Building Fedora Vagrant boxes for VirtualBox using Packer</title>
+      <link>https://echorand.me/posts/building-fedora-vagrant-boxes-for-virtualbox-with-packer/</link>
+      <pubDate>Wed, 10 Oct 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/building-fedora-vagrant-boxes-for-virtualbox-with-packer/</guid>
+      <description>In a previous post, I shared that we are going to have Fedora Scientific Vagrant boxes with the upcoming Fedora 29 release. Few weeks back, I wanted to try out a more recent build to script some of the testing I do on Fedora Scientific boxes to make sure that the expected libraries/programs are installed. Unexpectedly, vagrant ssh would not succeed.
+I filed a issue with rel-eng where I was suggested to see if a package in Fedora Scientific was mucking around with the SSH config.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>flyway, SQL server and non-empty schema?</title>
+      <link>https://echorand.me/posts/sql-server-flyway-non-empty-schema/</link>
+      <pubDate>Fri, 28 Sep 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/sql-server-flyway-non-empty-schema/</guid>
+      <description>While attempting to use flyway for SQL server schema migrations, I was consistently getting an error of the form Found non-empty schema xxx ithout metadata table! Use init() or set initOnMigrate to true to initialize the metadata table.. Okay, so easy - let me just delete the tables, drop the schema and we will be good. No luck!
+Okay, let&amp;rsquo;s try cleaning it - a destructive process potentially, but the risks were low in my case.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Examples of consuming data in Golang templates</title>
+      <link>https://echorand.me/posts/golang-templates/</link>
+      <pubDate>Tue, 18 Sep 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/golang-templates/</guid>
+      <description>While working on creating a template file for a Golang project, I wanted to better understand how to work with data in Golang templates as available via the html/template package. In this post, I discuss a few use cases that may arise.
+Accessing a variable Let&amp;rsquo;s consider our first program:
+package main import ( &amp;quot;html/template&amp;quot; &amp;quot;log&amp;quot; &amp;quot;os&amp;quot; ) func main() { var names = []string{&amp;quot;Tabby&amp;quot;, &amp;quot;Jill&amp;quot;} tmpl := template.New(&amp;quot;test&amp;quot;) tmpl, err := tmpl.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Download a file using `curl` - How hard can it get?</title>
+      <link>https://echorand.me/posts/curl-download-redirect/</link>
+      <pubDate>Fri, 14 Sep 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/curl-download-redirect/</guid>
+      <description>I wanted to download the prometheus binary using curl. My first attempt:
+$ curl https://github.com/prometheus/prometheus/releases/download/v2.4.0/prometheus-2.4.0.linux-amd64.tar.gz &amp;lt;html&amp;gt;&amp;lt;body&amp;gt; You are being &amp;lt;a href=&amp;quot;https://github-production-release-asset-2e65be.s3.amazonaws.com/6838921/5c87dc00-b5d1-11e8-8a3a-fd29b54e0c60?X-Amz-Algorithm=AWS4-HMAC-SHA256&amp;amp;amp;X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20180914%2Fus-east-1%2Fs3%2Faws4_request&amp;amp;amp;X-Amz-Date=20180914T004135Z&amp;amp;amp;X-Amz-Expires=300&amp;amp;amp;X-Amz-Signature=5a4887918cf75526c045d236dd5a8b22dace657900a1d131a7ffa947be66fc81&amp;amp;amp;X-Amz-SignedHeaders=host&amp;amp;amp;actor_id=0&amp;amp;amp;response-content-disposition=attachment%3B%20filename%3Dprometheus-2.4.0.linux-amd64.tar.gz&amp;amp;amp;response-content-type=application%2Foctet-stream&amp;quot;&amp;gt;redirected&amp;lt;/a&amp;gt;. Sure, that&amp;rsquo;s a redirect, let&amp;rsquo;s try:
+$ curl --location https://github.com/prometheus/prometheus/releases/download/v2.4.0/prometheus-2.4.0.linux-amd64.tar.gz curl: (23) Failed writing body (0 != 16360) What does that mean? I frantically then google, &amp;ldquo;download prometheus using curl&amp;rdquo; and hit upon this link.
+So, the -O option will help:
+$ curl --remote-name --location https://github.com/prometheus/prometheus/releases/download/v2.4.0/prometheus-2.4.0.linux-amd64.tar.gz &amp;lt;file downloaded&amp;gt; The -O option is equivalent to --remote-name which basically says two things:</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Docker userns-remap and system users on Linux</title>
+      <link>https://echorand.me/posts/docker-user-namespacing-remap-system-user/</link>
+      <pubDate>Fri, 24 Aug 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/docker-user-namespacing-remap-system-user/</guid>
+      <description>In this post, we learn how we can make use of docker&amp;rsquo;s user namespacing feature on Linux in a CI/build environment to avoid running into permission issues. Using user namespacing also keeping things a bit sane without adopting sub-optimal alternatives.
+Introduction Let&amp;rsquo;s consider that we are leveraging docker in a continuous integration (CI)/build environment and the usage scenario looks as follows:
+ CI agent/slave runs as an unpriviliged user agent on the host agent clones the repository during a build on the host The build happens in a docker container spawned by scripts running as agent with the repository volume mounted  On a new build, the agent doesn&amp;rsquo;t do a fresh clone if a clone already exists, but instead does a git clean followed by git fetch of the commit.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>AWS Private Route53 DNS and Docker containers</title>
+      <link>https://echorand.me/posts/aws-vpc-private-dns/</link>
+      <pubDate>Wed, 15 Aug 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/aws-vpc-private-dns/</guid>
+      <description>AWS Route 53 private hosted zones enable you to have private DNS names which only resolve from your VPC. This is great when working from EC2 instances since everything is setup and ready to go. This however becomes a problem when using docker containers on a systemd system. On such a system, systemd-resolved sits in between your host applications and name resolution. The entry in /etc/resolv.conf is basically, 127.0.0.53 which doesn&amp;rsquo;t mean much when you want name resolution from a docker container which defaults to 8.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>AWS Network ACLs and ephemeral port ranges</title>
+      <link>https://echorand.me/posts/aws-network-acl-docker/</link>
+      <pubDate>Tue, 14 Aug 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/aws-network-acl-docker/</guid>
+      <description>In this post, I discuss a problem (and its solution) I encountered while working with AWS (Amazon Web Services) Network ACLs, docker containers and ephemeral port ranges.
+Infrastructure setup A Linux EC2 instance with docker engine running in a VPC with inbound and outbound traffic controlled by Network ACLs. I was connecting to another hosted service running on a separate VM, service1 running on port 10001 inside the same subnet with security groups allowing traffic from the host IP (via CIDR).</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Managing AWS lambda functions from start to finish with Terraform</title>
+      <link>https://echorand.me/posts/managing-aws-lambda-functions-terraform/</link>
+      <pubDate>Thu, 02 Aug 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/managing-aws-lambda-functions-terraform/</guid>
+      <description>AWS lambda functions look deceptively simple. The devil is in the details though. Once you have written the code and have created a .zip file, there&amp;rsquo;s a few more steps to go.
+For starters, we need an IAM profile to be defined with appropriate policies allowing the function to access the AWS resources. To setup the lambda function to be invoked automatically in reaction to another event, we need some more permissions and references to these resources.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>On running Windows Docker containers</title>
+      <link>https://echorand.me/posts/windows-docker-containers/</link>
+      <pubDate>Thu, 26 Jul 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/windows-docker-containers/</guid>
+      <description>I went into working with Windows docker containers after having been worked with docker on Linux exclusively. My goal was to have isolated environments for each build in a continuous integration pipeline. That is, each build happens on an exclusive build host (AWS EC2 VM instance) and every database and service the application needs access to for the integration tests (including selenium tets) are run on docker containers on the same host.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Powershell Measuring seconds elapsed</title>
+      <link>https://echorand.me/posts/measuring-seconds-elapsed-powershell/</link>
+      <pubDate>Wed, 25 Jul 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/measuring-seconds-elapsed-powershell/</guid>
+      <description>I have been working with PowerShell for three months now, and my approach to using it has been pretty much google and trial - copying things, modifying things till they work and learning new things on the way. This post talks about a discovery which I made today.
+I had a script like this:
+while ($health -ne &#39;healthy&#39;) { $elapsedTime = $(get-date) - $StartTime Write-Output &amp;quot;--- Waiting for service to become ready - $($elapsedTime.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Using Terraform with consul remote backend</title>
+      <link>https://echorand.me/posts/terraform-remote-state-consul/</link>
+      <pubDate>Wed, 27 Jun 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/terraform-remote-state-consul/</guid>
+      <description>In my new post on the CodeShip blog, I discuss configuring terraform with a consul remote backend. The entire aricle is available here.
+The accompanying git repository is here. Please file an issue if you have trouble following the setup.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Pre-release Fedora Scientific Vagrant Boxes</title>
+      <link>https://echorand.me/posts/fedora-29-scientific-rawhide-vagrant-box/</link>
+      <pubDate>Mon, 18 Jun 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/fedora-29-scientific-rawhide-vagrant-box/</guid>
+      <description>I am very excited to share that sometime back the Fedora project gave the go ahead on my idea of making Fedora Scientific available as Vagrant boxes starting with Fedora 29. This basically means (I think) that using Fedora Scientific in a virtual machine is even easier. Instead of downloading the ISO and then going through the installation process, you can now basically do:
+ Download Fedora Scientific Vagrant box Initialize VM vagrant up  Trying it out before Fedora 29 release As of a few days back, Fedora 29 rawhide vagrant boxes for Fedora Scientific are now being published.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>A demo plugin based Python code analyser</title>
+      <link>https://echorand.me/posts/py-ast-straightplugin-nox/</link>
+      <pubDate>Sun, 13 May 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/py-ast-straightplugin-nox/</guid>
+      <description>A few weeks back I wrote a analyser for Apache Thrift IDL in Python. We used it to enforce some code review guidelines. When we hooked it onto arcanist lint engine, we could give feedback to developers at the time they were proposing a code change. The thrift parsing was done using ptsd. The analyser was written as a single file which meant adding new rules meant changing the engine itself.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Video PYCON US 2018 Talk - Counter, Gauge, Oh my!</title>
+      <link>https://echorand.me/posts/video-counter-gauge-oh-my/</link>
+      <pubDate>Sun, 13 May 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/video-counter-gauge-oh-my/</guid>
+      <description>The video for my PyCon talk - &amp;ldquo;Counter, Gauge, Oh My!&amp;rdquo; is up:
+The accompanying git repository is here and has the demos, links to some of my related articles and other resources.
+If you have any feedback, please let me know.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>PYCON US 2018 talk Counter, Gauge, Upper 90 - Oh my!</title>
+      <link>https://echorand.me/posts/pycon-counter-gauge-oh-my/</link>
+      <pubDate>Wed, 09 May 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/pycon-counter-gauge-oh-my/</guid>
+      <description>In a couple of days, on Saturday, I will be delivering my PYCON US talk titled Counter, Gauge, Upper 90 - Oh my!.
+This talk covers my journey into application monitoring in general and Python applications specifically. We will start with looking into the why of monitoring, learn the absolute basics of various monitoring terminologies and use pandas to play with some of the aggregation and summarizing operation usually associated with monitoring.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Fedora Scientific 28 is here!</title>
+      <link>https://echorand.me/posts/fedora-scientific-28/</link>
+      <pubDate>Wed, 02 May 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/fedora-scientific-28/</guid>
+      <description>Fedora 28 is out and I am happy to share that after a few releases of no Fedora Scientific, we are back. Thanks to all your emails and enquiring about whether Fedora Scientific is dead.
+Go Download it now!
+The Fedora Scientific Guide has been updated a bit as well.
+Thanks to all the packagers who fixed the issues we were having with some of the relevant packages.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>How does ping roughly work over IPv4 on Linux?</title>
+      <link>https://echorand.me/posts/my-own-ping/</link>
+      <pubDate>Fri, 27 Apr 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/my-own-ping/</guid>
+      <description>Introduction The ping program is one of the most common programs which is used to check the &amp;ldquo;aliveness&amp;rdquo; of a host and a typical execution looks as follows:
+$ ping 127.0.0.1 -c 1 -4 PING 127.0.0.1 (127.0.0.1) 56(84) bytes of data. 64 bytes from 127.0.0.1: icmp_seq=1 ttl=64 time=0.062 ms --- 127.0.0.1 ping statistics --- 1 packets transmitted, 1 received, 0% packet loss, time 0ms rtt min/avg/max/mdev = 0.062/0.062/0.062/0.000 ms The -c switch indicates that we want to send a single &amp;ldquo;probe&amp;rdquo;.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Notes on using Cloudflare DNS over HTTPS</title>
+      <link>https://echorand.me/posts/cloudflare-dns-over-https/</link>
+      <pubDate>Tue, 10 Apr 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/cloudflare-dns-over-https/</guid>
+      <description>Introduction I recently learned about Cloudflare&amp;rsquo;s 1.1.1.1 DNS service. Let&amp;rsquo;s explore.
+Exploration One of the more interesting things that caught my attention there was DNS over HTTPS. That is, we can do this:
+22:27 $ http &#39;https://cloudflare-dns.com/dns-query?ct=application/dns-json&amp;amp;name=echorand. me&#39; HTTP/1.1 200 OK CF-RAY: 409535ca3b3765bd-SYD Connection: keep-alive Content-Length: 281 Content-Type: application/dns-json Date: Tue, 10 Apr 2018 12:27:53 GMT Server: cloudflare-nginx Set-Cookie: __cfduid=dfb12106907c3b55c52b27b8ea99e185a1523363273; expires=Wed, 10-Apr-19 12:27:53 GMT; path=/; domain=.cloudflare-dns.com; HttpOnly; Secure cache-control: max-age=285 { &amp;quot;AD&amp;quot;: false, &amp;quot;Answer&amp;quot;: [ { &amp;quot;TTL&amp;quot;: 285, &amp;quot;data&amp;quot;: &amp;quot;192.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Fedora Scientific 28 Beta</title>
+      <link>https://echorand.me/posts/fedora-scientific-28-beta/</link>
+      <pubDate>Mon, 09 Apr 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/fedora-scientific-28-beta/</guid>
+      <description>Fedora 28 beta was announced recently and I am happy to say Fedora Scientific is back.
+One note though, the following applications/libraries are not part of the release:
+ networkx scilab sagemath rkward  You can install them on your installation using:
+$ sudo dnf install python*-networkx scilab sagemath rkward The reason for the above software to be not installed was some failures to install the packages which is why I commented those out so that we can have a release.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Setting up AWS EC2 Assume Role with Terraform</title>
+      <link>https://echorand.me/posts/aws-assume-iam-role-from-another/</link>
+      <pubDate>Tue, 27 Feb 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/aws-assume-iam-role-from-another/</guid>
+      <description>In this post, we will see how we can implement the AWS assume role functionality which allows an IAM role to be able to obtain temporary credentials to access a resource otherwise only accessible by another IAM role. We will implement the infrastructure changes using Terraform and see how to obtain temporary credentials and access an AWS resource (a S3 bucket) that the corresponding IAM role doesn&amp;rsquo;t have access to otherwise via the AWS CLI.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Automatic building and publishing DEB packages for Golang applications</title>
+      <link>https://echorand.me/posts/automate-deb-package-packagecloud/</link>
+      <pubDate>Sat, 24 Feb 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/automate-deb-package-packagecloud/</guid>
+      <description>In my earlier post, Quick and dirty debian packages for your Golang application I shared a recipe building DEB packages for Golang applications. We are going to see the following things in this post building upon our recipe in that post:
+ Building the DEB packages in Travis CI Publishing the DEB package to packagecloud.io  The primary assumption in my first post was using dep for dependency management. That still holds here.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Detecting RLO character in Python</title>
+      <link>https://echorand.me/posts/python-rlo/</link>
+      <pubDate>Mon, 19 Feb 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/python-rlo/</guid>
+      <description>At work, I learned about how Right-to-Left Override was being used to make actually malicious files to look harmless. For example, a .exe file was being made to appear as .doc files. We didn&amp;rsquo;t want to allow uploading such files. This meant that I nedded to detect the presence of the RLO character in the filename.
+Then, I came across this post, where I learned about unicode bidirectional class and Python&amp;rsquo;s bidirectional() method.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Sorted Sets in Redis from CLI, Python and Golang</title>
+      <link>https://echorand.me/posts/redis-sorted-sets/</link>
+      <pubDate>Mon, 19 Feb 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/redis-sorted-sets/</guid>
+      <description>In this post, we will see a demo of sorted sets in redis. I just learned about them and I think they are really cool! This post shows how we can play with sorted sets first via the redis-cli, then from Python and Golang.
+ ┌────────────┐ .───────────────. │ │ .─────────────. ( Redis CLI ) ───▶ │ Redis │ ◀───── ( Golang ) `───────────────&#39; │ │ `─────────────&#39; └────────────┘ ▲ │ │ .</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Python Using specific git commits of third party packages</title>
+      <link>https://echorand.me/posts/python-using-specific-git-commits-of-packages/</link>
+      <pubDate>Fri, 16 Feb 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/python-using-specific-git-commits-of-packages/</guid>
+      <description>After a fair number of furious impatient attempts to try and use specific git commits of third party packages in my Python software, I finally have been able to make it work. I went back to the drawing board - basically reading setup-vs-requirement.
+Applications This is what I did:
+ If you have a setup.py, add the library name to setup.py (abstract dependency) Add the git URL in a requirements.txt file (concrete dependency) When you create your deployment artifact, do pip install -r requirements.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Why RPC in Microservices instead of HTTP?</title>
+      <link>https://echorand.me/posts/rest-or-rpc-for-microservices/</link>
+      <pubDate>Sun, 11 Feb 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/rest-or-rpc-for-microservices/</guid>
+      <description>The Freelancer.com REST API is powered by a number of backend services. The API itself is powered by a Python HTTP server which communicates with the other services (Python, Golang and PHP) via RPC calls implemented using Apache Thrift. It is only during the past 2.5 years that I have been working with Apache Thrift or cross-language RPCs in general. The question often comes up especially when thinking about the future - why not just use HTTP throughout across all services?</description>
+    </item>
+    
+    
+    
     <item>
       <title>C/C&#43;&#43; Scientific Programming Libraries and Tools</title>
       <link>https://echorand.me/posts/c_cplus_scientific_programming/</link>
@@ -15,6 +809,8 @@
       <guid>https://echorand.me/posts/c_cplus_scientific_programming/</guid>
       <description>math.h provides basic mathematical functions as part of the C standard library and are also usable from C++. However, it needs to be supplemented with custom libraries when advanced numerical functionalities are desired. In this article, we shall take a look at two such libraries - the GNU Scientific Library and Blitz++. In the last section of this article, we take a look at Ch - a C/C++ interpreter which combines the power of C/C++ with the ease of use of an interpreter.</description>
     </item>
+    
+    
     
     <item>
       <title>Data in C</title>
@@ -25,6 +821,32 @@
       <description>In C, the data you use in your programs will usually fall into one of the three basic categories: int, char and float. Data in C has no existence without an associated memory location labeled by an identifier, usually referred to as a variable (the term variable is a bit misleading, since it essentially means that it must always vary, but you can have constant variables - i.e. variables whose values do not vary).</description>
     </item>
     
+    
+    
+    <item>
+      <title>Data in C and CPython</title>
+      <link>https://echorand.me/posts/data-in-c-cpython/</link>
+      <pubDate>Fri, 26 Jan 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/data-in-c-cpython/</guid>
+      <description>In the last two articles (Data in CPython and Data in C), as it turned out, I discussed two fundamental points in each language:
+What happens in an assignment operation (such as a=2)? Are separate copies of data created or references passed to the original when they are sent as function parameters?  In this article, I will summarize the findings by presenting a comparative analysis.
+Assignment The simplest way to explain the difference between an assignment operation in C and that in CPython is as follows.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Data in CPython</title>
+      <link>https://echorand.me/posts/data-in-cpython/</link>
+      <pubDate>Fri, 26 Jan 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/data-in-cpython/</guid>
+      <description>When writing programs in Python (CPython), you have access to data types such as a int, str, tuple, list and a dict. It is fairly obvious what each of these data types would be used to represent: an int data type would represent an integer and a list would represent a list of items - homeogeneous or heterogenous. As opposed to a language like C, the Python compiler automatically decides what type to use for your data without the need to be explicitly specified.</description>
+    </item>
+    
+    
+    
     <item>
       <title>Resource Acquisition Is Initialization (RAII) in C</title>
       <link>https://echorand.me/posts/clean_up_variable_attribute/</link>
@@ -33,6 +855,484 @@
       <guid>https://echorand.me/posts/clean_up_variable_attribute/</guid>
       <description>GCC&#39;s C compiler allows you to define various variable attributes. One of them is the cleanup attribute (which you can also write as __cleanup__) which allows you to define a function to be called when the variable goes out of scope (for example, before returning from a function). This is useful, for example to never forget to close a file or freeing the memory you may have allocated. Next up is a demo example defining this attribute on an integer variable (which obviously has no practical value).</description>
     </item>
+    
+    
+    
+    <item>
+      <title>Quick and dirty debian packages for your Golang application</title>
+      <link>https://echorand.me/posts/building-golang-deb-packages/</link>
+      <pubDate>Thu, 25 Jan 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/building-golang-deb-packages/</guid>
+      <description>In this post, we will learn about a quick and easy workflow for building and deploying your golang applications as Debian packages. The packages produced will not be official quality DEB packages.
+Assumptions I have been using dep for dependency management, and I assume that you are doing the same. Other dependency management solutions should work with only the specific bits of the workflow swapped out to suit the one you may be using.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Your options for monitoring multi-process Python applications with Prometheus</title>
+      <link>https://echorand.me/posts/python-prometheus-monitoring-options/</link>
+      <pubDate>Wed, 24 Jan 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/python-prometheus-monitoring-options/</guid>
+      <description>In an earlier article, Monitoring Your Synchronous Python Web Applications Using Prometheus, I discussed a limitation of using the Python client for prometheus.
+Limitation of native prometheus exporting prometheus was built with single process multi-threaded applications in mind. I use the term multi-threaded here to also include coroutine based concurrent applications such as those written in golang or using Python&amp;rsquo;s asynchronous primitives (Example: Monitoring Your Asynchronous Python Web Applications Using Prometheus).</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Linux System Mining with Python</title>
+      <link>https://echorand.me/posts/linux-system-mining/</link>
+      <pubDate>Mon, 22 Jan 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/linux-system-mining/</guid>
+      <description>In this article, we will explore the Python programming language as a tool to retrieve various information about a system running Linux. Let&#39;s get started.
+Which Python? When I refer to Python, I am referring to CPython 2 (2.7 to be exact). I will mention it explicitly when the same code won&#39;t work with CPython 3 (3.3) and provide the alternative code, explaining the differences. Just to make sure that you have CPython installed, type python or python3 from the terminal and you should see the Python prompt displayed in your terminal.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Doing something before systemd shuts your supervisord down</title>
+      <link>https://echorand.me/posts/systemd-supervisord/</link>
+      <pubDate>Fri, 12 Jan 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/systemd-supervisord/</guid>
+      <description>If you are running your server applications via supervisord on a Linux distro running systemd, you may find this post useful.
+Problem Scenario An example scenario to help us establish the utility for this post is as follows:
+ systemd starts the shutdown process systemd stops supervisord supervisord stops your processes You see in-flight requests being dropped  Solution What we want to do is prevent in-flight requests being dropped when a system is shutting down as part of a power off cycle (AWS instance termination, for example).</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Setting up OpenVPN client with systemd template unit files</title>
+      <link>https://echorand.me/posts/fedora-openvpn-systemd/</link>
+      <pubDate>Fri, 12 Jan 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/fedora-openvpn-systemd/</guid>
+      <description>First, I installed openvpn:
+$ sudo dnf -y install openvpn Then, I used the following systemd unit file from here to create a systemd service for creating a new VPN connection on Fedora 27:
+$ cat /etc/systemd/system/openvpn@.service [Unit] Description=OpenVPN service for %I After=syslog.target network-online.target Wants=network-online.target Documentation=man:openvpn(8) Documentation=https://community.openvpn.net/openvpn/wiki/Openvpn24ManPage Documentation=https://community.openvpn.net/openvpn/wiki/HOWTO [Service] Type=notify PrivateTmp=true WorkingDirectory=/etc/openvpn/client/%i/ ExecStart=/usr/sbin/openvpn --status %t/openvpn-server/status-%i.log --status-version 2 --suppress-timestamps --cipher AES-256-GCM --ncp-ciphers AES-256-GCM:AES-128-GCM:AES-256-CBC:AES-128-CBC:BF-CBC --config /etc/openvpn/client/%i/%i.conf CapabilityBoundingSet=CAP_IPC_LOCK CAP_NET_ADMIN CAP_NET_BIND_SERVICE CAP_NET_RAW CAP_SETGID CAP_SETUID CAP_SYS_CHROOT CAP_DAC_OVERRIDE LimitNPROC=10 DeviceAllow=/dev/null rw DeviceAllow=/dev/net/tun rw ProtectSystem=true ProtectHome=true KillMode=process RestartSec=5s Restart=on-failure [Install] WantedBy=multi-user.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Compilation and Interpretation in C and CPython</title>
+      <link>https://echorand.me/posts/compilation-interpretation-c-python/</link>
+      <pubDate>Fri, 05 Jan 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/compilation-interpretation-c-python/</guid>
+      <description>It is common knowledge that programs written in high level languages have to be translated into a low level language using programs referred to as translators. This low level language is either in a native form, in the sense that it is understood by the operating system itself, or in an intermediate form which is understood by an intermediate program such as the bytecode interpreter. It is also known that C is a compiled language, whereas CPython is both first compiled and then interpreted.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Notes on Vim</title>
+      <link>https://echorand.me/posts/vim-notes/</link>
+      <pubDate>Fri, 05 Jan 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/vim-notes/</guid>
+      <description>Modes  Insert Normal mode: In insert mode, press Ctrl-o to quickly execute a command and come back to insert mode  Files  Save current buffer as file.txt: :sav file.text. If you use :w to write the current buffer contents into a new file, post-write, you will still be editing the current buffer  Opening commands  +NUM: File will be opened and cursor positioned on line, NUM +/{pattern}: File will be opened and cursor positioned on first occurence of pattern +&amp;quot;NUMd|x&amp;quot; : Delete a specific line from the file  Cursor movement  Move to the line below: j Move the line above: k Move to the character on the right: l Move to the character on the left: h Move forward to the start of the next word: w Move forward to the end of the next word: e Move backward to the start of the previous word: b Move backward to the end of the previous word: ge Jump to the beginning of a line: 0 Jump the end of a line: $  Line search f&amp;lt;c&amp;gt; to go the next occurence of c, ; to repeat this search, , to repeat the search in backward direction F&amp;lt;c&amp;gt; to go the previous occurence of c, ; to repeat this search, , to repeat the search in forward direction</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Tip Terraform and AWS Security Group rules in EC2 classic</title>
+      <link>https://echorand.me/posts/tip-terraform-security-group-existing/</link>
+      <pubDate>Fri, 05 Jan 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/tip-terraform-security-group-existing/</guid>
+      <description>When using Terraform&amp;rsquo;s aws_security_group_rule with EC2 classic, you may get an error saying that the source security group doesn&amp;rsquo;t exist, even though it does. That&amp;rsquo;s probably because you (like me and others) used the source security group ID and not the security group name, like so:
+resource &amp;quot;aws_security_group_rule&amp;quot; &amp;quot;my_sg_rule&amp;quot; { type = &amp;quot;ingress&amp;quot; from_port = 11123 to_port = 11123 protocol = &amp;quot;tcp&amp;quot; security_group_id = &amp;quot;${aws_security_group.sg1.id}&amp;quot; source_security_group_id = &amp;quot;${aws_security_group.sg2.id}&amp;quot; } You should actually do this instead:</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Tip MySQL - Too many connections</title>
+      <link>https://echorand.me/posts/mysql-too-many-connection/</link>
+      <pubDate>Thu, 04 Jan 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/mysql-too-many-connection/</guid>
+      <description>If you are getting the &amp;ldquo;Too many connections&amp;rdquo; error, couple of things worth checking on the MySQL server:
+mysql&amp;gt; show processlist; .. The above will show the currently open connections. The second is:
+mysql&amp;gt; show variables like &amp;quot;max_connections&amp;quot;; .. The above will show the configured max_connections allowed. When you get this error, this value is less than or equal to the number of rows returned by show processlist.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Using Travis CI to publish to GitHub pages with custom domain</title>
+      <link>https://echorand.me/posts/github-pages-custom-domain-travis-ci/</link>
+      <pubDate>Wed, 03 Jan 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/github-pages-custom-domain-travis-ci/</guid>
+      <description>As of yesterday, this blog is automatically being published via Travis CI. When I push a new commit to my GitHub repository it triggers a new build in Travis CI. The build completes and the the git repository is then updated with the generated output (mostly HTML with some static CSS).
+The overall flow looks as follows:
+This is how I set it all up.
+Please see issue issue.
+Blog repository setup I use pelican as my blog engine.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Getting started with gRPC and Python</title>
+      <link>https://echorand.me/posts/python-grpc/</link>
+      <pubDate>Mon, 01 Jan 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/python-grpc/</guid>
+      <description>My article on getting started with gRPC in Python is up on the codeship blog:
+ Using gRPC in Python  I build upon it in the next article:
+ Exploring Security, Metrics, and Error-handling with gRPC in Python  The demos can be found in the python-grpc-demo repository.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Tip Rotating video frames using iMovie</title>
+      <link>https://echorand.me/posts/imovie-rotate-video/</link>
+      <pubDate>Mon, 01 Jan 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/imovie-rotate-video/</guid>
+      <description>I had to rotate a few video frames using iMovie. The instructions for rotating the frames were working, but the rotation was being applied to &amp;ldquo;neighboring&amp;rdquo; frames as well. It turns out the trick is to use &amp;ldquo;split clip&amp;rdquo; to split a frame so that you can isolate the exact frame to be rotated. And that worked!
+Thanks to this forum reply.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Brief overview of using consul tags</title>
+      <link>https://echorand.me/posts/consul-tags/</link>
+      <pubDate>Fri, 01 Dec 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/consul-tags/</guid>
+      <description>consul allows a service to associate itself with tags. These are arbitrary metadata that can be associated with the service and can be used for different purposes. Below I outline a few examples of making use of tags and discuss some related topics.
+Use case #1: Dedicated service instances based on requests Let&amp;rsquo;s say our service is a HTTP server (REST API) acting as a routing point for multiple independent resources with the following service definition:</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Add an additional host entry to docker container</title>
+      <link>https://echorand.me/posts/docker-extra-hosts/</link>
+      <pubDate>Sun, 29 Oct 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/docker-extra-hosts/</guid>
+      <description>Problem
+Let&amp;rsquo;s say a program in a container should be able to resolve a custom hostname.
+Solution
+When using docker run:
+$ sudo docker run --add-host myhost.name:127.0.0.1 -ti python bash Unable to find image &#39;python:latest&#39; locally latest: Pulling from library/python Digest: sha256:eb20fd0c13d2c57fb602572f27f05f7f1e87f606045175c108a7da1af967313e Status: Downloaded newer image for python:latest ... This will show up as an additional entry in the container&amp;rsquo;s /etc/hosts file:
+root@fee9aeccbc4b:/# cat /etc/hosts ... 127.0.0.1	myhost.name With docker compose, we can use the extra_hosts key:</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Monitoring Python applications with Prometheus</title>
+      <link>https://echorand.me/posts/python-prometheus/</link>
+      <pubDate>Thu, 26 Oct 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/python-prometheus/</guid>
+      <description>I recently wrote two articles on Python application monitoring with Prometheus:
+ Monitoring Your Synchronous Python Web Applications Using Prometheus Monitoring Your Asynchronous Python Web Applications Using Prometheus  The demos can be found in the python-prometheus-demo repository.
+Also checkout aiohttp-prometheus.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>User-defined networks in Docker for inter-container communication on Linux</title>
+      <link>https://echorand.me/posts/docker-user-defined-networks/</link>
+      <pubDate>Thu, 26 Oct 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/docker-user-defined-networks/</guid>
+      <description>Problem
+Let&amp;rsquo;s say a program in a container wants to communicate with a service running in another docker container on the same host. The current recommended approach to do so is using a user-defined network and avoid using links.
+Solution
+Create an user-defined network and run both (or as many you have) the containers in this network: (For reference, I am using docker 17.09.0-ce)
+$ sudo docker network create --driver bridge webapp1 The first container which we will launch in this network is a HTTP server listening on port 8000.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>HandlerFunc, Handle and DefaultServeMux in Golang</title>
+      <link>https://echorand.me/posts/golang-dissecting-listen-and-serve/</link>
+      <pubDate>Wed, 26 Apr 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/golang-dissecting-listen-and-serve/</guid>
+      <description>Introduction My aim in this post is to discuss three &amp;ldquo;concepts&amp;rdquo; in Golang that I come across while writing HTTP servers. Through this post, my aim to get rid of my own lack of understanding (at least to a certain degree) about these. Hopefully, it will be of use to others too.. The understanding will help you write better unit tests for your handlers as well as shown in this blog post.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Doing Math with Python Humble Bundle</title>
+      <link>https://echorand.me/posts/doing-math-humble-bundle/</link>
+      <pubDate>Thu, 06 Apr 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/doing-math-humble-bundle/</guid>
+      <description>Slug:humble-bundle  Summary:Humble bundle    No Starch Press has launched a &amp;quot;Pay what you want&amp;quot; Python Humble Bundle running from April 5th - April 19th! Your purchases will help support the Python Software Foundation and I am excited to announce that Doing Math with Python is part of it.
+ For 1+ USD you can get three books including &amp;quot;Doing Math with Python&amp;quot;! For 15+ USD you get nine excellent Python books!</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Introducing distributed tracing in your Python application via Zipkin</title>
+      <link>https://echorand.me/posts/python-zipkin/</link>
+      <pubDate>Tue, 28 Mar 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/python-zipkin/</guid>
+      <description>Distributed tracing is the idea of tracing a network request as it travels through your services, as it would be in a microservices based architecture. The primary reason you may want to do is to troubleshoot or monitor the latency of a request as it travels through the different services.
+In this post we will see a demo of how we can introduce distributed tracing into a Python network stack communicating via HTTP.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Notes on using Go to write gitbackup</title>
+      <link>https://echorand.me/posts/golang-notes-gitbackup/</link>
+      <pubDate>Sun, 26 Mar 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/golang-notes-gitbackup/</guid>
+      <description>gitbackup is a tool to backup your git repositories from GitHub and GitLab. I wrote the initial version as a project for a go article which is in review for publication in a Linux magazine. It supports GitHub enterprise installations and custom GitLab installations in addition to repositories on github.com and gitlab.com. It&#39;s written in Golang, and built upon go-github and go-gitlab and other third party golang packages.
+Since the initial version, the project&#39;s code has seen number of changes which has been a learning experience for me since I am still fairly new to Go.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>QueueLogger and Python JSON Logger</title>
+      <link>https://echorand.me/posts/queue-logger-python-json-logging/</link>
+      <pubDate>Wed, 01 Mar 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/queue-logger-python-json-logging/</guid>
+      <description>Using QueueLogger with Python JSON Logger When logging from multiple processes (via multiprocessing module), using QueueHandler is one approach with Python 2.
+QueueHandler however sets exc_info attribute of a LogRecord to None since it is not &amp;quot;pickleable&amp;quot; (more on this later). This becomes a problem when you use python-json-logger to format your logs as JSON since it relies on exc_info being set. The result is you don&#39;t get exc_info in your logs.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Setup Golang 1.8 and gb on Fedora (and other Linux distributions)</title>
+      <link>https://echorand.me/posts/golang-setup-1.8/</link>
+      <pubDate>Wed, 01 Mar 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/golang-setup-1.8/</guid>
+      <description>This guide will be how I usually setup and get started with Go development environment on Linux. By the end of this document, we will have seen how to:
+Install the Go 1.8 compiler and other tools (gofmt, for eaxmple), collectively referred to as go tools Install gb and the vendor plugin Vendoring third party packages  Installing Go tools We can follow the official install guide to get the latest stable version of the Go tools:</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Setup Golang on Fedora 24 (and other Linux distributions)</title>
+      <link>https://echorand.me/posts/golang-setup/</link>
+      <pubDate>Thu, 23 Jun 2016 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/golang-setup/</guid>
+      <description>This guide will be how I usually setup and get started with Go development environment on Linux. By the end of this document, we will have seen how to:
+Install the Go compiler and other tools (gofmt, for eaxmple), collectively referred to as go tools Setup Go workspace Working with Go programs using third-party packages  Installing Go tools The first option to install the Go compiler and other tools from your distro&#39;s package manager.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Presentation slides with Jupyter Notebook</title>
+      <link>https://echorand.me/posts/slides-jupyter-notebook/</link>
+      <pubDate>Tue, 31 May 2016 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/slides-jupyter-notebook/</guid>
+      <description>I presented at the PyCon 2016 Education Summit on &amp;quot;Doing Math with Python&amp;quot; day before yesterday and a lightning talk yesterday. This is the first time, I prepared a slide deck using Jupyter Notebook + Reveal.js. I was pleased with the content creation process and the end result. So, here is what worked for me.
+Please note that I have basically taken quite a bit of liberty with HTML where I didn&#39;t want to search for markdown way of doing something</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>New article Write a program to tee output using Rust</title>
+      <link>https://echorand.me/posts/tee-in-rust/</link>
+      <pubDate>Wed, 04 May 2016 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/tee-in-rust/</guid>
+      <description>My article &amp;quot;Write a program to tee output using Rust&amp;quot; is out in Linux Voice (Issue 27).
+When I first set out to learning Rust, I really liked how the Rust programming language book took the approach of introducing the language via small projects. In a recent &amp;quot;New Rustacean&amp;quot; bonus episode, Chris Krycho urges &amp;quot;to build anything&amp;quot; in Rust while one is learning the language. If you like both of those things, I think you will find my article useful.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>runC and libcontainer on Fedora 23/24</title>
+      <link>https://echorand.me/posts/libcontainer-runc-fedora-24/</link>
+      <pubDate>Wed, 27 Apr 2016 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/libcontainer-runc-fedora-24/</guid>
+      <description>In this post, I will post my notes on how I got runC and then using libcontainer on Fedora. The first step is to install golang:
+$ sudo dnf -y install golang $ go version go version go1.6 linux/amd64  We will set GOPATH=~/golang/ and then do the following:
+$ mkdir -p ~/golang/github.com/opencontainers $ cd ~/golang/github.com/opencontainers $ git clone https://github.com/opencontainers/runc.git $ cd runc $ sudo dnf -y install libseccomp-devel $ make $ sudo make install  At this stage, runc should be installed and ready to use:</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>New article Write an Image Cropping program with Go</title>
+      <link>https://echorand.me/posts/go_image_cropping/</link>
+      <pubDate>Sun, 17 Apr 2016 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/go_image_cropping/</guid>
+      <description>My article &amp;quot;Write an Image Cropping with Go&amp;quot; is out in Linux Voice (Issue 26). It is my first article to be published in Linux Voice and I am very excited about it.
+It is challenging to write an introductory article without being able to explain everything the reader needs to know so as to follow the article, while keeping the article concise. Therefore I have updated the GitHub repo of the final code with a README which points you to various resources and tips I found useful while I was learning myself.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Did your Fedora live cd build fail?</title>
+      <link>https://echorand.me/posts/fedora_koji_livecd_builds/</link>
+      <pubDate>Wed, 17 Feb 2016 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/fedora_koji_livecd_builds/</guid>
+      <description>Update: Changed the Koji URL to reflect the change to livemedia
+As the Fedora Scientific maintainer, I have to make sure I look into whether the nightly build is failing so that I can look into the why. So far I have been doing that by going to the koji url.
+But I think there is a better way - make a program do it regularly. First, the program (a Python script):</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Replacing boto S3 mocks using moto in Python</title>
+      <link>https://echorand.me/posts/mocking_s3_with_moto_in_python/</link>
+      <pubDate>Mon, 25 Jan 2016 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/mocking_s3_with_moto_in_python/</guid>
+      <description>Let&#39;s say you have some Python application code which connects to Amazon S3 which retrieves the keys in a bucket. Very likely, the application would be using boto and the code would like this:
+import boto def get_s3_conn(): return boto.connect_s3(&#39;&amp;lt;aws-access-key&#39;, &#39;&amp;lt;aws-secret-key&amp;gt;&#39;) def list_keys(): s3_conn = get_s3_conn() b = s3_conn.get_bucket(&#39;bucket_name&#39;) keys = b.list() return keys  The corresponding test would presumably use some mocks and patching. Here is one way to write a test for the above code:</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>tempfile.NamedTemporaryFile() in Python</title>
+      <link>https://echorand.me/posts/named_temporary_file/</link>
+      <pubDate>Wed, 20 Jan 2016 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/named_temporary_file/</guid>
+      <description>In Python, when you need to create a temporary file with a filename associated to it on disk, NamedTemporaryFile function in the tempfile module is the goto function. Here are some use cases that I think one might use it for.
+Case #1: You simply need a named empty temporary file
+You just want a file object (pointing to an empty file) which has a filename associated to it and hence you cannot use a StringIO object:</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Mock objects and non-existent attributes/methods in Python</title>
+      <link>https://echorand.me/posts/mock_and_attribute_error/</link>
+      <pubDate>Mon, 11 Jan 2016 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/mock_and_attribute_error/</guid>
+      <description>Updated: Fixed typo in the last paragraph.
+Today, I was curious to see this behavior of Mock() objects when using mock:
+&amp;gt;&amp;gt;&amp;gt; from mock import Mock &amp;gt;&amp;gt;&amp;gt; m = Mock() &amp;gt;&amp;gt;&amp;gt; m.i_dont_exist &amp;lt;Mock name=&#39;mock.i_dont_exist&#39; id=&#39;139841609578768&#39;&amp;gt; &amp;gt;&amp;gt;&amp;gt; m.i_dont_exist() &amp;lt;Mock name=&#39;mock.i_dont_exist()&#39; id=&#39;139841609106896&#39;&amp;gt;  The above is expected, since I have not declared a spec when creating the Mock() object, so even when you call a non-existent method or get/set a non-existent attribute, you will not get a AttributeError.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Data only Docker containers</title>
+      <link>https://echorand.me/posts/data-containers-in-docker/</link>
+      <pubDate>Sun, 13 Dec 2015 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/data-containers-in-docker/</guid>
+      <description>In this post, we shall take a look at the idea of data only containers - containers whose sole purpose is to exist on the docker host so that other containers can have portable access to a persistent data volume.
+Why do we need a persistent data volume? We will experiment with the jenkins image from the docker hub. Let&#39;s run a jenkins container using $ sudo docker run -p 8080:8080 jenkins.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>A virtualenv first approach to Python projects</title>
+      <link>https://echorand.me/posts/virtualenv-first-python/</link>
+      <pubDate>Mon, 30 Nov 2015 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/virtualenv-first-python/</guid>
+      <description>I have until the last few months (of my ~4 years of working with Python) always worked without virtualenv for all my Python projects. Why? I think I found the whole idea of having to do the following two steps before I work on something cumbersome:
+Remember the exact virtualenv name, and then Activate it  That said, I was very much aware that it was certainly a good thing to do and would cause me less headaches someday.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>PYTHONHASHSEED and your tests</title>
+      <link>https://echorand.me/posts/python-hashseed/</link>
+      <pubDate>Thu, 19 Nov 2015 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/python-hashseed/</guid>
+      <description>Recently at work, I wanted to test a string which was being created by the urllib.urlencode() function. My first attempt was simple - test my expected string with that being created by the function above using unittest&#39;s assertEquals() function. It passed all the times I ran the tests before I committed the code, but it started failing when the tests were ran as part of the deployment process.
+The input to the urllib.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Mounting a docker volume on SELinux enabled host</title>
+      <link>https://echorand.me/posts/docker-volume-mount-selinux/</link>
+      <pubDate>Mon, 05 Oct 2015 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/docker-volume-mount-selinux/</guid>
+      <description>My workflow with docker usually involves volume mounting a host directory so that I can read and write to the host directory from my container as a non-root user. On a Fedora 23 host with SELinux enabled, this is what I have to do differently:
+Use: -v /var/dir1:var/dir1:Z  Note the extra Z above? You can learn more about it this Project Atomic blog post</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Standalone open source puppet setup on Fedora</title>
+      <link>https://echorand.me/posts/puppet-on-fedora-23/</link>
+      <pubDate>Thu, 01 Oct 2015 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/puppet-on-fedora-23/</guid>
+      <description>My goal in this post is to show how to setup puppet in standalone mode on a Fedora 23 system. This setup will allow writing puppet modules and then you can apply them on your local system and check manually and via serverspec tests that they are doing what you intend them to be doing. Obviously, a VM would be the best test environment for this, or even a container. Let&#39;s get started.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Fedora 22 Scientific</title>
+      <link>https://echorand.me/posts/fedora-22-scientific/</link>
+      <pubDate>Thu, 11 Jun 2015 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/fedora-22-scientific/</guid>
+      <description>Fedora 22 was released recently which also means we have a new Fedora Scientific release. Fedora Scientific is now part of Fedora labs.
+ As you can see, the new home for Fedora Scientific looks amazing. The &amp;quot;Featured Applications&amp;quot; section features the most important and useful tools in Fedora Scientific. I think that is a great idea. Everyone associated with it, thank you very much.
+I have also updated the Fedora Scientific Guide to reflect the changes.</description>
+    </item>
+    
+    
+    
+    <item>
+      <title>Remapping http//echorand.me</title>
+      <link>https://echorand.me/posts/hello/</link>
+      <pubDate>Thu, 30 Apr 2015 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/hello/</guid>
+      <description>I changed the mapping of my domain to point to my GitHub pages. My old blog content is still available here.</description>
+    </item>
+    
+    
+    
+    
+    
+    
+    
     
   </channel>
 </rss>

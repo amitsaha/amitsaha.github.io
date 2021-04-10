@@ -1,227 +1,39 @@
 <!DOCTYPE html>
-<html lang="en-us">
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title> New article Write an Image Cropping program with Go | Exploring Software</title>
-  <meta name="description" content="echo $RANDOM. Exploring Software and writing about it.">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="robots" content="all,follow">
-  <meta name="googlebot" content="index,follow,snippet,archive">
-  <meta property="og:title" content="New article Write an Image Cropping program with Go" />
-<meta property="og:description" content="My article &quot;Write an Image Cropping with Go&quot; is out in Linux Voice (Issue 26). It is my first article to be published in Linux Voice and I am very excited about it.
-It is challenging to write an introductory article without being able to explain everything the reader needs to know so as to follow the article, while keeping the article concise. Therefore I have updated the GitHub repo of the final code with a README which points you to various resources and tips I found useful while I was learning myself." />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://echorand.me/posts/go_image_cropping/" />
-<meta property="article:published_time" content="2016-04-17T00:00:00+00:00" />
-<meta property="article:modified_time" content="2019-06-17T14:58:57+10:00" />
-
-  <meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="New article Write an Image Cropping program with Go"/>
-<meta name="twitter:description" content="My article &quot;Write an Image Cropping with Go&quot; is out in Linux Voice (Issue 26). It is my first article to be published in Linux Voice and I am very excited about it.
-It is challenging to write an introductory article without being able to explain everything the reader needs to know so as to follow the article, while keeping the article concise. Therefore I have updated the GitHub repo of the final code with a README which points you to various resources and tips I found useful while I was learning myself."/>
-
-  
-  
-  
-  <link rel="stylesheet" href="https://echorand.me/css/style-white.css">
-  
-  
-  
-    <!--[if lt IE 9]>
-      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-    <![endif]-->
-  
-
-  
-<link rel="icon" type="image/png" href="https://echorand.me/images/favicon.ico" />
-
-  
-  
-  
-  
-  
+<html><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="echo $RANDOM. Exploring Software and writing about it.">
     
-<script type="application/javascript">
-var doNotTrack = false;
-if (!doNotTrack) {
-	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-	ga('create', 'UA-108901610-1', 'auto');
-	
-	ga('send', 'pageview');
-}
-</script>
+    <link rel="shortcut icon" href="https://echorand.me/favicon.ico">
+    
+    <link rel="stylesheet" href="/css/style.min.css">
 
-  
-  
+    <title>New article Write an Image Cropping program with Go</title>
 </head>
-
-<body class="max-width mx-auto px3 ltr">
-  <div class="content index py4">
-
-  <div id="header-post">
-  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
-  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
-  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
-  <span id="menu">
-    <span id="nav">
-      <ul>
-         
-        <li><a href="/about">About</a></li>
-         
-        <li><a href="/articles">Articles</a></li>
-         
-        <li><a href="/books">Books</a></li>
-         
-        <li><a href="/posts">Posts</a></li>
-         
-        <li><a href="/talks">Talks</a></li>
-         
-        <li><a href="/categories/">Categories</a></li>
-        
-      </ul>
-    </span>
-    <br/>
-    <span id="actions">
-      <ul>
-        
-        <li>
-          <a class="icon" href=" https://echorand.me/posts/fedora_koji_livecd_builds/">
-            <i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i>
-          </a>
-        </li>
-        
-        
-        <li>
-          <a class="icon" href="https://echorand.me/posts/libcontainer-runc-fedora-24/">
-            <i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i>
-          </a>
-        </li>
-        
-        <li>
-          <a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');">
-            <i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i>
-          </a>
-        </li>
-        <li>
-          <a class="icon" href="#">
-            <i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i>
-          </a>
-        </li>
-      </ul>
-      <span id="i-prev" class="info" style="display:none;">Previous post</span>
-      <span id="i-next" class="info" style="display:none;">Next post</span>
-      <span id="i-top" class="info" style="display:none;">Back to top</span>
-      <span id="i-share" class="info" style="display:none;">Share post</span>
-    </span>
-    <br/>
-    <div id="share" style="display: none">
-      
-      <ul>
-  
-  
-    
-  
-  
-  <li>
-    <a class="icon" href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fechorand.me%2fposts%2fgo_image_cropping%2f">
-      <i class="fab fa-facebook " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="https://twitter.com/share?url=https%3a%2f%2fechorand.me%2fposts%2fgo_image_cropping%2f&text=New%20article%20Write%20an%20Image%20Cropping%20program%20with%20Go">
-      <i class="fab fa-twitter " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fechorand.me%2fposts%2fgo_image_cropping%2f&title=New%20article%20Write%20an%20Image%20Cropping%20program%20with%20Go">
-      <i class="fab fa-linkedin " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fechorand.me%2fposts%2fgo_image_cropping%2f&is_video=false&description=New%20article%20Write%20an%20Image%20Cropping%20program%20with%20Go">
-      <i class="fab fa-pinterest " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="mailto:?subject=New%20article%20Write%20an%20Image%20Cropping%20program%20with%20Go&body=Check out this article: https%3a%2f%2fechorand.me%2fposts%2fgo_image_cropping%2f">
-      <i class="fas fa-envelope " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="https://getpocket.com/save?url=https%3a%2f%2fechorand.me%2fposts%2fgo_image_cropping%2f&title=New%20article%20Write%20an%20Image%20Cropping%20program%20with%20Go">
-      <i class="fab fa-get-pocket " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://reddit.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fgo_image_cropping%2f&title=New%20article%20Write%20an%20Image%20Cropping%20program%20with%20Go">
-      <i class="fab fa-reddit " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://www.stumbleupon.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fgo_image_cropping%2f&title=New%20article%20Write%20an%20Image%20Cropping%20program%20with%20Go">
-      <i class="fab fa-stumbleupon " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://digg.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fgo_image_cropping%2f&title=New%20article%20Write%20an%20Image%20Cropping%20program%20with%20Go">
-      <i class="fab fa-digg " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://www.tumblr.com/share/link?url=https%3a%2f%2fechorand.me%2fposts%2fgo_image_cropping%2f&name=New%20article%20Write%20an%20Image%20Cropping%20program%20with%20Go&description=My%20article%20%26quot%3bWrite%20an%20Image%20Cropping%20with%20Go%26quot%3b%20is%20out%20in%20Linux%20Voice%20%28Issue%2026%29.%20It%20is%20my%20first%20article%20to%20be%20published%20in%20Linux%20Voice%20and%20I%20am%20very%20excited%20about%20it.%0aIt%20is%20challenging%20to%20write%20an%20introductory%20article%20without%20being%20able%20to%20explain%20everything%20the%20reader%20needs%20to%20know%20so%20as%20to%20follow%20the%20article%2c%20while%20keeping%20the%20article%20concise.%20Therefore%20I%20have%20updated%20the%20GitHub%20repo%20of%20the%20final%20code%20with%20a%20README%20which%20points%20you%20to%20various%20resources%20and%20tips%20I%20found%20useful%20while%20I%20was%20learning%20myself.">
-      <i class="fab fa-tumblr " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fechorand.me%2fposts%2fgo_image_cropping%2f&t=New%20article%20Write%20an%20Image%20Cropping%20program%20with%20Go">
-      <i class="fab fa-hacker-news " aria-hidden="true"></i>
-    </a>
-  </li>
-</ul>
-
-    </div>
-    <div id="toc">
-      
-    </div>
-  </span>
-</div>
-
-
-  <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
-    <header>
-      <h1 class="posttitle" itemprop="name headline">
-        New article Write an Image Cropping program with Go
-      </h1>
-      <div class="meta">
-        
-        <div class="postdate">
-          
-          <time datetime="2016-04-17 00:00:00 &#43;0000 UTC" itemprop="datePublished">2016-04-17</time>
-          
-            (Updated: <time datetime="2019-06-17 14:58:57 &#43;1000 &#43;1000" itemprop="dateModified">2019-06-17</time>)
-          
-        </div>
-        
-        <div class="article-category">
-            <i class="fas fa-archive"></i>
-            
-            
-            <a class="category-link" href="/categories/golang">golang</a>
-            
-        </div>
-        
-        
-      </div>
-    </header>
-
-  
-    <div class="content" itemprop="articleBody">
-      <div class="document">
+<body><header id="banner">
+    <h2><a href="https://echorand.me">Exploring Software</a></h2>
+    <nav>
+        <ul>
+            <li>
+                <a href="/about" title="">About</a>
+            </li><li>
+                <a href="/articles" title="">Articles</a>
+            </li><li>
+                <a href="/books" title="">Books</a>
+            </li><li>
+                <a href="/posts" title="">Posts</a>
+            </li><li>
+                <a href="/talks" title="">Talks</a>
+            </li><li>
+                <a href="/categories/" title="">Categories</a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main id="content">
+<article>
+    <header id="post-header">
+        <h1>New article Write an Image Cropping program with Go</h1><time>April 17, 2016</time></header><div class="document">
 
 
 <p>My article &quot;Write an Image Cropping with Go&quot; is out in <a class="reference external" href="https://linuxvoice.com">Linux Voice</a> (Issue 26). It is my first article to be published in Linux Voice and I am very excited about it.</p>
@@ -240,158 +52,10 @@ if (!doNotTrack) {
 <p>I hope you enjoy reading the article, and please feel free to get in touch if you have any suggestions/comments/queries. I am <cite>&#64;echorand</cite> on Twitter, or you can email me at <cite>amitsaha.in AT gmail.com</cite>.</p>
 <p>In the next issue of Linux Voice, I have an article coming up on Rust.</p>
 </div>
-</div>
-    </div>
-  </article>
+</div></article>
 
-  
-  
-
-
-
-
-
-  <div id="footer-post-container">
-  <div id="footer-post">
-
-    <div id="nav-footer" style="display: none">
-      <ul>
-         
-          <li><a href="/about">About</a></li>
-         
-          <li><a href="/articles">Articles</a></li>
-         
-          <li><a href="/books">Books</a></li>
-         
-          <li><a href="/posts">Posts</a></li>
-         
-          <li><a href="/talks">Talks</a></li>
-         
-          <li><a href="/categories/">Categories</a></li>
-        
-      </ul>
-    </div>
-
-    <div id="toc-footer" style="display: none">
-      
-    </div>
-
-    <div id="share-footer" style="display: none">
-      
-      <ul>
-  
-  
+        </main><footer id="footer">
     
-  
-  
-  <li>
-    <a class="icon" href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fechorand.me%2fposts%2fgo_image_cropping%2f">
-      <i class="fab fa-facebook fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="https://twitter.com/share?url=https%3a%2f%2fechorand.me%2fposts%2fgo_image_cropping%2f&text=New%20article%20Write%20an%20Image%20Cropping%20program%20with%20Go">
-      <i class="fab fa-twitter fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fechorand.me%2fposts%2fgo_image_cropping%2f&title=New%20article%20Write%20an%20Image%20Cropping%20program%20with%20Go">
-      <i class="fab fa-linkedin fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fechorand.me%2fposts%2fgo_image_cropping%2f&is_video=false&description=New%20article%20Write%20an%20Image%20Cropping%20program%20with%20Go">
-      <i class="fab fa-pinterest fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="mailto:?subject=New%20article%20Write%20an%20Image%20Cropping%20program%20with%20Go&body=Check out this article: https%3a%2f%2fechorand.me%2fposts%2fgo_image_cropping%2f">
-      <i class="fas fa-envelope fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="https://getpocket.com/save?url=https%3a%2f%2fechorand.me%2fposts%2fgo_image_cropping%2f&title=New%20article%20Write%20an%20Image%20Cropping%20program%20with%20Go">
-      <i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://reddit.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fgo_image_cropping%2f&title=New%20article%20Write%20an%20Image%20Cropping%20program%20with%20Go">
-      <i class="fab fa-reddit fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://www.stumbleupon.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fgo_image_cropping%2f&title=New%20article%20Write%20an%20Image%20Cropping%20program%20with%20Go">
-      <i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://digg.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fgo_image_cropping%2f&title=New%20article%20Write%20an%20Image%20Cropping%20program%20with%20Go">
-      <i class="fab fa-digg fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://www.tumblr.com/share/link?url=https%3a%2f%2fechorand.me%2fposts%2fgo_image_cropping%2f&name=New%20article%20Write%20an%20Image%20Cropping%20program%20with%20Go&description=My%20article%20%26quot%3bWrite%20an%20Image%20Cropping%20with%20Go%26quot%3b%20is%20out%20in%20Linux%20Voice%20%28Issue%2026%29.%20It%20is%20my%20first%20article%20to%20be%20published%20in%20Linux%20Voice%20and%20I%20am%20very%20excited%20about%20it.%0aIt%20is%20challenging%20to%20write%20an%20introductory%20article%20without%20being%20able%20to%20explain%20everything%20the%20reader%20needs%20to%20know%20so%20as%20to%20follow%20the%20article%2c%20while%20keeping%20the%20article%20concise.%20Therefore%20I%20have%20updated%20the%20GitHub%20repo%20of%20the%20final%20code%20with%20a%20README%20which%20points%20you%20to%20various%20resources%20and%20tips%20I%20found%20useful%20while%20I%20was%20learning%20myself.">
-      <i class="fab fa-tumblr fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fechorand.me%2fposts%2fgo_image_cropping%2f&t=New%20article%20Write%20an%20Image%20Cropping%20program%20with%20Go">
-      <i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-</ul>
-
-    </div>
-
-    <div id="actions-footer">
-      
-        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;">
-          <i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
-        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;">
-          <i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
-        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;">
-          <i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> share</a>
-        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');">
-          <i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
-    </div>
-
-  </div>
-</div>
-
-
-  <footer id="footer">
-  <div class="footer-left">
-    Copyright  &copy; 2021  Exploring Software 
-  </div>
-  <div class="footer-right">
-    <nav>
-      <ul>
-         
-        <li><a href="/about">About</a></li>
-         
-        <li><a href="/articles">Articles</a></li>
-         
-        <li><a href="/books">Books</a></li>
-         
-        <li><a href="/posts">Posts</a></li>
-         
-        <li><a href="/talks">Talks</a></li>
-         
-        <li><a href="/categories/">Categories</a></li>
-        
-      </ul>
-    </nav>
-  </div>
 </footer>
-
-
-  </div>
 </body>
-
-<link rel="stylesheet" href=/lib/font-awesome/css/all.min.css>
-<script src=/lib/jquery/jquery.min.js></script>
-<script src=/js/main.js></script>
-
-
-
 </html>

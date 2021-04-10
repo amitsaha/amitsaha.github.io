@@ -1,227 +1,39 @@
 <!DOCTYPE html>
-<html lang="en-us">
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title> Setup Golang 1.8 and gb on Fedora (and other Linux distributions) | Exploring Software</title>
-  <meta name="description" content="echo $RANDOM. Exploring Software and writing about it.">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="robots" content="all,follow">
-  <meta name="googlebot" content="index,follow,snippet,archive">
-  <meta property="og:title" content="Setup Golang 1.8 and gb on Fedora (and other Linux distributions)" />
-<meta property="og:description" content="This guide will be how I usually setup and get started with Go development environment on Linux. By the end of this document, we will have seen how to:
-Install the Go 1.8 compiler and other tools (gofmt, for eaxmple), collectively referred to as go tools Install gb and the vendor plugin Vendoring third party packages  Installing Go tools We can follow the official install guide to get the latest stable version of the Go tools:" />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://echorand.me/posts/golang-setup-1.8/" />
-<meta property="article:published_time" content="2017-03-01T00:00:00+00:00" />
-<meta property="article:modified_time" content="2019-06-17T14:58:57+10:00" />
-
-  <meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="Setup Golang 1.8 and gb on Fedora (and other Linux distributions)"/>
-<meta name="twitter:description" content="This guide will be how I usually setup and get started with Go development environment on Linux. By the end of this document, we will have seen how to:
-Install the Go 1.8 compiler and other tools (gofmt, for eaxmple), collectively referred to as go tools Install gb and the vendor plugin Vendoring third party packages  Installing Go tools We can follow the official install guide to get the latest stable version of the Go tools:"/>
-
-  
-  
-  
-  <link rel="stylesheet" href="https://echorand.me/css/style-white.css">
-  
-  
-  
-    <!--[if lt IE 9]>
-      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-    <![endif]-->
-  
-
-  
-<link rel="icon" type="image/png" href="https://echorand.me/images/favicon.ico" />
-
-  
-  
-  
-  
-  
+<html><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="echo $RANDOM. Exploring Software and writing about it.">
     
-<script type="application/javascript">
-var doNotTrack = false;
-if (!doNotTrack) {
-	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-	ga('create', 'UA-108901610-1', 'auto');
-	
-	ga('send', 'pageview');
-}
-</script>
+    <link rel="shortcut icon" href="https://echorand.me/favicon.ico">
+    
+    <link rel="stylesheet" href="/css/style.min.css">
 
-  
-  
+    <title>Setup Golang 1.8 and gb on Fedora (and other Linux distributions)</title>
 </head>
-
-<body class="max-width mx-auto px3 ltr">
-  <div class="content index py4">
-
-  <div id="header-post">
-  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
-  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
-  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
-  <span id="menu">
-    <span id="nav">
-      <ul>
-         
-        <li><a href="/about">About</a></li>
-         
-        <li><a href="/articles">Articles</a></li>
-         
-        <li><a href="/books">Books</a></li>
-         
-        <li><a href="/posts">Posts</a></li>
-         
-        <li><a href="/talks">Talks</a></li>
-         
-        <li><a href="/categories/">Categories</a></li>
-        
-      </ul>
-    </span>
-    <br/>
-    <span id="actions">
-      <ul>
-        
-        <li>
-          <a class="icon" href=" https://echorand.me/posts/golang-setup/">
-            <i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i>
-          </a>
-        </li>
-        
-        
-        <li>
-          <a class="icon" href="https://echorand.me/posts/queue-logger-python-json-logging/">
-            <i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i>
-          </a>
-        </li>
-        
-        <li>
-          <a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');">
-            <i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i>
-          </a>
-        </li>
-        <li>
-          <a class="icon" href="#">
-            <i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i>
-          </a>
-        </li>
-      </ul>
-      <span id="i-prev" class="info" style="display:none;">Previous post</span>
-      <span id="i-next" class="info" style="display:none;">Next post</span>
-      <span id="i-top" class="info" style="display:none;">Back to top</span>
-      <span id="i-share" class="info" style="display:none;">Share post</span>
-    </span>
-    <br/>
-    <div id="share" style="display: none">
-      
-      <ul>
-  
-  
-    
-  
-  
-  <li>
-    <a class="icon" href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fechorand.me%2fposts%2fgolang-setup-1.8%2f">
-      <i class="fab fa-facebook " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="https://twitter.com/share?url=https%3a%2f%2fechorand.me%2fposts%2fgolang-setup-1.8%2f&text=Setup%20Golang%201.8%20and%20gb%20on%20Fedora%20%28and%20other%20Linux%20distributions%29">
-      <i class="fab fa-twitter " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fechorand.me%2fposts%2fgolang-setup-1.8%2f&title=Setup%20Golang%201.8%20and%20gb%20on%20Fedora%20%28and%20other%20Linux%20distributions%29">
-      <i class="fab fa-linkedin " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fechorand.me%2fposts%2fgolang-setup-1.8%2f&is_video=false&description=Setup%20Golang%201.8%20and%20gb%20on%20Fedora%20%28and%20other%20Linux%20distributions%29">
-      <i class="fab fa-pinterest " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="mailto:?subject=Setup%20Golang%201.8%20and%20gb%20on%20Fedora%20%28and%20other%20Linux%20distributions%29&body=Check out this article: https%3a%2f%2fechorand.me%2fposts%2fgolang-setup-1.8%2f">
-      <i class="fas fa-envelope " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="https://getpocket.com/save?url=https%3a%2f%2fechorand.me%2fposts%2fgolang-setup-1.8%2f&title=Setup%20Golang%201.8%20and%20gb%20on%20Fedora%20%28and%20other%20Linux%20distributions%29">
-      <i class="fab fa-get-pocket " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://reddit.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fgolang-setup-1.8%2f&title=Setup%20Golang%201.8%20and%20gb%20on%20Fedora%20%28and%20other%20Linux%20distributions%29">
-      <i class="fab fa-reddit " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://www.stumbleupon.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fgolang-setup-1.8%2f&title=Setup%20Golang%201.8%20and%20gb%20on%20Fedora%20%28and%20other%20Linux%20distributions%29">
-      <i class="fab fa-stumbleupon " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://digg.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fgolang-setup-1.8%2f&title=Setup%20Golang%201.8%20and%20gb%20on%20Fedora%20%28and%20other%20Linux%20distributions%29">
-      <i class="fab fa-digg " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://www.tumblr.com/share/link?url=https%3a%2f%2fechorand.me%2fposts%2fgolang-setup-1.8%2f&name=Setup%20Golang%201.8%20and%20gb%20on%20Fedora%20%28and%20other%20Linux%20distributions%29&description=This%20guide%20will%20be%20how%20I%20usually%20setup%20and%20get%20started%20with%20Go%20development%20environment%20on%20Linux.%20By%20the%20end%20of%20this%20document%2c%20we%20will%20have%20seen%20how%20to%3a%0aInstall%20the%20Go%201.8%20compiler%20and%20other%20tools%20%28gofmt%2c%20for%20eaxmple%29%2c%20collectively%20referred%20to%20as%20go%20tools%20Install%20gb%20and%20the%20vendor%20plugin%20Vendoring%20third%20party%20packages%20%20Installing%20Go%20tools%20We%20can%20follow%20the%20official%20install%20guide%20to%20get%20the%20latest%20stable%20version%20of%20the%20Go%20tools%3a">
-      <i class="fab fa-tumblr " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fechorand.me%2fposts%2fgolang-setup-1.8%2f&t=Setup%20Golang%201.8%20and%20gb%20on%20Fedora%20%28and%20other%20Linux%20distributions%29">
-      <i class="fab fa-hacker-news " aria-hidden="true"></i>
-    </a>
-  </li>
-</ul>
-
-    </div>
-    <div id="toc">
-      
-    </div>
-  </span>
-</div>
-
-
-  <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
-    <header>
-      <h1 class="posttitle" itemprop="name headline">
-        Setup Golang 1.8 and gb on Fedora (and other Linux distributions)
-      </h1>
-      <div class="meta">
-        
-        <div class="postdate">
-          
-          <time datetime="2017-03-01 00:00:00 &#43;0000 UTC" itemprop="datePublished">2017-03-01</time>
-          
-            (Updated: <time datetime="2019-06-17 14:58:57 &#43;1000 &#43;1000" itemprop="dateModified">2019-06-17</time>)
-          
-        </div>
-        
-        <div class="article-category">
-            <i class="fas fa-archive"></i>
-            
-            
-            <a class="category-link" href="/categories/golang">golang</a>
-            
-        </div>
-        
-        
-      </div>
-    </header>
-
-  
-    <div class="content" itemprop="articleBody">
-      <div class="document">
+<body><header id="banner">
+    <h2><a href="https://echorand.me">Exploring Software</a></h2>
+    <nav>
+        <ul>
+            <li>
+                <a href="/about" title="">About</a>
+            </li><li>
+                <a href="/articles" title="">Articles</a>
+            </li><li>
+                <a href="/books" title="">Books</a>
+            </li><li>
+                <a href="/posts" title="">Posts</a>
+            </li><li>
+                <a href="/talks" title="">Talks</a>
+            </li><li>
+                <a href="/categories/" title="">Categories</a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main id="content">
+<article>
+    <header id="post-header">
+        <h1>Setup Golang 1.8 and gb on Fedora (and other Linux distributions)</h1><time>March 1, 2017</time></header><div class="document">
 
 
 <p>This guide will be how I usually setup and get started with Go development environment on Linux. By the end of this document, we will have seen how to:</p>
@@ -490,158 +302,10 @@ $ ./bin/main
 <p>That's all for now, you can find the simple source code above <a class="reference external" href="https://github.com/amitsaha/golang_gettingstarted">here</a>.</p>
 </div>
 </div>
-</div>
-    </div>
-  </article>
+</div></article>
 
-  
-  
-
-
-
-
-
-  <div id="footer-post-container">
-  <div id="footer-post">
-
-    <div id="nav-footer" style="display: none">
-      <ul>
-         
-          <li><a href="/about">About</a></li>
-         
-          <li><a href="/articles">Articles</a></li>
-         
-          <li><a href="/books">Books</a></li>
-         
-          <li><a href="/posts">Posts</a></li>
-         
-          <li><a href="/talks">Talks</a></li>
-         
-          <li><a href="/categories/">Categories</a></li>
-        
-      </ul>
-    </div>
-
-    <div id="toc-footer" style="display: none">
-      
-    </div>
-
-    <div id="share-footer" style="display: none">
-      
-      <ul>
-  
-  
+        </main><footer id="footer">
     
-  
-  
-  <li>
-    <a class="icon" href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fechorand.me%2fposts%2fgolang-setup-1.8%2f">
-      <i class="fab fa-facebook fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="https://twitter.com/share?url=https%3a%2f%2fechorand.me%2fposts%2fgolang-setup-1.8%2f&text=Setup%20Golang%201.8%20and%20gb%20on%20Fedora%20%28and%20other%20Linux%20distributions%29">
-      <i class="fab fa-twitter fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fechorand.me%2fposts%2fgolang-setup-1.8%2f&title=Setup%20Golang%201.8%20and%20gb%20on%20Fedora%20%28and%20other%20Linux%20distributions%29">
-      <i class="fab fa-linkedin fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fechorand.me%2fposts%2fgolang-setup-1.8%2f&is_video=false&description=Setup%20Golang%201.8%20and%20gb%20on%20Fedora%20%28and%20other%20Linux%20distributions%29">
-      <i class="fab fa-pinterest fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="mailto:?subject=Setup%20Golang%201.8%20and%20gb%20on%20Fedora%20%28and%20other%20Linux%20distributions%29&body=Check out this article: https%3a%2f%2fechorand.me%2fposts%2fgolang-setup-1.8%2f">
-      <i class="fas fa-envelope fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="https://getpocket.com/save?url=https%3a%2f%2fechorand.me%2fposts%2fgolang-setup-1.8%2f&title=Setup%20Golang%201.8%20and%20gb%20on%20Fedora%20%28and%20other%20Linux%20distributions%29">
-      <i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://reddit.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fgolang-setup-1.8%2f&title=Setup%20Golang%201.8%20and%20gb%20on%20Fedora%20%28and%20other%20Linux%20distributions%29">
-      <i class="fab fa-reddit fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://www.stumbleupon.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fgolang-setup-1.8%2f&title=Setup%20Golang%201.8%20and%20gb%20on%20Fedora%20%28and%20other%20Linux%20distributions%29">
-      <i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://digg.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fgolang-setup-1.8%2f&title=Setup%20Golang%201.8%20and%20gb%20on%20Fedora%20%28and%20other%20Linux%20distributions%29">
-      <i class="fab fa-digg fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://www.tumblr.com/share/link?url=https%3a%2f%2fechorand.me%2fposts%2fgolang-setup-1.8%2f&name=Setup%20Golang%201.8%20and%20gb%20on%20Fedora%20%28and%20other%20Linux%20distributions%29&description=This%20guide%20will%20be%20how%20I%20usually%20setup%20and%20get%20started%20with%20Go%20development%20environment%20on%20Linux.%20By%20the%20end%20of%20this%20document%2c%20we%20will%20have%20seen%20how%20to%3a%0aInstall%20the%20Go%201.8%20compiler%20and%20other%20tools%20%28gofmt%2c%20for%20eaxmple%29%2c%20collectively%20referred%20to%20as%20go%20tools%20Install%20gb%20and%20the%20vendor%20plugin%20Vendoring%20third%20party%20packages%20%20Installing%20Go%20tools%20We%20can%20follow%20the%20official%20install%20guide%20to%20get%20the%20latest%20stable%20version%20of%20the%20Go%20tools%3a">
-      <i class="fab fa-tumblr fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fechorand.me%2fposts%2fgolang-setup-1.8%2f&t=Setup%20Golang%201.8%20and%20gb%20on%20Fedora%20%28and%20other%20Linux%20distributions%29">
-      <i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-</ul>
-
-    </div>
-
-    <div id="actions-footer">
-      
-        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;">
-          <i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
-        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;">
-          <i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
-        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;">
-          <i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> share</a>
-        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');">
-          <i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
-    </div>
-
-  </div>
-</div>
-
-
-  <footer id="footer">
-  <div class="footer-left">
-    Copyright  &copy; 2021  Exploring Software 
-  </div>
-  <div class="footer-right">
-    <nav>
-      <ul>
-         
-        <li><a href="/about">About</a></li>
-         
-        <li><a href="/articles">Articles</a></li>
-         
-        <li><a href="/books">Books</a></li>
-         
-        <li><a href="/posts">Posts</a></li>
-         
-        <li><a href="/talks">Talks</a></li>
-         
-        <li><a href="/categories/">Categories</a></li>
-        
-      </ul>
-    </nav>
-  </div>
 </footer>
-
-
-  </div>
 </body>
-
-<link rel="stylesheet" href=/lib/font-awesome/css/all.min.css>
-<script src=/lib/jquery/jquery.min.js></script>
-<script src=/js/main.js></script>
-
-
-
 </html>

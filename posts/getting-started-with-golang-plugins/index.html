@@ -1,225 +1,39 @@
 <!DOCTYPE html>
-<html lang="en-us">
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title> Getting started with Golang plugins | Exploring Software</title>
-  <meta name="description" content="echo $RANDOM. Exploring Software and writing about it.">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="robots" content="all,follow">
-  <meta name="googlebot" content="index,follow,snippet,archive">
-  <meta property="og:title" content="Getting started with Golang plugins" />
-<meta property="og:description" content="Introduction In this post, I will share some of my learnings and explorations on plugins in Golang. We will write a &ldquo;driver&rdquo; program which will load two plugins and execute a certain function which are present in both of them. The driver program will feed an integer into the first plugin, which will run some processing on it. The result of the first plugin is fed into the second plugin and finally the driver program will print the result." />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://echorand.me/posts/getting-started-with-golang-plugins/" />
-<meta property="article:published_time" content="2020-05-26T00:00:00+00:00" />
-<meta property="article:modified_time" content="2020-05-26T20:04:00+10:00" />
-
-  <meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="Getting started with Golang plugins"/>
-<meta name="twitter:description" content="Introduction In this post, I will share some of my learnings and explorations on plugins in Golang. We will write a &ldquo;driver&rdquo; program which will load two plugins and execute a certain function which are present in both of them. The driver program will feed an integer into the first plugin, which will run some processing on it. The result of the first plugin is fed into the second plugin and finally the driver program will print the result."/>
-
-  
-  
-  
-  <link rel="stylesheet" href="https://echorand.me/css/style-white.css">
-  
-  
-  
-    <!--[if lt IE 9]>
-      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-    <![endif]-->
-  
-
-  
-<link rel="icon" type="image/png" href="https://echorand.me/images/favicon.ico" />
-
-  
-  
-  
-  
-  
+<html><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="echo $RANDOM. Exploring Software and writing about it.">
     
-<script type="application/javascript">
-var doNotTrack = false;
-if (!doNotTrack) {
-	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-	ga('create', 'UA-108901610-1', 'auto');
-	
-	ga('send', 'pageview');
-}
-</script>
+    <link rel="shortcut icon" href="https://echorand.me/favicon.ico">
+    
+    <link rel="stylesheet" href="/css/style.min.css">
 
-  
-  
+    <title>Getting started with Golang plugins</title>
 </head>
-
-<body class="max-width mx-auto px3 ltr">
-  <div class="content index py4">
-
-  <div id="header-post">
-  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
-  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
-  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
-  <span id="menu">
-    <span id="nav">
-      <ul>
-         
-        <li><a href="/about">About</a></li>
-         
-        <li><a href="/articles">Articles</a></li>
-         
-        <li><a href="/books">Books</a></li>
-         
-        <li><a href="/posts">Posts</a></li>
-         
-        <li><a href="/talks">Talks</a></li>
-         
-        <li><a href="/categories/">Categories</a></li>
-        
-      </ul>
-    </span>
-    <br/>
-    <span id="actions">
-      <ul>
-        
-        <li>
-          <a class="icon" href=" https://echorand.me/posts/kubernetes-pod-security-policies/">
-            <i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i>
-          </a>
-        </li>
-        
-        
-        <li>
-          <a class="icon" href="https://echorand.me/posts/gatekeeper-kubernetes/">
-            <i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i>
-          </a>
-        </li>
-        
-        <li>
-          <a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');">
-            <i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i>
-          </a>
-        </li>
-        <li>
-          <a class="icon" href="#">
-            <i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i>
-          </a>
-        </li>
-      </ul>
-      <span id="i-prev" class="info" style="display:none;">Previous post</span>
-      <span id="i-next" class="info" style="display:none;">Next post</span>
-      <span id="i-top" class="info" style="display:none;">Back to top</span>
-      <span id="i-share" class="info" style="display:none;">Share post</span>
-    </span>
-    <br/>
-    <div id="share" style="display: none">
-      
-      <ul>
-  
-  
-    
-  
-  
-  <li>
-    <a class="icon" href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fechorand.me%2fposts%2fgetting-started-with-golang-plugins%2f">
-      <i class="fab fa-facebook " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="https://twitter.com/share?url=https%3a%2f%2fechorand.me%2fposts%2fgetting-started-with-golang-plugins%2f&text=Getting%20started%20with%20Golang%20plugins">
-      <i class="fab fa-twitter " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fechorand.me%2fposts%2fgetting-started-with-golang-plugins%2f&title=Getting%20started%20with%20Golang%20plugins">
-      <i class="fab fa-linkedin " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fechorand.me%2fposts%2fgetting-started-with-golang-plugins%2f&is_video=false&description=Getting%20started%20with%20Golang%20plugins">
-      <i class="fab fa-pinterest " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="mailto:?subject=Getting%20started%20with%20Golang%20plugins&body=Check out this article: https%3a%2f%2fechorand.me%2fposts%2fgetting-started-with-golang-plugins%2f">
-      <i class="fas fa-envelope " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="https://getpocket.com/save?url=https%3a%2f%2fechorand.me%2fposts%2fgetting-started-with-golang-plugins%2f&title=Getting%20started%20with%20Golang%20plugins">
-      <i class="fab fa-get-pocket " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://reddit.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fgetting-started-with-golang-plugins%2f&title=Getting%20started%20with%20Golang%20plugins">
-      <i class="fab fa-reddit " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://www.stumbleupon.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fgetting-started-with-golang-plugins%2f&title=Getting%20started%20with%20Golang%20plugins">
-      <i class="fab fa-stumbleupon " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://digg.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fgetting-started-with-golang-plugins%2f&title=Getting%20started%20with%20Golang%20plugins">
-      <i class="fab fa-digg " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://www.tumblr.com/share/link?url=https%3a%2f%2fechorand.me%2fposts%2fgetting-started-with-golang-plugins%2f&name=Getting%20started%20with%20Golang%20plugins&description=Introduction%20In%20this%20post%2c%20I%20will%20share%20some%20of%20my%20learnings%20and%20explorations%20on%20plugins%20in%20Golang.%20We%20will%20write%20a%20%26ldquo%3bdriver%26rdquo%3b%20program%20which%20will%20load%20two%20plugins%20and%20execute%20a%20certain%20function%20which%20are%20present%20in%20both%20of%20them.%20The%20driver%20program%20will%20feed%20an%20integer%20into%20the%20first%20plugin%2c%20which%20will%20run%20some%20processing%20on%20it.%20The%20result%20of%20the%20first%20plugin%20is%20fed%20into%20the%20second%20plugin%20and%20finally%20the%20driver%20program%20will%20print%20the%20result.">
-      <i class="fab fa-tumblr " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fechorand.me%2fposts%2fgetting-started-with-golang-plugins%2f&t=Getting%20started%20with%20Golang%20plugins">
-      <i class="fab fa-hacker-news " aria-hidden="true"></i>
-    </a>
-  </li>
-</ul>
-
-    </div>
-    <div id="toc">
-      <nav id="TableOfContents"></nav>
-    </div>
-  </span>
-</div>
-
-
-  <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
-    <header>
-      <h1 class="posttitle" itemprop="name headline">
-        Getting started with Golang plugins
-      </h1>
-      <div class="meta">
-        
-        <div class="postdate">
-          
-          <time datetime="2020-05-26 00:00:00 &#43;0000 UTC" itemprop="datePublished">2020-05-26</time>
-          
-            (Updated: <time datetime="2020-05-26 20:04:00 &#43;1000 &#43;1000" itemprop="dateModified">2020-05-26</time>)
-          
-        </div>
-        
-        <div class="article-category">
-            <i class="fas fa-archive"></i>
-            
-            
-            <a class="category-link" href="/categories/golang">golang</a>
-            
-        </div>
-        
-        
-      </div>
-    </header>
-
-  
-    <div class="content" itemprop="articleBody">
-      <h1 id="introduction">Introduction</h1>
+<body><header id="banner">
+    <h2><a href="https://echorand.me">Exploring Software</a></h2>
+    <nav>
+        <ul>
+            <li>
+                <a href="/about" title="">About</a>
+            </li><li>
+                <a href="/articles" title="">Articles</a>
+            </li><li>
+                <a href="/books" title="">Books</a>
+            </li><li>
+                <a href="/posts" title="">Posts</a>
+            </li><li>
+                <a href="/talks" title="">Talks</a>
+            </li><li>
+                <a href="/categories/" title="">Categories</a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main id="content">
+<article>
+    <header id="post-header">
+        <h1>Getting started with Golang plugins</h1><time>May 26, 2020</time></header><h1 id="introduction">Introduction</h1>
 <p>In this post, I will share some of my learnings and explorations on <a href="https://golang.org/pkg/plugin/">plugins in Golang</a>.
 We will write a &ldquo;driver&rdquo; program which will load two plugins and execute a certain function which
 are present in both of them. The driver program will feed an integer into the first plugin, which will run some processing
@@ -388,158 +202,10 @@ from a plugin to the driver. Hence, we make use of plugin symbol lookup to retri
 making use of Golang plugins.</li>
 <li><a href="https://www.reddit.com/r/golang/comments/b6h8qq/is_anyone_actually_using_go_plugins/">Discussion on Reddit</a> about what folks are using plugins for</li>
 </ul>
+</article>
 
-    </div>
-  </article>
-
-  
-  
-
-
-
-
-
-  <div id="footer-post-container">
-  <div id="footer-post">
-
-    <div id="nav-footer" style="display: none">
-      <ul>
-         
-          <li><a href="/about">About</a></li>
-         
-          <li><a href="/articles">Articles</a></li>
-         
-          <li><a href="/books">Books</a></li>
-         
-          <li><a href="/posts">Posts</a></li>
-         
-          <li><a href="/talks">Talks</a></li>
-         
-          <li><a href="/categories/">Categories</a></li>
-        
-      </ul>
-    </div>
-
-    <div id="toc-footer" style="display: none">
-      <nav id="TableOfContents"></nav>
-    </div>
-
-    <div id="share-footer" style="display: none">
-      
-      <ul>
-  
-  
+        </main><footer id="footer">
     
-  
-  
-  <li>
-    <a class="icon" href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fechorand.me%2fposts%2fgetting-started-with-golang-plugins%2f">
-      <i class="fab fa-facebook fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="https://twitter.com/share?url=https%3a%2f%2fechorand.me%2fposts%2fgetting-started-with-golang-plugins%2f&text=Getting%20started%20with%20Golang%20plugins">
-      <i class="fab fa-twitter fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fechorand.me%2fposts%2fgetting-started-with-golang-plugins%2f&title=Getting%20started%20with%20Golang%20plugins">
-      <i class="fab fa-linkedin fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fechorand.me%2fposts%2fgetting-started-with-golang-plugins%2f&is_video=false&description=Getting%20started%20with%20Golang%20plugins">
-      <i class="fab fa-pinterest fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="mailto:?subject=Getting%20started%20with%20Golang%20plugins&body=Check out this article: https%3a%2f%2fechorand.me%2fposts%2fgetting-started-with-golang-plugins%2f">
-      <i class="fas fa-envelope fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="https://getpocket.com/save?url=https%3a%2f%2fechorand.me%2fposts%2fgetting-started-with-golang-plugins%2f&title=Getting%20started%20with%20Golang%20plugins">
-      <i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://reddit.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fgetting-started-with-golang-plugins%2f&title=Getting%20started%20with%20Golang%20plugins">
-      <i class="fab fa-reddit fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://www.stumbleupon.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fgetting-started-with-golang-plugins%2f&title=Getting%20started%20with%20Golang%20plugins">
-      <i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://digg.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2fgetting-started-with-golang-plugins%2f&title=Getting%20started%20with%20Golang%20plugins">
-      <i class="fab fa-digg fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://www.tumblr.com/share/link?url=https%3a%2f%2fechorand.me%2fposts%2fgetting-started-with-golang-plugins%2f&name=Getting%20started%20with%20Golang%20plugins&description=Introduction%20In%20this%20post%2c%20I%20will%20share%20some%20of%20my%20learnings%20and%20explorations%20on%20plugins%20in%20Golang.%20We%20will%20write%20a%20%26ldquo%3bdriver%26rdquo%3b%20program%20which%20will%20load%20two%20plugins%20and%20execute%20a%20certain%20function%20which%20are%20present%20in%20both%20of%20them.%20The%20driver%20program%20will%20feed%20an%20integer%20into%20the%20first%20plugin%2c%20which%20will%20run%20some%20processing%20on%20it.%20The%20result%20of%20the%20first%20plugin%20is%20fed%20into%20the%20second%20plugin%20and%20finally%20the%20driver%20program%20will%20print%20the%20result.">
-      <i class="fab fa-tumblr fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fechorand.me%2fposts%2fgetting-started-with-golang-plugins%2f&t=Getting%20started%20with%20Golang%20plugins">
-      <i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-</ul>
-
-    </div>
-
-    <div id="actions-footer">
-      
-        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;">
-          <i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
-        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;">
-          <i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
-        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;">
-          <i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> share</a>
-        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');">
-          <i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
-    </div>
-
-  </div>
-</div>
-
-
-  <footer id="footer">
-  <div class="footer-left">
-    Copyright  &copy; 2021  Exploring Software 
-  </div>
-  <div class="footer-right">
-    <nav>
-      <ul>
-         
-        <li><a href="/about">About</a></li>
-         
-        <li><a href="/articles">Articles</a></li>
-         
-        <li><a href="/books">Books</a></li>
-         
-        <li><a href="/posts">Posts</a></li>
-         
-        <li><a href="/talks">Talks</a></li>
-         
-        <li><a href="/categories/">Categories</a></li>
-        
-      </ul>
-    </nav>
-  </div>
 </footer>
-
-
-  </div>
 </body>
-
-<link rel="stylesheet" href=/lib/font-awesome/css/all.min.css>
-<script src=/lib/jquery/jquery.min.js></script>
-<script src=/js/main.js></script>
-
-
-
 </html>

@@ -1,229 +1,39 @@
 <!DOCTYPE html>
-<html lang="en-us">
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title> Setting up OpenVPN client with systemd template unit files | Exploring Software</title>
-  <meta name="description" content="echo $RANDOM. Exploring Software and writing about it.">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="robots" content="all,follow">
-  <meta name="googlebot" content="index,follow,snippet,archive">
-  <meta property="og:title" content="Setting up OpenVPN client with systemd template unit files" />
-<meta property="og:description" content="First, I installed openvpn:
-$ sudo dnf -y install openvpn Then, I used the following systemd unit file from here to create a systemd service for creating a new VPN connection on Fedora 27:
-$ cat /etc/systemd/system/openvpn@.service [Unit] Description=OpenVPN service for %I After=syslog.target network-online.target Wants=network-online.target Documentation=man:openvpn(8) Documentation=https://community.openvpn.net/openvpn/wiki/Openvpn24ManPage Documentation=https://community.openvpn.net/openvpn/wiki/HOWTO [Service] Type=notify PrivateTmp=true WorkingDirectory=/etc/openvpn/client/%i/ ExecStart=/usr/sbin/openvpn --status %t/openvpn-server/status-%i.log --status-version 2 --suppress-timestamps --cipher AES-256-GCM --ncp-ciphers AES-256-GCM:AES-128-GCM:AES-256-CBC:AES-128-CBC:BF-CBC --config /etc/openvpn/client/%i/%i.conf CapabilityBoundingSet=CAP_IPC_LOCK CAP_NET_ADMIN CAP_NET_BIND_SERVICE CAP_NET_RAW CAP_SETGID CAP_SETUID CAP_SYS_CHROOT CAP_DAC_OVERRIDE LimitNPROC=10 DeviceAllow=/dev/null rw DeviceAllow=/dev/net/tun rw ProtectSystem=true ProtectHome=true KillMode=process RestartSec=5s Restart=on-failure [Install] WantedBy=multi-user." />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://echorand.me/posts/fedora-openvpn-systemd/" />
-<meta property="article:published_time" content="2018-01-12T00:00:00+00:00" />
-<meta property="article:modified_time" content="2019-07-11T16:52:00+10:00" />
-
-  <meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="Setting up OpenVPN client with systemd template unit files"/>
-<meta name="twitter:description" content="First, I installed openvpn:
-$ sudo dnf -y install openvpn Then, I used the following systemd unit file from here to create a systemd service for creating a new VPN connection on Fedora 27:
-$ cat /etc/systemd/system/openvpn@.service [Unit] Description=OpenVPN service for %I After=syslog.target network-online.target Wants=network-online.target Documentation=man:openvpn(8) Documentation=https://community.openvpn.net/openvpn/wiki/Openvpn24ManPage Documentation=https://community.openvpn.net/openvpn/wiki/HOWTO [Service] Type=notify PrivateTmp=true WorkingDirectory=/etc/openvpn/client/%i/ ExecStart=/usr/sbin/openvpn --status %t/openvpn-server/status-%i.log --status-version 2 --suppress-timestamps --cipher AES-256-GCM --ncp-ciphers AES-256-GCM:AES-128-GCM:AES-256-CBC:AES-128-CBC:BF-CBC --config /etc/openvpn/client/%i/%i.conf CapabilityBoundingSet=CAP_IPC_LOCK CAP_NET_ADMIN CAP_NET_BIND_SERVICE CAP_NET_RAW CAP_SETGID CAP_SETUID CAP_SYS_CHROOT CAP_DAC_OVERRIDE LimitNPROC=10 DeviceAllow=/dev/null rw DeviceAllow=/dev/net/tun rw ProtectSystem=true ProtectHome=true KillMode=process RestartSec=5s Restart=on-failure [Install] WantedBy=multi-user."/>
-
-  
-  
-  
-  <link rel="stylesheet" href="https://echorand.me/css/style-white.css">
-  
-  
-  
-    <!--[if lt IE 9]>
-      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-    <![endif]-->
-  
-
-  
-<link rel="icon" type="image/png" href="https://echorand.me/images/favicon.ico" />
-
-  
-  
-  
-  
-  
+<html><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="echo $RANDOM. Exploring Software and writing about it.">
     
-<script type="application/javascript">
-var doNotTrack = false;
-if (!doNotTrack) {
-	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-	ga('create', 'UA-108901610-1', 'auto');
-	
-	ga('send', 'pageview');
-}
-</script>
+    <link rel="shortcut icon" href="https://echorand.me/favicon.ico">
+    
+    <link rel="stylesheet" href="/css/style.min.css">
 
-  
-  
+    <title>Setting up OpenVPN client with systemd template unit files</title>
 </head>
-
-<body class="max-width mx-auto px3 ltr">
-  <div class="content index py4">
-
-  <div id="header-post">
-  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
-  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
-  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
-  <span id="menu">
-    <span id="nav">
-      <ul>
-         
-        <li><a href="/about">About</a></li>
-         
-        <li><a href="/articles">Articles</a></li>
-         
-        <li><a href="/books">Books</a></li>
-         
-        <li><a href="/posts">Posts</a></li>
-         
-        <li><a href="/talks">Talks</a></li>
-         
-        <li><a href="/categories/">Categories</a></li>
-        
-      </ul>
-    </span>
-    <br/>
-    <span id="actions">
-      <ul>
-        
-        <li>
-          <a class="icon" href=" https://echorand.me/posts/compilation-interpretation-c-python/">
-            <i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i>
-          </a>
-        </li>
-        
-        
-        <li>
-          <a class="icon" href="https://echorand.me/posts/systemd-supervisord/">
-            <i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i>
-          </a>
-        </li>
-        
-        <li>
-          <a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');">
-            <i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i>
-          </a>
-        </li>
-        <li>
-          <a class="icon" href="#">
-            <i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i>
-          </a>
-        </li>
-      </ul>
-      <span id="i-prev" class="info" style="display:none;">Previous post</span>
-      <span id="i-next" class="info" style="display:none;">Next post</span>
-      <span id="i-top" class="info" style="display:none;">Back to top</span>
-      <span id="i-share" class="info" style="display:none;">Share post</span>
-    </span>
-    <br/>
-    <div id="share" style="display: none">
-      
-      <ul>
-  
-  
-    
-  
-  
-  <li>
-    <a class="icon" href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fechorand.me%2fposts%2ffedora-openvpn-systemd%2f">
-      <i class="fab fa-facebook " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="https://twitter.com/share?url=https%3a%2f%2fechorand.me%2fposts%2ffedora-openvpn-systemd%2f&text=Setting%20up%20OpenVPN%20client%20with%20systemd%20template%20unit%20files">
-      <i class="fab fa-twitter " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fechorand.me%2fposts%2ffedora-openvpn-systemd%2f&title=Setting%20up%20OpenVPN%20client%20with%20systemd%20template%20unit%20files">
-      <i class="fab fa-linkedin " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fechorand.me%2fposts%2ffedora-openvpn-systemd%2f&is_video=false&description=Setting%20up%20OpenVPN%20client%20with%20systemd%20template%20unit%20files">
-      <i class="fab fa-pinterest " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="mailto:?subject=Setting%20up%20OpenVPN%20client%20with%20systemd%20template%20unit%20files&body=Check out this article: https%3a%2f%2fechorand.me%2fposts%2ffedora-openvpn-systemd%2f">
-      <i class="fas fa-envelope " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="https://getpocket.com/save?url=https%3a%2f%2fechorand.me%2fposts%2ffedora-openvpn-systemd%2f&title=Setting%20up%20OpenVPN%20client%20with%20systemd%20template%20unit%20files">
-      <i class="fab fa-get-pocket " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://reddit.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2ffedora-openvpn-systemd%2f&title=Setting%20up%20OpenVPN%20client%20with%20systemd%20template%20unit%20files">
-      <i class="fab fa-reddit " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://www.stumbleupon.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2ffedora-openvpn-systemd%2f&title=Setting%20up%20OpenVPN%20client%20with%20systemd%20template%20unit%20files">
-      <i class="fab fa-stumbleupon " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://digg.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2ffedora-openvpn-systemd%2f&title=Setting%20up%20OpenVPN%20client%20with%20systemd%20template%20unit%20files">
-      <i class="fab fa-digg " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://www.tumblr.com/share/link?url=https%3a%2f%2fechorand.me%2fposts%2ffedora-openvpn-systemd%2f&name=Setting%20up%20OpenVPN%20client%20with%20systemd%20template%20unit%20files&description=First%2c%20I%20installed%20openvpn%3a%0a%24%20sudo%20dnf%20-y%20install%20openvpn%20Then%2c%20I%20used%20the%20following%20systemd%20unit%20file%20from%20here%20to%20create%20a%20systemd%20service%20for%20creating%20a%20new%20VPN%20connection%20on%20Fedora%2027%3a%0a%24%20cat%20%2fetc%2fsystemd%2fsystem%2fopenvpn%40.service%20%5bUnit%5d%20Description%3dOpenVPN%20service%20for%20%25I%20After%3dsyslog.target%20network-online.target%20Wants%3dnetwork-online.target%20Documentation%3dman%3aopenvpn%288%29%20Documentation%3dhttps%3a%2f%2fcommunity.openvpn.net%2fopenvpn%2fwiki%2fOpenvpn24ManPage%20Documentation%3dhttps%3a%2f%2fcommunity.openvpn.net%2fopenvpn%2fwiki%2fHOWTO%20%5bService%5d%20Type%3dnotify%20PrivateTmp%3dtrue%20WorkingDirectory%3d%2fetc%2fopenvpn%2fclient%2f%25i%2f%20ExecStart%3d%2fusr%2fsbin%2fopenvpn%20--status%20%25t%2fopenvpn-server%2fstatus-%25i.log%20--status-version%202%20--suppress-timestamps%20--cipher%20AES-256-GCM%20--ncp-ciphers%20AES-256-GCM%3aAES-128-GCM%3aAES-256-CBC%3aAES-128-CBC%3aBF-CBC%20--config%20%2fetc%2fopenvpn%2fclient%2f%25i%2f%25i.conf%20CapabilityBoundingSet%3dCAP_IPC_LOCK%20CAP_NET_ADMIN%20CAP_NET_BIND_SERVICE%20CAP_NET_RAW%20CAP_SETGID%20CAP_SETUID%20CAP_SYS_CHROOT%20CAP_DAC_OVERRIDE%20LimitNPROC%3d10%20DeviceAllow%3d%2fdev%2fnull%20rw%20DeviceAllow%3d%2fdev%2fnet%2ftun%20rw%20ProtectSystem%3dtrue%20ProtectHome%3dtrue%20KillMode%3dprocess%20RestartSec%3d5s%20Restart%3don-failure%20%5bInstall%5d%20WantedBy%3dmulti-user.">
-      <i class="fab fa-tumblr " aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fechorand.me%2fposts%2ffedora-openvpn-systemd%2f&t=Setting%20up%20OpenVPN%20client%20with%20systemd%20template%20unit%20files">
-      <i class="fab fa-hacker-news " aria-hidden="true"></i>
-    </a>
-  </li>
-</ul>
-
-    </div>
-    <div id="toc">
-      <nav id="TableOfContents"></nav>
-    </div>
-  </span>
-</div>
-
-
-  <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
-    <header>
-      <h1 class="posttitle" itemprop="name headline">
-        Setting up OpenVPN client with systemd template unit files
-      </h1>
-      <div class="meta">
-        
-        <div class="postdate">
-          
-          <time datetime="2018-01-12 00:00:00 &#43;0000 UTC" itemprop="datePublished">2018-01-12</time>
-          
-            (Updated: <time datetime="2019-07-11 16:52:00 &#43;1000 &#43;1000" itemprop="dateModified">2019-07-11</time>)
-          
-        </div>
-        
-        <div class="article-category">
-            <i class="fas fa-archive"></i>
-            
-            
-            <a class="category-link" href="/categories/fedora">fedora</a>
-            
-        </div>
-        
-        
-      </div>
-    </header>
-
-  
-    <div class="content" itemprop="articleBody">
-      <p>First, I installed <code>openvpn</code>:</p>
+<body><header id="banner">
+    <h2><a href="https://echorand.me">Exploring Software</a></h2>
+    <nav>
+        <ul>
+            <li>
+                <a href="/about" title="">About</a>
+            </li><li>
+                <a href="/articles" title="">Articles</a>
+            </li><li>
+                <a href="/books" title="">Books</a>
+            </li><li>
+                <a href="/posts" title="">Posts</a>
+            </li><li>
+                <a href="/talks" title="">Talks</a>
+            </li><li>
+                <a href="/categories/" title="">Categories</a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main id="content">
+<article>
+    <header id="post-header">
+        <h1>Setting up OpenVPN client with systemd template unit files</h1><time>January 12, 2018</time></header><p>First, I installed <code>openvpn</code>:</p>
 <pre><code>$ sudo dnf  -y install openvpn
 </code></pre><p>Then, I used the following systemd unit file from <a href="https://ask.fedoraproject.org/en/question/113988/openvpn-will-not-start-via-systemd-after-upgrade-to-f25/?answer=114099#post-id-114099">here</a> to create a systemd service for creating a new VPN
 connection on Fedora 27:</p>
@@ -271,158 +81,10 @@ $ sudo systemctl start openvpn@fln2.service
 <li><a href="https://fedoramagazine.org/systemd-template-unit-files/">systemd template unit files</a></li>
 <li><a href="https://www.digitalocean.com/community/tutorials/understanding-systemd-units-and-unit-files#creating-instance-units-from-template-unit-files">More on systemd template unit files</a></li>
 </ul>
+</article>
 
-    </div>
-  </article>
-
-  
-  
-
-
-
-
-
-  <div id="footer-post-container">
-  <div id="footer-post">
-
-    <div id="nav-footer" style="display: none">
-      <ul>
-         
-          <li><a href="/about">About</a></li>
-         
-          <li><a href="/articles">Articles</a></li>
-         
-          <li><a href="/books">Books</a></li>
-         
-          <li><a href="/posts">Posts</a></li>
-         
-          <li><a href="/talks">Talks</a></li>
-         
-          <li><a href="/categories/">Categories</a></li>
-        
-      </ul>
-    </div>
-
-    <div id="toc-footer" style="display: none">
-      <nav id="TableOfContents"></nav>
-    </div>
-
-    <div id="share-footer" style="display: none">
-      
-      <ul>
-  
-  
+        </main><footer id="footer">
     
-  
-  
-  <li>
-    <a class="icon" href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fechorand.me%2fposts%2ffedora-openvpn-systemd%2f">
-      <i class="fab fa-facebook fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="https://twitter.com/share?url=https%3a%2f%2fechorand.me%2fposts%2ffedora-openvpn-systemd%2f&text=Setting%20up%20OpenVPN%20client%20with%20systemd%20template%20unit%20files">
-      <i class="fab fa-twitter fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://www.linkedin.com/shareArticle?url=https%3a%2f%2fechorand.me%2fposts%2ffedora-openvpn-systemd%2f&title=Setting%20up%20OpenVPN%20client%20with%20systemd%20template%20unit%20files">
-      <i class="fab fa-linkedin fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https%3a%2f%2fechorand.me%2fposts%2ffedora-openvpn-systemd%2f&is_video=false&description=Setting%20up%20OpenVPN%20client%20with%20systemd%20template%20unit%20files">
-      <i class="fab fa-pinterest fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="mailto:?subject=Setting%20up%20OpenVPN%20client%20with%20systemd%20template%20unit%20files&body=Check out this article: https%3a%2f%2fechorand.me%2fposts%2ffedora-openvpn-systemd%2f">
-      <i class="fas fa-envelope fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="https://getpocket.com/save?url=https%3a%2f%2fechorand.me%2fposts%2ffedora-openvpn-systemd%2f&title=Setting%20up%20OpenVPN%20client%20with%20systemd%20template%20unit%20files">
-      <i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://reddit.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2ffedora-openvpn-systemd%2f&title=Setting%20up%20OpenVPN%20client%20with%20systemd%20template%20unit%20files">
-      <i class="fab fa-reddit fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://www.stumbleupon.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2ffedora-openvpn-systemd%2f&title=Setting%20up%20OpenVPN%20client%20with%20systemd%20template%20unit%20files">
-      <i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://digg.com/submit?url=https%3a%2f%2fechorand.me%2fposts%2ffedora-openvpn-systemd%2f&title=Setting%20up%20OpenVPN%20client%20with%20systemd%20template%20unit%20files">
-      <i class="fab fa-digg fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="http://www.tumblr.com/share/link?url=https%3a%2f%2fechorand.me%2fposts%2ffedora-openvpn-systemd%2f&name=Setting%20up%20OpenVPN%20client%20with%20systemd%20template%20unit%20files&description=First%2c%20I%20installed%20openvpn%3a%0a%24%20sudo%20dnf%20-y%20install%20openvpn%20Then%2c%20I%20used%20the%20following%20systemd%20unit%20file%20from%20here%20to%20create%20a%20systemd%20service%20for%20creating%20a%20new%20VPN%20connection%20on%20Fedora%2027%3a%0a%24%20cat%20%2fetc%2fsystemd%2fsystem%2fopenvpn%40.service%20%5bUnit%5d%20Description%3dOpenVPN%20service%20for%20%25I%20After%3dsyslog.target%20network-online.target%20Wants%3dnetwork-online.target%20Documentation%3dman%3aopenvpn%288%29%20Documentation%3dhttps%3a%2f%2fcommunity.openvpn.net%2fopenvpn%2fwiki%2fOpenvpn24ManPage%20Documentation%3dhttps%3a%2f%2fcommunity.openvpn.net%2fopenvpn%2fwiki%2fHOWTO%20%5bService%5d%20Type%3dnotify%20PrivateTmp%3dtrue%20WorkingDirectory%3d%2fetc%2fopenvpn%2fclient%2f%25i%2f%20ExecStart%3d%2fusr%2fsbin%2fopenvpn%20--status%20%25t%2fopenvpn-server%2fstatus-%25i.log%20--status-version%202%20--suppress-timestamps%20--cipher%20AES-256-GCM%20--ncp-ciphers%20AES-256-GCM%3aAES-128-GCM%3aAES-256-CBC%3aAES-128-CBC%3aBF-CBC%20--config%20%2fetc%2fopenvpn%2fclient%2f%25i%2f%25i.conf%20CapabilityBoundingSet%3dCAP_IPC_LOCK%20CAP_NET_ADMIN%20CAP_NET_BIND_SERVICE%20CAP_NET_RAW%20CAP_SETGID%20CAP_SETUID%20CAP_SYS_CHROOT%20CAP_DAC_OVERRIDE%20LimitNPROC%3d10%20DeviceAllow%3d%2fdev%2fnull%20rw%20DeviceAllow%3d%2fdev%2fnet%2ftun%20rw%20ProtectSystem%3dtrue%20ProtectHome%3dtrue%20KillMode%3dprocess%20RestartSec%3d5s%20Restart%3don-failure%20%5bInstall%5d%20WantedBy%3dmulti-user.">
-      <i class="fab fa-tumblr fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-  <li>
-    <a class="icon" href="https://news.ycombinator.com/submitlink?u=https%3a%2f%2fechorand.me%2fposts%2ffedora-openvpn-systemd%2f&t=Setting%20up%20OpenVPN%20client%20with%20systemd%20template%20unit%20files">
-      <i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i>
-    </a>
-  </li>
-</ul>
-
-    </div>
-
-    <div id="actions-footer">
-      
-        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;">
-          <i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
-        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;">
-          <i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
-        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;">
-          <i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> share</a>
-        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');">
-          <i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
-    </div>
-
-  </div>
-</div>
-
-
-  <footer id="footer">
-  <div class="footer-left">
-    Copyright  &copy; 2021  Exploring Software 
-  </div>
-  <div class="footer-right">
-    <nav>
-      <ul>
-         
-        <li><a href="/about">About</a></li>
-         
-        <li><a href="/articles">Articles</a></li>
-         
-        <li><a href="/books">Books</a></li>
-         
-        <li><a href="/posts">Posts</a></li>
-         
-        <li><a href="/talks">Talks</a></li>
-         
-        <li><a href="/categories/">Categories</a></li>
-        
-      </ul>
-    </nav>
-  </div>
 </footer>
-
-
-  </div>
 </body>
-
-<link rel="stylesheet" href=/lib/font-awesome/css/all.min.css>
-<script src=/lib/jquery/jquery.min.js></script>
-<script src=/js/main.js></script>
-
-
-
 </html>
