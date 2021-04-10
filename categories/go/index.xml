@@ -23,7 +23,7 @@ Let&amp;rsquo;s see a pattern for implementing concurrency safe file access in G
       <pubDate>Sun, 20 Dec 2020 00:00:00 +0000</pubDate>
       
       <guid>https://echorand.me/posts/go-embed/</guid>
-      <description>Go 1.16 Release Candidate 1 was announced recently and the most exciting feature for me in this release is the new &amp;ldquo;embed&amp;rdquo; package which allows you to embed a file contents as part of the Go application binary.
+      <description>The most exciting feature for me in the Go 1.16 release is the new &amp;ldquo;embed&amp;rdquo; package which allows you to embed a file contents as part of the Go application binary.
 This ability so far was most easily available via using various third party packages and they worked great. You could also use go generate to roll out your own solution, if needed. However, now having this facility in the form of a standard library package is great news.</description>
     </item>
     
