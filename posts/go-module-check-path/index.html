@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="echo $RANDOM. Exploring Software and writing about it.">
+    
+    <link rel="shortcut icon" href="https://echorand.me/favicon.ico">
+    
+    <link rel="stylesheet" href="/css/style.min.css">
+
+    <title>Check Go Module Path Validity</title>
+</head>
+<body><header id="banner">
+    <h2><a href="https://echorand.me">Exploring Software</a></h2>
+    <nav>
+        <ul>
+            <li>
+                <a href="/about" title="">About</a>
+            </li><li>
+                <a href="/articles" title="">Articles</a>
+            </li><li>
+                <a href="/books" title="">Books</a>
+            </li><li>
+                <a href="/posts" title="">Posts</a>
+            </li><li>
+                <a href="/talks" title="">Talks</a>
+            </li><li>
+                <a href="/categories/" title="">Categories</a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main id="content">
+<article>
+    <header id="post-header">
+        <h1>Check Go Module Path Validity</h1><time>April 15, 2021</time></header><p>The Go module path enforces certain restrictions as expected on what constitutes a valid path.
+Try running <code>go mod init https://foo.bar/baz</code> for example.</p>
+<p>Now, what if you as a Go programmer needed to run this check yourself? That&rsquo;s where the
+<a href="https://pkg.go.dev/golang.org/x/mod/module">golang.org/x/mod/</a> package comes in.
+It has a number of functions, one of them being the <a href="https://pkg.go.dev/golang.org/x/mod/module#Check">CheckPath</a>
+function, which you can use as follows:</p>
+<pre><code>// Using Go 1.16
+package main
+
+import (
+	&quot;fmt&quot;
+	&quot;golang.org/x/mod/module&quot;
+)
+
+func main() {
+	err := module.CheckPath(&quot;https://github.com/foo/bar&quot;)
+	fmt.Printf(&quot;%v\n&quot;, err)
+}
+</code></pre><p>Running the above will print an error as the module path is invalid:</p>
+<pre><code>malformed module path &quot;https/github.com/foo/bar&quot;: missing dot in first path element
+</code></pre><p>Here&rsquo;s a <a href="https://play.golang.org/p/PNDgARMYLrZ">Playground link</a>.</p>
+<p>Initially i thought, it was just because <code>https://</code> was a protocol specifier, but the restrictions
+are broader, so always great to be able to do that using the <a href="https://pkg.go.dev/golang.org/x/mod/module">golang.org/x/mod/</a> package.</p>
+</article>
+
+        </main><footer id="footer">
+    
+</footer>
+</body>
+</html>

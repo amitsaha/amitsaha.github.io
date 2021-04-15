@@ -6,9 +6,22 @@
     <description>Recent content in Categories on Exploring Software</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 18 Jan 2021 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 15 Apr 2021 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://echorand.me/categories/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    
+    <item>
+      <title>Check Go Module Path Validity</title>
+      <link>https://echorand.me/posts/go-module-check-path/</link>
+      <pubDate>Thu, 15 Apr 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/go-module-check-path/</guid>
+      <description>The Go module path enforces certain restrictions as expected on what constitutes a valid path. Try running go mod init https://foo.bar/baz for example.
+Now, what if you as a Go programmer needed to run this check yourself? That&amp;rsquo;s where the golang.org/x/mod/ package comes in. It has a number of functions, one of them being the CheckPath function, which you can use as follows:
+// Using Go 1.16 package main import ( &amp;quot;fmt&amp;quot; &amp;quot;golang.</description>
+    </item>
     
     
     
