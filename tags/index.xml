@@ -206,7 +206,7 @@ I shared my experience and some examples in a talk at the combined Golang/Women 
     
     
     <item>
-      <title>Jenkins Docker Workflow plugin - A look inside `inside()`</title>
+      <title>Jenkins Docker Workflow plugin - A look at inside()</title>
       <link>https://echorand.me/posts/jenkins-docker-workflow-inside/</link>
       <pubDate>Tue, 26 Nov 2019 00:00:00 +0000</pubDate>
       
