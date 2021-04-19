@@ -4,7 +4,7 @@
   
   <url>
     <loc>https://echorand.me/categories/</loc>
-    <lastmod>2021-04-19T13:55:05+10:00</lastmod>
+    <lastmod>2021-04-19T13:55:45+10:00</lastmod>
   </url>
   
   <url>
@@ -14,17 +14,17 @@
   
   <url>
     <loc>https://echorand.me/</loc>
-    <lastmod>2021-04-19T13:55:05+10:00</lastmod>
+    <lastmod>2021-04-19T13:55:45+10:00</lastmod>
   </url>
   
   <url>
     <loc>https://echorand.me/categories/go/</loc>
-    <lastmod>2021-04-19T13:55:05+10:00</lastmod>
+    <lastmod>2021-04-19T13:55:45+10:00</lastmod>
   </url>
   
   <url>
     <loc>https://echorand.me/posts/</loc>
-    <lastmod>2021-04-19T13:55:05+10:00</lastmod>
+    <lastmod>2021-04-19T13:55:45+10:00</lastmod>
   </url>
   
   <url>
@@ -64,12 +64,7 @@
   
   <url>
     <loc>https://echorand.me/posts/getting-started-with-golang-plugins/</loc>
-    <lastmod>2020-05-26T20:04:00+10:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://echorand.me/categories/golang/</loc>
-    <lastmod>2020-09-22T19:17:58+10:00</lastmod>
+    <lastmod>2021-04-19T13:55:45+10:00</lastmod>
   </url>
   
   <url>
@@ -115,6 +110,11 @@
   <url>
     <loc>https://echorand.me/posts/correlated-error-logging/</loc>
     <lastmod>2020-10-10T10:03:44+11:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://echorand.me/categories/golang/</loc>
+    <lastmod>2020-09-22T19:17:58+10:00</lastmod>
   </url>
   
   <url>
