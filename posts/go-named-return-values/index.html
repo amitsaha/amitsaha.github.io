@@ -8,7 +8,7 @@
     
     <link rel="stylesheet" href="/css/style.min.css">
 
-    <title>defer() and named return values in Go</title>
+    <title>Named return values in Go</title>
 </head>
 <body><header id="banner">
     <h2><a href="https://echorand.me">Exploring Software</a></h2>
@@ -33,7 +33,7 @@
 <main id="content">
 <article>
     <header id="post-header">
-        <h1>defer() and named return values in Go</h1><time>July 5, 2021</time></header><p>In Go, there are a couple of ways to return values from a function.</p>
+        <h1>Named return values in Go</h1><time>July 5, 2021</time></header><p>In Go, there are a couple of ways to return values from a function.</p>
 <h2 id="non-named-return-values">Non-named return values</h2>
 <p>Until today, I had been exclusively using the following style of what i am going
 to refer to as &ldquo;Non-named return values&rdquo;:</p>
@@ -55,12 +55,26 @@ Then in your code, you return those values.</p>
 <li>Declares two variables - <code>i</code> of type <code>int</code> and <code>e</code> of type <code>error</code></li>
 </ol>
 <p>Now, when a <code>return</code> statement is encountered, the latest value stored in <code>i</code>
-and <code>e</code> are the returned values from this function.</p>
+and <code>e</code> are the returned values from this function. The above is meant
+to be a demonstration of using named values, but let&rsquo;s consider for a moment
+if there is any reason to prefer this over the &ldquo;non-named&rdquo; version.</p>
+<p>I will list the pros first:</p>
+<ol>
+<li>I do like declaring the variables along with the function signature, automatically giving the variables a function scope</li>
+<li>Returning from the function is, simply writing <code>return</code></li>
+</ol>
+<p>And the cons are:</p>
+<ol>
+<li><code>return</code> is also valid in a function when it returns no values, so code reading can be an ambiguous exercise</li>
+<li>What if i mistakenly used one of the variables that i want to return for some temporary calculation forgetting that
+its value will be returned</li>
+<li>I have also got used to writing &ldquo;explicit&rdquo; return statements, so it helps my code readability</li>
+</ol>
+<p>(They aren&rsquo;t very well defined, as I am still sort of thinking about it)</p>
+<p>So, as of this post, i have only found one reason to use named return values - primarily because it&rsquo;s the only way.</p>
 <h2 id="why-would-i-use-named-return-values">Why would I use Named return values?</h2>
-<p>Till today, i hadn&rsquo;t quite understood why i may need to use named return values
-and so never used them in any of my code. However, today I was writing gRPC interceptors
-for my book and i had to use <code>recover()</code> to handle <code>panic()</code> in a deferred function call.
-I came across the usefulness of named return values while going through some
+<p>Today I was writing gRPC interceptors for my book and i wanted to use <code>recover()</code> to &ldquo;handle&rdquo; <code>panic()</code>
+in a deferred function call. I came across the usefulness of named return values while going through some
 <a href="https://github.com/grpc-ecosystem/go-grpc-middleware">examples</a>.</p>
 <p>This technique is well described in the <a href="https://blog.golang.org/defer-panic-and-recover">Defer, Panic, and Recover</a> blog
 post as - &ldquo;Deferred functions may read and assign to the returning function&rsquo;s named return values.&rdquo;</p>
@@ -121,12 +135,12 @@ I: 0
 Err: &lt;nil&gt;
 </code></pre><p>In the second case, the values returned are the <code>nil</code> values of the <code>int</code> and <code>error</code> types - <code>0</code>
 and <code>nil</code> respectively.</p>
-<p>The way I see it, named return values give the application authors chance to set desired
-safe/default values that are eventually returned from the function that encountered the
+<p>The way I see it, for this use-case named return values give the application authors chance to set
+desired safe/default values that are eventually returned from the function that encountered the
 panic.</p>
 </article>
 <footer id="footer">
-    Post managed in a <a href="https://github.com/amitsaha/echorand.me">git repo</a> | <a href="https://github.com/amitsaha/echorand.me/commit/324d732da64a7e48ba8b48b71189b8631fa2180c">Last Commit on this post </a>
+    Post managed in a <a href="https://github.com/amitsaha/echorand.me">git repo</a> | <a href="https://github.com/amitsaha/echorand.me/commit/c67167d06ce4ae34851472e42ad77035cb03e965">Last Commit on this post </a>
   | <a href="https://github.com/amitsaha/echorand.me/edit/master/content/posts/go-named-return-values.md">Edit post</a>
     <p>
     Blog managed via <a href="https://gohugo.io/">Hugo</a> and using a modified version of the <a href="https://themes.gohugo.io/etch/">Etch</a> theme.

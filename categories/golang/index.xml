@@ -13,7 +13,7 @@
     
     
     <item>
-      <title>defer() and named return values in Go</title>
+      <title>Named return values in Go</title>
       <link>https://echorand.me/posts/go-named-return-values/</link>
       <pubDate>Mon, 05 Jul 2021 00:00:00 +0000</pubDate>
       
