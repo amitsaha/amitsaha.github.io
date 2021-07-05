@@ -6,9 +6,22 @@
     <description>Recent content in go on Exploring Software</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 15 Apr 2021 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 05 Jul 2021 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://echorand.me/categories/go/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    
+    <item>
+      <title>defer() and named return values in Go</title>
+      <link>https://echorand.me/posts/go-named-return-values/</link>
+      <pubDate>Mon, 05 Jul 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/go-named-return-values/</guid>
+      <description>In Go, there are a couple of ways to return values from a function.
+Non-named return values Until today, I had been exclusively using the following style of what i am going to refer to as &amp;ldquo;Non-named return values&amp;rdquo;:
+func myFunc() (int, error) { return 1, errors.New(&amp;#34;An error&amp;#34;) } You declare in the function signature that you will be returning an int and and an error. Then in your code, you return those values.</description>
+    </item>
     
     
     

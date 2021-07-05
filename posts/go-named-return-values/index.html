@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="echo $RANDOM. Exploring Software and writing about it.">
+    
+    <link rel="shortcut icon" href="https://echorand.me/favicon.ico">
+    
+    <link rel="stylesheet" href="/css/style.min.css">
+
+    <title>defer() and named return values in Go</title>
+</head>
+<body><header id="banner">
+    <h2><a href="https://echorand.me">Exploring Software</a></h2>
+    <nav>
+        <ul>
+            <li>
+                <a href="/about" title="">About</a>
+            </li><li>
+                <a href="/articles" title="">Articles</a>
+            </li><li>
+                <a href="/books" title="">Books</a>
+            </li><li>
+                <a href="/posts" title="">Posts</a>
+            </li><li>
+                <a href="/talks" title="">Talks</a>
+            </li><li>
+                <a href="/categories/" title="">Categories</a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main id="content">
+<article>
+    <header id="post-header">
+        <h1>defer() and named return values in Go</h1><time>July 5, 2021</time></header><p>In Go, there are a couple of ways to return values from a function.</p>
+<h2 id="non-named-return-values">Non-named return values</h2>
+<p>Until today, I had been exclusively using the following style of what i am going
+to refer to as &ldquo;Non-named return values&rdquo;:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">myFunc</span>() (<span style="color:#66d9ef">int</span>, <span style="color:#66d9ef">error</span>) {
+        <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">1</span>, <span style="color:#a6e22e">errors</span>.<span style="color:#a6e22e">New</span>(<span style="color:#e6db74">&#34;An error&#34;</span>)
+}
+</code></pre></div><p>You declare in the function signature that you will be returning an <code>int</code> and and an <code>error</code>.
+Then in your code, you return those values.</p>
+<h2 id="named-return-values">Named return values</h2>
+<p>Using the &ldquo;named return values&rdquo; approach, the above function would be written as:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">myFunc</span>() (<span style="color:#a6e22e">i</span> <span style="color:#66d9ef">int</span>, <span style="color:#a6e22e">e</span> <span style="color:#66d9ef">error</span>) {
+        <span style="color:#a6e22e">i</span> = <span style="color:#ae81ff">1</span>
+        <span style="color:#a6e22e">e</span> = <span style="color:#a6e22e">errors</span>.<span style="color:#a6e22e">New</span>(<span style="color:#e6db74">&#34;An error&#34;</span>)
+        <span style="color:#66d9ef">return</span>
+}
+</code></pre></div><p>The updated function signature essentially does two things:</p>
+<ol>
+<li>It says that the function will return an <code>int</code> and an <code>error</code></li>
+<li>Declares two variables - <code>i</code> of type <code>int</code> and <code>e</code> of type <code>error</code></li>
+</ol>
+<p>Now, when a <code>return</code> statement is encountered, the latest value stored in <code>i</code>
+and <code>e</code> are the returned values from this function.</p>
+<h2 id="why-would-i-use-named-return-values">Why would I use Named return values?</h2>
+<p>Till today, i hadn&rsquo;t quite understood why i may need to use named return values
+and so never used them in any of my code. However, today I was writing gRPC interceptors
+for my book and i had to use <code>recover()</code> to handle <code>panic()</code> in a deferred function call.
+I came across the usefulness of named return values while going through some
+<a href="https://github.com/grpc-ecosystem/go-grpc-middleware">examples</a>.</p>
+<p>This technique is well described in the <a href="https://blog.golang.org/defer-panic-and-recover">Defer, Panic, and Recover</a> blog
+post as - &ldquo;Deferred functions may read and assign to the returning function&rsquo;s named return values.&rdquo;</p>
+<p>Let&rsquo;s consider an updated <code>myFunc()</code>:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go">
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">myFunc</span>(<span style="color:#a6e22e">msg</span> <span style="color:#66d9ef">string</span>) (<span style="color:#a6e22e">i</span> <span style="color:#66d9ef">int</span>, <span style="color:#a6e22e">e</span> <span style="color:#66d9ef">error</span>) {
+	<span style="color:#a6e22e">i</span> = <span style="color:#ae81ff">1</span>
+	<span style="color:#66d9ef">defer</span> <span style="color:#66d9ef">func</span>() {
+		<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">r</span> <span style="color:#f92672">:=</span> recover(); <span style="color:#a6e22e">r</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+			<span style="color:#a6e22e">e</span> = <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Errorf</span>(<span style="color:#e6db74">&#34;Error recovered: %v&#34;</span>, <span style="color:#a6e22e">r</span>)
+		}
+
+	}()
+	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">msg</span> <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;panic&#34;</span> {
+		panic(<span style="color:#e6db74">&#34;Panicked!&#34;</span>)
+	}
+	<span style="color:#a6e22e">i</span> = <span style="color:#ae81ff">2</span>
+	<span style="color:#66d9ef">return</span>
+}
+</code></pre></div><p>We setup a deferred function call where in we call <code>recover()</code> and set the error value, <code>e</code>
+to the recovered error.</p>
+<p>If the string argument, <code>msg</code> is equal to <code>panic</code>, we call the <code>panic()</code> function.</p>
+<p>Else, we set the value of <code>i</code> to 2 and call <code>return</code>.</p>
+<p>(<a href="https://play.golang.org/p/D4g877Ft2_i">Go playground link</a>)</p>
+<p>Now, if we call the function as <code>i, e := myFunc(&quot;don't panic&quot;)</code>, the output will be:</p>
+<pre><code>I: 2 
+Err: &lt;nil&gt;
+</code></pre><p>If we call the function as <code>i, e = myFunc(&quot;panic&quot;)</code>, the output will be:</p>
+<pre><code>I: 1 
+Err: Error recovered: Panicked!
+</code></pre><p>We need to use named return values technique here, because of one primary reason:
+<em>return</em> values from a <code>defer</code>-red function call are discarded. If you update
+<code>myFunc()</code> to be as follows: (<a href="https://play.golang.org/p/vTTZzuvzVgw">Playground link</a>)</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go">
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">myFunc</span>(<span style="color:#a6e22e">msg</span> <span style="color:#66d9ef">string</span>) (<span style="color:#66d9ef">int</span>, <span style="color:#66d9ef">error</span>) {
+	<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">i</span> <span style="color:#66d9ef">int</span>
+	<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">e</span> <span style="color:#66d9ef">error</span>
+	<span style="color:#a6e22e">i</span> = <span style="color:#ae81ff">1</span>
+	<span style="color:#66d9ef">defer</span> <span style="color:#66d9ef">func</span>() (<span style="color:#66d9ef">int</span>, <span style="color:#66d9ef">error</span>) {
+		<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">r</span> <span style="color:#f92672">:=</span> recover(); <span style="color:#a6e22e">r</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+			<span style="color:#a6e22e">e</span> = <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Errorf</span>(<span style="color:#e6db74">&#34;Error recovered: %v&#34;</span>, <span style="color:#a6e22e">r</span>)
+			<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">i</span>, <span style="color:#a6e22e">e</span>
+		}
+		<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">i</span>, <span style="color:#a6e22e">e</span>
+
+	}()
+	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">msg</span> <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;panic&#34;</span> {
+		panic(<span style="color:#e6db74">&#34;Panicked!&#34;</span>)
+	}
+	<span style="color:#a6e22e">i</span> = <span style="color:#ae81ff">2</span>
+	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">i</span>, <span style="color:#a6e22e">e</span>
+}
+</code></pre></div><p>The output of the same two function calls will be:</p>
+<pre><code>I: 2 
+Err: &lt;nil&gt;
+
+I: 0 
+Err: &lt;nil&gt;
+</code></pre><p>In the second case, the values returned are the <code>nil</code> values of the <code>int</code> and <code>error</code> types - <code>0</code>
+and <code>nil</code> respectively.</p>
+<p>The way I see it, named return values give the application authors chance to set desired
+safe/default values that are eventually returned from the function that encountered the
+panic.</p>
+</article>
+<footer id="footer">
+    Post managed in a <a href="https://github.com/amitsaha/echorand.me">git repo</a> | <a href="https://github.com/amitsaha/echorand.me/commit/324d732da64a7e48ba8b48b71189b8631fa2180c">Last Commit on this post </a>
+  | <a href="https://github.com/amitsaha/echorand.me/edit/master/content/posts/go-named-return-values.md">Edit post</a>
+    <p>
+    Blog managed via <a href="https://gohugo.io/">Hugo</a> and using a modified version of the <a href="https://themes.gohugo.io/etch/">Etch</a> theme.
+    </p>  
+</footer>
+
+        </main><footer id="footer">
+    
+</footer>
+</body>
+</html>
