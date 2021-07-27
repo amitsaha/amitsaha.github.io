@@ -638,17 +638,17 @@
   </url>
   
   <url>
-    <loc>https://echorand.me/articles/</loc>
-    <lastmod>2021-07-12T08:09:28+10:00</lastmod>
-  </url>
-  
-  <url>
     <loc>https://echorand.me/tags/</loc>
   </url>
   
   <url>
     <loc>https://echorand.me/talks/</loc>
     <lastmod>2021-06-30T18:47:59+10:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://echorand.me/writings-trainings/</loc>
+    <lastmod>2021-07-28T08:07:47+10:00</lastmod>
   </url>
   
 </urlset>
