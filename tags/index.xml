@@ -332,8 +332,6 @@ Application Logs -&amp;gt; Fluentd (logging) -&amp;gt; Nginx -&amp;gt; ElasticSe
     
     
     
-    
-    
     <item>
       <title>Nginx and geoip lookup with geoip2 module</title>
       <link>https://echorand.me/posts/nginx-geoip2-mmdblookup/</link>
