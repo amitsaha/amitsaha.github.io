@@ -8,7 +8,7 @@
     
     <link rel="stylesheet" href="/css/style.min.css">
 
-    <title>Examples of consuming data in Golang templates</title>
+    <title>Examples of consuming data in Go templates</title>
 </head>
 <body><header id="banner">
     <h2><a href="https://echorand.me">Exploring Software</a></h2>
@@ -31,8 +31,8 @@
 <main id="content">
 <article>
     <header id="post-header">
-        <h1>Examples of consuming data in Golang templates</h1><time>September 18, 2018</time></header><p>While working on creating a template file for a Golang project, I wanted to better understand how to work
-with data in Golang templates as available via the <code>html/template</code> package. In this post, I discuss
+        <h1>Examples of consuming data in Go templates</h1><time>September 18, 2018</time></header><p>While working on creating a template file for a Go project, I wanted to better understand how to work
+with data in Go templates as available via the <code>html/template</code> package. In this post, I discuss
 a few use cases that may arise.</p>
 <h1 id="accessing-a-variable">Accessing a variable</h1>
 <p>Let&rsquo;s consider our first program:</p>
@@ -186,7 +186,7 @@ extra checks.</p>
 <pre><code>tmpl, err := tmpl.Parse(&quot;{{range .}}{{.Name}} has an {{len .Name | oddOrEven}} name \n{{end}}&quot;)
 </code></pre><p>Here, we invoke the in-built <code>len</code> function to calculate the length of <code>Name</code> and then call the <code>oddOrEven</code> function.</p>
 <h1 id="controlling-output-using-template-strings">Controlling output using template strings</h1>
-<p>My first encounter with Golang templates was when working with <a href="https://docs.docker.com/config/formatting/">docker</a> output
+<p>My first encounter with Go templates was when working with <a href="https://docs.docker.com/config/formatting/">docker</a> output
 formatting which allowed controlling what I get as output. Let&rsquo;s see how we can implement something like that
 for our program. The entire program is <a href="https://github.com/amitsaha/golang-templates-demo/blob/master/format-output/test.go">here</a>.</p>
 <p>When we run it without passing any arguments:</p>
@@ -253,7 +253,7 @@ Nodes:
 but it seems like a hit and trial thing!</p>
 <h1 id="accessing-a-map-object">Accessing a map object</h1>
 <p>Complete example <a href="https://play.golang.org/p/4kz3Ji_56s9">here</a>. You will see that by default <code>range .</code> iterates
-over the map&rsquo;s values, rather than keys (opposite of what we see in the Golang language).</p>
+over the map&rsquo;s values, rather than keys (opposite of what we see in the Go language).</p>
 <h1 id="explore">Explore</h1>
 <p>There&rsquo;s a lot more to explore in Golang templates. Check out:</p>
 <ul>
@@ -262,7 +262,7 @@ over the map&rsquo;s values, rather than keys (opposite of what we see in the Go
 </ul>
 </article>
 <footer id="footer">
-    Post managed in a <a href="https://github.com/amitsaha/echorand.me">git repo</a> | <a href="https://github.com/amitsaha/echorand.me/commit/6a40e300afbd6c28ccd84c8478903e1ca9aa13d5">Last Commit on this post </a>
+    Post managed in a <a href="https://github.com/amitsaha/echorand.me">git repo</a> | <a href="https://github.com/amitsaha/echorand.me/commit/0b20e64311d7d0a24f441e8f4699fed366525fba">Last Commit on this post </a>
   | <a href="https://github.com/amitsaha/echorand.me/edit/master/content/posts/golang-templates.md">Edit post</a>
     <p>
     Blog managed via <a href="https://gohugo.io/">Hugo</a> and using a modified version of the <a href="https://themes.gohugo.io/etch/">Etch</a> theme.

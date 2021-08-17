@@ -219,13 +219,13 @@ Introduction In a service oriented architecture, more popular these days as a mi
     
     
     <item>
-      <title>Using Golang for automating infrastructure and operations work</title>
+      <title>Using Go for automating infrastructure and operations work</title>
       <link>https://echorand.me/posts/golang-ops-automation/</link>
       <pubDate>Sat, 07 Dec 2019 00:00:00 +0000</pubDate>
       
       <guid>https://echorand.me/posts/golang-ops-automation/</guid>
       <description>Since around 1.5 years ago, I have been working in roles which has required to automate various things usually classified as &amp;ldquo;infrastructure and operations&amp;rdquo; work. Sometimes they have involved working with cloud infrastructure and at other times they have involved interacting with databases and other services via HTTP APIs. During this period, to solve such tasks I have started using the Go programming language to implement these things.
-I shared my experience and some examples in a talk at the combined Golang/Women who Go and Infrastructure as code meetup in Sydney.</description>
+I shared my experience and some examples in a talk at the combined Go/Women who Go and Infrastructure as code meetup in Sydney.</description>
     </item>
     
     
@@ -553,12 +553,12 @@ Okay, let&amp;rsquo;s try cleaning it - a destructive process potentially, but t
     
     
     <item>
-      <title>Examples of consuming data in Golang templates</title>
+      <title>Examples of consuming data in Go templates</title>
       <link>https://echorand.me/posts/golang-templates/</link>
       <pubDate>Tue, 18 Sep 2018 00:00:00 +0000</pubDate>
       
       <guid>https://echorand.me/posts/golang-templates/</guid>
-      <description>While working on creating a template file for a Golang project, I wanted to better understand how to work with data in Golang templates as available via the html/template package. In this post, I discuss a few use cases that may arise.
+      <description>While working on creating a template file for a Go project, I wanted to better understand how to work with data in Go templates as available via the html/template package. In this post, I discuss a few use cases that may arise.
 Accessing a variable Let&amp;rsquo;s consider our first program:
 package main import ( &amp;quot;html/template&amp;quot; &amp;quot;log&amp;quot; &amp;quot;os&amp;quot; ) func main() { var names = []string{&amp;quot;Tabby&amp;quot;, &amp;quot;Jill&amp;quot;} tmpl := template.New(&amp;quot;test&amp;quot;) tmpl, err := tmpl.</description>
     </item>
@@ -777,12 +777,12 @@ $ sudo dnf install python*-networkx scilab sagemath rkward The reason for the ab
     
     
     <item>
-      <title>Automatic building and publishing DEB packages for Golang applications</title>
+      <title>Automatic building and publishing DEB packages for Go applications</title>
       <link>https://echorand.me/posts/automate-deb-package-packagecloud/</link>
       <pubDate>Sat, 24 Feb 2018 00:00:00 +0000</pubDate>
       
       <guid>https://echorand.me/posts/automate-deb-package-packagecloud/</guid>
-      <description>In my earlier post, Quick and dirty debian packages for your Golang application I shared a recipe building DEB packages for Golang applications. We are going to see the following things in this post building upon our recipe in that post:
+      <description>In my earlier post, Quick and dirty debian packages for your Go application I shared a recipe building DEB packages for Go applications. We are going to see the following things in this post building upon our recipe in that post:
  Building the DEB packages in Travis CI Publishing the DEB package to packagecloud.io  The primary assumption in my first post was using dep for dependency management. That still holds here.</description>
     </item>
     
@@ -1099,12 +1099,12 @@ $ sudo docker network create --driver bridge webapp1 The first container which w
     
     
     <item>
-      <title>HandlerFunc, Handle and DefaultServeMux in Golang</title>
+      <title>HandlerFunc, Handle and DefaultServeMux in Go</title>
       <link>https://echorand.me/posts/golang-dissecting-listen-and-serve/</link>
       <pubDate>Wed, 26 Apr 2017 00:00:00 +0000</pubDate>
       
       <guid>https://echorand.me/posts/golang-dissecting-listen-and-serve/</guid>
-      <description>Introduction My aim in this post is to discuss three &amp;ldquo;concepts&amp;rdquo; in Golang that I come across while writing HTTP servers. Through this post, my aim to get rid of my own lack of understanding (at least to a certain degree) about these. Hopefully, it will be of use to others too.. The understanding will help you write better unit tests for your handlers as well as shown in this blog post.</description>
+      <description>Introduction My aim in this post is to discuss three &amp;ldquo;concepts&amp;rdquo; in Go that I come across while writing HTTP servers. Through this post, my aim to get rid of my own lack of understanding (at least to a certain degree) about these. Hopefully, it will be of use to others too.. The understanding will help you write better unit tests for your handlers as well as shown in this blog post.</description>
     </item>
     
     
@@ -1158,7 +1158,7 @@ QueueHandler however sets exc_info attribute of a LogRecord to None since it is 
     
     
     <item>
-      <title>Setup Golang 1.8 and gb on Fedora (and other Linux distributions)</title>
+      <title>Setup Go 1.8 and gb on Fedora (and other Linux distributions)</title>
       <link>https://echorand.me/posts/golang-setup-1.8/</link>
       <pubDate>Wed, 01 Mar 2017 00:00:00 +0000</pubDate>
       
@@ -1170,7 +1170,7 @@ Install the Go 1.8 compiler and other tools (gofmt, for eaxmple), collectively r
     
     
     <item>
-      <title>Setup Golang on Fedora 24 (and other Linux distributions)</title>
+      <title>Setup Go on Fedora 24 (and other Linux distributions)</title>
       <link>https://echorand.me/posts/golang-setup/</link>
       <pubDate>Thu, 23 Jun 2016 00:00:00 +0000</pubDate>
       

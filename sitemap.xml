@@ -4,32 +4,27 @@
   
   <url>
     <loc>https://echorand.me/categories/</loc>
-    <lastmod>2021-08-07T08:16:39+10:00</lastmod>
+    <lastmod>2021-08-17T02:26:43+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://echorand.me/</loc>
-    <lastmod>2021-08-07T08:16:39+10:00</lastmod>
+    <lastmod>2021-08-17T02:26:43+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://echorand.me/categories/go/</loc>
-    <lastmod>2021-08-07T08:16:39+10:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://echorand.me/categories/golang/</loc>
-    <lastmod>2021-08-07T08:16:39+10:00</lastmod>
+    <lastmod>2021-08-17T02:26:43+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://echorand.me/posts/</loc>
-    <lastmod>2021-08-07T08:16:39+10:00</lastmod>
+    <lastmod>2021-08-17T02:26:43+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://echorand.me/posts/go-contexts/</loc>
-    <lastmod>2021-08-07T08:16:39+10:00</lastmod>
+    <lastmod>2021-08-17T02:26:43+00:00</lastmod>
   </url>
   
   <url>
@@ -129,7 +124,7 @@
   
   <url>
     <loc>https://echorand.me/posts/golang-ops-automation/</loc>
-    <lastmod>2019-12-07T17:21:39+11:00</lastmod>
+    <lastmod>2021-08-17T02:26:43+00:00</lastmod>
   </url>
   
   <url>
@@ -284,7 +279,7 @@
   
   <url>
     <loc>https://echorand.me/posts/golang-templates/</loc>
-    <lastmod>2019-07-11T16:52:00+10:00</lastmod>
+    <lastmod>2021-08-17T02:26:43+00:00</lastmod>
   </url>
   
   <url>
@@ -374,7 +369,7 @@
   
   <url>
     <loc>https://echorand.me/posts/automate-deb-package-packagecloud/</loc>
-    <lastmod>2019-07-11T16:52:00+10:00</lastmod>
+    <lastmod>2021-08-17T02:26:43+00:00</lastmod>
   </url>
   
   <url>
@@ -514,7 +509,7 @@
   
   <url>
     <loc>https://echorand.me/posts/golang-dissecting-listen-and-serve/</loc>
-    <lastmod>2020-07-27T18:02:06+10:00</lastmod>
+    <lastmod>2021-08-17T02:26:43+00:00</lastmod>
   </url>
   
   <url>
@@ -539,12 +534,12 @@
   
   <url>
     <loc>https://echorand.me/posts/golang-setup-1.8/</loc>
-    <lastmod>2019-06-17T14:58:57+10:00</lastmod>
+    <lastmod>2021-08-17T02:26:43+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://echorand.me/posts/golang-setup/</loc>
-    <lastmod>2019-06-17T14:58:57+10:00</lastmod>
+    <lastmod>2021-08-17T02:26:43+00:00</lastmod>
   </url>
   
   <url>
@@ -563,13 +558,18 @@
   </url>
   
   <url>
+    <loc>https://echorand.me/categories/golang/</loc>
+    <lastmod>2019-06-17T14:58:57+10:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://echorand.me/posts/libcontainer-runc-fedora-24/</loc>
     <lastmod>2019-06-17T14:58:57+10:00</lastmod>
   </url>
   
   <url>
     <loc>https://echorand.me/posts/go_image_cropping/</loc>
-    <lastmod>2019-06-17T14:58:57+10:00</lastmod>
+    <lastmod>2021-08-17T02:26:43+00:00</lastmod>
   </url>
   
   <url>
