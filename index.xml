@@ -6,9 +6,23 @@
     <description>Recent content on Exploring Software</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 07 Aug 2021 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 13 Sep 2021 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://echorand.me/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    
+    <item>
+      <title>PyCon AU 2021 Talk - Planning for Failure using Chaos Engineering</title>
+      <link>https://echorand.me/posts/chaos-engineering-talk/</link>
+      <pubDate>Mon, 13 Sep 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/chaos-engineering-talk/</guid>
+      <description>I delivered a talk at the recently concluded PyCon Australia conference.
+Amazing conference, great work by the organizers and everybody involved. Fantastic experience!
+My talk My talk was in the DevOops track titled “Planning for Failure using Chaos Engineering”.
+Since I joined Atlassian, I have come to realize the value chaos engineering/wargaming brings to the table when it comes to assess the production readiness of your services. However, as I discuss in the talk, it’s not really just about your software’s readiness, it is also about your people systems.</description>
+    </item>
     
     
     
@@ -57,21 +71,6 @@ Now, what if you as a Go programmer needed to run this check yourself? That&amp;
       <guid>https://echorand.me/posts/go-file-mutex/</guid>
       <description>Using a file for persistent storage (and not a database - datastore/object store) sounds like an academic exercise. For me, it brings back memories of writing a structure in C (programming language) to a file to simulate a student record database. However, there may be situations where you may just get by using it especially when you just want to run a single copy of your application.
 Let&amp;rsquo;s see a pattern for implementing concurrency safe file access in Go using sync.</description>
-    </item>
-    
-    
-    
-    <item>
-      <title>Notes on Chaos Engineering</title>
-      <link>https://echorand.me/posts/chaos-engineering/</link>
-      <pubDate>Thu, 31 Dec 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://echorand.me/posts/chaos-engineering/</guid>
-      <description>I have been exploring Chaos engineering as it applies to software systems this year.
-As I explored further, I really got interested into it.
-Next, I point to various references that I have found useful so far.
-Theory  Principles of Chaos Engineering describes the fundamental principles of chaos engineering. Chaos Engineering by Casey Rosenthal, Nora Jones  Talks Identifyingn Hidden Dependencies
- Continuous verification Test your recover procedures Practice controlled experiments  Why SREs can&amp;rsquo;t afford to NOT do Chaos Engineering</description>
     </item>
     
     
