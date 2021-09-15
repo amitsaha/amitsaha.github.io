@@ -4,21 +4,31 @@
   
   <url>
     <loc>https://echorand.me/categories/</loc>
-    <lastmod>2021-09-13T14:31:24+10:00</lastmod>
+    <lastmod>2021-09-15T11:40:19+10:00</lastmod>
   </url>
   
   <url>
     <loc>https://echorand.me/</loc>
-    <lastmod>2021-09-13T14:31:24+10:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://echorand.me/categories/infrastructure/</loc>
-    <lastmod>2021-09-13T14:31:24+10:00</lastmod>
+    <lastmod>2021-09-15T11:40:19+10:00</lastmod>
   </url>
   
   <url>
     <loc>https://echorand.me/posts/</loc>
+    <lastmod>2021-09-15T11:40:19+10:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://echorand.me/categories/software/</loc>
+    <lastmod>2021-09-15T11:40:19+10:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://echorand.me/posts/computing-transparency/</loc>
+    <lastmod>2021-09-15T11:40:19+10:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://echorand.me/categories/infrastructure/</loc>
     <lastmod>2021-09-13T14:31:24+10:00</lastmod>
   </url>
   
@@ -85,11 +95,6 @@
   <url>
     <loc>https://echorand.me/posts/fluentbit-kubernetes/</loc>
     <lastmod>2020-05-07T11:07:41+10:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://echorand.me/categories/software/</loc>
-    <lastmod>2020-10-10T10:03:44+11:00</lastmod>
   </url>
   
   <url>

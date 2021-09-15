@@ -13,6 +13,17 @@
     
     
     <item>
+      <title>Use of &#34;transparent&#34; in computing</title>
+      <link>https://echorand.me/posts/computing-transparency/</link>
+      <pubDate>Wed, 15 Sep 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/computing-transparency/</guid>
+      <description>One word that has always baffled me in the context of software/computing is “transparency”. “This change is completely transparent to the application” - or some version of it is often used to tell consumers of an application/library that a certain change won’t be noticeable by the consumer at all. If I were to put in my English language hat on (a non-native at that), i would think that means “so, the consumer will see the change” and not the intended “the consumer will not see the change”.</description>
+    </item>
+    
+    
+    
+    <item>
       <title>PyCon AU 2021 Talk - Planning for Failure using Chaos Engineering</title>
       <link>https://echorand.me/posts/chaos-engineering-talk/</link>
       <pubDate>Mon, 13 Sep 2021 00:00:00 +0000</pubDate>
