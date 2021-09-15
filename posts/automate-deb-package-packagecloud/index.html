@@ -88,7 +88,7 @@ to learn more about this. <code>local-dir</code> specifies where the packages ar
 file patterns we want to push to the repository. <code>skip_cleanup</code> ensures we don&rsquo;t cleanup the working directory
 and we restrict the deploy to only happen on pushes to the <code>master</code> branch.</p>
 <p>We will have add an environment variable, <code>PACKAGECLOUD_TOKEN</code> in the Travis CI&rsquo;s repository
-settings (<a href="https://travis-ci.org/">https://travis-ci.org/</a><!-- raw HTML omitted -->settings) and set it&rsquo;s value to the packagecloud.io API token.
+settings (<a href="https://travis-ci.org/">https://travis-ci.org/</a><github repo>settings) and set it&rsquo;s value to the packagecloud.io API token.
 The value of your API token can be found by going to your <a href="https://packagecloud.io/api_token">packagecloud API token</a>
 page.</p>
 <p>At this stage we are all set. If we trigger a new build, it should build the DEB and deploy the package to your

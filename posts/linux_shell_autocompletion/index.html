@@ -229,7 +229,7 @@ print(os.path.commonprefix(suggestions))
 
 </code></pre><p>Now, let&rsquo;s see if the suggestions had a common prefix:</p>
 <pre><code>$ git --list-cmds=list-mainporcelain,others,nohelpers,alias,list-complete,config | python3 commonprefix.py
-</code></pre><p>This verifies that there were no common prefix among all the suggestions and hence <!-- raw HTML omitted --> didn&rsquo;t
+</code></pre><p>This verifies that there were no common prefix among all the suggestions and hence <TAB> didn&rsquo;t
 bring up any suggestion.</p>
 <p>Let&rsquo;s now ask the question - how did installing the <code>bash-completion</code> package magically bring our
 auto-completion machinery into motion? The short answer is a bunch of bash magic happening. Let&rsquo;s
