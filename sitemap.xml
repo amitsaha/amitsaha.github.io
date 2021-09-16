@@ -3,22 +3,17 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>https://echorand.me/</loc>
-    <lastmod>2021-09-16T11:33:57+10:00</lastmod>
+    <loc>https://echorand.me/categories/</loc>
+    <lastmod>2021-09-15T11:40:19+10:00</lastmod>
   </url>
   
   <url>
-    <loc>https://echorand.me/posts/2021-09-16-hello-from-netlify-cms/</loc>
-    <lastmod>2021-09-16T11:33:57+10:00</lastmod>
+    <loc>https://echorand.me/</loc>
+    <lastmod>2021-09-15T11:40:19+10:00</lastmod>
   </url>
   
   <url>
     <loc>https://echorand.me/posts/</loc>
-    <lastmod>2021-09-16T11:33:57+10:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://echorand.me/categories/</loc>
     <lastmod>2021-09-15T11:40:19+10:00</lastmod>
   </url>
   
