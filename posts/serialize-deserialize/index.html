@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="echo $RANDOM. Exploring Software and writing about it.">
+    
+    <link rel="shortcut icon" href="https://echorand.me/favicon.ico">
+    
+    <link rel="stylesheet" href="/css/style.min.css">
+
+    <title>Serialization</title>
+</head>
+<body><header id="banner">
+    <h2><a href="https://echorand.me">Exploring Software</a></h2>
+    <nav>
+        <ul>
+            <li>
+                <a href="/about" title="">About</a>
+            </li><li>
+                <a href="/posts" title="">Posts</a>
+            </li><li>
+                <a href="/talks" title="">Talks</a>
+            </li><li>
+                <a href="/writings-trainings" title="">Writings and Trainings</a>
+            </li><li>
+                <a href="/categories" title="">Categories</a>
+            </li><li>
+                <a href="/index.xml" title="">Subscribe (RSS)</a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main id="content">
+<article>
+    <header id="post-header">
+        <h1>Serialization</h1><time>September 18, 2021</time></header><p>I always get confused between &ldquo;serialization&rdquo; and &ldquo;deserialization&rdquo;. Perhaps, that is
+because I am trying to memorize what they are, and then trying to recall from memory.
+Of course, it&rsquo;s sufficient to remember only one of them correctly.</p>
+<p>So, here&rsquo;s my trick that I am going to use from now on. It is derived from this Wikipedia
+article on the subject, in the Drawbacks section:</p>
+<blockquote>
+<p>Serialization breaks the opacity of an abstract data type by potentially exposing private implementation details.</p>
+</blockquote>
+<p>When I want to <em><em>S</em>tore</em> some data that we have in an application&rsquo;s memory as an object of some
+<em>abstract data type</em>, we serialize it. For example, serializing a <code>struct</code> in Go to a JSON file on disk.</p>
+<p>A <a href="https://web.archive.org/web/20150405013606/http://isocpp.org/wiki/faq/serialization#serialize-overview">reference</a> from the Wikipedia
+article explains serialization in this manner:</p>
+<blockquote>
+<p>It lets you take an object or group of objects, put them on a disk or send them through a wire
+or wireless transport mechanism, then later, perhaps on another computer,
+reverse the process: resurrect the original object(s). The basic mechanisms are to flatten object(s)
+into a one-dimensional stream of bits, and to turn that stream of bits back into the original object(s).</p>
+</blockquote>
+<blockquote>
+<p>Like the Transporter on Star Trek, it’s all about taking something complicated and turning it into a
+flat sequence of 1s and 0s, then taking that sequence of 1s and 0s (possibly at another place, possibly
+at another time) and reconstructing the original complicated “something.”</p>
+</blockquote>
+<p>So, the understanding I obtained based on reading the Wikipedia article and the above reference, I serialized it by
+writing this blog post. Or did I deserialize it? Who knows.</p>
+</article>
+<footer id="footer">
+    Post managed in a <a href="https://github.com/amitsaha/echorand.me">git repo</a> | <a href="https://github.com/amitsaha/echorand.me/commit/71e7b07b6b873a1a3ce8ebe98488a886f23794cf">Last Commit on this post </a>
+  | <a href="https://github.com/amitsaha/echorand.me/edit/master/content/posts/serialize-deserialize.md">Edit post</a>
+    <p>
+    Blog managed via <a href="https://gohugo.io/">Hugo</a> and using a modified version of the <a href="https://themes.gohugo.io/etch/">Etch</a> theme.
+    </p>  
+</footer>
+
+        </main><footer id="footer">
+    
+</footer>
+</body>
+</html>

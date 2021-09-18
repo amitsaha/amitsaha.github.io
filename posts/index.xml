@@ -6,9 +6,22 @@
     <description>Recent content in Posts on Exploring Software</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 15 Sep 2021 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 18 Sep 2021 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://echorand.me/posts/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    
+    <item>
+      <title>Serialization</title>
+      <link>https://echorand.me/posts/serialize-deserialize/</link>
+      <pubDate>Sat, 18 Sep 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/serialize-deserialize/</guid>
+      <description>I always get confused between &amp;ldquo;serialization&amp;rdquo; and &amp;ldquo;deserialization&amp;rdquo;. Perhaps, that is because I am trying to memorize what they are, and then trying to recall from memory. Of course, it&amp;rsquo;s sufficient to remember only one of them correctly.
+So, here&amp;rsquo;s my trick that I am going to use from now on. It is derived from this Wikipedia article on the subject, in the Drawbacks section:
+ Serialization breaks the opacity of an abstract data type by potentially exposing private implementation details.</description>
+    </item>
     
     
     
