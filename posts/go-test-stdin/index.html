@@ -78,9 +78,10 @@ package. I tried to look <a href="https://github.com/golang/go/blob/c7f2f51fed15
 but didn&rsquo;t find any quick answers.</p>
 <p>So, I posted my findings to the <a href="https://groups.google.com/g/golang-nuts/c/24pL7iQbx64/m/ZHQugkOLAgAJ">golang-nuts google group</a>.</p>
 <h2 id="why-does-it-not-wait">Why does it not wait?</h2>
-<p>As you can see from the reply, the reason the test doesn&rsquo;t wait for the interactive input is the Stdin of the process
+<p>As you will see from the reply to my query, the reason the test doesn&rsquo;t wait for the interactive input is the Stdin of the process
 that&rsquo;s executed (our test binary), is set to the operating system&rsquo;s null input device (<code>/dev/null</code> on <a href="https://cs.opensource.google/go/go/+/refs/tags/go1.17.3:src/os/file_unix.go;l=202">Unix</a>
-and <code>NUL</code> on <a href="https://cs.opensource.google/go/go/+/refs/tags/go1.17.3:src/os/file_windows.go;l=98">Windows</a>).</p>
+and <code>NUL</code> on <a href="https://cs.opensource.google/go/go/+/refs/tags/go1.17.3:src/os/file_windows.go;l=98">Windows</a>). This
+is desribed in the <a href="https://github.com/golang/go/blob/c7f2f51fed15b410dea5f608420858b401887d0a/src/os/exec/exec.go#L98">documentation of the <code>Cmd</code> struct</a>.</p>
 <p>The top reason I was confused by this is if I had tried something similar in Python, it would have exhibited the expected behavior, i.e.
 the executed program (for e.g. via <code>subprocess.check_output()</code>) would have waited for the input. That is because, by default, the
 standard input of the newly executed child process is set to <a href="https://docs.python.org/3/library/subprocess.html#subprocess.PIPE">PIPE</a>
@@ -126,7 +127,7 @@ that is where you want to pretend that a user entered a specific input interacti
 </code></pre></div><p>The key here is the <a href="https://pkg.go.dev/strings#NewReader">strings.NewReader()</a> function.</p>
 </article>
 <footer id="footer">
-    Post managed in a <a href="https://github.com/amitsaha/echorand.me">git repo</a> | <a href="https://github.com/amitsaha/echorand.me/commit/c26d2afe3e9e2c979dac7d8ab9e0a0df9c3c10df">Last Commit on this post </a>
+    Post managed in a <a href="https://github.com/amitsaha/echorand.me">git repo</a> | <a href="https://github.com/amitsaha/echorand.me/commit/4c9b7e6e34ab79705da63adce861054e978bb39e">Last Commit on this post </a>
   | <a href="https://github.com/amitsaha/echorand.me/edit/master/content/posts/go-test-stdin.md">Edit post</a>
     <p>
     Blog managed via <a href="https://gohugo.io/">Hugo</a> and using a modified version of the <a href="https://themes.gohugo.io/etch/">Etch</a> theme.
