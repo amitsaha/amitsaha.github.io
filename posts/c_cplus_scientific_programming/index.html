@@ -48,7 +48,7 @@ the features. For C/C++, we will use <tt class="docutils literal">gcc</tt> and <
 for working with vectors and matrices, support for complex numbers, calculus, interpolation, statistics, random numbers generation
 and host of others. The easiest way to install the library will be via your Linux distribution's package manager. Let us now
 get started with using the library.</p>
-<p>GSL's basic mathematical functions defines the common mathematical constants such as <span class="formula"><i>π</i>, <i>e</i></span>, euler's constant and provides
+<p>GSL's basic mathematical functions defines the common mathematical constants such as <span class="formula"><i>π</i>, <i>e</i></span>, euler's constant and provides
 functions and macros for working with Infinities and Not-a-number, testing the sign of numbers and miscellaneous
 other numbers. One of the more interesting functions is the <tt class="docutils literal">gsl_fcmp(double x, double y, double epsilon)</tt> function which is used to approximately compare
 two floating point numbers, <span class="formula"><i>x</i></span> and <span class="formula"><i>y</i></span>, accounting for rounding off and truncation errors - specified by epsilon. Now, we move onto
@@ -298,7 +298,7 @@ Sorted Vector::               0.16291 0.231657 0.282618 0.947201 0.999742
 </pre>
 <p>In your application, you might have a need for finding the original indices of the elements in sorted order - <tt class="docutils literal">gsl_sort_vector_index()</tt>
 and the <tt class="docutils literal">gsl_sort_largest_index()</tt> correspond to the two functions we used in Listing 3.</p>
-<p>Next, we use GSL's function minimizing capabilities to find the minimum of a simple one-dimensional function: <span class="formula">2<i>x</i><sup>2</sup> + 4<i>x</i></span>, which has a minimum
+<p>Next, we use GSL's function minimizing capabilities to find the minimum of a simple one-dimensional function: <span class="formula">2<i>x</i><sup>2</sup> + 4<i>x</i></span>, which has a minimum
 at <tt class="docutils literal"><span class="pre">x=-1</span></tt> (Listing 4) (This program has been built upon the example in the GSL documentation).</p>
 <pre class="literal-block">
 /*Listing-4: gsl_fmin.c*/

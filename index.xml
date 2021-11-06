@@ -6,9 +6,21 @@
     <description>Recent content on Exploring Software</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 18 Sep 2021 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 06 Nov 2021 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://echorand.me/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    
+    <item>
+      <title>The &#34;go test&#34; command, os.Stdin and testing interactive input</title>
+      <link>https://echorand.me/posts/go-test-stdin/</link>
+      <pubDate>Sat, 06 Nov 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/go-test-stdin/</guid>
+      <description>While working on the solutions to exercises for my soon to be published book Practical Go, I wanted to write a test function which would simulate a user not providing an interactive input when one was asked for. However, I noticed that the test function would not wait for me to provide the input and just continue the execution. Consider the following test function:
+import ( &amp;#34;bufio&amp;#34; &amp;#34;fmt&amp;#34; &amp;#34;os&amp;#34; &amp;#34;testing&amp;#34; ) func TestInput(t *testing.</description>
+    </item>
     
     
     

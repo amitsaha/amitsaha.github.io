@@ -104,7 +104,7 @@ step. Your program <cite>helloworld.py</cite> is first converted to an intermedi
 representation which is a low level equivalent of your high level
 language program. The difference from C is that the instructions in
 these low level language equivalents are not meant to be executed by a
-<em>real</em> computer, but a <em>process virtual machine</em> <a class="footnote-reference" href="#id5" id="id1">[1]</a>. In the case of CPython, the intermediate
+<em>real</em> computer, but a <em>process virtual machine</em> <a class="footnote-reference" href="#footnote-1" id="footnote-reference-1">[1]</a>. In the case of CPython, the intermediate
 representation is known as <cite>bytecodes</cite> and the virtual machine referred
 to as the <cite>bytecode interpreter</cite> or the CPython virtual machine.
 Hence, the CPython code is first converted into its bytecode equivalent
@@ -136,7 +136,7 @@ $ file ./helloworld
 ./helloworld: ELF 64-bit LSB executable, x86-64, version 1 (SYSV), dynamically linked (uses shared libs), for GNU/Linux 2.6.32,
 BuildID[sha1]=0xc50d74290927cb25ef9e34055af6c437e89ed5eb, not stripped
 </pre>
-<p>The <tt class="docutils literal">file</tt> command shows the type of a file <a class="footnote-reference" href="#id6" id="id2">[2]</a> and from the above
+<p>The <tt class="docutils literal">file</tt> command shows the type of a file <a class="footnote-reference" href="#footnote-2" id="footnote-reference-2">[2]</a> and from the above
 output, the key information for us is that the file <tt class="docutils literal">helloworld</tt> is
 a <cite>ELF 64-bit LSB executable, x86-64, version 1 (SYSV)</cite>. You can
 of course execute the program as we have done earlier using
@@ -171,7 +171,7 @@ System2 as expected and hence it had to be recreated to execute it.</p>
 <div class="section" id="cpython">
 <h2>CPython</h2>
 <p>On System1, create the <cite>compiled</cite> version of <tt class="docutils literal">helloworld.py</tt> using the following
-code <a class="footnote-reference" href="#id7" id="id3">[3]</a>:</p>
+code <a class="footnote-reference" href="#footnote-3" id="footnote-reference-3">[3]</a>:</p>
 <pre class="literal-block">
 $ python -c &quot;import py_compile;py_compile.compile('helloworld.py')&quot;
 </pre>
@@ -200,7 +200,7 @@ without being re-created from its source file, <tt class="docutils literal">hell
 two systems with different instruction set architecture. This was made
 possible by the <tt class="docutils literal">python</tt> bytecode interpreter on the two systems,
 which created an abstraction between the bytecodes and the native
-instruction set architecture <a class="footnote-reference" href="#id8" id="id4">[4]</a>. I should mention here that if your
+instruction set architecture <a class="footnote-reference" href="#footnote-4" id="footnote-reference-4">[4]</a>. I should mention here that if your
 CPython application has anything to do beyond pure CPython code (C
 extension, for example), the results of the experiments here will not
 be applicable.</p>
@@ -247,35 +247,35 @@ clear).</p>
 </div>
 <div class="section" id="footnotes">
 <h2>Footnotes</h2>
-<table class="docutils footnote" frame="void" id="id5" rules="none">
+<table class="docutils footnote" frame="void" id="footnote-1" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>Note that, there are two kinds of virtual machines that can be
+<tr><td class="label"><a class="fn-backref" href="#footnote-reference-1">[1]</a></td><td>Note that, there are two kinds of virtual machines that can be
 implemented in software: <cite>system virtual machine</cite> and <cite>process
 virtual machine</cite>. Here, I am referring to the process virtual
 machine. See the <a class="reference external" href="http://en.wikipedia.org/wiki/Virtual_machine">Wikipedia article</a> on Virtual Machine
 to learn more.</td></tr>
 </tbody>
 </table>
-<table class="docutils footnote" frame="void" id="id6" rules="none">
+<table class="docutils footnote" frame="void" id="footnote-2" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id2">[2]</a></td><td><a class="reference external" href="http://linux.die.net/man/1/file">http://linux.die.net/man/1/file</a></td></tr>
+<tr><td class="label"><a class="fn-backref" href="#footnote-reference-2">[2]</a></td><td><a class="reference external" href="http://linux.die.net/man/1/file">http://linux.die.net/man/1/file</a></td></tr>
 </tbody>
 </table>
-<table class="docutils footnote" frame="void" id="id7" rules="none">
+<table class="docutils footnote" frame="void" id="footnote-3" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id3">[3]</a></td><td>The <tt class="docutils literal">py_compile</tt> module can be used to compile a CPython
+<tr><td class="label"><a class="fn-backref" href="#footnote-reference-3">[3]</a></td><td>The <tt class="docutils literal">py_compile</tt> module can be used to compile a CPython
 program into its bytecode equivalent. This is the version of your
 program that is executed the CPython bytecode interpreter. See:
 <a class="reference external" href="http://docs.python.org/2/library/py_compile.html">http://docs.python.org/2/library/py_compile.html</a>.</td></tr>
 </tbody>
 </table>
-<table class="docutils footnote" frame="void" id="id8" rules="none">
+<table class="docutils footnote" frame="void" id="footnote-4" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id4">[4]</a></td><td>Actually, to be more accurate, the <tt class="docutils literal">python</tt> executable takes
+<tr><td class="label"><a class="fn-backref" href="#footnote-reference-4">[4]</a></td><td>Actually, to be more accurate, the <tt class="docutils literal">python</tt> executable takes
 care of the interfacing with the operating system kernel (Linux
 Kernel), which is once again different on systems with different
 instruction set architecture.</td></tr>

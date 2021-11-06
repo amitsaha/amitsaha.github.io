@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="echo $RANDOM. Exploring Software and writing about it.">
+    
+    <link rel="shortcut icon" href="https://echorand.me/favicon.ico">
+    
+    <link rel="stylesheet" href="/css/style.min.css">
+
+    <title>The &#34;go test&#34; command, os.Stdin and testing interactive input</title>
+</head>
+<body><header id="banner">
+    <h2><a href="https://echorand.me">Exploring Software</a></h2>
+    <nav>
+        <ul>
+            <li>
+                <a href="/about" title="">About</a>
+            </li><li>
+                <a href="/posts" title="">Posts</a>
+            </li><li>
+                <a href="/talks" title="">Talks</a>
+            </li><li>
+                <a href="/writings-trainings" title="">Writings and Trainings</a>
+            </li><li>
+                <a href="/categories" title="">Categories</a>
+            </li><li>
+                <a href="/index.xml" title="">Subscribe (RSS)</a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main id="content">
+<article>
+    <header id="post-header">
+        <h1>The &#34;go test&#34; command, os.Stdin and testing interactive input</h1><time>November 6, 2021</time></header><p>While working on the solutions to exercises for my soon to be published book <a href="https://practicalgobook.net/">Practical Go</a>,
+I wanted to write a test function which would simulate a user <em>not</em> providing an interactive input when one was asked for.
+However, I noticed that the test function would not wait for me to provide the input and just continue the execution.
+Consider the following test function:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#f92672">import</span> (
+        <span style="color:#e6db74">&#34;bufio&#34;</span>
+        <span style="color:#e6db74">&#34;fmt&#34;</span>
+        <span style="color:#e6db74">&#34;os&#34;</span>
+        <span style="color:#e6db74">&#34;testing&#34;</span>
+)
+
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">TestInput</span>(<span style="color:#a6e22e">t</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">testing</span>.<span style="color:#a6e22e">T</span>) {
+        <span style="color:#a6e22e">scanner</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">bufio</span>.<span style="color:#a6e22e">NewScanner</span>(<span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Stdin</span>)
+        <span style="color:#a6e22e">msg</span> <span style="color:#f92672">:=</span> <span style="color:#e6db74">&#34;Your name please? Press the Enter key when done&#34;</span>
+        <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Fprintln</span>(<span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Stdout</span>, <span style="color:#a6e22e">msg</span>)
+
+        <span style="color:#a6e22e">scanner</span>.<span style="color:#a6e22e">Scan</span>()
+        <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">scanner</span>.<span style="color:#a6e22e">Err</span>(); <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+                <span style="color:#a6e22e">t</span>.<span style="color:#a6e22e">Fatal</span>(<span style="color:#a6e22e">err</span>)
+        }
+        <span style="color:#a6e22e">name</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">scanner</span>.<span style="color:#a6e22e">Text</span>()
+        <span style="color:#66d9ef">if</span> len(<span style="color:#a6e22e">name</span>) <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span> {
+                <span style="color:#a6e22e">t</span>.<span style="color:#a6e22e">Log</span>(<span style="color:#e6db74">&#34;empty input&#34;</span>)
+        }
+        <span style="color:#a6e22e">t</span>.<span style="color:#a6e22e">Logf</span>(<span style="color:#e6db74">&#34;You entered: %s\n&#34;</span>, <span style="color:#a6e22e">name</span>)
+
+}
+</code></pre></div><p>The key point is the <code>scanner := bufio.NewScanner(os.Stdin)</code> statement. Here I am creating a new Scanner to read
+from the standard input, typically, your keyboard.</p>
+<p>If you run the above function (<a href="https://play.golang.org/p/-8VayZKyaHY">Playground Link</a>) via <code>go test -v</code>, the test function will
+terminate with:</p>
+<pre><code>=== RUN   TestInput
+Your name please? Press the Enter key when done
+    prog.go:21: empty input
+    prog.go:23: You entered: 
+--- PASS: TestInput (0.00s)
+PASS
+</code></pre><p>Now, instead of running the above test via <code>go test</code>, if you compile the test and then run the test executable, it will wait for interactive input.
+Try it.</p>
+<p>So, I reasoned that there is something special going on in how <code>go test</code> runs the test function. At this point of time in my Go learning
+journey, I know that <code>go test</code> essentially executes the test executable via facilities provided by the <a href="https://pkg.go.dev/os/exec">os/exec</a>
+package. I tried to look <a href="https://github.com/golang/go/blob/c7f2f51fed15b410dea5f608420858b401887d0a/src/cmd/go/internal/test/test.go">a bit</a> into it,
+but didn&rsquo;t find any quick answers.</p>
+<p>So, I posted my findings to the <a href="https://groups.google.com/g/golang-nuts/c/24pL7iQbx64/m/ZHQugkOLAgAJ">golang-nuts google group</a>.</p>
+<h2 id="why-does-it-not-wait">Why does it not wait?</h2>
+<p>As you can see from the reply, the reason the test doesn&rsquo;t wait for the interactive input is the Stdin of the process
+that&rsquo;s executed (our test binary), is set to the operating system&rsquo;s null input device (<code>/dev/null</code> on <a href="https://cs.opensource.google/go/go/+/refs/tags/go1.17.3:src/os/file_unix.go;l=202">Unix</a>
+and <code>NUL</code> on <a href="https://cs.opensource.google/go/go/+/refs/tags/go1.17.3:src/os/file_windows.go;l=98">Windows</a>).</p>
+<p>The top reason I was confused by this is if I had tried something similar in Python, it would have exhibited the expected behavior, i.e.
+the executed program (for e.g. via <code>subprocess.check_output()</code>) would have waited for the input. That is because, by default, the
+standard input of the newly executed child process is set to <a href="https://docs.python.org/3/library/subprocess.html#subprocess.PIPE">PIPE</a>
+which is connected to the standard input stream.</p>
+<h2 id="testing-interactive-input">Testing interactive input</h2>
+<p>So, coming back to my original problem i.e. to simulate that interactive input is <em>not</em> provided, this is how I ended
+up doing it:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
+
+<span style="color:#f92672">import</span> (
+	<span style="color:#e6db74">&#34;bufio&#34;</span>
+	<span style="color:#e6db74">&#34;fmt&#34;</span>
+	<span style="color:#e6db74">&#34;io&#34;</span>
+	<span style="color:#e6db74">&#34;os&#34;</span>
+	<span style="color:#e6db74">&#34;testing&#34;</span>
+)
+
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">TestInput</span>(<span style="color:#a6e22e">t</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">testing</span>.<span style="color:#a6e22e">T</span>) {
+	<span style="color:#a6e22e">r</span>, <span style="color:#a6e22e">_</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">io</span>.<span style="color:#a6e22e">Pipe</span>()
+	<span style="color:#a6e22e">scanner</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">bufio</span>.<span style="color:#a6e22e">NewScanner</span>(<span style="color:#a6e22e">r</span>)
+	<span style="color:#a6e22e">msg</span> <span style="color:#f92672">:=</span> <span style="color:#e6db74">&#34;Your name please? Press the Enter key when done&#34;</span>
+	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Fprintln</span>(<span style="color:#a6e22e">os</span>.<span style="color:#a6e22e">Stdout</span>, <span style="color:#a6e22e">msg</span>)
+
+	<span style="color:#a6e22e">scanner</span>.<span style="color:#a6e22e">Scan</span>()
+	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">scanner</span>.<span style="color:#a6e22e">Err</span>(); <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+		<span style="color:#a6e22e">t</span>.<span style="color:#a6e22e">Fatal</span>(<span style="color:#a6e22e">err</span>)
+	}
+	<span style="color:#a6e22e">name</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">scanner</span>.<span style="color:#a6e22e">Text</span>()
+	<span style="color:#66d9ef">if</span> len(<span style="color:#a6e22e">name</span>) <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span> {
+		<span style="color:#a6e22e">t</span>.<span style="color:#a6e22e">Log</span>(<span style="color:#e6db74">&#34;empty input&#34;</span>)
+	}
+	<span style="color:#a6e22e">t</span>.<span style="color:#a6e22e">Logf</span>(<span style="color:#e6db74">&#34;You entered: %s\n&#34;</span>, <span style="color:#a6e22e">name</span>)
+}
+</code></pre></div><p>The key here is the call to the <a href="https://pkg.go.dev/io#Pipe">io.Pipe()</a> function. It returns a reader and a writer. I discard the writer, and use the reader
+to create the Scanner object. Now, it will wait for the interactive input. <a href="https://play.golang.org/p/h3_CPMDplJv">Go Playground link</a>.
+(I am not sure how the playground detects it so quickly and terminates the test). If you run it on your computer, it will wait for
+the input.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>Hope you find the post useful. It certainly stumped me to see this behaviour. For completion, here&rsquo;s how you would simulate interactive input -
+that is where you want to pretend that a user entered a specific input interactively:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#a6e22e">input</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">strings</span>.<span style="color:#a6e22e">NewReader</span>(<span style="color:#e6db74">&#34;jane&#34;</span>)
+<span style="color:#a6e22e">scanner</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">bufio</span>.<span style="color:#a6e22e">NewScanner</span>(<span style="color:#a6e22e">input</span>)
+</code></pre></div><p>The key here is the <a href="https://pkg.go.dev/strings#NewReader">strings.NewReader()</a> function.</p>
+</article>
+<footer id="footer">
+    Post managed in a <a href="https://github.com/amitsaha/echorand.me">git repo</a> | <a href="https://github.com/amitsaha/echorand.me/commit/c26d2afe3e9e2c979dac7d8ab9e0a0df9c3c10df">Last Commit on this post </a>
+  | <a href="https://github.com/amitsaha/echorand.me/edit/master/content/posts/go-test-stdin.md">Edit post</a>
+    <p>
+    Blog managed via <a href="https://gohugo.io/">Hugo</a> and using a modified version of the <a href="https://themes.gohugo.io/etch/">Etch</a> theme.
+    </p>  
+</footer>
+
+        </main><footer id="footer">
+    
+</footer>
+</body>
+</html>
