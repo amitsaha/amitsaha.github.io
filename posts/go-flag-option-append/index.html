@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="echo $RANDOM. Exploring Software and writing about it.">
+    
+    <link rel="shortcut icon" href="https://echorand.me/favicon.ico">
+    
+    <link rel="stylesheet" href="/css/style.min.css">
+
+    <title>Go - Append behavior in option values using flag package</title>
+</head>
+<body><header id="banner">
+    <h2><a href="https://echorand.me">Exploring Software</a></h2>
+    <nav>
+        <ul>
+            <li>
+                <a href="/about" title="">About</a>
+            </li><li>
+                <a href="/posts" title="">Posts</a>
+            </li><li>
+                <a href="/talks" title="">Talks</a>
+            </li><li>
+                <a href="/writings-trainings" title="">Writings and Trainings</a>
+            </li><li>
+                <a href="/categories" title="">Categories</a>
+            </li><li>
+                <a href="/index.xml" title="">Subscribe (RSS)</a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main id="content">
+<article>
+    <header id="post-header">
+        <h1>Go - Append behavior in option values using flag package</h1><time>November 6, 2021</time></header><p>While working on the solutions to exercises for my soon to be published book <a href="https://practicalgobook.net/">Practical Go</a>,
+I needed to implement a way to implement an option in my command line application which could be specified multiple times.
+The result would be that all the values specified would form a list of the values. To make that concrete, consider that
+you are writing a command line HTTP client application. You want to add one or more headers to an outgoing request, so this is
+the user interface that you want for your application:</p>
+<pre><code>$ my-command-line-app -header key1:value1 -header key2:value2 https://www.example.com
+</code></pre><p>Next, I show how you can achieve the above using the Go standard library&rsquo;s <a href="https://pkg.go.dev/flag#Func">flag</a> package.</p>
+<h2 id="the-func-function">The Func() function</h2>
+<p>The <a href="https://pkg.go.dev/flag#Func">Func()</a> function allows you to define a function that will be called everytime
+the flag parsing machinery encounters a specific option. This is how our solution to the above problem
+may look like:</p>
+<pre><code>type httpConfig struct {
+	headers         []string
+}
+
+func myFunc() {
+  c := httpConfig{}
+  fs := flag.NewFlagSet(&quot;http&quot;, flag.ContinueOnError)	
+  // define your other flags
+	
+  headerOptionFunc := func(v string) error {
+		c.headers = append(c.headers, v)
+		return nil
+	}
+	fs.Func(&quot;header&quot;, &quot;Add one or more headers to the outgoing request (key=value)&quot;, headerOptionFunc)
+  
+# other stuff..
+}
+</code></pre><p><code>headerOptionFunc</code> gets calld everytime the <code>flag.Parse()</code> function encounters <code>-header</code>. Here, we append it to a list <code>headers</code> which
+is a field we have defined in the <code>httpConfig</code> struct.</p>
+<p>This is another of those moments, where I thought - how do i solve this using the standard library? (Yes i hear you, didn&rsquo;t you think of that
+when you wrote the exercise? I may have, or i may not have, who knows).</p>
+<p>And the standard library delivered, yet again.</p>
+</article>
+<footer id="footer">
+    Post managed in a <a href="https://github.com/amitsaha/echorand.me">git repo</a> | <a href="https://github.com/amitsaha/echorand.me/commit/87f02905d3d0a72a0131688294c012ffdc4799bb">Last Commit on this post </a>
+  | <a href="https://github.com/amitsaha/echorand.me/edit/master/content/posts/go-flag-option-append.md">Edit post</a>
+    <p>
+    Blog managed via <a href="https://gohugo.io/">Hugo</a> and using a modified version of the <a href="https://themes.gohugo.io/etch/">Etch</a> theme.
+    </p>  
+</footer>
+
+        </main><footer id="footer">
+    
+</footer>
+</body>
+</html>
