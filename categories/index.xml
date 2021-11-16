@@ -6,7 +6,7 @@
     <description>Recent content in Categories on Exploring Software</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 06 Nov 2021 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 13 Nov 2021 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://echorand.me/categories/index.xml" rel="self" type="application/rss+xml" />
     
@@ -15,7 +15,7 @@
     <item>
       <title>Go - Append behavior in option values using flag package</title>
       <link>https://echorand.me/posts/go-flag-option-append/</link>
-      <pubDate>Sat, 06 Nov 2021 00:00:00 +0000</pubDate>
+      <pubDate>Sat, 13 Nov 2021 00:00:00 +0000</pubDate>
       
       <guid>https://echorand.me/posts/go-flag-option-append/</guid>
       <description>While working on the solutions to exercises for my soon to be published book Practical Go, I needed to implement a way to implement an option in my command line application which could be specified multiple times. The result would be that all the values specified would form a list of the values. To make that concrete, consider that you are writing a command line HTTP client application. You want to add one or more headers to an outgoing request, so this is the user interface that you want for your application:</description>
