@@ -330,9 +330,9 @@ package main import ( &amp;quot;fmt&amp;quot; ) func main() { s := `Multi line s
       
       <guid>https://echorand.me/posts/kubernetes-notes/</guid>
       <description>Introduction This in-progress page lists some of my findings while working with Kubernetes.
-EKS cluster setup This section will have findings that are relevant when working with an AWS EKS cluster.
-Terraform configuration for master This is based on the tutorial from the Terraform folks here. Unlike the tutorial though, I assume that you already have the VPC and subnets you want to setup your EKS master in.
-First up, the master.</description>
+EKS cluster setup You may also find this guide from spacelift.io useful.
+This section will have findings that are relevant when working with an AWS EKS cluster.
+Terraform configuration for master This is based on the tutorial from the Terraform folks here. Unlike the tutorial though, I assume that you already have the VPC and subnets you want to setup your EKS master in.</description>
     </item>
     
     
