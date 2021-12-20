@@ -33,7 +33,16 @@
 <main id="content">
 <article>
     <header id="post-header">
-        <h1>Kubernetes pod security policies</h1><time>May 20, 2020</time></header><h1 id="introduction">Introduction</h1>
+        <h1>Kubernetes pod security policies</h1><time>May 20, 2020</time></header><p>Welcome to this new blog post!</p>
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#enforcing-policies">Enforcing policies</a></li>
+<li><a href="#using-kustomize-to-manage-policies">Using <code>kustomize</code> to manage policies</a></li>
+<li><a href="#rolling-the-policy-changes-out">Rolling the policy changes out</a></li>
+<li><a href="#multiple-matching-policies">Multiple matching policies</a></li>
+<li><a href="#conclusion">Conclusion</a></li>
+</ul>
+<h1 id="introduction">Introduction</h1>
 <p>Pod security policies are <a href="https://kubernetes.io/docs/concepts/policy/pod-security-policy/">cluster level resources</a>.
 The Google cloud <a href="https://cloud.google.com/kubernetes-engine/docs/how-to/pod-security-policies">docs</a> has some basic
 human friendly docs.  A <code>psp</code> is a way to enforce certain policies that <code>pod</code> needs to comply with before it&rsquo;s allowed
@@ -442,7 +451,7 @@ which I made use of while working on this are:</p>
 </ul>
 </article>
 <footer id="footer">
-    Post managed in a <a href="https://github.com/amitsaha/echorand.me">git repo</a> | <a href="https://github.com/amitsaha/echorand.me/commit/838493464090a0d04f18408d278f92c834f51403">Last Commit on this post </a>
+    Post managed in a <a href="https://github.com/amitsaha/echorand.me">git repo</a> | <a href="https://github.com/amitsaha/echorand.me/commit/727efe98f091959317fdb371b4a3ac123ed81293">Last Commit on this post </a>
   | <a href="https://github.com/amitsaha/echorand.me/edit/master/content/posts/kubernetes-pod-security-policies.md">Edit post</a>
     <p>
     Blog managed via <a href="https://gohugo.io/">Hugo</a> and using a modified version of the <a href="https://themes.gohugo.io/etch/">Etch</a> theme.

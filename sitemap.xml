@@ -4,12 +4,12 @@
   
   <url>
     <loc>https://echorand.me/categories/</loc>
-    <lastmod>2021-12-12T12:06:05+11:00</lastmod>
+    <lastmod>2021-12-21T08:36:46+11:00</lastmod>
   </url>
   
   <url>
     <loc>https://echorand.me/</loc>
-    <lastmod>2021-12-12T12:06:05+11:00</lastmod>
+    <lastmod>2021-12-21T08:36:46+11:00</lastmod>
   </url>
   
   <url>
@@ -19,17 +19,22 @@
   
   <url>
     <loc>https://echorand.me/posts/</loc>
-    <lastmod>2021-12-12T12:06:05+11:00</lastmod>
+    <lastmod>2021-12-21T08:36:46+11:00</lastmod>
   </url>
   
   <url>
     <loc>https://echorand.me/categories/software/</loc>
-    <lastmod>2021-12-12T12:06:05+11:00</lastmod>
+    <lastmod>2021-12-21T08:36:46+11:00</lastmod>
   </url>
   
   <url>
     <loc>https://echorand.me/categories/go/</loc>
-    <lastmod>2021-11-17T06:44:59+11:00</lastmod>
+    <lastmod>2021-12-21T08:36:46+11:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://echorand.me/posts/go-values-references-etc/</loc>
+    <lastmod>2021-12-21T08:36:46+11:00</lastmod>
   </url>
   
   <url>
@@ -54,7 +59,7 @@
   
   <url>
     <loc>https://echorand.me/categories/infrastructure/</loc>
-    <lastmod>2021-11-30T10:18:00+11:00</lastmod>
+    <lastmod>2021-12-21T08:36:46+11:00</lastmod>
   </url>
   
   <url>
@@ -79,7 +84,7 @@
   
   <url>
     <loc>https://echorand.me/posts/go-file-mutex/</loc>
-    <lastmod>2021-07-10T19:39:38+10:00</lastmod>
+    <lastmod>2021-12-21T08:36:46+11:00</lastmod>
   </url>
   
   <url>
@@ -109,7 +114,7 @@
   
   <url>
     <loc>https://echorand.me/posts/kubernetes-pod-security-policies/</loc>
-    <lastmod>2020-05-20T15:55:09+10:00</lastmod>
+    <lastmod>2021-12-21T08:36:46+11:00</lastmod>
   </url>
   
   <url>
@@ -189,7 +194,7 @@
   
   <url>
     <loc>https://echorand.me/posts/linux_shell_autocompletion/</loc>
-    <lastmod>2019-07-11T16:52:00+10:00</lastmod>
+    <lastmod>2021-12-21T08:36:46+11:00</lastmod>
   </url>
   
   <url>
@@ -279,7 +284,7 @@
   
   <url>
     <loc>https://echorand.me/posts/aws-vpc-internet-connectivity-subnets/</loc>
-    <lastmod>2019-07-11T16:52:00+10:00</lastmod>
+    <lastmod>2021-12-21T08:36:46+11:00</lastmod>
   </url>
   
   <url>
@@ -534,7 +539,7 @@
   
   <url>
     <loc>https://echorand.me/posts/golang-dissecting-listen-and-serve/</loc>
-    <lastmod>2021-08-17T02:26:43+00:00</lastmod>
+    <lastmod>2021-12-21T08:36:46+11:00</lastmod>
   </url>
   
   <url>

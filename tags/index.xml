@@ -23,6 +23,19 @@
     
     
     <item>
+      <title>Shallow copy and Deep copy in Go</title>
+      <link>https://echorand.me/posts/go-values-references-etc/</link>
+      <pubDate>Sun, 21 Nov 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/go-values-references-etc/</guid>
+      <description>A shallow copy of an variable/object is a copy of an object, usually a container - for example, an array or a struct type such that the elements in both the copy and the original object are occupying the same memory addresses.
+(PS: I am not sure, but perhaps, Rust does this differently where moving a basic data type is a shallow copy? I may be completely wrong).
+A deep copy of an variable/object is a copy of an object such that the copy and the original object occupy different memory addresses.</description>
+    </item>
+    
+    
+    
+    <item>
       <title>Go - Append behavior in option values using flag package</title>
       <link>https://echorand.me/posts/go-flag-option-append/</link>
       <pubDate>Sat, 13 Nov 2021 00:00:00 +0000</pubDate>
@@ -196,8 +209,8 @@ You can find the article here with the accompanying code repository here.</descr
       <pubDate>Wed, 20 May 2020 00:00:00 +0000</pubDate>
       
       <guid>https://echorand.me/posts/kubernetes-pod-security-policies/</guid>
-      <description>Introduction Pod security policies are cluster level resources. The Google cloud docs has some basic human friendly docs. A psp is a way to enforce certain policies that pod needs to comply with before it&amp;rsquo;s allowed to be scheduled to be run on the cluster - create or an update operation (perhaps a restart of the pod?). Essentially, it is a type of a validating admission controller.
-I should mention that I found it (later on) to think about pod security policies as a way to &amp;ldquo;control&amp;rdquo; various attributes of a pod.</description>
+      <description>Welcome to this new blog post!
+ Introduction Enforcing policies Using kustomize to manage policies Rolling the policy changes out Multiple matching policies Conclusion  Introduction Pod security policies are cluster level resources. The Google cloud docs has some basic human friendly docs. A psp is a way to enforce certain policies that pod needs to comply with before it&amp;rsquo;s allowed to be scheduled to be run on the cluster - create or an update operation (perhaps a restart of the pod?</description>
     </item>
     
     
@@ -367,7 +380,8 @@ Terraform configuration for master This is based on the tutorial from the Terraf
       <pubDate>Wed, 03 Jul 2019 00:00:00 +0000</pubDate>
       
       <guid>https://echorand.me/posts/linux_shell_autocompletion/</guid>
-      <description>Introduction What happens when you press &amp;lt;command&amp;gt; &amp;lt;TAB&amp;gt; or &amp;lt;command&amp;gt; &amp;lt;TAB&amp;gt;&amp;lt;TAB&amp;gt;? You get a bunch of suggestions with one of them just the one you had in mind you were going to type. Auto completions in shells are super helpful and as we will find out, quite a bit goes on behind the scenes. Before we go too further into my investigations and findings, I must credit the author of this blog post - it triggered my curiosity and made me find time out to learn more about something I use everyday, but didn&amp;rsquo;t know much about how it worked.</description>
+      <description>Welcome to this new blog post!
+ Introduction Setting up DIY bash completion Data provided to completion handlers Single &amp;lt;TAB&amp;gt; and double &amp;lt;TAB&amp;gt;&amp;lt;TAB&amp;gt; Getting good old BASH completion back Magic of bash-completion package compgen built-in command Learning more Bash completion for applications  cobra (Golang), click (Python) and clap (Rust) complete (Golang) and shell_completion (Rust)   Conclusion  Introduction What happens when you press &amp;lt;command&amp;gt; &amp;lt;TAB&amp;gt; or &amp;lt;command&amp;gt; &amp;lt;TAB&amp;gt;&amp;lt;TAB&amp;gt;? You get a bunch of suggestions with one of them just the one you had in mind you were going to type.</description>
     </item>
     
     
@@ -554,7 +568,8 @@ Key details The key details that are important to my story are:</description>
       <pubDate>Mon, 15 Oct 2018 00:00:00 +0000</pubDate>
       
       <guid>https://echorand.me/posts/aws-vpc-internet-connectivity-subnets/</guid>
-      <description>We can have two kinds of subnets inside a AWS VPC - private and public. A public subnet is one which is attached to an Internet Gateway. This essentially adds a routing table entry to the subnet&amp;rsquo;s routing table sending all Internet traffic to an Internet Gateway. On the other hand, if traffic from a subnet destined for the &amp;ldquo;Internet&amp;rdquo; is sent to either a NAT instance, or a AWS managed NAT device, the subnet is a private subnet.</description>
+      <description>Welcome to this new blog post!
+ Public subnet - Public IP  Ingress Egress   Public subnet - No Public IP Private subnet - Public IP  Ingress   Egress Private subnet - No Public IP Ingress Egress Learn more  We can have two kinds of subnets inside a AWS VPC - private and public. A public subnet is one which is attached to an Internet Gateway.</description>
     </item>
     
     
@@ -1160,7 +1175,8 @@ $ sudo docker network create --driver bridge webapp1 The first container which w
       <pubDate>Wed, 26 Apr 2017 00:00:00 +0000</pubDate>
       
       <guid>https://echorand.me/posts/golang-dissecting-listen-and-serve/</guid>
-      <description>Introduction My aim in this post is to discuss three &amp;ldquo;concepts&amp;rdquo; in Go that I come across while writing HTTP servers. Through this post, my aim to get rid of my own lack of understanding (at least to a certain degree) about these. Hopefully, it will be of use to others too.. The understanding will help you write better unit tests for your handlers as well as shown in this blog post.</description>
+      <description>Welcome to this blog post!
+ Introduction What is DefaultServeMux? Registering handlers  The HandleFunc() type   Using your own Handler with ListenAndServe() Writing Middleware Rewrapping http.ResponseWriter References  Introduction My aim in this post is to discuss three &amp;ldquo;concepts&amp;rdquo; in Go that I come across while writing HTTP servers. Through this post, my aim to get rid of my own lack of understanding (at least to a certain degree) about these.</description>
     </item>
     
     

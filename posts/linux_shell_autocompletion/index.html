@@ -33,7 +33,26 @@
 <main id="content">
 <article>
     <header id="post-header">
-        <h1>Notes on Bash auto-completion on Linux</h1><time>July 3, 2019</time></header><h1 id="introduction">Introduction</h1>
+        <h1>Notes on Bash auto-completion on Linux</h1><time>July 3, 2019</time></header><p>Welcome to this new blog post!</p>
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#setting-up">Setting up</a></li>
+<li><a href="#diy-bash-completion">DIY bash completion</a></li>
+<li><a href="#data-provided-to-completion-handlers">Data provided to completion handlers</a></li>
+<li><a href="#single-tab-and-double-tabtab">Single <code>&lt;TAB&gt;</code> and double <code>&lt;TAB&gt;&lt;TAB&gt;</code></a></li>
+<li><a href="#getting-good-old-bash-completion-back">Getting good old BASH completion back</a></li>
+<li><a href="#magic-of-bash-completion-package">Magic of <code>bash-completion</code> package</a></li>
+<li><a href="#compgen-built-in-command"><code>compgen</code> built-in command</a></li>
+<li><a href="#learning-more">Learning more</a></li>
+<li><a href="#bash-completion-for-applications">Bash completion for applications</a>
+<ul>
+<li><a href="#cobra-golang-click-python-and-clap-rust">cobra (Golang), click (Python) and clap (Rust)</a></li>
+<li><a href="#complete-golang-and-shell_completion-rust">complete (Golang) and shell_completion (Rust)</a></li>
+</ul>
+</li>
+<li><a href="#conclusion">Conclusion</a></li>
+</ul>
+<h1 id="introduction">Introduction</h1>
 <p>What happens when you press <code>&lt;command&gt; &lt;TAB&gt;</code> or <code>&lt;command&gt; &lt;TAB&gt;&lt;TAB&gt;</code>? You get a bunch of suggestions with one of them
 just the one you had in mind you were going to type. Auto completions in shells are super helpful and as we will find
 out, quite a bit goes on behind the scenes. Before we go too further into my investigations and findings, I  must credit the author of
@@ -474,7 +493,7 @@ Missing separate debuginfos, use: dnf debuginfo-install sssd-client-2.1.0-2.fc30
 </code></pre><p>You can learn about <code>readline</code> <a href="https://tiswww.case.edu/php/chet/readline/readline.html#SEC_Contents">here</a>.</p>
 </article>
 <footer id="footer">
-    Post managed in a <a href="https://github.com/amitsaha/echorand.me">git repo</a> | <a href="https://github.com/amitsaha/echorand.me/commit/6a40e300afbd6c28ccd84c8478903e1ca9aa13d5">Last Commit on this post </a>
+    Post managed in a <a href="https://github.com/amitsaha/echorand.me">git repo</a> | <a href="https://github.com/amitsaha/echorand.me/commit/727efe98f091959317fdb371b4a3ac123ed81293">Last Commit on this post </a>
   | <a href="https://github.com/amitsaha/echorand.me/edit/master/content/posts/linux_shell_autocompletion.md">Edit post</a>
     <p>
     Blog managed via <a href="https://gohugo.io/">Hugo</a> and using a modified version of the <a href="https://themes.gohugo.io/etch/">Etch</a> theme.

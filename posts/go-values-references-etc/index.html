@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="echo $RANDOM. Exploring Software and writing about it.">
+    
+    <link rel="shortcut icon" href="https://echorand.me/favicon.ico">
+    
+    <link rel="stylesheet" href="/css/style.min.css">
+
+    <title>Shallow copy and Deep copy in Go</title>
+</head>
+<body><header id="banner">
+    <h2><a href="https://echorand.me">Exploring Software</a></h2>
+    <nav>
+        <ul>
+            <li>
+                <a href="/about" title="">About</a>
+            </li><li>
+                <a href="/posts" title="">Posts</a>
+            </li><li>
+                <a href="/talks" title="">Talks</a>
+            </li><li>
+                <a href="/writings-trainings" title="">Writings and Trainings</a>
+            </li><li>
+                <a href="/categories" title="">Categories</a>
+            </li><li>
+                <a href="/index.xml" title="">Subscribe (RSS)</a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main id="content">
+<article>
+    <header id="post-header">
+        <h1>Shallow copy and Deep copy in Go</h1><time>November 21, 2021</time></header><p>A <strong>shallow copy</strong> of an variable/object is a copy of an object, usually a container - for example, an array or
+a struct type such that the elements in both the copy and the original object are occupying the same
+<em>memory addresses</em>.</p>
+<p>(PS: I am not sure, but perhaps, <a href="https://hashrust.com/blog/moves-copies-and-clones-in-rust/">Rust</a> does this differently
+where moving a basic data type is a shallow copy? I may be completely wrong).</p>
+<p>A <strong>deep copy</strong> of an variable/object is a copy of an object such that the copy and the original object
+occupy different <em>memory addresses</em>.</p>
+<p>This post is about <em>shallow</em> and <em>deep copy</em> in Go as it applies to various data types.  As it turns out,
+for certain data types, a deep copy is the default, while as for others shallow copy is the default.</p>
+<p>Let&rsquo;s go exploring!</p>
+<ul>
+<li><a href="#basic-data-types">Basic data types</a>
+<ul>
+<li><a href="#call-by-value-and-call-by-reference">Call by Value and Call by reference</a></li>
+<li><a href="#summary">Summary</a></li>
+</ul>
+</li>
+<li><a href="#slice-of-integers-and-strings">Slice of integers and strings</a>
+<ul>
+<li><a href="#call-by-value-and-call-by-reference-1">Call by Value and Call by reference</a></li>
+<li><a href="#summary-1">Summary</a></li>
+</ul>
+</li>
+<li><a href="#arrays-of-strings-and-integers">Arrays of strings and integers</a>
+<ul>
+<li><a href="#call-by-value-and-call-by-reference-2">Call by Value and Call by reference</a></li>
+<li><a href="#summary-2">Summary</a></li>
+</ul>
+</li>
+<li><a href="#elements-in-maps-and-struct-types">Elements in Maps and Struct types</a>
+<ul>
+<li><a href="#call-by-value-and-call-by-reference-3">Call by Value and Call by reference</a></li>
+<li><a href="#summary-3">Summary</a></li>
+</ul>
+</li>
+<li><a href="#conclusion">Conclusion</a></li>
+<li><a href="#resources">Resources</a></li>
+</ul>
+<h2 id="basic-data-types">Basic data types</h2>
+<p>Let&rsquo;s consider two of the basic data types - <code>int</code> and <code>string</code>.</p>
+<p>Consider the following program: (<a href="https://play.golang.org/p/2HJ82Qx8prp">Link to Playground</a>)</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
+
+<span style="color:#f92672">import</span> (
+	<span style="color:#e6db74">&#34;fmt&#34;</span>
+)
+
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+	<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">n1</span> <span style="color:#66d9ef">int</span> = <span style="color:#ae81ff">1</span>
+	<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">s1</span> <span style="color:#66d9ef">string</span> = <span style="color:#e6db74">&#34;hello&#34;</span>
+
+	<span style="color:#75715e">// integers
+</span><span style="color:#75715e"></span>	<span style="color:#a6e22e">n2</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">n1</span>
+	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;n1(%p)=%v n2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n1</span>, <span style="color:#a6e22e">n1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n2</span>, <span style="color:#a6e22e">n2</span>)
+	<span style="color:#a6e22e">n1</span> = <span style="color:#ae81ff">3</span>
+	<span style="color:#a6e22e">n2</span> = <span style="color:#ae81ff">7</span>
+	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;n1(%p)=%v n2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n1</span>, <span style="color:#a6e22e">n1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n2</span>, <span style="color:#a6e22e">n2</span>)
+
+	<span style="color:#75715e">// strings
+</span><span style="color:#75715e"></span>	<span style="color:#a6e22e">s2</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">s1</span>
+
+	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;s1(%p)=%v s2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s1</span>, <span style="color:#a6e22e">s1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s2</span>, <span style="color:#a6e22e">s2</span>)
+
+	<span style="color:#a6e22e">s1</span> = <span style="color:#e6db74">&#34;world&#34;</span>
+	<span style="color:#a6e22e">s2</span> = <span style="color:#e6db74">&#34;universe&#34;</span>
+
+	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;s1(%p)=%v s2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s1</span>, <span style="color:#a6e22e">s1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s2</span>, <span style="color:#a6e22e">s2</span>)
+}
+
+</code></pre></div><p>We declare <code>n1</code> and <code>s1</code> as an integer and a string, respectively with each having an initial value.
+When we write the statement, <code>n2 := n1</code>, we are creating a new integer variable, <code>n2</code>.
+Similarly, <code>s2 := s1</code> creates a new string variable. When we create these variables, their
+values are the same as that referred to by <code>n1</code> and <code>s1</code>, respectively. Then, when we update the values,
+the changes remain confined to the variables we are updating - i.e. updating the value of <code>n2</code> doesn&rsquo;t
+affect the value of <code>n1</code> and vice-versa.</p>
+<p>Hence, when we run the above code, you will see an output as follows:</p>
+<pre><code>n1(0xc0000b8000)=1 n2(0xc0000b8008)=1
+n1(0xc0000b8000)=3 n2(0xc0000b8008)=7
+s1(0xc00009e210)=hello s2(0xc00009e220)=hello
+s1(0xc00009e210)=world s2(0xc00009e220)=universe
+</code></pre><p>The values of the form <code>0x</code> are the <em>memory address</em> of a variable, <code>n1</code> obtained by the statement, <code>&amp;n1</code>
+and printed using the <code>%p</code> verb.</p>
+<p>Next, let&rsquo;s update the code above to understand what happens when we call functions passing integers and strings
+as arguments.</p>
+<h3 id="call-by-value-and-call-by-reference">Call by Value and Call by reference</h3>
+<p>Consider the following program (<a href="https://play.golang.org/p/HgtLzXfqD-7">Link to Playground</a>):</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
+
+<span style="color:#f92672">import</span> (
+	<span style="color:#e6db74">&#34;fmt&#34;</span>
+	<span style="color:#e6db74">&#34;log&#34;</span>
+)
+
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">callByReference</span>(<span style="color:#a6e22e">n1</span>, <span style="color:#a6e22e">n2</span> <span style="color:#f92672">*</span><span style="color:#66d9ef">int</span>, <span style="color:#a6e22e">s1</span>, <span style="color:#a6e22e">s2</span> <span style="color:#f92672">*</span><span style="color:#66d9ef">string</span>) {
+	<span style="color:#f92672">*</span><span style="color:#a6e22e">n1</span> = <span style="color:#ae81ff">3</span>
+	<span style="color:#f92672">*</span><span style="color:#a6e22e">n2</span> = <span style="color:#ae81ff">7</span>
+	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;n1(%p)=%v n2(%p)=%v\n&#34;</span>, <span style="color:#a6e22e">n1</span>, <span style="color:#f92672">*</span><span style="color:#a6e22e">n1</span>, <span style="color:#a6e22e">n2</span>, <span style="color:#f92672">*</span><span style="color:#a6e22e">n2</span>)
+
+	<span style="color:#f92672">*</span><span style="color:#a6e22e">s1</span> = <span style="color:#e6db74">&#34;world&#34;</span>
+	<span style="color:#f92672">*</span><span style="color:#a6e22e">s2</span> = <span style="color:#e6db74">&#34;universe&#34;</span>
+
+	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;s1(%p)=%v s2(%p)=%v\n&#34;</span>, <span style="color:#a6e22e">s1</span>, <span style="color:#f92672">*</span><span style="color:#a6e22e">s1</span>, <span style="color:#a6e22e">s2</span>, <span style="color:#f92672">*</span><span style="color:#a6e22e">s2</span>)
+
+}
+
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">callByValue</span>(<span style="color:#a6e22e">n1</span>, <span style="color:#a6e22e">n2</span> <span style="color:#66d9ef">int</span>, <span style="color:#a6e22e">s1</span>, <span style="color:#a6e22e">s2</span> <span style="color:#66d9ef">string</span>) {
+	<span style="color:#a6e22e">n1</span> = <span style="color:#ae81ff">3</span>
+	<span style="color:#a6e22e">n2</span> = <span style="color:#ae81ff">7</span>
+	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;n1(%p)=%v n2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n1</span>, <span style="color:#a6e22e">n1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n2</span>, <span style="color:#a6e22e">n2</span>)
+
+	<span style="color:#a6e22e">s1</span> = <span style="color:#e6db74">&#34;world&#34;</span>
+	<span style="color:#a6e22e">s2</span> = <span style="color:#e6db74">&#34;universe&#34;</span>
+
+	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;s1(%p)=%v s2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s1</span>, <span style="color:#a6e22e">s1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s2</span>, <span style="color:#a6e22e">s2</span>)
+}
+
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+	<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">n1</span> <span style="color:#66d9ef">int</span> = <span style="color:#ae81ff">1</span>
+	<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">s1</span> <span style="color:#66d9ef">string</span> = <span style="color:#e6db74">&#34;hello&#34;</span>
+
+	<span style="color:#75715e">// integers
+</span><span style="color:#75715e"></span>	<span style="color:#a6e22e">n2</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">n1</span>
+	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;n1(%p)=%v n2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n1</span>, <span style="color:#a6e22e">n1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n2</span>, <span style="color:#a6e22e">n2</span>)
+
+	<span style="color:#75715e">// strings
+</span><span style="color:#75715e"></span>	<span style="color:#a6e22e">s2</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">s1</span>
+
+	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;s1(%p)=%v s2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s1</span>, <span style="color:#a6e22e">s1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s2</span>, <span style="color:#a6e22e">s2</span>)
+
+	<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Calling function callByValue&#34;</span>)
+	<span style="color:#a6e22e">callByValue</span>(<span style="color:#a6e22e">n1</span>, <span style="color:#a6e22e">n2</span>, <span style="color:#a6e22e">s1</span>, <span style="color:#a6e22e">s2</span>)
+	
+	<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Back to main()&#34;</span>)
+	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;n1(%p)=%v n2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n1</span>, <span style="color:#a6e22e">n1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n2</span>, <span style="color:#a6e22e">n2</span>)
+	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;s1(%p)=%v s2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s1</span>, <span style="color:#a6e22e">s1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s2</span>, <span style="color:#a6e22e">s2</span>)
+	
+	<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Calling function callByReference&#34;</span>)
+	<span style="color:#a6e22e">callByReference</span>(<span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n2</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s2</span>)
+	
+	<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Back to main()&#34;</span>)
+	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;n1(%p)=%v n2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n1</span>, <span style="color:#a6e22e">n1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n2</span>, <span style="color:#a6e22e">n2</span>)
+	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;s1(%p)=%v s2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s1</span>, <span style="color:#a6e22e">s1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s2</span>, <span style="color:#a6e22e">s2</span>)	
+
+}
+</code></pre></div><p>We define two functions, <code>callByValue()</code> and <code>callByReference()</code>. Both the functions accept two integers
+and two strings as parameters. In each function, we then proceed to update the values of the variables
+that the functions were called with. The difference is that the first function accepts the values of existing
+integer and string variables, and the second function accepts the <em>memory address</em> or pointer to variables
+containing integer and string values.</p>
+<p>When we run the program, we will see the following output:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#a6e22e">n1</span>(<span style="color:#ae81ff">0xc000018030</span>)=<span style="color:#ae81ff">1</span> <span style="color:#a6e22e">n2</span>(<span style="color:#ae81ff">0xc000018038</span>)=<span style="color:#ae81ff">1</span>
+<span style="color:#a6e22e">s1</span>(<span style="color:#ae81ff">0xc000010230</span>)=<span style="color:#a6e22e">hello</span> <span style="color:#a6e22e">s2</span>(<span style="color:#ae81ff">0xc000010240</span>)=<span style="color:#a6e22e">hello</span>
+
+<span style="color:#ae81ff">2009</span><span style="color:#f92672">/</span><span style="color:#ae81ff">11</span><span style="color:#f92672">/</span><span style="color:#ae81ff">10</span> <span style="color:#ae81ff">23</span>:<span style="color:#ae81ff">00</span>:<span style="color:#ae81ff">00</span> <span style="color:#a6e22e">Calling</span> <span style="color:#a6e22e">function</span> <span style="color:#a6e22e">callByValue</span>
+<span style="color:#a6e22e">n1</span>(<span style="color:#ae81ff">0xc000018098</span>)=<span style="color:#ae81ff">3</span> <span style="color:#a6e22e">n2</span>(<span style="color:#ae81ff">0xc0000180b0</span>)=<span style="color:#ae81ff">7</span>
+<span style="color:#a6e22e">s1</span>(<span style="color:#ae81ff">0xc000010270</span>)=<span style="color:#a6e22e">world</span> <span style="color:#a6e22e">s2</span>(<span style="color:#ae81ff">0xc000010280</span>)=<span style="color:#a6e22e">universe</span>
+
+<span style="color:#ae81ff">2009</span><span style="color:#f92672">/</span><span style="color:#ae81ff">11</span><span style="color:#f92672">/</span><span style="color:#ae81ff">10</span> <span style="color:#ae81ff">23</span>:<span style="color:#ae81ff">00</span>:<span style="color:#ae81ff">00</span> <span style="color:#a6e22e">Back</span> <span style="color:#a6e22e">to</span> <span style="color:#a6e22e">main</span>()
+<span style="color:#a6e22e">n1</span>(<span style="color:#ae81ff">0xc000018030</span>)=<span style="color:#ae81ff">1</span> <span style="color:#a6e22e">n2</span>(<span style="color:#ae81ff">0xc000018038</span>)=<span style="color:#ae81ff">1</span>
+<span style="color:#a6e22e">s1</span>(<span style="color:#ae81ff">0xc000010230</span>)=<span style="color:#a6e22e">hello</span> <span style="color:#a6e22e">s2</span>(<span style="color:#ae81ff">0xc000010240</span>)=<span style="color:#a6e22e">hello</span>
+
+<span style="color:#ae81ff">2009</span><span style="color:#f92672">/</span><span style="color:#ae81ff">11</span><span style="color:#f92672">/</span><span style="color:#ae81ff">10</span> <span style="color:#ae81ff">23</span>:<span style="color:#ae81ff">00</span>:<span style="color:#ae81ff">00</span> <span style="color:#a6e22e">Calling</span> <span style="color:#a6e22e">function</span> <span style="color:#a6e22e">callByReference</span>
+<span style="color:#a6e22e">n1</span>(<span style="color:#ae81ff">0xc000018030</span>)=<span style="color:#ae81ff">3</span> <span style="color:#a6e22e">n2</span>(<span style="color:#ae81ff">0xc000018038</span>)=<span style="color:#ae81ff">7</span>
+<span style="color:#a6e22e">s1</span>(<span style="color:#ae81ff">0xc000010230</span>)=<span style="color:#a6e22e">world</span> <span style="color:#a6e22e">s2</span>(<span style="color:#ae81ff">0xc000010240</span>)=<span style="color:#a6e22e">universe</span>
+
+<span style="color:#ae81ff">2009</span><span style="color:#f92672">/</span><span style="color:#ae81ff">11</span><span style="color:#f92672">/</span><span style="color:#ae81ff">10</span> <span style="color:#ae81ff">23</span>:<span style="color:#ae81ff">00</span>:<span style="color:#ae81ff">00</span> <span style="color:#a6e22e">Back</span> <span style="color:#a6e22e">to</span> <span style="color:#a6e22e">main</span>()
+<span style="color:#a6e22e">n1</span>(<span style="color:#ae81ff">0xc000018030</span>)=<span style="color:#ae81ff">3</span> <span style="color:#a6e22e">n2</span>(<span style="color:#ae81ff">0xc000018038</span>)=<span style="color:#ae81ff">7</span>
+<span style="color:#a6e22e">s1</span>(<span style="color:#ae81ff">0xc000010230</span>)=<span style="color:#a6e22e">world</span> <span style="color:#a6e22e">s2</span>(<span style="color:#ae81ff">0xc000010240</span>)=<span style="color:#a6e22e">universe</span>
+</code></pre></div><p>The changes made in the <code>callByValue()</code> function are not visible in the <code>main()</code> function. However,
+the changes made inside the second function are.</p>
+<p>When we called the <code>callByValue()</code> function, we created a new set of variables containing the values of the
+existing variables. Hence, we changed the values of these new variables, the values of the existing variables
+which were defined in <code>main()</code> are not affected. On the other hand, when calling <code>callByReference()</code>, we passed
+along the <em>memory addresses</em> of the variables called in <code>main()</code> function. Hence, any updations to the values
+of those variables, affected the original variables, since they are manipulating the same memory address.</p>
+<h3 id="summary">Summary</h3>
+<p>When it comes to the basic types, numbers and strings, it is always <em>deep copy</em>.</p>
+<p>There is no <em>shallow copy</em> when it comes to these types. Another way of saying that is that, when we want
+a <em>shallow copy</em>, use <em>memory addresses</em> for basic data types.</p>
+<p>Next, let&rsquo;s explore what happens when we have basic data types as elements in a slice.</p>
+<h2 id="slice-of-integers-and-strings">Slice of integers and strings</h2>
+<p>Consider the following program: (<a href="https://go.dev/play/p/Wd490w3WJpU">Link to playground</a>)</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
+
+<span style="color:#f92672">import</span> (
+	<span style="color:#e6db74">&#34;fmt&#34;</span>
+	<span style="color:#e6db74">&#34;strings&#34;</span>
+)
+
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+	<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">n1</span> []<span style="color:#66d9ef">int</span> = []<span style="color:#66d9ef">int</span>{<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>}
+	<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">s1</span> []<span style="color:#66d9ef">string</span> = []<span style="color:#66d9ef">string</span>{<span style="color:#e6db74">&#34;hello&#34;</span>, <span style="color:#e6db74">&#34;world&#34;</span>}
+
+	<span style="color:#75715e">// slice of integers
+</span><span style="color:#75715e"></span>	<span style="color:#a6e22e">n2</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">n1</span>
+	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;n1(%p)=%v n2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n1</span>, <span style="color:#a6e22e">n1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n2</span>, <span style="color:#a6e22e">n2</span>)
+
+	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Update n2[0]&#34;</span>)
+	<span style="color:#a6e22e">n2</span>[<span style="color:#ae81ff">0</span>] = <span style="color:#a6e22e">n2</span>[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">*</span> <span style="color:#ae81ff">10</span>
+	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;n1(%p)=%v n2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n1</span>, <span style="color:#a6e22e">n1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n2</span>, <span style="color:#a6e22e">n2</span>)
+
+	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Assign new slice to n2&#34;</span>)
+	<span style="color:#a6e22e">n2</span> = []<span style="color:#66d9ef">int</span>{<span style="color:#ae81ff">100</span>, <span style="color:#ae81ff">110</span>, <span style="color:#ae81ff">120</span>}
+	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;n1(%p)=%v n2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n1</span>, <span style="color:#a6e22e">n1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n2</span>, <span style="color:#a6e22e">n2</span>)
+
+	<span style="color:#75715e">// strings
+</span><span style="color:#75715e"></span>	<span style="color:#a6e22e">s2</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">s1</span>
+	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;s1(%p)=%v s2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s1</span>, <span style="color:#a6e22e">s1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s2</span>, <span style="color:#a6e22e">s2</span>)
+
+	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Update s2[0]&#34;</span>)
+	<span style="color:#a6e22e">s2</span>[<span style="color:#ae81ff">0</span>] = <span style="color:#a6e22e">strings</span>.<span style="color:#a6e22e">ToUpper</span>(<span style="color:#a6e22e">s2</span>[<span style="color:#ae81ff">0</span>])
+	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;s1(%p)=%v s2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s1</span>, <span style="color:#a6e22e">s1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s2</span>, <span style="color:#a6e22e">s2</span>)
+
+	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Assign new slice to s2&#34;</span>)
+	<span style="color:#a6e22e">s2</span> = []<span style="color:#66d9ef">string</span>{<span style="color:#e6db74">&#34;Hi&#34;</span>, <span style="color:#e6db74">&#34;go play ground&#34;</span>}
+	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;s1(%p)=%v s2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s1</span>, <span style="color:#a6e22e">s1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s2</span>, <span style="color:#a6e22e">s2</span>)
+}
+</code></pre></div><p>We define a slice, <code>n1</code> containing integers. We create a new slice, <code>n2</code> using the statement, <code>n2 := n1</code>.</p>
+<p>We then, update the value of the first element of <code>n2</code> using <code>n2[0] = n2[0]*10</code>.</p>
+<p>At this stage when we print the two slices, we see that the first element of <em>both</em> the slices, <code>n1</code> and <code>n2</code>
+has been updated. This is because when we created a copy of <code>n1</code>, it performed a <em>shallow copy</em>. Hence, even
+though the memory addresses of <code>n1</code> and <code>n2</code> are different, as you will soon see in the output, the elements
+they contain were pointing to the same underlying <em>memory addresses</em>.</p>
+<p>Then, when we create a new slice and assign it to <code>n2</code>, we have now overwritten the elements of the slice,
+<code>n2</code>. Hence, the slice, <code>n1</code> is not affected.</p>
+<p>The same behavior is seen for the slice of strings, <code>s1</code> and <code>s2</code>.</p>
+<p>When we run the program, you will see the following output:</p>
+<pre><code>n1(0xc00000c030)=[1 2 3] n2(0xc00000c060)=[1 2 3]
+Update n2[0]
+n1(0xc00000c030)=[10 2 3] n2(0xc00000c060)=[10 2 3]
+Assign new slice to n2
+n1(0xc00000c030)=[10 2 3] n2(0xc00000c060)=[100 110 120]
+s1(0xc00000c048)=[hello world] s2(0xc00000c108)=[hello world]
+Update s2[0]
+s1(0xc00000c048)=[HELLO world] s2(0xc00000c108)=[HELLO world]
+Assign new slice to s2
+s1(0xc00000c048)=[HELLO world] s2(0xc00000c108)=[Hi go play ground]
+</code></pre><p>How does the above translate to passing slices as function arguments?</p>
+<h3 id="call-by-value-and-call-by-reference-1">Call by Value and Call by reference</h3>
+<p>When it comes to a slice, we are always working with shallow copies. Hence, there is no need for a call by reference
+when it comes to slices. Simply passing the slice is a call by reference. <a href="https://go.dev/play/p/xJElc3RhI9f">This playground link</a>
+has an example.</p>
+<h3 id="summary-1">Summary</h3>
+<p>When it comes to a slice of basic data types, we are by default working with a <em>shallow copy</em>. If you want to create
+a <em>deep copy</em>, you will find the <a href="https://pkg.go.dev/builtin#copy">copy()</a> function useful. See <a href="https://stackoverflow.com/a/27056295">here</a>
+for an example of creating a deep copy of a slice.</p>
+<p>Why do we have the default behavior copying a slice as a shallow copy? The Effective Go guide has
+the <a href="https://go.dev/doc/effective_go#slices">answer</a>:</p>
+<blockquote>
+<p>Slices hold references to an underlying array, and if you assign one slice to another, both refer to the same array. If a function takes a slice argument, changes it makes to the elements of the slice will be visible to the caller, analogous to passing a pointer to the underlying array.</p>
+</blockquote>
+<p>So, we should expect the behavior to be different when it comes to arrays then? Let&rsquo;s find out.</p>
+<h2 id="arrays-of-strings-and-integers">Arrays of strings and integers</h2>
+<p>Consider the following program. Compared to the previous program, we use arrays instead
+of slices (<a href="https://play.golang.org/p/7UPwSyR6628">Link to the playground</a>):</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go">
+<span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
+
+<span style="color:#f92672">import</span> (
+	<span style="color:#e6db74">&#34;fmt&#34;</span>
+	<span style="color:#e6db74">&#34;strings&#34;</span>
+)
+
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+	<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">n1</span> [<span style="color:#ae81ff">3</span>]<span style="color:#66d9ef">int</span> = [<span style="color:#ae81ff">3</span>]<span style="color:#66d9ef">int</span>{<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>}
+	<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">s1</span> [<span style="color:#ae81ff">2</span>]<span style="color:#66d9ef">string</span> = [<span style="color:#ae81ff">2</span>]<span style="color:#66d9ef">string</span>{<span style="color:#e6db74">&#34;hello&#34;</span>, <span style="color:#e6db74">&#34;world&#34;</span>}
+
+	<span style="color:#75715e">// array of integers
+</span><span style="color:#75715e"></span>	<span style="color:#a6e22e">n2</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">n1</span>
+	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;n1(%p)=%v n2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n1</span>, <span style="color:#a6e22e">n1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n2</span>, <span style="color:#a6e22e">n2</span>)
+	<span style="color:#a6e22e">n2</span>[<span style="color:#ae81ff">0</span>] = <span style="color:#a6e22e">n2</span>[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">*</span> <span style="color:#ae81ff">10</span>
+	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;n1(%p)=%v n2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n1</span>, <span style="color:#a6e22e">n1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n2</span>, <span style="color:#a6e22e">n2</span>)
+	<span style="color:#a6e22e">n2</span> = [<span style="color:#ae81ff">3</span>]<span style="color:#66d9ef">int</span>{<span style="color:#ae81ff">100</span>, <span style="color:#ae81ff">110</span>, <span style="color:#ae81ff">120</span>}
+	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;n1(%p)=%v n2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n1</span>, <span style="color:#a6e22e">n1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n2</span>, <span style="color:#a6e22e">n2</span>)
+
+	<span style="color:#75715e">// array of strings
+</span><span style="color:#75715e"></span>	<span style="color:#a6e22e">s2</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">s1</span>
+	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;s1(%p)=%v s2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s1</span>, <span style="color:#a6e22e">s1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s2</span>, <span style="color:#a6e22e">s2</span>)
+	<span style="color:#a6e22e">s2</span>[<span style="color:#ae81ff">0</span>] = <span style="color:#a6e22e">strings</span>.<span style="color:#a6e22e">ToUpper</span>(<span style="color:#a6e22e">s2</span>[<span style="color:#ae81ff">0</span>])
+	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;s1(%p)=%v s2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s1</span>, <span style="color:#a6e22e">s1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s2</span>, <span style="color:#a6e22e">s2</span>)
+	<span style="color:#a6e22e">s2</span> = [<span style="color:#ae81ff">2</span>]<span style="color:#66d9ef">string</span>{<span style="color:#e6db74">&#34;Hi&#34;</span>, <span style="color:#e6db74">&#34;go play ground&#34;</span>}
+	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;s1(%p)=%v s2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s1</span>, <span style="color:#a6e22e">s1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s2</span>, <span style="color:#a6e22e">s2</span>)
+}
+</code></pre></div><p>We define an array, <code>n1</code> containing integers. We create a new array, <code>n2</code> using the statement, <code>n2 := n1</code>.</p>
+<p>We then, update the value of the first element of <code>n2</code> using <code>n2[0] = n2[0]*10</code>.</p>
+<p>At this stage when we print the two arrays, we see that the first element of only the second array has been updated.
+<code>n1</code> hasn&rsquo;t been affected. Thus, we are working with a deep copy of our original array.</p>
+<p>Then, when we create a new array and assign it to <code>n2</code>, we have now overwritten the elements of the array,
+<code>n2</code>. Hence, once again the array, <code>n1</code> is not affected.</p>
+<p>The same behavior is seen for the array of strings, <code>s1</code> and <code>s2</code>.</p>
+<p>When we run the program, you will see the following output:</p>
+<p>Output:</p>
+<pre><code>n1(0xc0000b8000)=[1 2 3] n2(0xc0000b8018)=[1 2 3]
+n1(0xc0000b8000)=[1 2 3] n2(0xc0000b8018)=[10 2 3]
+n1(0xc0000b8000)=[1 2 3] n2(0xc0000b8018)=[100 110 120]
+s1(0xc0000ba000)=[hello world] s2(0xc0000ba020)=[hello world]
+s1(0xc0000ba000)=[hello world] s2(0xc0000ba020)=[HELLO world]
+s1(0xc0000ba000)=[hello world] s2(0xc0000ba020)=[Hi go play ground]
+</code></pre><h3 id="call-by-value-and-call-by-reference-2">Call by Value and Call by reference</h3>
+<p>When it comes to arrays, we are always working with deep copies. Hence, if we want to pass an array which
+we want to modify in another function and want the updated result to be reflected in the original array, we
+should pass the array by reference. <a href="https://go.dev/play/p/PDiSKXsQmtP">This playground link</a> has an example.</p>
+<p>It looks like this:</p>
+<pre><code>func callByReference(n1, n2 *[3]int, s1, s2 *[3]string) {
+	n1[0] = 3
+	n2[0] = 7
+	fmt.Printf(&quot;n1(%p)=%v n2(%p)=%v\n&quot;, &amp;n1, n1, &amp;n2, n2)
+
+	s1[0] = &quot;world&quot;
+	s2[0] = &quot;universe&quot;
+
+	fmt.Printf(&quot;s1(%p)=%v s2(%p)=%v\n&quot;, &amp;s1, s1, &amp;s2, s2)
+}
+
+
+callByReference(&amp;n1, &amp;n2, &amp;s1, &amp;s2)
+</code></pre><p>In the <code>callByReference()</code> function, we can see how Go allows us to work with the individual elements
+as if we are working with an array variable, n1 and not a pointer to an array, n1.</p>
+<h3 id="summary-2">Summary</h3>
+<p>The default behavior of copying arrays is thus, deep copy. If your intention is to have a shallow copy,
+you will need to work with a pointer to an array, rather than a copy of the array, such as inside a function.</p>
+<h2 id="elements-in-maps-and-struct-types">Elements in Maps and Struct types</h2>
+<p>A <code>map</code> and <code>struct</code> types are special as their elements are either one of the basic types, or an array or a slice
+of basic types. Thus, in the context of shallow and deep copy, we have two questions we want to explore:</p>
+<ol>
+<li>What is the behavior of the <code>map</code> and <code>struct</code> type itself?</li>
+<li>What is the behavior of the elements which are values of the <code>struct</code> or the <code>map</code>?</li>
+</ol>
+<p>The answer for a map is described in <a href="https://go.dev/doc/effective_go#maps">Effective Go</a>:</p>
+<blockquote>
+<p>Like slices, maps hold references to an underlying data structure. If you pass a map to a function that changes the contents of the map, the changes will be visible in the caller.</p>
+</blockquote>
+<p>Thus, the default behavior of a <code>map</code> is a shallow copy.</p>
+<p>A <code>struct</code> is by default deep copied. However, consider what happens to the constituent elements as
+we explore our second question above next.</p>
+<p>A <code>map</code> is by default shallow copied and hence automatically, the keys and values are shallow copied too,
+irrespective of the behavior of the constituent elements.</p>
+<p>For a value of a <code>struct</code> type, the behavior of the constituent elements is preserved as it would be when they
+are not elements of a struct type. That is:</p>
+<ul>
+<li>An integer, a string and an array will be deep copied when a struct or a map is copied</li>
+<li>A slice will be shallow copied when a struct or a map is copied.</li>
+</ul>
+<p>Consider the following code for an example (<a href="https://go.dev/play/p/D6hRpNroZoP">link to playground</a>):</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
+
+<span style="color:#f92672">import</span> (
+	<span style="color:#e6db74">&#34;fmt&#34;</span>
+	<span style="color:#e6db74">&#34;log&#34;</span>
+	<span style="color:#e6db74">&#34;strings&#34;</span>
+)
+
+<span style="color:#66d9ef">type</span> <span style="color:#a6e22e">myStruct</span> <span style="color:#66d9ef">struct</span> {
+	<span style="color:#a6e22e">a</span>    <span style="color:#66d9ef">string</span>
+	<span style="color:#a6e22e">arr</span>  [<span style="color:#ae81ff">3</span>]<span style="color:#66d9ef">int</span>
+	<span style="color:#a6e22e">arr1</span> []<span style="color:#66d9ef">string</span>
+}
+
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">callByValue</span>(<span style="color:#a6e22e">s</span> <span style="color:#a6e22e">myStruct</span>) {
+	<span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">a</span> = <span style="color:#a6e22e">strings</span>.<span style="color:#a6e22e">ToUpper</span>(<span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">a</span>)
+	<span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">arr</span>[<span style="color:#ae81ff">0</span>] = <span style="color:#ae81ff">100</span>
+	<span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">arr1</span>[<span style="color:#ae81ff">1</span>] = <span style="color:#e6db74">&#34;ih&#34;</span>
+}
+
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">callByReference</span>(<span style="color:#a6e22e">s</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">myStruct</span>) {
+	<span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">a</span> = <span style="color:#a6e22e">strings</span>.<span style="color:#a6e22e">ToUpper</span>(<span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">a</span>)
+	<span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">arr</span>[<span style="color:#ae81ff">0</span>] = <span style="color:#ae81ff">100</span>
+	<span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">arr1</span>[<span style="color:#ae81ff">1</span>] = <span style="color:#e6db74">&#34;ih&#34;</span>
+}
+
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+
+	<span style="color:#a6e22e">s</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">myStruct</span>{
+		<span style="color:#a6e22e">a</span>:    <span style="color:#e6db74">&#34;hello&#34;</span>,
+		<span style="color:#a6e22e">arr</span>:  [<span style="color:#ae81ff">3</span>]<span style="color:#66d9ef">int</span>{<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>},
+		<span style="color:#a6e22e">arr1</span>: []<span style="color:#66d9ef">string</span>{<span style="color:#e6db74">&#34;hi&#34;</span>, <span style="color:#e6db74">&#34;there&#34;</span>},
+	}
+
+	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;%#v\n&#34;</span>, <span style="color:#a6e22e">s</span>)
+
+	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>()
+
+	<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Calling function callByValue&#34;</span>)
+	<span style="color:#a6e22e">callByValue</span>(<span style="color:#a6e22e">s</span>)
+	<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Back to main()&#34;</span>)
+	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;%#v\n&#34;</span>, <span style="color:#a6e22e">s</span>)
+
+	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>()
+
+	<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Calling function callByReference&#34;</span>)
+	<span style="color:#a6e22e">callByReference</span>(<span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s</span>)
+	<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Back to main()&#34;</span>)
+	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;%#v\n&#34;</span>, <span style="color:#a6e22e">s</span>)
+}
+</code></pre></div><p>We define a <code>struct</code> type:</p>
+<pre><code>type myStruct struct {
+	a    string
+	arr  [3]int
+	arr1 []string
+}
+</code></pre><p>Both the <code>callByValue()</code> and <code>callByReference()</code> function performs the same modifications to the struct value.
+However, only the changes to the <code>arr1</code> element performed in the <code>callByValue()</code> function is reflected in <code>main()</code>.
+The change to <code>arr</code> is not reflected as we would expect based on our previous discussions. Of course, when
+we then invoke the <code>callByReference()</code> function, all the three changes are reflected in <code>main()</code>, as we
+are working with a pointer to the struct value.</p>
+<p>Running the above program will show the following output:</p>
+<pre><code>main.myStruct{a:&quot;hello&quot;, arr:[3]int{1, 2, 3}, arr1:[]string{&quot;hi&quot;, &quot;there&quot;}}
+
+2009/11/10 23:00:00 Calling function callByValue
+2009/11/10 23:00:00 Back to main()
+main.myStruct{a:&quot;hello&quot;, arr:[3]int{1, 2, 3}, arr1:[]string{&quot;hi&quot;, &quot;ih&quot;}}
+
+2009/11/10 23:00:00 Calling function callByReference
+2009/11/10 23:00:00 Back to main()
+main.myStruct{a:&quot;HELLO&quot;, arr:[3]int{100, 2, 3}, arr1:[]string{&quot;hi&quot;, &quot;ih&quot;}}
+</code></pre><p><a href="https://alenkacz.medium.com/shallow-copy-of-a-go-struct-in-golang-is-never-a-good-idea-83be60106af8">This</a>
+article specifically discusses a bit more around why you should never shallow copy a struct type. The author
+makes an interesting observation (Quoted) - &ldquo;structs evolve over time&rdquo;. Thus, it&rsquo;s a better idea to
+adopt deep copying from the get go than getting bugged later and adopting it.</p>
+<h3 id="call-by-value-and-call-by-reference-3">Call by Value and Call by reference</h3>
+<p>A <code>map</code> is by default call by reference and <code>struct</code> is by default call by value. Hence, if you want call by value
+behavior:</p>
+<ol>
+<li><code>map</code>: Create a deep copy by creating a new map and copying the key value pairs. Be careful of also ensuring that you deep
+copy the elements themselves</li>
+<li><code>struct</code>: Create a deep copy by creating a new struct and copying the elements. Be careful of also ensuring that you deep copy
+the elements themselves</li>
+</ol>
+<p>If you want call by reference behavior:</p>
+<ol>
+<li><code>map</code>: Nothing special to do, passing a map is by default call by reference</li>
+<li><code>struct</code>: Pass a pointer to the struct value instead of the struct itself</li>
+</ol>
+<h3 id="summary-3">Summary</h3>
+<p>A map is shallow copied and a struct is deep copied, but the elements of the struct may be deep copied
+or shallow copied depending on their own default behavior.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>As we have seen in this post (or let&rsquo;s say as I learned while writing this post), whether a value in Go is shallow
+copied or deep copied varies. It has to do with the <em>internal</em> representation of the data type itself. Hence, the
+Effective Go refers to values of type map, a slices or a channel as a reference to an underlying data structure.
+The section <a href="https://go.dev/doc/effective_go#allocation_make">Allocation with make</a> describes this behavior. We
+haven&rsquo;t looked at channels in this post (may be in future), but they also belong to the same category
+of maps and slices and hence should exhibit similar behavior.</p>
+<p>A &ldquo;surprise&rdquo; for me that I had to overlook when I was working on this post was that shallow copies had
+different memory addresses, as printed by the <code>%p</code> verb. When I first came across the shallow copy
+behavior in some code (the contributing cause to writing this post), I was perplexed since the
+memory addresses was different. That remains an unanswered question for me, for now.</p>
+<p>I explored the same topic in C and Python programming languages several years back:</p>
+<ul>
+<li><a href="http://echorand.me/data-in-c.html">Data in C</a></li>
+<li><a href="http://echorand.me/data-in-cpython.html">Date in CPython</a></li>
+<li><a href="https://echorand.me/posts/data-in-c-cpython/">Data in C and CPython</a></li>
+</ul>
+<h2 id="resources">Resources</h2>
+<ul>
+<li><a href="https://go.dev/doc/effective_go">Effective Go</a></li>
+<li><a href="https://tour.golang.org/basics/11">Basic Types</a></li>
+<li><a href="https://www.digitalocean.com/community/tutorials/understanding-data-types-in-go">Understanding Data Types in Go</a></li>
+<li><a href="https://alenkacz.medium.com/shallow-copy-of-a-go-struct-in-golang-is-never-a-good-idea-83be60106af8">Shallow copy of a go struct in golang is never a good idea</a></li>
+</ul>
+</article>
+<footer id="footer">
+    Post managed in a <a href="https://github.com/amitsaha/echorand.me">git repo</a> | <a href="https://github.com/amitsaha/echorand.me/commit/727efe98f091959317fdb371b4a3ac123ed81293">Last Commit on this post </a>
+  | <a href="https://github.com/amitsaha/echorand.me/edit/master/content/posts/go-values-references-etc.md">Edit post</a>
+    <p>
+    Blog managed via <a href="https://gohugo.io/">Hugo</a> and using a modified version of the <a href="https://themes.gohugo.io/etch/">Etch</a> theme.
+    </p>  
+</footer>
+
+        </main><footer id="footer">
+    
+</footer>
+</body>
+</html>

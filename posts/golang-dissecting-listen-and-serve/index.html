@@ -33,7 +33,21 @@
 <main id="content">
 <article>
     <header id="post-header">
-        <h1>HandlerFunc, Handle and DefaultServeMux in Go</h1><time>April 26, 2017</time></header><h1 id="introduction">Introduction</h1>
+        <h1>HandlerFunc, Handle and DefaultServeMux in Go</h1><time>April 26, 2017</time></header><p>Welcome to this blog post!</p>
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#what-is-defaultservemux">What is <code>DefaultServeMux</code>?</a></li>
+<li><a href="#registering-handlers">Registering handlers</a>
+<ul>
+<li><a href="#the-handlefunc-type">The HandleFunc() type</a></li>
+</ul>
+</li>
+<li><a href="#using-your-own-handler-with-listenandserve">Using your own Handler with ListenAndServe()</a></li>
+<li><a href="#writing-middleware">Writing Middleware</a></li>
+<li><a href="#rewrapping-httpresponsewriter">Rewrapping <code>http.ResponseWriter</code></a></li>
+<li><a href="#references">References</a></li>
+</ul>
+<h1 id="introduction">Introduction</h1>
 <p>My aim in this post is to discuss three &ldquo;concepts&rdquo; in Go that I come across while writing HTTP servers. Through this
 post, my aim to get rid of my own lack of understanding (at least to a certain degree) about these. <del>Hopefully, it will
 be of use to others too.</del>. The understanding will help you write better unit tests for your handlers as well as shown
@@ -516,7 +530,7 @@ to get the HTTP response status.</p>
 </ul>
 </article>
 <footer id="footer">
-    Post managed in a <a href="https://github.com/amitsaha/echorand.me">git repo</a> | <a href="https://github.com/amitsaha/echorand.me/commit/0b20e64311d7d0a24f441e8f4699fed366525fba">Last Commit on this post </a>
+    Post managed in a <a href="https://github.com/amitsaha/echorand.me">git repo</a> | <a href="https://github.com/amitsaha/echorand.me/commit/727efe98f091959317fdb371b4a3ac123ed81293">Last Commit on this post </a>
   | <a href="https://github.com/amitsaha/echorand.me/edit/master/content/posts/golang-dissecting-listen-and-serve.md">Edit post</a>
     <p>
     Blog managed via <a href="https://gohugo.io/">Hugo</a> and using a modified version of the <a href="https://themes.gohugo.io/etch/">Etch</a> theme.

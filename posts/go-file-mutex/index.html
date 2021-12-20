@@ -38,6 +38,17 @@ For me, it brings back memories of writing a structure in C (programming languag
 a student record database. However, there may be situations where you may just get by using it especially
 when you just want to run a single copy of your application.</p>
 <p>Let&rsquo;s see a pattern for implementing concurrency safe file access in Go using <code>sync.Mutex</code>.</p>
+<ul>
+<li><a href="#our-data-structure">Our data structure</a></li>
+<li><a href="#a-reference-implementation">A reference implementation</a>
+<ul>
+<li><a href="#writing-to-the-file">Writing to the file</a></li>
+<li><a href="#reading-from-file">Reading from file</a></li>
+</ul>
+</li>
+<li><a href="#notes">Notes</a></li>
+<li><a href="#learn-more">Learn more</a></li>
+</ul>
 <h2 id="our-data-structure">Our data structure</h2>
 <p>Let&rsquo;s consider the following <code>struct</code> type:</p>
 <pre><code>type fileStore struct {
@@ -198,7 +209,7 @@ all the data. So we can improve upon this by using a <code>rename()</code> opera
 </ul>
 </article>
 <footer id="footer">
-    Post managed in a <a href="https://github.com/amitsaha/echorand.me">git repo</a> | <a href="https://github.com/amitsaha/echorand.me/commit/556c952ce495ed37c818a88612b91efd995d8e86">Last Commit on this post </a>
+    Post managed in a <a href="https://github.com/amitsaha/echorand.me">git repo</a> | <a href="https://github.com/amitsaha/echorand.me/commit/727efe98f091959317fdb371b4a3ac123ed81293">Last Commit on this post </a>
   | <a href="https://github.com/amitsaha/echorand.me/edit/master/content/posts/go-file-mutex.md">Edit post</a>
     <p>
     Blog managed via <a href="https://gohugo.io/">Hugo</a> and using a modified version of the <a href="https://themes.gohugo.io/etch/">Etch</a> theme.

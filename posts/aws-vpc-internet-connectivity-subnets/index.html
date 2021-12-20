@@ -33,7 +33,27 @@
 <main id="content">
 <article>
     <header id="post-header">
-        <h1>AWS VPC subnets and Internet connectivity over IPv4</h1><time>October 15, 2018</time></header><p>We can have two kinds of subnets inside a AWS VPC - <strong>private</strong> and <strong>public</strong>. A public subnet is one which is
+        <h1>AWS VPC subnets and Internet connectivity over IPv4</h1><time>October 15, 2018</time></header><p>Welcome to this new blog post!</p>
+<ul>
+<li><a href="#public-subnet---public-ip">Public subnet - Public IP</a>
+<ul>
+<li><a href="#ingress">Ingress</a></li>
+<li><a href="#egress">Egress</a></li>
+</ul>
+</li>
+<li><a href="#public-subnet---no-public-ip">Public subnet - No Public IP</a></li>
+<li><a href="#private-subnet---public-ip">Private subnet - Public IP</a>
+<ul>
+<li><a href="#ingress-1">Ingress</a></li>
+</ul>
+</li>
+<li><a href="#egress-1">Egress</a></li>
+<li><a href="#private-subnet---no-public-ip">Private subnet - No Public IP</a></li>
+<li><a href="#ingress-2">Ingress</a></li>
+<li><a href="#egress-2">Egress</a></li>
+<li><a href="#learn-more">Learn more</a></li>
+</ul>
+<p>We can have two kinds of subnets inside a AWS VPC - <strong>private</strong> and <strong>public</strong>. A public subnet is one which is
 attached to an <a href="https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Internet_Gateway.html">Internet Gateway</a>. This essentially adds a routing table entry to the subnet&rsquo;s routing table sending all Internet traffic to an <strong>Internet Gateway</strong>. On the other hand,
 if traffic from a subnet destined for the &ldquo;Internet&rdquo; is sent to either a NAT instance, or a AWS managed NAT device, the subnet
 is a <strong>private</strong> subnet.</p>
@@ -93,7 +113,7 @@ IP address from itself to that of the private IP address of the instance.</p>
 </ul>
 </article>
 <footer id="footer">
-    Post managed in a <a href="https://github.com/amitsaha/echorand.me">git repo</a> | <a href="https://github.com/amitsaha/echorand.me/commit/6a40e300afbd6c28ccd84c8478903e1ca9aa13d5">Last Commit on this post </a>
+    Post managed in a <a href="https://github.com/amitsaha/echorand.me">git repo</a> | <a href="https://github.com/amitsaha/echorand.me/commit/727efe98f091959317fdb371b4a3ac123ed81293">Last Commit on this post </a>
   | <a href="https://github.com/amitsaha/echorand.me/edit/master/content/posts/aws-vpc-internet-connectivity-subnets.md">Edit post</a>
     <p>
     Blog managed via <a href="https://gohugo.io/">Hugo</a> and using a modified version of the <a href="https://themes.gohugo.io/etch/">Etch</a> theme.
