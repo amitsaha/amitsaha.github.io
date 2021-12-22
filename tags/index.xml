@@ -28,7 +28,7 @@
       <pubDate>Sun, 21 Nov 2021 00:00:00 +0000</pubDate>
       
       <guid>https://echorand.me/posts/go-values-references-etc/</guid>
-      <description>Update: Please note that my usage of &amp;ldquo;Call by reference&amp;rdquo; is not correct here as pointed out by a Reddit community member here. Read it as &amp;ldquo;Call by passing pointer values&amp;rdquo;. While trying to understand this a bit more, I cam across a few more links to the topic. You can find them here in my reply. I will do a follow up post on this topic perhaps. I am glad that the reddit commenter helped me revise my mental model on the topic.</description>
+      <description>Update: Please note that my usage of &amp;ldquo;Call by reference&amp;rdquo; is not correct here as pointed out by a Reddit community member here. Read it as &amp;ldquo;Call by passing pointer values&amp;rdquo;. While trying to understand this a bit more, I came across a few more links to the topic. You can find them here in my reply. I will do a follow up post on this topic perhaps. I am grateful that the reddit commenter helped me revise my mental model on the topic.</description>
     </item>
     
     
