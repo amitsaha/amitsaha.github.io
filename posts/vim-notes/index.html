@@ -33,7 +33,32 @@
 <main id="content">
 <article>
     <header id="post-header">
-        <h1>Notes on Vim</h1><time>January 5, 2018</time></header><h1 id="modes">Modes</h1>
+        <h1>Notes on Vim</h1><time>January 5, 2018</time></header><p>I use <code>vim</code> as my occasional text editor, especially when I am working on small projects or just editing a text document. Here&rsquo;s some notes for myself, mostly created by searching the web and pointing to or copying other people&rsquo;s answers.</p>
+<ul>
+<li><a href="#modes">Modes</a></li>
+<li><a href="#files">Files</a></li>
+<li><a href="#opening-commands">Opening commands</a></li>
+<li><a href="#cursor-movement">Cursor movement</a></li>
+<li><a href="#line-search">Line search</a></li>
+<li><a href="#replacing-a-word-in-a-block">Replacing a word in a block</a></li>
+<li><a href="#changing-a-word-at-n-positions">Changing a word at n positions</a></li>
+<li><a href="#recording-and-playing-macros">Recording and playing macros</a></li>
+<li><a href="#swap-two-characters">Swap two characters</a></li>
+<li><a href="#switch-case">Switch case</a></li>
+<li><a href="#replace-character">Replace character</a></li>
+<li><a href="#move-block-of-text">Move block of text</a></li>
+<li><a href="#delete">Delete</a></li>
+<li><a href="#search">Search</a></li>
+<li><a href="#folds">Folds</a>
+<ul>
+<li><a href="#movements">Movements</a></li>
+</ul>
+</li>
+<li><a href="#powerless-verbs">Powerless verbs</a></li>
+<li><a href="#miscellaneous-movementsscrolling">Miscellaneous movements/Scrolling</a></li>
+<li><a href="#external-resources">External Resources</a></li>
+</ul>
+<h1 id="modes">Modes</h1>
 <ul>
 <li>Insert Normal mode: In insert mode, press <code>Ctrl-o</code> to quickly execute a command and come back to insert mode</li>
 </ul>
@@ -148,8 +173,9 @@ zE Delete all folds the current buffer
 <li>r - replace character under the cursor with another character</li>
 <li>s- delete character under the cursor and enter the Insert mode</li>
 </ul>
-<h1 id="miscellaneous-movements">Miscellaneous movements</h1>
+<h1 id="miscellaneous-movementsscrolling">Miscellaneous movements/Scrolling</h1>
 <ul>
+<li><code>zt</code> to put the current line to the top of the screen</li>
 <li><code>zz</code> to center the current line to the center</li>
 <li><code>G</code> to go the last line of the document</li>
 <li><code>gg</code> to go the first line of the document</li>
@@ -162,6 +188,10 @@ zE Delete all folds the current buffer
 <li>Scroll up full page: <code>Ctrl-b</code></li>
 <li>Go to line at 50% of file: <code>50%</code></li>
 <li>In Insert mode, <code>shift+right/left arrow</code> to jump forward/backward by words</li>
+</ul>
+<p>More scrolling tips and techniques:</p>
+<ul>
+<li><a href="https://unix.stackexchange.com/a/110252">https://unix.stackexchange.com/a/110252</a></li>
 </ul>
 <h1 id="external-resources">External Resources</h1>
 <ul>
@@ -176,7 +206,7 @@ zE Delete all folds the current buffer
 </ul>
 </article>
 <footer id="footer">
-    Post managed in a <a href="https://github.com/amitsaha/echorand.me">git repo</a> | <a href="https://github.com/amitsaha/echorand.me/commit/65fc6b4f844fd321db87dc3ff663cb367532c542">Last Commit on this post </a>
+    Post managed in a <a href="https://github.com/amitsaha/echorand.me">git repo</a> | <a href="https://github.com/amitsaha/echorand.me/commit/ff326f82b7d656bfc306e8f9a6909ba38f2e3cfe">Last Commit on this post </a>
   | <a href="https://github.com/amitsaha/echorand.me/edit/master/content/posts/vim-notes.md">Edit post</a>
     <p>
     Blog managed via <a href="https://gohugo.io/">Hugo</a> and using a modified version of the <a href="https://themes.gohugo.io/etch/">Etch</a> theme.
