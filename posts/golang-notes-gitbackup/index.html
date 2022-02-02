@@ -44,50 +44,50 @@
 perform cleanup after these tests so that my filesystem would not remain polluted. However, then I decided to check what <a class="reference external" href="https://github.com/spf13/afero">afero</a> had to offer. It had exactly what I needed - a memory backed filesystem (<cite>NewMemMapFs</cite>).This <a class="reference external" href="https://github.com/spf13/afero#using-afero-for-testing">section</a> in the project homepage was all I needed to switch to using <cite>afero</cite> instead of <cite>os</cite> package drirectly. And hence I didn't need to worry about cleaning up my filesystem after a test run or worry about starting from a known clean state!</p>
 <p>To show some code, this is the <cite>git diff</cite> of introducing <cite>afero</cite> and switching out direct use of <cite>os</cite>:</p>
 <pre class="code diff literal-block">
-<span class="generic heading">diff --git a/src/gitbackup/main.go b/src/gitbackup/main.go
-index 500d9a2..6e71beb 100644
-</span><span class="generic deleted">--- a/src/gitbackup/main.go
-</span><span class="generic inserted">+++ b/src/gitbackup/main.go
-</span><span class="generic subheading">&#64;&#64; -3,6 +3,7 &#64;&#64; package main
-</span> import (
-        &quot;flag&quot;
-        &quot;github.com/mitchellh/go-homedir&quot;
-<span class="generic inserted">+       &quot;github.com/spf13/afero&quot;
-</span>        &quot;log&quot;
-        &quot;os&quot;
-        &quot;os/exec&quot;
-<span class="generic subheading">&#64;&#64; -14,6 +15,7 &#64;&#64; import (
-</span> var MAX_CONCURRENT_CLONES int = 20
+<span class="generic heading">diff --git a/src/gitbackup/main.go b/src/gitbackup/main.go</span><span class="whitespace">
+</span><span class="generic heading">index 500d9a2..6e71beb 100644</span><span class="whitespace">
+</span><span class="generic deleted">--- a/src/gitbackup/main.go</span><span class="whitespace">
+</span><span class="generic inserted">+++ b/src/gitbackup/main.go</span><span class="whitespace">
+</span><span class="generic subheading">&#64;&#64; -3,6 +3,7 &#64;&#64; package main</span><span class="whitespace">
+ </span>import (<span class="whitespace">
+ </span>       &quot;flag&quot;<span class="whitespace">
+ </span>       &quot;github.com/mitchellh/go-homedir&quot;<span class="whitespace">
+</span><span class="generic inserted">+       &quot;github.com/spf13/afero&quot;</span><span class="whitespace">
+ </span>       &quot;log&quot;<span class="whitespace">
+ </span>       &quot;os&quot;<span class="whitespace">
+ </span>       &quot;os/exec&quot;<span class="whitespace">
+</span><span class="generic subheading">&#64;&#64; -14,6 +15,7 &#64;&#64; import (</span><span class="whitespace">
+ </span>var MAX_CONCURRENT_CLONES int = 20<span class="whitespace">
 
- var execCommand = exec.Command
-<span class="generic inserted">+var appFS = afero.NewOsFs()
-</span> var gitCommand = &quot;git&quot;
+ </span>var execCommand = exec.Command<span class="whitespace">
+</span><span class="generic inserted">+var appFS = afero.NewOsFs()</span><span class="whitespace">
+ </span>var gitCommand = &quot;git&quot;<span class="whitespace">
 
- // Check if we have a copy of the repo already, if
-<span class="generic subheading">&#64;&#64; -22,7 +24,7 &#64;&#64; func backUp(backupDir string, repo *Repository, wg *sync.WaitGroup) ([]byte, err
-</span>        defer wg.Done()
+ </span>// Check if we have a copy of the repo already, if<span class="whitespace">
+</span><span class="generic subheading">&#64;&#64; -22,7 +24,7 &#64;&#64; func backUp(backupDir string, repo *Repository, wg *sync.WaitGroup) ([]byte, err</span><span class="whitespace">
+ </span>       defer wg.Done()<span class="whitespace">
 
-        repoDir := path.Join(backupDir, repo.Name)
-<span class="generic deleted">-       _, err := os.Stat(repoDir)
-</span><span class="generic inserted">+       _, err := appFS.Stat(repoDir)
-</span>
-        var stdoutStderr []byte
-        if err == nil {
-<span class="generic subheading">&#64;&#64; -83,7 +85,7 &#64;&#64; func main() {
-</span>        } else {
-                *backupDir = path.Join(*backupDir, *service)
-        }
-<span class="generic deleted">-       _, err := os.Stat(*backupDir)
-</span><span class="generic inserted">+       _, err := appFS.Stat(*backupDir)
-</span>        if err != nil {
-                log.Printf(&quot;%s doesn't exist, creating it\n&quot;, *backupDir)
-                err := os.MkdirAll(*backupDir, 0771)
+ </span>       repoDir := path.Join(backupDir, repo.Name)<span class="whitespace">
+</span><span class="generic deleted">-       _, err := os.Stat(repoDir)</span><span class="whitespace">
+</span><span class="generic inserted">+       _, err := appFS.Stat(repoDir)</span><span class="whitespace">
+
+ </span>       var stdoutStderr []byte<span class="whitespace">
+ </span>       if err == nil {<span class="whitespace">
+</span><span class="generic subheading">&#64;&#64; -83,7 +85,7 &#64;&#64; func main() {</span><span class="whitespace">
+ </span>       } else {<span class="whitespace">
+ </span>               *backupDir = path.Join(*backupDir, *service)<span class="whitespace">
+ </span>       }<span class="whitespace">
+</span><span class="generic deleted">-       _, err := os.Stat(*backupDir)</span><span class="whitespace">
+</span><span class="generic inserted">+       _, err := appFS.Stat(*backupDir)</span><span class="whitespace">
+ </span>       if err != nil {<span class="whitespace">
+ </span>               log.Printf(&quot;%s doesn't exist, creating it\n&quot;, *backupDir)<span class="whitespace">
+ </span>               err := os.MkdirAll(*backupDir, 0771)
 </pre>
 <p>When we declare <cite>appFS</cite> above outside all functions, it becomes a package level
 variable and we set it to <cite>NewOsFs()</cite> and replace function calls such as <cite>os.Stat</cite> by <cite>appFS.Stat()</cite>. Since the variable name starts with a small letter, this variable is not visible outside the package.</p>
 <p>Then, in the test, I will do:</p>
 <pre class="code go literal-block">
-<span class="name other">appFS</span> <span class="punctuation">=</span> <span class="name other">afero</span><span class="punctuation">.</span><span class="name other">NewMemMapFs</span><span class="punctuation">()</span>
+<span class="name other">appFS</span><span class="whitespace"> </span><span class="punctuation">=</span><span class="whitespace"> </span><span class="name other">afero</span><span class="punctuation">.</span><span class="name other">NewMemMapFs</span><span class="punctuation">()</span>
 </pre>
 <p>Hence, all operations will happen in the memory based filesystem rather than the &quot;real&quot; underlying filesystem.</p>
 </div>
@@ -96,48 +96,48 @@ variable and we set it to <cite>NewOsFs()</cite> and replace function calls such
 <p>One of the first roadblocks to writing tests I faced was how to test functions which were invoking external programs (<tt class="docutils literal">git</tt> in this case). This post here titled <a class="reference external" href="https://npf.io/2015/06/testing-exec-command/">Testing os/exec.Command</a> had my answer. However, it took me a while to correctly apply it. And that post is still the reference if you want to understand what's going on.</p>
 <p>Here's basically what I did:</p>
 <pre class="code go literal-block">
-<span class="keyword declaration">var</span> <span class="name other">execCommand</span> <span class="punctuation">=</span> <span class="name other">exec</span><span class="punctuation">.</span><span class="name other">Command</span>
-<span class="punctuation">..</span>
+<span class="keyword declaration">var</span><span class="whitespace"> </span><span class="name other">execCommand</span><span class="whitespace"> </span><span class="punctuation">=</span><span class="whitespace"> </span><span class="name other">exec</span><span class="punctuation">.</span><span class="name other">Command</span><span class="whitespace">
+</span><span class="punctuation">..</span><span class="whitespace">
 
-<span class="keyword declaration">func</span> <span class="name other">backUp</span><span class="punctuation">(</span><span class="name other">backupDir</span> <span class="keyword type">string</span><span class="punctuation">,</span> <span class="name other">repo</span> <span class="operator">*</span><span class="name other">Repository</span><span class="punctuation">,</span> <span class="name other">wg</span> <span class="operator">*</span><span class="name other">sync</span><span class="punctuation">.</span><span class="name other">WaitGroup</span><span class="punctuation">)</span> <span class="punctuation">([]</span><span class="keyword type">byte</span><span class="punctuation">,</span> <span class="keyword type">error</span><span class="punctuation">)</span> <span class="punctuation">{</span>
-    <span class="operator">...</span>
-    <span class="keyword">if</span> <span class="name other">err</span> <span class="operator">==</span> <span class="keyword constant">nil</span> <span class="punctuation">{</span>
-        <span class="punctuation">..</span>
-        <span class="name other">cmd</span> <span class="operator">:=</span> <span class="name other">execCommand</span><span class="punctuation">(</span><span class="name other">gitCommand</span><span class="punctuation">,</span> <span class="literal string">&quot;-C&quot;</span><span class="punctuation">,</span> <span class="name other">repoDir</span><span class="punctuation">,</span> <span class="literal string">&quot;pull&quot;</span><span class="punctuation">)</span>
-        <span class="punctuation">..</span>
-    <span class="punctuation">}</span> <span class="keyword">else</span> <span class="punctuation">{</span>
-        <span class="punctuation">..</span>
-        <span class="name other">cmd</span> <span class="operator">:=</span> <span class="name other">execCommand</span><span class="punctuation">(</span><span class="name other">gitCommand</span><span class="punctuation">,</span> <span class="literal string">&quot;clone&quot;</span><span class="punctuation">,</span> <span class="name other">repo</span><span class="punctuation">.</span><span class="name other">GitURL</span><span class="punctuation">,</span> <span class="name other">repoDir</span><span class="punctuation">)</span>
-        <span class="punctuation">..</span>
-    <span class="punctuation">}</span>
-    <span class="operator">...</span>
-<span class="punctuation">}</span>
+</span><span class="keyword declaration">func</span><span class="whitespace"> </span><span class="name other">backUp</span><span class="punctuation">(</span><span class="name other">backupDir</span><span class="whitespace"> </span><span class="keyword type">string</span><span class="punctuation">,</span><span class="whitespace"> </span><span class="name other">repo</span><span class="whitespace"> </span><span class="operator">*</span><span class="name other">Repository</span><span class="punctuation">,</span><span class="whitespace"> </span><span class="name other">wg</span><span class="whitespace"> </span><span class="operator">*</span><span class="name other">sync</span><span class="punctuation">.</span><span class="name other">WaitGroup</span><span class="punctuation">)</span><span class="whitespace"> </span><span class="punctuation">([]</span><span class="keyword type">byte</span><span class="punctuation">,</span><span class="whitespace"> </span><span class="keyword type">error</span><span class="punctuation">)</span><span class="whitespace"> </span><span class="punctuation">{</span><span class="whitespace">
+    </span><span class="operator">...</span><span class="whitespace">
+    </span><span class="keyword">if</span><span class="whitespace"> </span><span class="name other">err</span><span class="whitespace"> </span><span class="operator">==</span><span class="whitespace"> </span><span class="keyword constant">nil</span><span class="whitespace"> </span><span class="punctuation">{</span><span class="whitespace">
+        </span><span class="punctuation">..</span><span class="whitespace">
+        </span><span class="name other">cmd</span><span class="whitespace"> </span><span class="operator">:=</span><span class="whitespace"> </span><span class="name other">execCommand</span><span class="punctuation">(</span><span class="name other">gitCommand</span><span class="punctuation">,</span><span class="whitespace"> </span><span class="literal string">&quot;-C&quot;</span><span class="punctuation">,</span><span class="whitespace"> </span><span class="name other">repoDir</span><span class="punctuation">,</span><span class="whitespace"> </span><span class="literal string">&quot;pull&quot;</span><span class="punctuation">)</span><span class="whitespace">
+        </span><span class="punctuation">..</span><span class="whitespace">
+    </span><span class="punctuation">}</span><span class="whitespace"> </span><span class="keyword">else</span><span class="whitespace"> </span><span class="punctuation">{</span><span class="whitespace">
+        </span><span class="punctuation">..</span><span class="whitespace">
+        </span><span class="name other">cmd</span><span class="whitespace"> </span><span class="operator">:=</span><span class="whitespace"> </span><span class="name other">execCommand</span><span class="punctuation">(</span><span class="name other">gitCommand</span><span class="punctuation">,</span><span class="whitespace"> </span><span class="literal string">&quot;clone&quot;</span><span class="punctuation">,</span><span class="whitespace"> </span><span class="name other">repo</span><span class="punctuation">.</span><span class="name other">GitURL</span><span class="punctuation">,</span><span class="whitespace"> </span><span class="name other">repoDir</span><span class="punctuation">)</span><span class="whitespace">
+        </span><span class="punctuation">..</span><span class="whitespace">
+    </span><span class="punctuation">}</span><span class="whitespace">
+    </span><span class="operator">...</span><span class="whitespace">
+</span><span class="punctuation">}</span>
 </pre>
 <p>We declare a package variable, <tt class="docutils literal">execCommand</tt> which is intialized with <tt class="docutils literal">exec.Command</tt> from the <tt class="docutils literal">os/exec</tt> package. Then, in the tests, I do the following:</p>
 <pre class="code go literal-block">
-<span class="keyword declaration">func</span> <span class="name other">TestHelperCloneProcess</span><span class="punctuation">(</span><span class="name other">t</span> <span class="operator">*</span><span class="name other">testing</span><span class="punctuation">.</span><span class="name other">T</span><span class="punctuation">)</span> <span class="punctuation">{</span>
-    <span class="keyword">if</span> <span class="name other">os</span><span class="punctuation">.</span><span class="name other">Getenv</span><span class="punctuation">(</span><span class="literal string">&quot;GO_WANT_HELPER_PROCESS&quot;</span><span class="punctuation">)</span> <span class="operator">!=</span> <span class="literal string">&quot;1&quot;</span> <span class="punctuation">{</span>
-        <span class="keyword">return</span>
-    <span class="punctuation">}</span>
-    <span class="comment single">// Check that git command was executed
-</span>    <span class="keyword">if</span> <span class="name other">os</span><span class="punctuation">.</span><span class="name other">Args</span><span class="punctuation">[</span><span class="literal number integer">3</span><span class="punctuation">]</span> <span class="operator">!=</span> <span class="literal string">&quot;git&quot;</span> <span class="operator">||</span> <span class="name other">os</span><span class="punctuation">.</span><span class="name other">Args</span><span class="punctuation">[</span><span class="literal number integer">4</span><span class="punctuation">]</span> <span class="operator">!=</span> <span class="literal string">&quot;clone&quot;</span> <span class="punctuation">{</span>
-        <span class="name other">fmt</span><span class="punctuation">.</span><span class="name other">Fprintf</span><span class="punctuation">(</span><span class="name other">os</span><span class="punctuation">.</span><span class="name other">Stdout</span><span class="punctuation">,</span> <span class="literal string">&quot;Expected git clone to be executed. Got %v&quot;</span><span class="punctuation">,</span> <span class="name other">os</span><span class="punctuation">.</span><span class="name other">Args</span><span class="punctuation">[</span><span class="literal number integer">3</span><span class="punctuation">:])</span>
-        <span class="name other">os</span><span class="punctuation">.</span><span class="name other">Exit</span><span class="punctuation">(</span><span class="literal number integer">1</span><span class="punctuation">)</span>
-    <span class="punctuation">}</span>
-    <span class="name other">os</span><span class="punctuation">.</span><span class="name other">Exit</span><span class="punctuation">(</span><span class="literal number integer">0</span><span class="punctuation">)</span>
-<span class="punctuation">}</span>
+<span class="keyword declaration">func</span><span class="whitespace"> </span><span class="name other">TestHelperCloneProcess</span><span class="punctuation">(</span><span class="name other">t</span><span class="whitespace"> </span><span class="operator">*</span><span class="name other">testing</span><span class="punctuation">.</span><span class="name other">T</span><span class="punctuation">)</span><span class="whitespace"> </span><span class="punctuation">{</span><span class="whitespace">
+    </span><span class="keyword">if</span><span class="whitespace"> </span><span class="name other">os</span><span class="punctuation">.</span><span class="name other">Getenv</span><span class="punctuation">(</span><span class="literal string">&quot;GO_WANT_HELPER_PROCESS&quot;</span><span class="punctuation">)</span><span class="whitespace"> </span><span class="operator">!=</span><span class="whitespace"> </span><span class="literal string">&quot;1&quot;</span><span class="whitespace"> </span><span class="punctuation">{</span><span class="whitespace">
+        </span><span class="keyword">return</span><span class="whitespace">
+    </span><span class="punctuation">}</span><span class="whitespace">
+    </span><span class="comment single">// Check that git command was executed</span><span class="whitespace">
+    </span><span class="keyword">if</span><span class="whitespace"> </span><span class="name other">os</span><span class="punctuation">.</span><span class="name other">Args</span><span class="punctuation">[</span><span class="literal number integer">3</span><span class="punctuation">]</span><span class="whitespace"> </span><span class="operator">!=</span><span class="whitespace"> </span><span class="literal string">&quot;git&quot;</span><span class="whitespace"> </span><span class="operator">||</span><span class="whitespace"> </span><span class="name other">os</span><span class="punctuation">.</span><span class="name other">Args</span><span class="punctuation">[</span><span class="literal number integer">4</span><span class="punctuation">]</span><span class="whitespace"> </span><span class="operator">!=</span><span class="whitespace"> </span><span class="literal string">&quot;clone&quot;</span><span class="whitespace"> </span><span class="punctuation">{</span><span class="whitespace">
+        </span><span class="name other">fmt</span><span class="punctuation">.</span><span class="name other">Fprintf</span><span class="punctuation">(</span><span class="name other">os</span><span class="punctuation">.</span><span class="name other">Stdout</span><span class="punctuation">,</span><span class="whitespace"> </span><span class="literal string">&quot;Expected git clone to be executed. Got %v&quot;</span><span class="punctuation">,</span><span class="whitespace"> </span><span class="name other">os</span><span class="punctuation">.</span><span class="name other">Args</span><span class="punctuation">[</span><span class="literal number integer">3</span><span class="punctuation">:])</span><span class="whitespace">
+        </span><span class="name other">os</span><span class="punctuation">.</span><span class="name other">Exit</span><span class="punctuation">(</span><span class="literal number integer">1</span><span class="punctuation">)</span><span class="whitespace">
+    </span><span class="punctuation">}</span><span class="whitespace">
+    </span><span class="name other">os</span><span class="punctuation">.</span><span class="name other">Exit</span><span class="punctuation">(</span><span class="literal number integer">0</span><span class="punctuation">)</span><span class="whitespace">
+</span><span class="punctuation">}</span><span class="whitespace">
 
 
-<span class="keyword declaration">func</span> <span class="name other">fakeCloneCommand</span><span class="punctuation">(</span><span class="name other">command</span> <span class="keyword type">string</span><span class="punctuation">,</span> <span class="name other">args</span> <span class="operator">...</span><span class="keyword type">string</span><span class="punctuation">)</span> <span class="punctuation">(</span><span class="name other">cmd</span> <span class="operator">*</span><span class="name other">exec</span><span class="punctuation">.</span><span class="name other">Cmd</span><span class="punctuation">)</span> <span class="punctuation">{</span>
-    <span class="name other">cs</span> <span class="operator">:=</span> <span class="punctuation">[]</span><span class="keyword type">string</span><span class="punctuation">{</span><span class="literal string">&quot;-test.run=TestHelperCloneProcess&quot;</span><span class="punctuation">,</span> <span class="literal string">&quot;--&quot;</span><span class="punctuation">,</span> <span class="name other">command</span><span class="punctuation">}</span>
-    <span class="name other">cs</span> <span class="punctuation">=</span> <span class="name builtin">append</span><span class="punctuation">(</span><span class="name other">cs</span><span class="punctuation">,</span> <span class="name other">args</span><span class="operator">...</span><span class="punctuation">)</span>
-    <span class="name other">cmd</span> <span class="punctuation">=</span> <span class="name other">exec</span><span class="punctuation">.</span><span class="name other">Command</span><span class="punctuation">(</span><span class="name other">os</span><span class="punctuation">.</span><span class="name other">Args</span><span class="punctuation">[</span><span class="literal number integer">0</span><span class="punctuation">],</span> <span class="name other">cs</span><span class="operator">...</span><span class="punctuation">)</span>
-    <span class="name other">cmd</span><span class="punctuation">.</span><span class="name other">Env</span> <span class="punctuation">=</span> <span class="punctuation">[]</span><span class="keyword type">string</span><span class="punctuation">{</span><span class="literal string">&quot;GO_WANT_HELPER_PROCESS=1&quot;</span><span class="punctuation">}</span>
-    <span class="keyword">return</span> <span class="name other">cmd</span>
-<span class="punctuation">}</span>
+</span><span class="keyword declaration">func</span><span class="whitespace"> </span><span class="name other">fakeCloneCommand</span><span class="punctuation">(</span><span class="name other">command</span><span class="whitespace"> </span><span class="keyword type">string</span><span class="punctuation">,</span><span class="whitespace"> </span><span class="name other">args</span><span class="whitespace"> </span><span class="operator">...</span><span class="keyword type">string</span><span class="punctuation">)</span><span class="whitespace"> </span><span class="punctuation">(</span><span class="name other">cmd</span><span class="whitespace"> </span><span class="operator">*</span><span class="name other">exec</span><span class="punctuation">.</span><span class="name other">Cmd</span><span class="punctuation">)</span><span class="whitespace"> </span><span class="punctuation">{</span><span class="whitespace">
+    </span><span class="name other">cs</span><span class="whitespace"> </span><span class="operator">:=</span><span class="whitespace"> </span><span class="punctuation">[]</span><span class="keyword type">string</span><span class="punctuation">{</span><span class="literal string">&quot;-test.run=TestHelperCloneProcess&quot;</span><span class="punctuation">,</span><span class="whitespace"> </span><span class="literal string">&quot;--&quot;</span><span class="punctuation">,</span><span class="whitespace"> </span><span class="name other">command</span><span class="punctuation">}</span><span class="whitespace">
+    </span><span class="name other">cs</span><span class="whitespace"> </span><span class="punctuation">=</span><span class="whitespace"> </span><span class="name builtin">append</span><span class="punctuation">(</span><span class="name other">cs</span><span class="punctuation">,</span><span class="whitespace"> </span><span class="name other">args</span><span class="operator">...</span><span class="punctuation">)</span><span class="whitespace">
+    </span><span class="name other">cmd</span><span class="whitespace"> </span><span class="punctuation">=</span><span class="whitespace"> </span><span class="name other">exec</span><span class="punctuation">.</span><span class="name other">Command</span><span class="punctuation">(</span><span class="name other">os</span><span class="punctuation">.</span><span class="name other">Args</span><span class="punctuation">[</span><span class="literal number integer">0</span><span class="punctuation">],</span><span class="whitespace"> </span><span class="name other">cs</span><span class="operator">...</span><span class="punctuation">)</span><span class="whitespace">
+    </span><span class="name other">cmd</span><span class="punctuation">.</span><span class="name other">Env</span><span class="whitespace"> </span><span class="punctuation">=</span><span class="whitespace"> </span><span class="punctuation">[]</span><span class="keyword type">string</span><span class="punctuation">{</span><span class="literal string">&quot;GO_WANT_HELPER_PROCESS=1&quot;</span><span class="punctuation">}</span><span class="whitespace">
+    </span><span class="keyword">return</span><span class="whitespace"> </span><span class="name other">cmd</span><span class="whitespace">
+</span><span class="punctuation">}</span><span class="whitespace">
 
-<span class="name other">execCommand</span> <span class="punctuation">=</span> <span class="name other">fakeCloneCommand</span>
-<span class="name other">stdoutStderr</span><span class="punctuation">,</span> <span class="name other">err</span> <span class="operator">:=</span> <span class="name other">backUp</span><span class="punctuation">(</span><span class="name other">backupDir</span><span class="punctuation">,</span> <span class="operator">&amp;</span><span class="name other">repo</span><span class="punctuation">,</span> <span class="operator">&amp;</span><span class="name other">wg</span><span class="punctuation">)</span>
+</span><span class="name other">execCommand</span><span class="whitespace"> </span><span class="punctuation">=</span><span class="whitespace"> </span><span class="name other">fakeCloneCommand</span><span class="whitespace">
+</span><span class="name other">stdoutStderr</span><span class="punctuation">,</span><span class="whitespace"> </span><span class="name other">err</span><span class="whitespace"> </span><span class="operator">:=</span><span class="whitespace"> </span><span class="name other">backUp</span><span class="punctuation">(</span><span class="name other">backupDir</span><span class="punctuation">,</span><span class="whitespace"> </span><span class="operator">&amp;</span><span class="name other">repo</span><span class="punctuation">,</span><span class="whitespace"> </span><span class="operator">&amp;</span><span class="name other">wg</span><span class="punctuation">)</span>
 </pre>
 <p>The above is a test for the case where a repository is being backed up for the first
 time via <tt class="docutils literal">git clone</tt>. In the test, before I call the <tt class="docutils literal">backUp()</tt> function which actually executes the command, I set <tt class="docutils literal">execCommand = fakeCloneCommand</tt> so to that <tt class="docutils literal">execCommand</tt> doesn't point to <tt class="docutils literal">os.execCommand</tt> any more. <tt class="docutils literal">fakeCloneCommand</tt>, instead of executing <tt class="docutils literal">git clone</tt> executes <tt class="docutils literal">TestHelperCloneProcess</tt>, where we also check if the command being attempted to execute was <tt class="docutils literal">git clone</tt>.</p>
