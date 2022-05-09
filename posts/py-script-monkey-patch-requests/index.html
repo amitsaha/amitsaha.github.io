@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="echo $RANDOM. Exploring Software and writing about it.">
+    
+    <link rel="shortcut icon" href="https://echorand.me/favicon.ico">
+    
+    <link rel="stylesheet" href="/css/style.min.css">
+
+    <title>Pyodide, PyScript - Monkey patching requests</title>
+</head>
+<body><header id="banner">
+    <h2><a href="https://echorand.me">Exploring Software</a></h2>
+    <nav>
+        <ul>
+            <li>
+                <a href="/about" title="">About</a>
+            </li><li>
+                <a href="/posts" title="">Posts</a>
+            </li><li>
+                <a href="/talks" title="">Talks</a>
+            </li><li>
+                <a href="/writings-trainings" title="">Writings and Trainings</a>
+            </li><li>
+                <a href="/categories" title="">Categories</a>
+            </li><li>
+                <a href="/index.xml" title="">Subscribe (RSS)</a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main id="content">
+<article>
+    <header id="post-header">
+        <h1>Pyodide, PyScript - Monkey patching requests</h1><time>May 8, 2022</time></header><p>At PyCon US 2022, Anaconda announced <a href="https://anaconda.cloud/pyscript-python-in-the-browser">PyScript: Python in the Browser</a>.
+So far my understanding is that it builds on <a href="https://pyodide.org/">Pyodide</a> and makes it magically
+easy to bridge the world of the Browser - the Document Object Model (DOM) and Python. It&rsquo;s so magical
+that you can simply copy scripts that you were running using Python installed on a computer and
+they just run in the browser. Check out the blog post for some demos.</p>
+<p>To explore it with some definite goal in mind, I started porting some programs from my book, &ldquo;Doing Math with Python&rdquo;,
+and things mostly worked as they were. This blog post aims to discuss a specific problem
+I came across while porting these programs and how I solved it.</p>
+<h1 id="monkey-patching-requests">Monkey patching requests</h1>
+<p>The <a href="https://docs.python-requests.org/en/latest/">requests</a> package is widely used in the Python ecosystem whenever there is a need to make network
+requests. However, due to limitations of the networking stack in CPython&rsquo;s WebAssembly, you cannot use it
+with Pyodide and hence, PyScript. This means that if you were trying to use a package which uses
+<code>requests</code> to make HTTP requests, you would not be able to get the functionality working in PyScript.</p>
+<p>In my case, I was trying to use the <a href="https://pyowm.readthedocs.io/en/latest/index.html">pyowm</a> package to fetch
+weather forecast data which was only making HTTP GET requests. Hence, the solution suggested by Hood in the
+Pyodide Gitter channel was to monkey patch the relevant code
+to use the <a href="https://pyodide.org/en/stable/usage/api/python-api.html?highlight=open_url#pyodide.open_url">pyodide.open_url()</a>
+function.</p>
+<p>First, I  implement a just enough <code>MyResponse</code> class to encapsulate the response:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">MyResponse</span>:
+    <span style="color:#66d9ef">def</span> __init__(self, status_code, message, json_body):
+        self<span style="color:#f92672">.</span>status_code <span style="color:#f92672">=</span> status_code
+        self<span style="color:#f92672">.</span>text <span style="color:#f92672">=</span> message
+        self<span style="color:#f92672">.</span>json_body <span style="color:#f92672">=</span> json_body
+
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">json</span>(self):
+       <span style="color:#66d9ef">return</span> self<span style="color:#f92672">.</span>json_body
+</code></pre></div><p>The class contains just enough attributes and functions needed by <code>pyowm</code> and specifically,
+the functionality I am using.</p>
+<p>Then, I create a <code>JustEnoughRequests</code> class to implement a <code>get()</code> method which will call the
+<code>pyodide.open_url()</code> function referred to earlier, essentially, intercepting the call to the
+<code>requests.get()</code> function and instead using the <code>pyodide.open_url()</code> function to make the
+HTTP GET call:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">JustEnoughRequests</span>:
+    <span style="color:#66d9ef">def</span> __init__(self):
+        <span style="color:#66d9ef">pass</span>
+
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">get</span>(self, uri, <span style="color:#f92672">**</span>kwargs):
+        <span style="color:#66d9ef">print</span>(<span style="color:#e6db74">&#34;Sending request to:&#34;</span>, uri)
+        <span style="color:#66d9ef">print</span>(<span style="color:#e6db74">&#34;Got kwargs, igoring everyting other than params&#34;</span>, kwargs)
+        query_params <span style="color:#f92672">=</span> []
+        <span style="color:#66d9ef">for</span> k, v <span style="color:#f92672">in</span> kwargs[<span style="color:#e6db74">&#34;params&#34;</span>]<span style="color:#f92672">.</span>items():
+            query_params<span style="color:#f92672">.</span>append(k <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;=&#34;</span> <span style="color:#f92672">+</span> v) 
+        query_string <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&amp;&#34;</span><span style="color:#f92672">.</span>join(query_params)
+        response <span style="color:#f92672">=</span> pyodide<span style="color:#f92672">.</span>open_url(uri <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;?&#34;</span> <span style="color:#f92672">+</span> query_string)
+        json_response <span style="color:#f92672">=</span> response<span style="color:#f92672">.</span>getvalue()
+        d <span style="color:#f92672">=</span> json<span style="color:#f92672">.</span>loads(json_response)
+        <span style="color:#66d9ef">return</span> MyResponse(int(d[<span style="color:#e6db74">&#34;cod&#34;</span>]), d[<span style="color:#e6db74">&#34;message&#34;</span>], json<span style="color:#f92672">.</span>loads(json_response))
+ 
+just_enough_requests <span style="color:#f92672">=</span> JustEnoughRequests()
+</code></pre></div><p>As you can see in the implementation of the <code>get()</code> method, it accepts one positional argument
+and one or more keyword arguments. From the keyword arguments it is called with, it ignores all,
+but the <code>params</code> keyword argument from which it constructs the query parameters, appends
+them to the <code>uri</code> (the target HTTP request host and path) and then invokes the <code>pyodide.open_url()</code>
+function. This function returns a <code>io.StringIO()</code> object, hence, we use the <code>getvalue()</code> method
+to get the JSON encoded data. The JSON response from the Open Weathter Map API contains a field,
+<code>cod</code> containing the HTTP status code, <code>message</code> containing any error message and other data
+relevant to the request made as key-value pairs. We encapsulate the result in a <code>MyResponse</code> object
+and return it.</p>
+<p>Then, we create an object of type, <code>JustEnoughRequests</code> which will be what we replace the
+<code>requests</code> module with.</p>
+<p>The patching is done as follows:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">with</span> mock<span style="color:#f92672">.</span>patch(<span style="color:#e6db74">&#39;pyowm.commons.http_client.requests&#39;</span>, just_enough_requests):
+    <span style="color:#75715e"># Get a token from https://home.openweathermap.org/users/sign_up</span>
+    owm <span style="color:#f92672">=</span> OWM(<span style="color:#e6db74">&#39;your token&#39;</span>)
+    mgr <span style="color:#f92672">=</span> owm<span style="color:#f92672">.</span>weather_manager()
+    three_h_forecast <span style="color:#f92672">=</span> mgr<span style="color:#f92672">.</span>forecast_at_place(<span style="color:#e6db74">&#39;new york, us&#39;</span>, <span style="color:#e6db74">&#39;3h&#39;</span>)<span style="color:#f92672">.</span>forecast
+</code></pre></div><p>And that&rsquo;s it. Here&rsquo;s a complete <a href="https://raw.githubusercontent.com/doingmathwithpython/code/master/explorations/PyScript/chap2/nyc_forecast_owm.html">HTML file</a> which you can download. You will need an API key from open weather map. Once you have replaced
+the token in code, and open in your browser, you should see a graph.</p>
+<p><img src="/static/img/py_script_owm.png" alt="Graph of the forecast temperature" title="Graph of the forecast temperature"></p>
+<p>If nothing seems to happen, open the Console to look for any error logs.</p>
+<h1 id="summary">Summary</h1>
+<p>Now, of course, how you patch some other code which uses the requests package will vary. The key is to ensure that
+you are choosing the right <em>namespace</em> to patch in. Additionally, how much of the <code>requests</code> package you will
+need to implement also determines how simple or convoluted the patching gets.</p>
+<p>Have a look at this <a href="https://github.com/pyscript/pyscript/issues/225#issuecomment-1118380014">github issue</a> for
+PyScipt and the linked Pyodide issue to learn more and what&rsquo;s happening in this space.</p>
+</article>
+<footer id="footer">
+    Post managed in a <a href="https://github.com/amitsaha/echorand.me">git repo</a> | <a href="https://github.com/amitsaha/echorand.me/commit/ff21a52981154931283c5bc5a9c6272ff5661130">Last Commit on this post </a>
+  | <a href="https://github.com/amitsaha/echorand.me/edit/master/content/posts/py-script-monkey-patch-requests.md">Edit post</a>
+    <p>
+    Blog managed via <a href="https://gohugo.io/">Hugo</a> and using a modified version of the <a href="https://themes.gohugo.io/etch/">Etch</a> theme.
+    </p>  
+</footer>
+
+        </main><footer id="footer">
+    
+</footer>
+</body>
+</html>

@@ -6,9 +6,20 @@
     <description>Recent content on Exploring Software</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 07 Feb 2022 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 08 May 2022 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://echorand.me/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    
+    <item>
+      <title>Pyodide, PyScript - Monkey patching requests</title>
+      <link>https://echorand.me/posts/py-script-monkey-patch-requests/</link>
+      <pubDate>Sun, 08 May 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/py-script-monkey-patch-requests/</guid>
+      <description>At PyCon US 2022, Anaconda announced PyScript: Python in the Browser. So far my understanding is that it builds on Pyodide and makes it magically easy to bridge the world of the Browser - the Document Object Model (DOM) and Python. It&amp;rsquo;s so magical that you can simply copy scripts that you were running using Python installed on a computer and they just run in the browser. Check out the blog post for some demos.</description>
+    </item>
     
     
     
