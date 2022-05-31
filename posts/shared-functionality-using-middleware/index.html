@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="echo $RANDOM. Exploring Software and writing about it.">
+    
+    <link rel="shortcut icon" href="https://echorand.me/favicon.ico">
+    
+    <link rel="stylesheet" href="/css/style.min.css">
+
+    <title>PyCon US 2022 Talk - Implementing Shared Functionality Using Middleware</title>
+</head>
+<body><header id="banner">
+    <h2><a href="https://echorand.me">Exploring Software</a></h2>
+    <nav>
+        <ul>
+            <li>
+                <a href="/about" title="">About</a>
+            </li><li>
+                <a href="/posts" title="">Posts</a>
+            </li><li>
+                <a href="/talks" title="">Talks</a>
+            </li><li>
+                <a href="/writings-trainings" title="">Writings and Trainings</a>
+            </li><li>
+                <a href="/categories" title="">Categories</a>
+            </li><li>
+                <a href="/index.xml" title="">Subscribe (RSS)</a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main id="content">
+<article>
+    <header id="post-header">
+        <h1>PyCon US 2022 Talk - Implementing Shared Functionality Using Middleware</h1><time>May 30, 2022</time></header><p>I delivered a talk at the recently concluded <a href="https://us.pycon.org/2022/">PyCon US 2022 conference</a>.</p>
+<p>Amazing conference, great work by the organizers and everybody involved. This was my third time
+at PyCon US and my first time participating in the post conference sprints. I contributed
+to the Pyodide project during the sprints, and was a great experience to work with the core
+developers during the sprints and for a couple of days after the sprints. I also had a great
+time speaking to so many people, discussing my talk, my book, their talks, and their work.</p>
+<p>It was also great to speak to participants who were able to attend the conference, thanks
+to grants from Pyladies. This was a great reminder to me of the impact that PSF and Pyladies
+are having via their work.</p>
+<p>This is a <a href="https://ehmatthes.com/blog/pycon_2022_highlights/">great recap</a> by another attendee
+about how they experienced the conference.</p>
+<h2 id="my-talk">My talk</h2>
+<p>My talk was titled &ldquo;Implementing Shared Functionality Using Middleware&rdquo;.</p>
+<p>While preparing this talk, I went on a journey that taught me so much about
+WSGI applications, ASGI applications and how the different frameworks implement
+middleware internally.</p>
+<p>Some of my biggest insights which I had and implemented myself are:</p>
+<ul>
+<li>Writing a WSGI middleware allows one write a framework independent middleware</li>
+<li>Using WSGI middleware, we can run a Flask and Django application in the same app server</li>
+<li>Using a middleware it is possible to run WSGI and ASGI applications in the same
+appserver</li>
+</ul>
+<p>I hope I was able to communicate all my own learnings effectively via my talk.</p>
+<p>The video is now available <a href="https://www.youtube.com/watch?v=_t7GxTbKocc">here</a>.</p>
+<p>Slides and Demo code are available <a href="https://github.com/prod-python/pycon-us-2022">here</a>.</p>
+<p>I want to take a moment to acknowledge PyCon providing a free service for speakers
+to have a session with a speaking coach. That was really very helpful in improving
+my own talk delivery and presentatition.</p>
+</article>
+<footer id="footer">
+    Post managed in a <a href="https://github.com/amitsaha/echorand.me">git repo</a> | <a href="https://github.com/amitsaha/echorand.me/commit/a6af314d32aa8043cb70e3e84d66040b8c30163b">Last Commit on this post </a>
+  | <a href="https://github.com/amitsaha/echorand.me/edit/master/content/posts/shared-functionality-using-middleware.md">Edit post</a>
+    <p>
+    Blog managed via <a href="https://gohugo.io/">Hugo</a> and using a modified version of the <a href="https://themes.gohugo.io/etch/">Etch</a> theme.
+    </p>  
+</footer>
+
+        </main><footer id="footer">
+    
+</footer>
+</body>
+</html>

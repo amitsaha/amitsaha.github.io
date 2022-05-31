@@ -6,9 +6,21 @@
     <description>Recent content in Categories on Exploring Software</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 08 May 2022 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 30 May 2022 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://echorand.me/categories/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    
+    <item>
+      <title>PyCon US 2022 Talk - Implementing Shared Functionality Using Middleware</title>
+      <link>https://echorand.me/posts/shared-functionality-using-middleware/</link>
+      <pubDate>Mon, 30 May 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/shared-functionality-using-middleware/</guid>
+      <description>I delivered a talk at the recently concluded PyCon US 2022 conference.
+Amazing conference, great work by the organizers and everybody involved. This was my third time at PyCon US and my first time participating in the post conference sprints. I contributed to the Pyodide project during the sprints, and was a great experience to work with the core developers during the sprints and for a couple of days after the sprints.</description>
+    </item>
     
     
     
