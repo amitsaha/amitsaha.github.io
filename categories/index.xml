@@ -6,9 +6,22 @@
     <description>Recent content in Categories on Exploring Software</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 30 May 2022 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 06 Sep 2022 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://echorand.me/categories/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    
+    <item>
+      <title>Kiwi PyCon XI Talk - Middleware Patterns for your Applications</title>
+      <link>https://echorand.me/posts/shared-functionality-using-middleware-ii/</link>
+      <pubDate>Tue, 06 Sep 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/shared-functionality-using-middleware-ii/</guid>
+      <description>I delivered a talk at the recently concluded Kiwi PyCon XI.
+I attended it virtually as I was unable to travel due to last minute interruptions from a certain virus.
+The organizers were of course very well prepared for that. Massive kudos to the Next day video team and everyone else involved in the process, including the paper chair and the directory who did go the extra mile in convincing me that I should make use of the virtual presentation opportunity rather than withdrawing my talk altogether.</description>
+    </item>
     
     
     
