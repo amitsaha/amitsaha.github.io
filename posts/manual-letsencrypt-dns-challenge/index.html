@@ -57,9 +57,9 @@ I was after. <code>win-acme</code> needed hooks to be provided for the DNS chall
 at the moment - meaning, writing the hooks.</p>
 <h1 id="generating-the-certificate">Generating the certificate</h1>
 <p>Once you have installed <code>certbot</code>:</p>
-<pre><code>$ certbot certonly --manual --preferred-challenges dns -d &lt;your domain&gt; --config-dir . --logs-dir . --work-dir .
+<pre tabindex="0"><code>$ certbot certonly --manual --preferred-challenges dns -d &lt;your domain&gt; --config-dir . --logs-dir . --work-dir .
 </code></pre><p>The program will pause displaying:</p>
-<pre><code>Please deploy a DNS TXT record under the name
+<pre tabindex="0"><code>Please deploy a DNS TXT record under the name
 _acme-challenge.&lt;your domain&gt; with the following value:
 random$string
 Before continuing, verify the record is deployed.
@@ -70,7 +70,7 @@ the entire domain name as the record if you are doing this for a sub-domain. For
 on Windows, or <code>dig -t</code> on Linux.</p>
 <p>Once the record has propagated, certbot will try to find it, and if successful continue and eventually give an
 output like this:</p>
-<pre><code>IMPORTANT NOTES:
+<pre tabindex="0"><code>IMPORTANT NOTES:
 
  - Congratulations! Your certificate and chain have been saved at:
    /home/asaha/letsencrypt/live/&lt;your domain&gt;/fullchain.pem
@@ -79,7 +79,7 @@ output like this:</p>
    ...
 </code></pre><h1 id="importing-into-iis">Importing into IIS</h1>
 <p>The directory created will have a bunch of files. We will next create a .pfx file for importing into IIS using <code>openssl</code>:</p>
-<pre><code>$ openssl pkcs12 -export -out certificate.pfx -inkey privkey.pem -in cert.pem -certfile chain.pem
+<pre tabindex="0"><code>$ openssl pkcs12 -export -out certificate.pfx -inkey privkey.pem -in cert.pem -certfile chain.pem
 Enter Export Password:
 Verifying - Enter Export Password:
 </code></pre><p>The resultant file will be certificate.pfx. Now, copy the <code>certificate.pfx</code> file to the target IIS box and import

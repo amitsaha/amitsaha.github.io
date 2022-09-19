@@ -34,11 +34,10 @@
 <article>
     <header id="post-header">
         <h1>Using a specific SSH private key</h1><time>September 5, 2019</time></header><h1 id="how-do-i-specify-a-specifc-private-key-with-rsync">How do I specify a specifc private key with <code>rsync</code>?</h1>
-<pre><code>$ rsync &lt;other options&gt; -e &quot;ssh -i &lt;your private key&gt;&quot; &lt;src&gt; &lt;destination&gt;
-
+<pre tabindex="0"><code>$ rsync &lt;other options&gt; -e &#34;ssh -i &lt;your private key&gt;&#34; &lt;src&gt; &lt;destination&gt;
 </code></pre><p>Answer from <a href="https://unix.stackexchange.com/a/127355">here</a></p>
 <h1 id="how-do-i-specify-a-specific-private-key-with-git">How do I specify a specific private key with <code>git</code>?</h1>
-<pre><code>$ GIT_SSH_COMMAND=&quot;ssh -i &lt;your key file&gt;&quot; git &lt;command&gt;
+<pre tabindex="0"><code>$ GIT_SSH_COMMAND=&#34;ssh -i &lt;your key file&gt;&#34; git &lt;command&gt;
 </code></pre></article>
 <footer id="footer">
     Post managed in a <a href="https://github.com/amitsaha/echorand.me">git repo</a> | <a href="https://github.com/amitsaha/echorand.me/commit/b172cbffe657b4809741f3d144d6d42006326adb">Last Commit on this post </a>

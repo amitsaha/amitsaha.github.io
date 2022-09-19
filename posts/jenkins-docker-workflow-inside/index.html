@@ -55,17 +55,17 @@ translate to <code>docker exec -t &lt;docker container id above&gt; ..</code> co
 <p>Let&rsquo;s say the docker image you specify to <code>inside()</code> defines an entrypoint. What happens then? <code>cat</code> is specified as
 an argument to the entrypoint. So unless, your entrypoint can execute the <code>cat</code> program successfully, your container
 will never start successfully. The error in your CI build will be something like:</p>
-<pre><code>java.io.IOException: Failed to run top '80e56ee23982149fa484429af94fb70c1f63245bbf4fac265fe0a2f972dc16f5'. Error: 
+<pre tabindex="0"><code>java.io.IOException: Failed to run top &#39;80e56ee23982149fa484429af94fb70c1f63245bbf4fac265fe0a2f972dc16f5&#39;. Error: 
 Error response from daemon: Container 80e56ee23982149fa484429af94fb70c1f63245bbf4fac265fe0a2f972dc16f5 is not running
 </code></pre><p>After (1) above is run, Jenkins runs the equivalent of the <code>docker top</code> command (source code <a href="https://github.com/jenkinsci/docker-workflow-plugin/blob/74a2370901f41e8b5b541d768b440e2ab1cd1b18/src/main/java/org/jenkinsci/plugins/docker/workflow/client/DockerClient.java#L143">reference</a>)
 to find out the processes that are running and check if there is a process running the <code>cat</code> command. If there is none or
 there is an error otherwise, the build is aborted. Hence the above error that it failed to run <code>top</code> inside the container.</p>
 <p>Thus, if you are not sure about whether there is an ENTRYPOINT defined or not, we can disable the entrypoint using, <code>--entrypoint=''</code>.
 Thus, our <code>inside()</code> statement will look something like this:</p>
-<pre><code>docker.image('user/image:version').inside(&quot;&quot;&quot;--entrypoint=''&quot;&quot;&quot;) {
+<pre tabindex="0"><code>docker.image(&#39;user/image:version&#39;).inside(&#34;&#34;&#34;--entrypoint=&#39;&#39;&#34;&#34;&#34;) {
 }
 </code></pre><p>The above will result in the following docker command for step (1) above:</p>
-<pre><code>docker run -d -t --entrypoint='' user/image:version cat
+<pre tabindex="0"><code>docker run -d -t --entrypoint=&#39;&#39; user/image:version cat
 </code></pre><h1 id="conclusion">Conclusion</h1>
 <p>Hopefully this post helps somebody else when you are furiously trying to figure out what&rsquo;s going on. I know it will certainly
 help me. To learn about docker&rsquo;s ENTRYPOINT (and CMD), this <a href="https://blog.codeship.com/understanding-dockers-cmd-and-entrypoint-instructions/">post</a>

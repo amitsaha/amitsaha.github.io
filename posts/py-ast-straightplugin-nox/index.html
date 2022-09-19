@@ -43,7 +43,7 @@ else. So finally, I got around to sit with it and the result is this post and a 
 Python code analyser with an accompanying <a href="https://github.com/amitsaha/py_analyser">git repository</a>.</p>
 <p>The final result is a program powered by two plugins which will parse a module and print any rule violations that
 has been configured by the plugins:</p>
-<pre><code>2: Class hello: Class name not in CapWords
+<pre tabindex="0"><code>2: Class hello: Class name not in CapWords
 7: Class Nodocstring: No docstring found in class
 10: Class Alongdocstring: Docstring is greater than 100 characters
 </code></pre><p>Our analyser has two parts - the core engine and the plugins which can do various things with the code being analysed. For
@@ -58,7 +58,7 @@ this PyCon 2018 talk - <a href="https://www.youtube.com/watch?v=XhWvz4dK4ng">The
 and we get back an AST Node object which we can then use to traverse through the various nodes using the
 <a href="https://docs.python.org/3/library/ast.html#ast.walk">walk</a> function. Here&rsquo;s the code for the engine at the time of
 writing:</p>
-<pre><code># analyser/main.py
+<pre tabindex="0"><code># analyser/main.py
 ...
 def analyse(file_path):
     with open(file_path) as f:
@@ -72,12 +72,12 @@ we call this function <code>check_class</code> which then invokes all the checks
 <code>check_class</code> function such that we have all the rules hard-coded in there or have a way to externally load the check
 rules. Externally loading the rules without having to change the core engine is where <code>straight.plugin</code> comes in.</p>
 <p>This how the <code>check_class</code> function looks like at the time of writing:</p>
-<pre><code># analyser/main.py
+<pre tabindex="0"><code># analyser/main.py
 def check_class(node):
     # The call() function yields a function object
     # http://straightplugin.readthedocs.io/en/latest/api.html#straight.plugin.manager.PluginManager.call
     # Not sure why..
-    for p in plugins.call('check_violation', node):
+    for p in plugins.call(&#39;check_violation&#39;, node):
         if p:
             p()
 </code></pre><p><code>plugins</code> is a basically a plugin registry - <code>straight.plugin</code> calls it as <code>PluginManager</code>. The <code>call</code> method
@@ -85,8 +85,8 @@ returns function objects corresponding to the function you specified. Here, I ha
 which expects an argument to be passed, <code>node</code>. If it finds an valid object - i.e. it found the specified
 method, we call it.</p>
 <p>How do we create the plugin registry? We use the <code>load</code> function:</p>
-<pre><code>from straight.plugin import load
-plugins = load('analyser.extensions', subclasses=BaseClassCheck)
+<pre tabindex="0"><code>from straight.plugin import load
+plugins = load(&#39;analyser.extensions&#39;, subclasses=BaseClassCheck)
 ..
 </code></pre><p>The <code>load</code> function is called with two parameters:</p>
 <ul>
@@ -94,42 +94,40 @@ plugins = load('analyser.extensions', subclasses=BaseClassCheck)
 <li>The <code>subclasses</code> kwarg specifies that we only want to load classes which are subclasses of <code>BaseClassCheck</code>.</li>
 </ul>
 <p><code>BaseClassCheck</code> is implemented as follows:</p>
-<pre><code># analyser/bases.py
+<pre tabindex="0"><code># analyser/bases.py
 class BaseClassCheck():
 
     @classmethod
     def check_violation(cls, node):
-        raise NotImplementedError('Method not implemented')
+        raise NotImplementedError(&#39;Method not implemented&#39;)
     
     @classmethod
     def report_violation(cls, node, msg):
-        print('{0}: Class {1}: {2}'.format(node.lineno, node.name, msg))
-
+        print(&#39;{0}: Class {1}: {2}&#39;.format(node.lineno, node.name, msg))
 </code></pre><p>Any plugins for this engine is thus expected to subclass <code>BaseClassCheck</code> and implement the <code>check_violation</code>
 method.</p>
 <p>The <code>setup.py</code> for the core engine looks as follows:</p>
-<pre><code>from setuptools import setup
+<pre tabindex="0"><code>from setuptools import setup
 
 
 setup(
-    name='analyser',
-    version='1.0',
-    description='',
-    long_description='',
-    author='Amit Saha',
-    author_email='a@a.com',
-    install_requires=['straight.plugin'],
-    packages=['analyser'],
+    name=&#39;analyser&#39;,
+    version=&#39;1.0&#39;,
+    description=&#39;&#39;,
+    long_description=&#39;&#39;,
+    author=&#39;Amit Saha&#39;,
+    author_email=&#39;a@a.com&#39;,
+    install_requires=[&#39;straight.plugin&#39;],
+    packages=[&#39;analyser&#39;],
     zip_safe=False,
 )
-
 </code></pre><h1 id="writing-plugins">Writing plugins</h1>
 <p>Our core engine is done, how do we write plugins? I was faced with this new thing called <code>namespace packages</code>.
 Looking at the <a href="https://packaging.python.org/guides/packaging-namespace-packages/">docs</a>, it made complete sense.
 Basically, you want your plugins to be able to shipped as different Python packages written by different people.</p>
 <p>So, let&rsquo;s do that now. There are two example plugins in the <code>example_plugins</code> sub-direcotry. Each is a Python package
 and has a directory structure as follows:</p>
-<pre><code>.
+<pre tabindex="0"><code>.
 ├── py_analyser_class_capwords
 │   ├── analyser
 │   │   └── extensions
@@ -140,21 +138,20 @@ and has a directory structure as follows:</p>
 The key point above is the directory structure, <code>analyser/extensions/capwords</code>. The other plugin will have the directory
 structure <code>analyser/extensions/docstring</code>. This is what makes them both belong to the <code>analyser.extensions</code> namespace and
 hence discoverable by <code>straight.plugin</code>. The <code>setup.py</code> for the above plugin looks as follows:</p>
-<pre><code>from setuptools import setup
+<pre tabindex="0"><code>from setuptools import setup
 
 
 setup(
-    name='analyser-class-capwords',
-    version='1.0',
-    description='',
-    long_description='',
-    author='Amit Saha',
-    author_email='a@a.com',
-    install_requires=['analyser'],
-    packages=['analyser.extensions.capwords'],
+    name=&#39;analyser-class-capwords&#39;,
+    version=&#39;1.0&#39;,
+    description=&#39;&#39;,
+    long_description=&#39;&#39;,
+    author=&#39;Amit Saha&#39;,
+    author_email=&#39;a@a.com&#39;,
+    install_requires=[&#39;analyser&#39;],
+    packages=[&#39;analyser.extensions.capwords&#39;],
     zip_safe=False,
 )
-
 </code></pre><p>In a practical scenario, we will have these packages elsewhere and will just <code>pip install</code> them and the effect
 will be the same.</p>
 <h1 id="trying-it-all-out">Trying it all out</h1>
@@ -167,32 +164,32 @@ will be the same.</p>
 </ul>
 <p>But, that&rsquo;s all very boring and I found the tox that I love - <a href="http://nox.readthedocs.io/">nox</a>.
 So, there is a <code>nox.py</code> file, so if you install <code>nox</code>, you can just run <code>nox</code> from the root of the respository:</p>
-<pre><code>$ nox 
+<pre tabindex="0"><code>$ nox 
 ...
 nox &gt; python analyser/main.py ./module_under_test.py
 2: Class hello: Class name not in CapWords
 7: Class Nodocstring: No docstring found in class
 10: Class Alongdocstring: Docstring is greater than 100 characters
-nox &gt; Session human_testing(python_version='3.6') was successful.
+nox &gt; Session human_testing(python_version=&#39;3.6&#39;) was successful.
 ...
 </code></pre><p>The last three lines of the output is the result of running the checks implemented by the plugins.</p>
 <p>The <code>nox.py</code> file looks as follows:</p>
-<pre><code>import nox
+<pre tabindex="0"><code>import nox
 
 @nox.session
-@nox.parametrize('python_version', ['3.6'])
+@nox.parametrize(&#39;python_version&#39;, [&#39;3.6&#39;])
 def human_testing(session, python_version):
-    session.interpreter = 'python' + python_version
-    session.run('pip', 'install', '.')
-    session.run('pip', 'install', './example_plugins/py_analyser_class_capwords/')
-    session.run('pip', 'install', './example_plugins/py_analyser_class_docstring/')
-    session.run('python', 'analyser/main.py', './module_under_test.py')
+    session.interpreter = &#39;python&#39; + python_version
+    session.run(&#39;pip&#39;, &#39;install&#39;, &#39;.&#39;)
+    session.run(&#39;pip&#39;, &#39;install&#39;, &#39;./example_plugins/py_analyser_class_capwords/&#39;)
+    session.run(&#39;pip&#39;, &#39;install&#39;, &#39;./example_plugins/py_analyser_class_docstring/&#39;)
+    session.run(&#39;python&#39;, &#39;analyser/main.py&#39;, &#39;./module_under_test.py&#39;)
  
 </code></pre><h1 id="other-learnings">Other learnings</h1>
 <p>Besides all the above things that I learned, I also learned something about the <code>issubclass</code> function.
 I was wondering why, the below comparisions was returning False:</p>
-<pre><code>issubclass(&lt;class 'analyser.main.BaseClassCheck'&gt;, &lt;class '__main__.BaseClassCheck'&gt;)
-issubclass(&lt;class 'analyser.extensions.capwords.CheckCapwords'&gt; &lt;class '__main__.BaseClassCheck'&gt;)
+<pre tabindex="0"><code>issubclass(&lt;class &#39;analyser.main.BaseClassCheck&#39;&gt;, &lt;class &#39;__main__.BaseClassCheck&#39;&gt;)
+issubclass(&lt;class &#39;analyser.extensions.capwords.CheckCapwords&#39;&gt; &lt;class &#39;__main__.BaseClassCheck&#39;&gt;)
 </code></pre><p>And so basically, I moved <code>BaseClassCheck</code> from <code>analyser/main.py</code> to <code>analyser/bases.py</code> which meant
 the namespace of <code>BaseClassCheck</code> was always going to be the same.</p>
 <h1 id="summary">Summary</h1>

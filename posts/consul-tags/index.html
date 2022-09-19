@@ -39,63 +39,63 @@ a few examples of making use of tags and discuss some related topics.</p>
 <h1 id="use-case-1-dedicated-service-instances-based-on-requests">Use case #1: Dedicated service instances based on requests</h1>
 <p>Let&rsquo;s say our service is a HTTP server (REST API) acting as a routing point for multiple
 independent resources with the following service definition:</p>
-<pre><code>{
-  &quot;service&quot;: {
-    &quot;name&quot;: &quot;api&quot;,
-    &quot;address&quot;: &quot;&quot;,
-    &quot;port&quot;: 8080,
-    &quot;checks&quot;: [],
+<pre tabindex="0"><code>{
+  &#34;service&#34;: {
+    &#34;name&#34;: &#34;api&#34;,
+    &#34;address&#34;: &#34;&#34;,
+    &#34;port&#34;: 8080,
+    &#34;checks&#34;: [],
   }
 }
 </code></pre><p>We can then communicate with service using the DNS, <code>api.service.consul</code>.</p>
 <p>Let&rsquo;s assume we are running N copies of this service, but want to have dedicated sub-pools for
 separate resource groups. We will assign the services in each pool a different tag as follows:</p>
 <p><strong>projects</strong></p>
-<pre><code>{
-  &quot;service&quot;: {
-    &quot;name&quot;: &quot;api&quot;,
-    &quot;address&quot;: &quot;&quot;,
-    &quot;port&quot;: 8080,
-    &quot;checks&quot;: [],
-    &quot;tags&quot;:[&quot;projects&quot;],
+<pre tabindex="0"><code>{
+  &#34;service&#34;: {
+    &#34;name&#34;: &#34;api&#34;,
+    &#34;address&#34;: &#34;&#34;,
+    &#34;port&#34;: 8080,
+    &#34;checks&#34;: [],
+    &#34;tags&#34;:[&#34;projects&#34;],
   }
 }
 </code></pre><p><strong>users</strong></p>
-<pre><code>{
-  &quot;service&quot;: {
-    &quot;name&quot;: &quot;api&quot;,
-    &quot;address&quot;: &quot;&quot;,
-    &quot;port&quot;: 8080,
-    &quot;checks&quot;: [],
-    &quot;tags&quot;:[&quot;users&quot;],
+<pre tabindex="0"><code>{
+  &#34;service&#34;: {
+    &#34;name&#34;: &#34;api&#34;,
+    &#34;address&#34;: &#34;&#34;,
+    &#34;port&#34;: 8080,
+    &#34;checks&#34;: [],
+    &#34;tags&#34;:[&#34;users&#34;],
   }
 }
 </code></pre><p>Once we register the services using the different tags, they automatically become discoverable via DNS
 as <code>projects.api.service.consul</code> and <code>users.api.service.consul</code> respectively. Assuming that the routing
 to our HTTP server is happening in a higher layer, we will then direct traffic to these pools as follows:</p>
-<pre><code>api/projects/ -&gt; projects.api.service.consul
+<pre tabindex="0"><code>api/projects/ -&gt; projects.api.service.consul
 api/users/ -&gt; users.api.service.consul
 </code></pre><h1 id="use-case-2-running-different-versions-of-your-service">Use case #2: Running different versions of your service</h1>
 <p>We can use tags to run two different versions of our application for testing, gathering
 performance data, blue-green deployment or any other reason:</p>
 <p><strong>v1</strong></p>
-<pre><code>{
-  &quot;service&quot;: {
-    &quot;name&quot;: &quot;api&quot;,
-    &quot;address&quot;: &quot;&quot;,
-    &quot;port&quot;: 8080,
-    &quot;checks&quot;: [],
-    &quot;tags&quot;:[&quot;v1&quot;],
+<pre tabindex="0"><code>{
+  &#34;service&#34;: {
+    &#34;name&#34;: &#34;api&#34;,
+    &#34;address&#34;: &#34;&#34;,
+    &#34;port&#34;: 8080,
+    &#34;checks&#34;: [],
+    &#34;tags&#34;:[&#34;v1&#34;],
   }
 }
 </code></pre><p><strong>v2</strong></p>
-<pre><code>{
-  &quot;service&quot;: {
-    &quot;name&quot;: &quot;api&quot;,
-    &quot;address&quot;: &quot;&quot;,
-    &quot;port&quot;: 8080,
-    &quot;checks&quot;: [],
-    &quot;tags&quot;:[&quot;v2&quot;],
+<pre tabindex="0"><code>{
+  &#34;service&#34;: {
+    &#34;name&#34;: &#34;api&#34;,
+    &#34;address&#34;: &#34;&#34;,
+    &#34;port&#34;: 8080,
+    &#34;checks&#34;: [],
+    &#34;tags&#34;:[&#34;v2&#34;],
   }
 }
 </code></pre><p>We can then use a tag based weighted mechanism at a higher level proxy (such as <a href="https://github.com/linkerd/linkerd/commit/718514fb1d4b86153820880162d3c9559e115725">linkerd</a>) to send traffic to these different service
@@ -115,7 +115,7 @@ tags.</p>
 <a href="https://github.com/amitsaha/consul-demo">here</a>. To follow along, clone the repository, install <code>docker</code> and
 <code>docker-compose</code>.</p>
 <h2 id="start-consul-and-the-two-versions-of-the-api">Start consul and the two versions of the API</h2>
-<pre><code>$ pushd tags/api/v1
+<pre tabindex="0"><code>$ pushd tags/api/v1
 $ ./build-image.sh
 $ popd
 
@@ -126,30 +126,30 @@ $ popd
 $ pushd tags
 $ docker-compose up
 </code></pre><p>We should see the following output from <code>docker-compose up</code>:</p>
-<pre><code>consul    |     2017/12/01 04:01:03 [DEBUG] http: Request PUT /v1/agent/service/register (1.020389ms) from=172.21.0.4:34030
-consul    |     2017/12/01 04:01:03 [DEBUG] agent: Service 'apiv2' in sync
+<pre tabindex="0"><code>consul    |     2017/12/01 04:01:03 [DEBUG] http: Request PUT /v1/agent/service/register (1.020389ms) from=172.21.0.4:34030
+consul    |     2017/12/01 04:01:03 [DEBUG] agent: Service &#39;apiv2&#39; in sync
 consul    |     2017/12/01 04:01:03 [DEBUG] agent: Node info in sync
-consul    |     2017/12/01 04:01:03 [DEBUG] agent: Service 'apiv2' in sync
+consul    |     2017/12/01 04:01:03 [DEBUG] agent: Service &#39;apiv2&#39; in sync
 consul    |     2017/12/01 04:01:03 [DEBUG] agent: Node info in sync
-consul    |     2017/12/01 04:01:04 [DEBUG] agent: Service 'apiv2' in sync
-consul    |     2017/12/01 04:01:04 [INFO] agent: Synced service 'apiv1'
+consul    |     2017/12/01 04:01:04 [DEBUG] agent: Service &#39;apiv2&#39; in sync
+consul    |     2017/12/01 04:01:04 [INFO] agent: Synced service &#39;apiv1&#39;
 consul    |     2017/12/01 04:01:04 [DEBUG] agent: Node info in sync
 consul    |     2017/12/01 04:01:04 [DEBUG] http: Request PUT /v1/agent/service/register (3.333932ms) from=172.21.0.3:42486
-consul    |     2017/12/01 04:01:04 [DEBUG] agent: Service 'apiv2' in sync
-consul    |     2017/12/01 04:01:04 [DEBUG] agent: Service 'apiv1' in sync
+consul    |     2017/12/01 04:01:04 [DEBUG] agent: Service &#39;apiv2&#39; in sync
+consul    |     2017/12/01 04:01:04 [DEBUG] agent: Service &#39;apiv1&#39; in sync
 consul    |     2017/12/01 04:01:04 [DEBUG] agent: Node info in sync
-consul    |     2017/12/01 04:01:04 [DEBUG] agent: Service 'apiv1' in sync
-consul    |     2017/12/01 04:01:04 [DEBUG] agent: Service 'apiv2' in sync
+consul    |     2017/12/01 04:01:04 [DEBUG] agent: Service &#39;apiv1&#39; in sync
+consul    |     2017/12/01 04:01:04 [DEBUG] agent: Service &#39;apiv2&#39; in sync
 consul    |     2017/12/01 04:01:04 [DEBUG] agent: Node info in sync
 </code></pre><h2 id="start-the-dnsmasq-container">Start the dnsmasq container</h2>
 <p>Next, we are going to start a new docker container running <a href="http://www.thekelleys.org.uk/dnsmasq/doc.html">dnsmasq</a>:</p>
-<pre><code>
+<pre tabindex="0"><code>
 $ &lt; repo root &gt;
 $ pushd support/dnsmasq
 $ ./start-dnsmasq.sh
 </code></pre><h2 id="start-the-api-client-container">Start the API client container</h2>
 <p>Now, let&rsquo;s start a container which will act as an API client:</p>
-<pre><code>$ &lt; repo root &gt;
+<pre tabindex="0"><code>$ &lt; repo root &gt;
 $ cd support/apiclient
 $ ./start-client.sh 
 
@@ -168,7 +168,6 @@ Hi there! I am v1/ #
 
 / # curl v2.api.service.consul:8080/ping/
 Hi there! I am v2/ # 
-
 </code></pre><h2 id="points-to-note">Points to note</h2>
 <p>While working on the demo, I found out that I needed to specify the IP address of the service I was registering.
 Otherwise, they were being registered with empty IP addresses. This could be due to those services running in the

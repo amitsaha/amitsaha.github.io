@@ -34,10 +34,10 @@
 <article>
     <header id="post-header">
         <h1>Setting up OpenVPN client with systemd template unit files</h1><time>January 12, 2018</time></header><p>First, I installed <code>openvpn</code>:</p>
-<pre><code>$ sudo dnf  -y install openvpn
+<pre tabindex="0"><code>$ sudo dnf  -y install openvpn
 </code></pre><p>Then, I used the following systemd unit file from <a href="https://ask.fedoraproject.org/en/question/113988/openvpn-will-not-start-via-systemd-after-upgrade-to-f25/?answer=114099#post-id-114099">here</a> to create a systemd service for creating a new VPN
 connection on Fedora 27:</p>
-<pre><code>$ cat /etc/systemd/system/openvpn@.service 
+<pre tabindex="0"><code>$ cat /etc/systemd/system/openvpn@.service 
 
 [Unit]
 Description=OpenVPN service for %I
@@ -66,14 +66,14 @@ Restart=on-failure
 WantedBy=multi-user.target
 </code></pre><p>The <code>WorkingDirectory</code> set as <code>/etc/openvpn/client/%i</code> has the client configuration and all the other configuration that I needed. If you nedded support for two VPN connections, we would have two directories here corresponding to each. In my case, the files in my <code>client/fln</code>directory are: <code>vpn.key</code>, <code>vpn.crt</code>, <code>ca.crt</code>, <code>fln.conf</code> and <code>tls-auth.key</code>.</p>
 <p>Once I created the unit file, I enabled and started it as follows:</p>
-<pre><code>$ sudo systemctl enable openvpn@fln.service
+<pre tabindex="0"><code>$ sudo systemctl enable openvpn@fln.service
 $ sudo systemctl start openvpn@fln.service
 </code></pre><p>If I had a second configuration, I would do something like:</p>
-<pre><code>$ sudo systemctl enable openvpn@fln2.service
+<pre tabindex="0"><code>$ sudo systemctl enable openvpn@fln2.service
 $ sudo systemctl start openvpn@fln2.service
 </code></pre><h1 id="troubleshooting">Troubleshooting</h1>
 <p>If something goes wrong, you can see the logs via <code>journalctl</code>:</p>
-<pre><code>$ sudo journalctl -u openvpn@fln
+<pre tabindex="0"><code>$ sudo journalctl -u openvpn@fln
 ..
 </code></pre><h1 id="references">References</h1>
 <ul>

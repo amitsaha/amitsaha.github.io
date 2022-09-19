@@ -36,20 +36,20 @@
         <h1>flyway baseline Introducing flyway migrations into existing database</h1><time>October 12, 2018</time></header><p>If you are trying to introduce <a href="https://flywaydb.org/">flyway</a> to an existing database with the schemas and tables already
 created, you may find <a href="https://flywaydb.org/documentation/command/baseline">flyway baseline</a> command useful.</p>
 <p>Let&rsquo;s say you already have the migration scripts written, or perhaps dumped out of your existing DB setup, and they are:</p>
-<pre><code>V1__foo.sql
+<pre tabindex="0"><code>V1__foo.sql
 V2__foo_new.sql.
 V3__bar.sql
 </code></pre><p>You basically want to say - flyway, ignore all scripts upto V3, but if there are newer migrations, run them. To do so,
 you run the <code>baseline</code> command, like so:</p>
-<pre><code>$ docker run --rm -v 
-  &quot;$(pwd)&quot;/MigrationScripts:/flyway/sql \
+<pre tabindex="0"><code>$ docker run --rm -v 
+  &#34;$(pwd)&#34;/MigrationScripts:/flyway/sql \
   boxfuse/flyway \
-  -url=&quot;jdbc:&lt;url&gt;&quot; \
+  -url=&#34;jdbc:&lt;url&gt;&#34; \
   -baselineVersion=3 \
   baseline
 </code></pre><p>The key parameter above is <code>baselineVersion=3</code>. Executing the above command will create the <code>schema_version</code> table
 with a single row, like so:</p>
-<pre><code>installed_rank	version	description	           type	     script	           checksum	installed_by	installed_on	        execution_time	success
+<pre tabindex="0"><code>installed_rank	version	description	           type	     script	           checksum	installed_by	installed_on	        execution_time	success
 1              3	    &lt;&lt; Flyway Baseline &gt;&gt;	BASELINE	&lt;&lt; Flyway Baseline &gt;&gt;	NULL	 UserName	    2018-10-11 23:33:07.4	     0	         1
 </code></pre><p>If you now, run <code>migrate</code>, you will see it doesn&rsquo;t apply any migrations.</p>
 </article>

@@ -44,14 +44,14 @@
 <p>We will need four server blocks:</p>
 <ol>
 <li>http - example.com (listen on 80)</li>
-<li>http - <a href="http://www.example.com">www.example.com</a> (listen on 80)</li>
+<li>http - <a href="https://www.example.com">www.example.com</a> (listen on 80)</li>
 <li>https - example.com (listen on 443)</li>
-<li>https - <a href="http://www.example.com">www.example.com</a> (listen on 443)</li>
+<li>https - <a href="https://www.example.com">www.example.com</a> (listen on 443)</li>
 </ol>
 <p>I obviously went through a bit of hit and trial, but my main issue was around how I would setup (3) correctly. Since (3) is https,
 I needed to setup it up like (4) pointing it to the right SSL cert and key.</p>
 <p>The following Nginx configuration will achieve it:</p>
-<pre><code>upstream yourupstream {
+<pre tabindex="0"><code>upstream yourupstream {
   server 127.0.0.1:8080;
 }
 
@@ -93,7 +93,6 @@ server {
     proxy_pass http://myupstream;
   }
 }
-
 </code></pre><h1 id="learn-more">Learn more</h1>
 <p>I got help from the following resources:</p>
 <ul>

@@ -35,23 +35,23 @@
     <header id="post-header">
         <h1>Generate yourself some Terraform code from TOML</h1><time>April 4, 2019</time></header><p>In this post, we will see how we can use <a href="https://golang.org/">Golang</a> to generate Terraform configuration from a TOML specification.
 That is, given a TOML file, like:</p>
-<pre><code>subnet_name = &quot;SubnetA&quot;
+<pre tabindex="0"><code>subnet_name = &#34;SubnetA&#34;
 
 rules = [
-    {rule_no=101, egress = false, protocol = &quot;tcp&quot;, rule_action = &quot;allow&quot;, cidr_block = &quot;127.0.0.1/32&quot;, from_port = 22, to_port = 30},   
+    {rule_no=101, egress = false, protocol = &#34;tcp&#34;, rule_action = &#34;allow&#34;, cidr_block = &#34;127.0.0.1/32&#34;, from_port = 22, to_port = 30},   
 ]
 </code></pre><p>We will  generate:</p>
-<pre><code># This is a generated file, do not hand edit. See README at the
+<pre tabindex="0"><code># This is a generated file, do not hand edit. See README at the
 # root of the repository
 
-resource &quot;aws_network_acl_rule&quot; &quot;rule_SubnetA_ingress_101&quot; {
+resource &#34;aws_network_acl_rule&#34; &#34;rule_SubnetA_ingress_101&#34; {
 
-    network_acl_id = &quot;${lookup(local.network_acl_ids_map, &quot;SubnetA&quot;)}&quot;
+    network_acl_id = &#34;${lookup(local.network_acl_ids_map, &#34;SubnetA&#34;)}&#34;
     egress = false
     rule_number = 101
-    rule_action = &quot;allow&quot;
-    cidr_block = &quot;127.0.0.1/32&quot;
-    protocol = &quot;tcp&quot;
+    rule_action = &#34;allow&#34;
+    cidr_block = &#34;127.0.0.1/32&#34;
+    protocol = &#34;tcp&#34;
     from_port = 22
     to_port = 30
 
@@ -64,68 +64,67 @@ extrpolable to other cloud resources.</p>
 creating multiple instances of the same resource. I have been combining it with <code>lists</code> and <code>maps</code> to configure
 multiple instances of resources such as AWS VPC subnets, Autoscaling groups and most recently Network ACL rules.</p>
 <p>For example:</p>
-<pre><code>
-module &quot;vpc_services&quot; {
-  source   = &quot;../../modules/vpc&quot;
+<pre tabindex="0"><code>
+module &#34;vpc_services&#34; {
+  source   = &#34;../../modules/vpc&#34;
   ...
   
-  private_subnet_nacl_rules = &quot;${list(
+  private_subnet_nacl_rules = &#34;${list(
     map(
-      &quot;subnet_name&quot;, &quot;SubnetA&quot;,
-      &quot;rule_number&quot;, 100,
-      &quot;egress&quot;, false,
-      &quot;protocol&quot;, &quot;tcp&quot;,
-      &quot;rule_action&quot;, &quot;allow&quot;,
-      &quot;cidr_block&quot;,&quot;${local.vpc_root}.12.0/24&quot;,
-      &quot;from_port&quot;, 1433,
-      &quot;to_port&quot;, 1433
+      &#34;subnet_name&#34;, &#34;SubnetA&#34;,
+      &#34;rule_number&#34;, 100,
+      &#34;egress&#34;, false,
+      &#34;protocol&#34;, &#34;tcp&#34;,
+      &#34;rule_action&#34;, &#34;allow&#34;,
+      &#34;cidr_block&#34;,&#34;${local.vpc_root}.12.0/24&#34;,
+      &#34;from_port&#34;, 1433,
+      &#34;to_port&#34;, 1433
     ),
     map(
-      &quot;name&quot;, &quot;SubnetB&quot;,
-      &quot;rule_number&quot;, 101,
-      &quot;egress&quot;, true,
-      &quot;protocol&quot;, &quot;tcp&quot;,
-      &quot;rule_action&quot;, &quot;allow&quot;,
-      &quot;cidr_block&quot;,&quot;${local.vpc_root}.93.0/24&quot;,
-      &quot;from_port&quot;, 32768,
-      &quot;to_port&quot;, 65535
+      &#34;name&#34;, &#34;SubnetB&#34;,
+      &#34;rule_number&#34;, 101,
+      &#34;egress&#34;, true,
+      &#34;protocol&#34;, &#34;tcp&#34;,
+      &#34;rule_action&#34;, &#34;allow&#34;,
+      &#34;cidr_block&#34;,&#34;${local.vpc_root}.93.0/24&#34;,
+      &#34;from_port&#34;, 32768,
+      &#34;to_port&#34;, 65535
     ),
     ...
     # more such rules
-  )}&quot;
+  )}&#34;
 
 }
-
 </code></pre><p>The resource creation looks as follows:</p>
-<pre><code>locals {
-    public_network_acl_ids_map = &quot;${zipmap(
+<pre tabindex="0"><code>locals {
+    public_network_acl_ids_map = &#34;${zipmap(
         aws_subnet.public.*.tags.Name, aws_network_acl.public_subnets.*.id
-    )}&quot;,
-    private_network_acl_ids_map = &quot;${zipmap(
+    )}&#34;,
+    private_network_acl_ids_map = &#34;${zipmap(
         aws_subnet.private.*.tags.Name, aws_network_acl.private_subnets.*.id
-    )}&quot;
+    )}&#34;
 }
 
 ...
 
-resource &quot;aws_network_acl_rule&quot; &quot;private_subnet_rules&quot; {
-    count = &quot;${length(var.private_subnet_nacl_rules)}&quot;
+resource &#34;aws_network_acl_rule&#34; &#34;private_subnet_rules&#34; {
+    count = &#34;${length(var.private_subnet_nacl_rules)}&#34;
 
-    network_acl_id = &quot;${lookup(
+    network_acl_id = &#34;${lookup(
         local.private_network_acl_ids_map,
-        lookup(var.private_subnet_nacl_rules[count.index], &quot;subnet_name&quot;)
-    )}&quot;
+        lookup(var.private_subnet_nacl_rules[count.index], &#34;subnet_name&#34;)
+    )}&#34;
 
-    rule_number    = &quot;${lookup(var.private_subnet_nacl_rules[count.index], &quot;rule_number&quot;)}&quot;
-    egress         = &quot;${lookup(var.private_subnet_nacl_rules[count.index], &quot;egress&quot;)}&quot;
-    protocol       = &quot;${lookup(var.private_subnet_nacl_rules[count.index], &quot;protocol&quot;)}&quot;
-    rule_action    = &quot;${lookup(var.private_subnet_nacl_rules[count.index], &quot;rule_action&quot;)}&quot;
+    rule_number    = &#34;${lookup(var.private_subnet_nacl_rules[count.index], &#34;rule_number&#34;)}&#34;
+    egress         = &#34;${lookup(var.private_subnet_nacl_rules[count.index], &#34;egress&#34;)}&#34;
+    protocol       = &#34;${lookup(var.private_subnet_nacl_rules[count.index], &#34;protocol&#34;)}&#34;
+    rule_action    = &#34;${lookup(var.private_subnet_nacl_rules[count.index], &#34;rule_action&#34;)}&#34;
 
-    cidr_block     = &quot;${lookup(var.private_subnet_nacl_rules[count.index], &quot;cidr_block&quot;)}&quot;
-    from_port      = &quot;${lookup(var.private_subnet_nacl_rules[count.index], &quot;from_port&quot;)}&quot;
-    to_port        = &quot;${lookup(var.private_subnet_nacl_rules[count.index], &quot;to_port&quot;)}&quot;
+    cidr_block     = &#34;${lookup(var.private_subnet_nacl_rules[count.index], &#34;cidr_block&#34;)}&#34;
+    from_port      = &#34;${lookup(var.private_subnet_nacl_rules[count.index], &#34;from_port&#34;)}&#34;
+    to_port        = &#34;${lookup(var.private_subnet_nacl_rules[count.index], &#34;to_port&#34;)}&#34;
 }
-</code></pre><p>Since we are using the <code>count</code> attribute which Terraform uses in its state to keep track of the resources' state,
+</code></pre><p>Since we are using the <code>count</code> attribute which Terraform uses in its state to keep track of the resources&rsquo; state,
 a change in an item somewhere in the middle of the <code>private_subnet_nacl_rules</code> list, will in this case cause the
 rules following itto be created and destroyed. Of course, this is not limited to Network ACL rules. See <a href="https://github.com/hashicorp/terraform/issues/14275">issue</a>.</p>
 <p>What do we do? The most straightforward approach to this is to create separate <code>aws_network_acl_rule</code> resources
@@ -146,11 +145,11 @@ by hand. Instead of writing by hand however, what if we generate the ACL rules? 
 <li>Network ACL to which it is attached to</li>
 </ul>
 <p>I propose a <a href="https://github.com/toml-lang/toml">toml</a> based specification:</p>
-<pre><code>subnet_name = &quot;SubnetA&quot;
+<pre tabindex="0"><code>subnet_name = &#34;SubnetA&#34;
 
 rules = [
-    {rule_no=101, egress = false, protocol = &quot;tcp&quot;, rule_action = &quot;allow&quot;, cidr_block = &quot;127.0.0.1/32&quot;, from_port = 22, to_port = 30},
-    {rule_no=102, egress = true, protocol = &quot;tcp&quot;, rule_action = &quot;allow&quot;, cidr_block = &quot;127.0.0.1/32&quot;, from_port = 22, to_port = 30}
+    {rule_no=101, egress = false, protocol = &#34;tcp&#34;, rule_action = &#34;allow&#34;, cidr_block = &#34;127.0.0.1/32&#34;, from_port = 22, to_port = 30},
+    {rule_no=102, egress = true, protocol = &#34;tcp&#34;, rule_action = &#34;allow&#34;, cidr_block = &#34;127.0.0.1/32&#34;, from_port = 22, to_port = 30}
 ]
 </code></pre><p>The assumption here is that, we will have a Network ACL rules specification file per Network ACL and the network ACL ID
 will be derived from the Subnet&rsquo;s name specified in <code>subnet_name</code>.</p>
@@ -159,20 +158,20 @@ will be derived from the Subnet&rsquo;s name specified in <code>subnet_name</cod
 from it. I will be using <a href="https://github.com/BurntSushi/toml">burntsushi/toml</a> to parse the TOML file and serialize
 it into a Golang structure.</p>
 <p>The key bit here is the Golang struct which we will serialize the rules into:</p>
-<pre><code>type naclRulesSpec struct {
-	SubnetName string     `toml:&quot;subnet_name&quot;`
-	Rules      []naclRule `toml:&quot;rules&quot;`
+<pre tabindex="0"><code>type naclRulesSpec struct {
+	SubnetName string     `toml:&#34;subnet_name&#34;`
+	Rules      []naclRule `toml:&#34;rules&#34;`
 }
 </code></pre><p>We define <code>naclRule</code> as a struct as follows:</p>
-<pre><code>type naclRule struct {
-	NetworkACLID string `tf:&quot;network_acl_id&quot;`
-	Egress       bool   `toml:&quot;egress&quot; tf:&quot;egress&quot; tf_type:&quot;bool&quot;`
-	RuleNo       int64  `toml:&quot;rule_no&quot; tf:&quot;rule_number&quot; tf_type:&quot;int&quot;`
-	RuleAction   string `toml:&quot;rule_action&quot; tf:&quot;rule_action&quot;`
-	CidrBlock    string `toml:&quot;cidr_block&quot; tf:&quot;cidr_block&quot;`
-	Protocol     string `toml:&quot;protocol&quot; tf:&quot;protocol&quot;`
-	FromPort     int64  `toml:&quot;from_port&quot; tf:&quot;from_port&quot; tf_type:&quot;int&quot;`
-	ToPort       int64  `toml:&quot;to_port&quot; tf:&quot;to_port&quot; tf_type:&quot;int&quot;`
+<pre tabindex="0"><code>type naclRule struct {
+	NetworkACLID string `tf:&#34;network_acl_id&#34;`
+	Egress       bool   `toml:&#34;egress&#34; tf:&#34;egress&#34; tf_type:&#34;bool&#34;`
+	RuleNo       int64  `toml:&#34;rule_no&#34; tf:&#34;rule_number&#34; tf_type:&#34;int&#34;`
+	RuleAction   string `toml:&#34;rule_action&#34; tf:&#34;rule_action&#34;`
+	CidrBlock    string `toml:&#34;cidr_block&#34; tf:&#34;cidr_block&#34;`
+	Protocol     string `toml:&#34;protocol&#34; tf:&#34;protocol&#34;`
+	FromPort     int64  `toml:&#34;from_port&#34; tf:&#34;from_port&#34; tf_type:&#34;int&#34;`
+	ToPort       int64  `toml:&#34;to_port&#34; tf:&#34;to_port&#34; tf_type:&#34;int&#34;`
 }
 </code></pre><p>From the rules specification above, you can see that we are not specifying the network acl ID, since in this case
 we will be generating Terraform code to look it up based on the subnet name. For all the other fields, we specify
@@ -183,10 +182,10 @@ struct tags we specify, <code>tf</code> and <code>tf_type</code> are used in gen
 <li><code>tf_type</code>: We use this to determine if the attribute value is a string or another data type understood by terraform</li>
 </ul>
 <p>The following code will then read a Network ACL rules specification and serialize it into Golang objects:</p>
-<pre><code>naclSpecPath := os.Args[1]
+<pre tabindex="0"><code>naclSpecPath := os.Args[1]
 var naclRules naclRulesSpec
 if _, err := toml.DecodeFile(naclSpecPath, &amp;naclRules); err != nil {
-    fmt.Println(&quot;Error&quot;, err)
+    fmt.Println(&#34;Error&#34;, err)
     return
 }
 subnetName = naclRules.SubnetName
@@ -195,48 +194,48 @@ rules specified - is the rule number valid? Is the CIDR a valid CIDR? and any ot
 so before we generate the Terraform code. It&rsquo;s also worth noting that the above serialization step will also assist in catching
 data type mismatch errors.</p>
 <p>Here&rsquo;s how we can run validation on the specified rules and generate Terraform code if all the rules are valid:</p>
-<pre><code>// We use the index only pattern here so that
+<pre tabindex="0"><code>// We use the index only pattern here so that
 // we can modify the array elements to insert the
 // static value for NetworkAclID
 for i := range naclRules.Rules {
 	if result, err := naclRules.Rules[i].Validate(); !result {
-		log.Fatalf(&quot;Invalid rule specification: %#v\n%v\n&quot;, naclRules.Rules[i], err)
+		log.Fatalf(&#34;Invalid rule specification: %#v\n%v\n&#34;, naclRules.Rules[i], err)
 	}
 	// This is static terraform code which looks up the Network ACL id from a map
 	// created in Terraform
-	naclRules.Rules[i].NetworkACLID = fmt.Sprintf(`${lookup(local.network_acl_ids_map, &quot;%s&quot;)}`, subnetName)
+	naclRules.Rules[i].NetworkACLID = fmt.Sprintf(`${lookup(local.network_acl_ids_map, &#34;%s&#34;)}`, subnetName)
 }
 generateTfNaclRules(naclRules.Rules)
 </code></pre><p>The <code>generateTfNaclRules</code> function makes use of Golang templates to create the Terraform configuration.</p>
 <h1 id="demo">Demo</h1>
 <p>If we build the <a href="https://github.com/amitsaha/toml_to_tf/tree/master/nacl">code</a>, and run it:</p>
-<pre><code>$ ./nacl ./nacl_example.toml
+<pre tabindex="0"><code>$ ./nacl ./nacl_example.toml
 </code></pre><p>A file <code>SubnetA_nacls.tf</code> will be created as follows:</p>
-<pre><code>
+<pre tabindex="0"><code>
 # This is a generated file, do not hand edit. See README at the
 # root of the repository
 
-resource &quot;aws_network_acl_rule&quot; &quot;rule_SubnetA_ingress_101&quot; {
+resource &#34;aws_network_acl_rule&#34; &#34;rule_SubnetA_ingress_101&#34; {
 
-    network_acl_id = &quot;${lookup(local.network_acl_ids_map, &quot;SubnetA&quot;)}&quot;
+    network_acl_id = &#34;${lookup(local.network_acl_ids_map, &#34;SubnetA&#34;)}&#34;
     egress = false
     rule_number = 101
-    rule_action = &quot;allow&quot;
-    cidr_block = &quot;127.0.0.1/32&quot;
-    protocol = &quot;tcp&quot;
+    rule_action = &#34;allow&#34;
+    cidr_block = &#34;127.0.0.1/32&#34;
+    protocol = &#34;tcp&#34;
     from_port = 22
     to_port = 30
 
 
 }
-resource &quot;aws_network_acl_rule&quot; &quot;rule_SubnetA_egress_102&quot; {
+resource &#34;aws_network_acl_rule&#34; &#34;rule_SubnetA_egress_102&#34; {
 
-    network_acl_id = &quot;${lookup(local.network_acl_ids_map, &quot;SubnetA&quot;)}&quot;
+    network_acl_id = &#34;${lookup(local.network_acl_ids_map, &#34;SubnetA&#34;)}&#34;
     egress = true
     rule_number = 102
-    rule_action = &quot;allow&quot;
-    cidr_block = &quot;127.0.0.1/32&quot;
-    protocol = &quot;tcp&quot;
+    rule_action = &#34;allow&#34;
+    cidr_block = &#34;127.0.0.1/32&#34;
+    protocol = &#34;tcp&#34;
     from_port = 22
     to_port = 30
 

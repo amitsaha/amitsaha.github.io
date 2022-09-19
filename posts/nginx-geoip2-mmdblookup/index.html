@@ -42,162 +42,160 @@ from nginx and the geoip2 module integration. This is where <a href="https://max
 helped tremendously.</p>
 <h1 id="mmdblookup">mmdblookup</h1>
 <p><code>mmdblookup</code> can be used to read a MaxMind DB file for an IP address and query various information. To install:</p>
-<pre><code># yum -y install libmaxminddb-devel
+<pre tabindex="0"><code># yum -y install libmaxminddb-devel
 </code></pre><p>We need to give it a path to the DB file and the IP address and it spits out all that it finds out. For example:</p>
-<pre><code>$ mmdblookup --file /usr/share/GeoIP/GeoLite2-City.mmdb --ip 49.255.14.118 
+<pre tabindex="0"><code>$ mmdblookup --file /usr/share/GeoIP/GeoLite2-City.mmdb --ip 49.255.14.118 
 
   {
-    &quot;city&quot;: 
+    &#34;city&#34;: 
       {
-        &quot;geoname_id&quot;: 
+        &#34;geoname_id&#34;: 
           2147714 &lt;uint32&gt;
-        &quot;names&quot;: 
+        &#34;names&#34;: 
           {
-            &quot;de&quot;: 
-              &quot;Sydney&quot; &lt;utf8_string&gt;
-            &quot;en&quot;: 
-              &quot;Sydney&quot; &lt;utf8_string&gt;
-            &quot;es&quot;: 
-              &quot;Sídney&quot; &lt;utf8_string&gt;
-            &quot;fr&quot;: 
-              &quot;Sydney&quot; &lt;utf8_string&gt;
-            &quot;ja&quot;: 
-              &quot;シドニー&quot; &lt;utf8_string&gt;
-            &quot;pt-BR&quot;: 
-              &quot;Sydney&quot; &lt;utf8_string&gt;
-            &quot;ru&quot;: 
-              &quot;Сидней&quot; &lt;utf8_string&gt;
-            &quot;zh-CN&quot;: 
-              &quot;悉尼&quot; &lt;utf8_string&gt;
+            &#34;de&#34;: 
+              &#34;Sydney&#34; &lt;utf8_string&gt;
+            &#34;en&#34;: 
+              &#34;Sydney&#34; &lt;utf8_string&gt;
+            &#34;es&#34;: 
+              &#34;Sídney&#34; &lt;utf8_string&gt;
+            &#34;fr&#34;: 
+              &#34;Sydney&#34; &lt;utf8_string&gt;
+            &#34;ja&#34;: 
+              &#34;シドニー&#34; &lt;utf8_string&gt;
+            &#34;pt-BR&#34;: 
+              &#34;Sydney&#34; &lt;utf8_string&gt;
+            &#34;ru&#34;: 
+              &#34;Сидней&#34; &lt;utf8_string&gt;
+            &#34;zh-CN&#34;: 
+              &#34;悉尼&#34; &lt;utf8_string&gt;
           }
       }
-    &quot;continent&quot;: 
+    &#34;continent&#34;: 
       {
-        &quot;code&quot;: 
-          &quot;OC&quot; &lt;utf8_string&gt;
-        &quot;geoname_id&quot;: 
+        &#34;code&#34;: 
+          &#34;OC&#34; &lt;utf8_string&gt;
+        &#34;geoname_id&#34;: 
           6255151 &lt;uint32&gt;
-        &quot;names&quot;: 
+        &#34;names&#34;: 
           {
-            &quot;de&quot;: 
-              &quot;Ozeanien&quot; &lt;utf8_string&gt;
-            &quot;en&quot;: 
-              &quot;Oceania&quot; &lt;utf8_string&gt;
-            &quot;es&quot;: 
-              &quot;Oceanía&quot; &lt;utf8_string&gt;
-            &quot;fr&quot;: 
-              &quot;Océanie&quot; &lt;utf8_string&gt;
-            &quot;ja&quot;: 
-              &quot;オセアニア&quot; &lt;utf8_string&gt;
-            &quot;pt-BR&quot;: 
-              &quot;Oceania&quot; &lt;utf8_string&gt;
-            &quot;ru&quot;: 
-              &quot;Океания&quot; &lt;utf8_string&gt;
-            &quot;zh-CN&quot;: 
-              &quot;大洋洲&quot; &lt;utf8_string&gt;
+            &#34;de&#34;: 
+              &#34;Ozeanien&#34; &lt;utf8_string&gt;
+            &#34;en&#34;: 
+              &#34;Oceania&#34; &lt;utf8_string&gt;
+            &#34;es&#34;: 
+              &#34;Oceanía&#34; &lt;utf8_string&gt;
+            &#34;fr&#34;: 
+              &#34;Océanie&#34; &lt;utf8_string&gt;
+            &#34;ja&#34;: 
+              &#34;オセアニア&#34; &lt;utf8_string&gt;
+            &#34;pt-BR&#34;: 
+              &#34;Oceania&#34; &lt;utf8_string&gt;
+            &#34;ru&#34;: 
+              &#34;Океания&#34; &lt;utf8_string&gt;
+            &#34;zh-CN&#34;: 
+              &#34;大洋洲&#34; &lt;utf8_string&gt;
           }
       }
-    &quot;country&quot;: 
+    &#34;country&#34;: 
       {
-        &quot;geoname_id&quot;: 
+        &#34;geoname_id&#34;: 
           2077456 &lt;uint32&gt;
-        &quot;iso_code&quot;: 
-          &quot;AU&quot; &lt;utf8_string&gt;
-        &quot;names&quot;: 
+        &#34;iso_code&#34;: 
+          &#34;AU&#34; &lt;utf8_string&gt;
+        &#34;names&#34;: 
           {
-            &quot;de&quot;: 
-              &quot;Australien&quot; &lt;utf8_string&gt;
-            &quot;en&quot;: 
-              &quot;Australia&quot; &lt;utf8_string&gt;
-            &quot;es&quot;: 
-              &quot;Australia&quot; &lt;utf8_string&gt;
-            &quot;fr&quot;: 
-              &quot;Australie&quot; &lt;utf8_string&gt;
-            &quot;ja&quot;: 
-              &quot;オーストラリア&quot; &lt;utf8_string&gt;
-            &quot;pt-BR&quot;: 
-              &quot;Austrália&quot; &lt;utf8_string&gt;
-            &quot;ru&quot;: 
-              &quot;Австралия&quot; &lt;utf8_string&gt;
-            &quot;zh-CN&quot;: 
-              &quot;澳大利亚&quot; &lt;utf8_string&gt;
+            &#34;de&#34;: 
+              &#34;Australien&#34; &lt;utf8_string&gt;
+            &#34;en&#34;: 
+              &#34;Australia&#34; &lt;utf8_string&gt;
+            &#34;es&#34;: 
+              &#34;Australia&#34; &lt;utf8_string&gt;
+            &#34;fr&#34;: 
+              &#34;Australie&#34; &lt;utf8_string&gt;
+            &#34;ja&#34;: 
+              &#34;オーストラリア&#34; &lt;utf8_string&gt;
+            &#34;pt-BR&#34;: 
+              &#34;Austrália&#34; &lt;utf8_string&gt;
+            &#34;ru&#34;: 
+              &#34;Австралия&#34; &lt;utf8_string&gt;
+            &#34;zh-CN&#34;: 
+              &#34;澳大利亚&#34; &lt;utf8_string&gt;
           }
       }
-    &quot;location&quot;: 
+    &#34;location&#34;: 
       {
-        &quot;accuracy_radius&quot;: 
+        &#34;accuracy_radius&#34;: 
           5 &lt;uint16&gt;
-        &quot;latitude&quot;: 
+        &#34;latitude&#34;: 
           -33.859100 &lt;double&gt;
-        &quot;longitude&quot;: 
+        &#34;longitude&#34;: 
           151.200200 &lt;double&gt;
-        &quot;time_zone&quot;: 
-          &quot;Australia/Sydney&quot; &lt;utf8_string&gt;
+        &#34;time_zone&#34;: 
+          &#34;Australia/Sydney&#34; &lt;utf8_string&gt;
       }
-    &quot;postal&quot;: 
+    &#34;postal&#34;: 
       {
-        &quot;code&quot;: 
-          &quot;2000&quot; &lt;utf8_string&gt;
+        &#34;code&#34;: 
+          &#34;2000&#34; &lt;utf8_string&gt;
       }
-    &quot;registered_country&quot;: 
+    &#34;registered_country&#34;: 
       {
-        &quot;geoname_id&quot;: 
+        &#34;geoname_id&#34;: 
           2077456 &lt;uint32&gt;
-        &quot;iso_code&quot;: 
-          &quot;AU&quot; &lt;utf8_string&gt;
-        &quot;names&quot;: 
+        &#34;iso_code&#34;: 
+          &#34;AU&#34; &lt;utf8_string&gt;
+        &#34;names&#34;: 
           {
-            &quot;de&quot;: 
-              &quot;Australien&quot; &lt;utf8_string&gt;
-            &quot;en&quot;: 
-              &quot;Australia&quot; &lt;utf8_string&gt;
-            &quot;es&quot;: 
-              &quot;Australia&quot; &lt;utf8_string&gt;
-            &quot;fr&quot;: 
-              &quot;Australie&quot; &lt;utf8_string&gt;
-            &quot;ja&quot;: 
-              &quot;オーストラリア&quot; &lt;utf8_string&gt;
-            &quot;pt-BR&quot;: 
-              &quot;Austrália&quot; &lt;utf8_string&gt;
-            &quot;ru&quot;: 
-              &quot;Австралия&quot; &lt;utf8_string&gt;
-            &quot;zh-CN&quot;: 
-              &quot;澳大利亚&quot; &lt;utf8_string&gt;
+            &#34;de&#34;: 
+              &#34;Australien&#34; &lt;utf8_string&gt;
+            &#34;en&#34;: 
+              &#34;Australia&#34; &lt;utf8_string&gt;
+            &#34;es&#34;: 
+              &#34;Australia&#34; &lt;utf8_string&gt;
+            &#34;fr&#34;: 
+              &#34;Australie&#34; &lt;utf8_string&gt;
+            &#34;ja&#34;: 
+              &#34;オーストラリア&#34; &lt;utf8_string&gt;
+            &#34;pt-BR&#34;: 
+              &#34;Austrália&#34; &lt;utf8_string&gt;
+            &#34;ru&#34;: 
+              &#34;Австралия&#34; &lt;utf8_string&gt;
+            &#34;zh-CN&#34;: 
+              &#34;澳大利亚&#34; &lt;utf8_string&gt;
           }
       }
-    &quot;subdivisions&quot;: 
+    &#34;subdivisions&#34;: 
       [
         {
-          &quot;geoname_id&quot;: 
+          &#34;geoname_id&#34;: 
             2155400 &lt;uint32&gt;
-          &quot;iso_code&quot;: 
-            &quot;NSW&quot; &lt;utf8_string&gt;
-          &quot;names&quot;: 
+          &#34;iso_code&#34;: 
+            &#34;NSW&#34; &lt;utf8_string&gt;
+          &#34;names&#34;: 
             {
-              &quot;en&quot;: 
-                &quot;New South Wales&quot; &lt;utf8_string&gt;
-              &quot;fr&quot;: 
-                &quot;Nouvelle-Galles du Sud&quot; &lt;utf8_string&gt;
-              &quot;pt-BR&quot;: 
-                &quot;Nova Gales do Sul&quot; &lt;utf8_string&gt;
-              &quot;ru&quot;: 
-                &quot;Новый Южный Уэльс&quot; &lt;utf8_string&gt;
+              &#34;en&#34;: 
+                &#34;New South Wales&#34; &lt;utf8_string&gt;
+              &#34;fr&#34;: 
+                &#34;Nouvelle-Galles du Sud&#34; &lt;utf8_string&gt;
+              &#34;pt-BR&#34;: 
+                &#34;Nova Gales do Sul&#34; &lt;utf8_string&gt;
+              &#34;ru&#34;: 
+                &#34;Новый Южный Уэльс&#34; &lt;utf8_string&gt;
             }
         }
       ]
   }
-
 </code></pre><p>Now, let&rsquo;s say we only wanted the name of the city in english, we would do something like this:</p>
-<pre><code>$ mmdblookup --file /usr/share/GeoIP/GeoLite2-City.mmdb --ip 49.255.14.118 city names en
+<pre tabindex="0"><code>$ mmdblookup --file /usr/share/GeoIP/GeoLite2-City.mmdb --ip 49.255.14.118 city names en
 
-&quot;Sydney&quot; &lt;utf8_string&gt;
-
+&#34;Sydney&#34; &lt;utf8_string&gt;
 </code></pre><p>If you look at the first &ldquo;object&rdquo; in the output above, you will see that the above three arguments, <code>city names en</code> is almost
 like accessing a nested key inside a dictionary. I say almost, becomes it&rsquo;s not a JSON format. Anyway, this was the key thing
 I needed to learn to be able to write the right things in my nginx configuration.</p>
 <h1 id="logging-the-geoip-decoded-data">Logging the GeoIP decoded data</h1>
 <p>This is how the relevant nginx configuration for GeoIP2 lookup looked like:</p>
-<pre><code>...
+<pre tabindex="0"><code>...
 http {
 
     geoip2 /etc/GeoLite2-Country.mmdb {
@@ -215,7 +213,7 @@ http {
   ..
 </code></pre><p>If you look at the two <code>geoip2</code> sections, you can see how I am feeding the value in the <code>http_x_forwarded_for</code> variable
 as the source for the IP lookup. This is how I understand how the above is working with inline comments:</p>
-<pre><code># this is similar to specfying --file /etc/GeoLite2-City.mmdb
+<pre tabindex="0"><code># this is similar to specfying --file /etc/GeoLite2-City.mmdb
 geoip2 /etc/GeoLite2-City.mmdb {
         # This is assigning a variable $geoip2_data_city_name to the value of:
         # mmdblookup --file /etc/GeoLite2-City.mmdb --ip $http_x_forwarded_for city names en
@@ -230,13 +228,12 @@ value of this variables in JSON format. A complete nginx.conf is <a href="https:
 <h1 id="multiple-ip-addresses-in-x-forwarded-for">Multiple IP addresses in X-Forwarded-For</h1>
 <p>What happens when your X-Forwarded-For has a chain of IP addresses: <code>&lt;UserIP&gt;, &lt;LB&gt;, &lt;API gateway&gt;</code>? We need to extract the user ip
 from this list and then perform GeoIP lookup on it. We will make use nginx&rsquo;s map module (thanks to this <a href="https://stackoverflow.com/a/53630597">answer</a>:</p>
-<pre><code>map $http_x_forwarded_for $realip {
+<pre tabindex="0"><code>map $http_x_forwarded_for $realip {
         ~^(\d+\.\d+\.\d+\.\d+) $1;
         default $remote_addr;
 }
-
 </code></pre><p>We default to <code>$remote_addr</code> if we don&rsquo;t have any IP address in <code>$http_x_forwarded_for</code> and then update our GeoIP lookup as follows:</p>
-<pre><code>geoip2 /etc/GeoLite2-Country.mmdb {
+<pre tabindex="0"><code>geoip2 /etc/GeoLite2-Country.mmdb {
         $geoip2_data_country_code default=US source=$realip country iso_code;
         $geoip2_data_country_name source=$realip country names en;
 }

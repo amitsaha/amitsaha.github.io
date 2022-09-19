@@ -75,42 +75,41 @@ for certain data types, a deep copy is the default, while as for others shallow 
 <h2 id="basic-data-types">Basic data types</h2>
 <p>Let&rsquo;s consider two of the basic data types - <code>int</code> and <code>string</code>.</p>
 <p>Consider the following program: (<a href="https://play.golang.org/p/2HJ82Qx8prp">Link to Playground</a>)</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
-
-<span style="color:#f92672">import</span> (
-	<span style="color:#e6db74">&#34;fmt&#34;</span>
-)
-
-<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
-	<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">n1</span> <span style="color:#66d9ef">int</span> = <span style="color:#ae81ff">1</span>
-	<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">s1</span> <span style="color:#66d9ef">string</span> = <span style="color:#e6db74">&#34;hello&#34;</span>
-
-	<span style="color:#75715e">// integers
-</span><span style="color:#75715e"></span>	<span style="color:#a6e22e">n2</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">n1</span>
-	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;n1(%p)=%v n2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n1</span>, <span style="color:#a6e22e">n1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n2</span>, <span style="color:#a6e22e">n2</span>)
-	<span style="color:#a6e22e">n1</span> = <span style="color:#ae81ff">3</span>
-	<span style="color:#a6e22e">n2</span> = <span style="color:#ae81ff">7</span>
-	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;n1(%p)=%v n2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n1</span>, <span style="color:#a6e22e">n1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n2</span>, <span style="color:#a6e22e">n2</span>)
-
-	<span style="color:#75715e">// strings
-</span><span style="color:#75715e"></span>	<span style="color:#a6e22e">s2</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">s1</span>
-
-	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;s1(%p)=%v s2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s1</span>, <span style="color:#a6e22e">s1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s2</span>, <span style="color:#a6e22e">s2</span>)
-
-	<span style="color:#a6e22e">s1</span> = <span style="color:#e6db74">&#34;world&#34;</span>
-	<span style="color:#a6e22e">s2</span> = <span style="color:#e6db74">&#34;universe&#34;</span>
-
-	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;s1(%p)=%v s2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s1</span>, <span style="color:#a6e22e">s1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s2</span>, <span style="color:#a6e22e">s2</span>)
-}
-
-</code></pre></div><p>We declare <code>n1</code> and <code>s1</code> as an integer and a string, respectively with each having an initial value.
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> (
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;fmt&#34;</span>
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">n1</span> <span style="color:#66d9ef">int</span> = <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">s1</span> <span style="color:#66d9ef">string</span> = <span style="color:#e6db74">&#34;hello&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#75715e">// integers
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>	<span style="color:#a6e22e">n2</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">n1</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;n1(%p)=%v n2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n1</span>, <span style="color:#a6e22e">n1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n2</span>, <span style="color:#a6e22e">n2</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">n1</span> = <span style="color:#ae81ff">3</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">n2</span> = <span style="color:#ae81ff">7</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;n1(%p)=%v n2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n1</span>, <span style="color:#a6e22e">n1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n2</span>, <span style="color:#a6e22e">n2</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#75715e">// strings
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>	<span style="color:#a6e22e">s2</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">s1</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;s1(%p)=%v s2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s1</span>, <span style="color:#a6e22e">s1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s2</span>, <span style="color:#a6e22e">s2</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">s1</span> = <span style="color:#e6db74">&#34;world&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">s2</span> = <span style="color:#e6db74">&#34;universe&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;s1(%p)=%v s2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s1</span>, <span style="color:#a6e22e">s1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s2</span>, <span style="color:#a6e22e">s2</span>)
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>We declare <code>n1</code> and <code>s1</code> as an integer and a string, respectively with each having an initial value.
 When we write the statement, <code>n2 := n1</code>, we are creating a new integer variable, <code>n2</code>.
 Similarly, <code>s2 := s1</code> creates a new string variable. When we create these variables, their
 values are the same as that referred to by <code>n1</code> and <code>s1</code>, respectively. Then, when we update the values,
 the changes remain confined to the variables we are updating - i.e. updating the value of <code>n2</code> doesn&rsquo;t
 affect the value of <code>n1</code> and vice-versa.</p>
 <p>Hence, when we run the above code, you will see an output as follows:</p>
-<pre><code>n1(0xc0000b8000)=1 n2(0xc0000b8008)=1
+<pre tabindex="0"><code>n1(0xc0000b8000)=1 n2(0xc0000b8008)=1
 n1(0xc0000b8000)=3 n2(0xc0000b8008)=7
 s1(0xc00009e210)=hello s2(0xc00009e220)=hello
 s1(0xc00009e210)=world s2(0xc00009e220)=universe
@@ -120,89 +119,89 @@ and printed using the <code>%p</code> verb.</p>
 as arguments.</p>
 <h3 id="call-by-value-and-call-by-reference">Call by Value and Call by reference</h3>
 <p>Consider the following program (<a href="https://play.golang.org/p/HgtLzXfqD-7">Link to Playground</a>):</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
-
-<span style="color:#f92672">import</span> (
-	<span style="color:#e6db74">&#34;fmt&#34;</span>
-	<span style="color:#e6db74">&#34;log&#34;</span>
-)
-
-<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">callByReference</span>(<span style="color:#a6e22e">n1</span>, <span style="color:#a6e22e">n2</span> <span style="color:#f92672">*</span><span style="color:#66d9ef">int</span>, <span style="color:#a6e22e">s1</span>, <span style="color:#a6e22e">s2</span> <span style="color:#f92672">*</span><span style="color:#66d9ef">string</span>) {
-	<span style="color:#f92672">*</span><span style="color:#a6e22e">n1</span> = <span style="color:#ae81ff">3</span>
-	<span style="color:#f92672">*</span><span style="color:#a6e22e">n2</span> = <span style="color:#ae81ff">7</span>
-	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;n1(%p)=%v n2(%p)=%v\n&#34;</span>, <span style="color:#a6e22e">n1</span>, <span style="color:#f92672">*</span><span style="color:#a6e22e">n1</span>, <span style="color:#a6e22e">n2</span>, <span style="color:#f92672">*</span><span style="color:#a6e22e">n2</span>)
-
-	<span style="color:#f92672">*</span><span style="color:#a6e22e">s1</span> = <span style="color:#e6db74">&#34;world&#34;</span>
-	<span style="color:#f92672">*</span><span style="color:#a6e22e">s2</span> = <span style="color:#e6db74">&#34;universe&#34;</span>
-
-	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;s1(%p)=%v s2(%p)=%v\n&#34;</span>, <span style="color:#a6e22e">s1</span>, <span style="color:#f92672">*</span><span style="color:#a6e22e">s1</span>, <span style="color:#a6e22e">s2</span>, <span style="color:#f92672">*</span><span style="color:#a6e22e">s2</span>)
-
-}
-
-<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">callByValue</span>(<span style="color:#a6e22e">n1</span>, <span style="color:#a6e22e">n2</span> <span style="color:#66d9ef">int</span>, <span style="color:#a6e22e">s1</span>, <span style="color:#a6e22e">s2</span> <span style="color:#66d9ef">string</span>) {
-	<span style="color:#a6e22e">n1</span> = <span style="color:#ae81ff">3</span>
-	<span style="color:#a6e22e">n2</span> = <span style="color:#ae81ff">7</span>
-	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;n1(%p)=%v n2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n1</span>, <span style="color:#a6e22e">n1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n2</span>, <span style="color:#a6e22e">n2</span>)
-
-	<span style="color:#a6e22e">s1</span> = <span style="color:#e6db74">&#34;world&#34;</span>
-	<span style="color:#a6e22e">s2</span> = <span style="color:#e6db74">&#34;universe&#34;</span>
-
-	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;s1(%p)=%v s2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s1</span>, <span style="color:#a6e22e">s1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s2</span>, <span style="color:#a6e22e">s2</span>)
-}
-
-<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
-	<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">n1</span> <span style="color:#66d9ef">int</span> = <span style="color:#ae81ff">1</span>
-	<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">s1</span> <span style="color:#66d9ef">string</span> = <span style="color:#e6db74">&#34;hello&#34;</span>
-
-	<span style="color:#75715e">// integers
-</span><span style="color:#75715e"></span>	<span style="color:#a6e22e">n2</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">n1</span>
-	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;n1(%p)=%v n2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n1</span>, <span style="color:#a6e22e">n1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n2</span>, <span style="color:#a6e22e">n2</span>)
-
-	<span style="color:#75715e">// strings
-</span><span style="color:#75715e"></span>	<span style="color:#a6e22e">s2</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">s1</span>
-
-	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;s1(%p)=%v s2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s1</span>, <span style="color:#a6e22e">s1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s2</span>, <span style="color:#a6e22e">s2</span>)
-
-	<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Calling function callByValue&#34;</span>)
-	<span style="color:#a6e22e">callByValue</span>(<span style="color:#a6e22e">n1</span>, <span style="color:#a6e22e">n2</span>, <span style="color:#a6e22e">s1</span>, <span style="color:#a6e22e">s2</span>)
-	
-	<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Back to main()&#34;</span>)
-	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;n1(%p)=%v n2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n1</span>, <span style="color:#a6e22e">n1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n2</span>, <span style="color:#a6e22e">n2</span>)
-	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;s1(%p)=%v s2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s1</span>, <span style="color:#a6e22e">s1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s2</span>, <span style="color:#a6e22e">s2</span>)
-	
-	<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Calling function callByReference&#34;</span>)
-	<span style="color:#a6e22e">callByReference</span>(<span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n2</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s2</span>)
-	
-	<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Back to main()&#34;</span>)
-	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;n1(%p)=%v n2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n1</span>, <span style="color:#a6e22e">n1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n2</span>, <span style="color:#a6e22e">n2</span>)
-	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;s1(%p)=%v s2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s1</span>, <span style="color:#a6e22e">s1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s2</span>, <span style="color:#a6e22e">s2</span>)	
-
-}
-</code></pre></div><p>We define two functions, <code>callByValue()</code> and <code>callByReference()</code>. Both the functions accept two integers
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> (
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;fmt&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;log&#34;</span>
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">callByReference</span>(<span style="color:#a6e22e">n1</span>, <span style="color:#a6e22e">n2</span> <span style="color:#f92672">*</span><span style="color:#66d9ef">int</span>, <span style="color:#a6e22e">s1</span>, <span style="color:#a6e22e">s2</span> <span style="color:#f92672">*</span><span style="color:#66d9ef">string</span>) {
+</span></span><span style="display:flex;"><span>	<span style="color:#f92672">*</span><span style="color:#a6e22e">n1</span> = <span style="color:#ae81ff">3</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#f92672">*</span><span style="color:#a6e22e">n2</span> = <span style="color:#ae81ff">7</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;n1(%p)=%v n2(%p)=%v\n&#34;</span>, <span style="color:#a6e22e">n1</span>, <span style="color:#f92672">*</span><span style="color:#a6e22e">n1</span>, <span style="color:#a6e22e">n2</span>, <span style="color:#f92672">*</span><span style="color:#a6e22e">n2</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#f92672">*</span><span style="color:#a6e22e">s1</span> = <span style="color:#e6db74">&#34;world&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#f92672">*</span><span style="color:#a6e22e">s2</span> = <span style="color:#e6db74">&#34;universe&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;s1(%p)=%v s2(%p)=%v\n&#34;</span>, <span style="color:#a6e22e">s1</span>, <span style="color:#f92672">*</span><span style="color:#a6e22e">s1</span>, <span style="color:#a6e22e">s2</span>, <span style="color:#f92672">*</span><span style="color:#a6e22e">s2</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">callByValue</span>(<span style="color:#a6e22e">n1</span>, <span style="color:#a6e22e">n2</span> <span style="color:#66d9ef">int</span>, <span style="color:#a6e22e">s1</span>, <span style="color:#a6e22e">s2</span> <span style="color:#66d9ef">string</span>) {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">n1</span> = <span style="color:#ae81ff">3</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">n2</span> = <span style="color:#ae81ff">7</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;n1(%p)=%v n2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n1</span>, <span style="color:#a6e22e">n1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n2</span>, <span style="color:#a6e22e">n2</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">s1</span> = <span style="color:#e6db74">&#34;world&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">s2</span> = <span style="color:#e6db74">&#34;universe&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;s1(%p)=%v s2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s1</span>, <span style="color:#a6e22e">s1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s2</span>, <span style="color:#a6e22e">s2</span>)
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">n1</span> <span style="color:#66d9ef">int</span> = <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">s1</span> <span style="color:#66d9ef">string</span> = <span style="color:#e6db74">&#34;hello&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#75715e">// integers
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>	<span style="color:#a6e22e">n2</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">n1</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;n1(%p)=%v n2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n1</span>, <span style="color:#a6e22e">n1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n2</span>, <span style="color:#a6e22e">n2</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#75715e">// strings
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>	<span style="color:#a6e22e">s2</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">s1</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;s1(%p)=%v s2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s1</span>, <span style="color:#a6e22e">s1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s2</span>, <span style="color:#a6e22e">s2</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Calling function callByValue&#34;</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">callByValue</span>(<span style="color:#a6e22e">n1</span>, <span style="color:#a6e22e">n2</span>, <span style="color:#a6e22e">s1</span>, <span style="color:#a6e22e">s2</span>)
+</span></span><span style="display:flex;"><span>	
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Back to main()&#34;</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;n1(%p)=%v n2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n1</span>, <span style="color:#a6e22e">n1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n2</span>, <span style="color:#a6e22e">n2</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;s1(%p)=%v s2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s1</span>, <span style="color:#a6e22e">s1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s2</span>, <span style="color:#a6e22e">s2</span>)
+</span></span><span style="display:flex;"><span>	
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Calling function callByReference&#34;</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">callByReference</span>(<span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n2</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s2</span>)
+</span></span><span style="display:flex;"><span>	
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Back to main()&#34;</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;n1(%p)=%v n2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n1</span>, <span style="color:#a6e22e">n1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n2</span>, <span style="color:#a6e22e">n2</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;s1(%p)=%v s2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s1</span>, <span style="color:#a6e22e">s1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s2</span>, <span style="color:#a6e22e">s2</span>)	
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>We define two functions, <code>callByValue()</code> and <code>callByReference()</code>. Both the functions accept two integers
 and two strings as parameters. In each function, we then proceed to update the values of the variables
 that the functions were called with. The difference is that the first function accepts the values of existing
 integer and string variables, and the second function accepts the <em>memory address</em> or pointer to variables
 containing integer and string values.</p>
 <p>When we run the program, we will see the following output:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#a6e22e">n1</span>(<span style="color:#ae81ff">0xc000018030</span>)=<span style="color:#ae81ff">1</span> <span style="color:#a6e22e">n2</span>(<span style="color:#ae81ff">0xc000018038</span>)=<span style="color:#ae81ff">1</span>
-<span style="color:#a6e22e">s1</span>(<span style="color:#ae81ff">0xc000010230</span>)=<span style="color:#a6e22e">hello</span> <span style="color:#a6e22e">s2</span>(<span style="color:#ae81ff">0xc000010240</span>)=<span style="color:#a6e22e">hello</span>
-
-<span style="color:#ae81ff">2009</span><span style="color:#f92672">/</span><span style="color:#ae81ff">11</span><span style="color:#f92672">/</span><span style="color:#ae81ff">10</span> <span style="color:#ae81ff">23</span>:<span style="color:#ae81ff">00</span>:<span style="color:#ae81ff">00</span> <span style="color:#a6e22e">Calling</span> <span style="color:#a6e22e">function</span> <span style="color:#a6e22e">callByValue</span>
-<span style="color:#a6e22e">n1</span>(<span style="color:#ae81ff">0xc000018098</span>)=<span style="color:#ae81ff">3</span> <span style="color:#a6e22e">n2</span>(<span style="color:#ae81ff">0xc0000180b0</span>)=<span style="color:#ae81ff">7</span>
-<span style="color:#a6e22e">s1</span>(<span style="color:#ae81ff">0xc000010270</span>)=<span style="color:#a6e22e">world</span> <span style="color:#a6e22e">s2</span>(<span style="color:#ae81ff">0xc000010280</span>)=<span style="color:#a6e22e">universe</span>
-
-<span style="color:#ae81ff">2009</span><span style="color:#f92672">/</span><span style="color:#ae81ff">11</span><span style="color:#f92672">/</span><span style="color:#ae81ff">10</span> <span style="color:#ae81ff">23</span>:<span style="color:#ae81ff">00</span>:<span style="color:#ae81ff">00</span> <span style="color:#a6e22e">Back</span> <span style="color:#a6e22e">to</span> <span style="color:#a6e22e">main</span>()
-<span style="color:#a6e22e">n1</span>(<span style="color:#ae81ff">0xc000018030</span>)=<span style="color:#ae81ff">1</span> <span style="color:#a6e22e">n2</span>(<span style="color:#ae81ff">0xc000018038</span>)=<span style="color:#ae81ff">1</span>
-<span style="color:#a6e22e">s1</span>(<span style="color:#ae81ff">0xc000010230</span>)=<span style="color:#a6e22e">hello</span> <span style="color:#a6e22e">s2</span>(<span style="color:#ae81ff">0xc000010240</span>)=<span style="color:#a6e22e">hello</span>
-
-<span style="color:#ae81ff">2009</span><span style="color:#f92672">/</span><span style="color:#ae81ff">11</span><span style="color:#f92672">/</span><span style="color:#ae81ff">10</span> <span style="color:#ae81ff">23</span>:<span style="color:#ae81ff">00</span>:<span style="color:#ae81ff">00</span> <span style="color:#a6e22e">Calling</span> <span style="color:#a6e22e">function</span> <span style="color:#a6e22e">callByReference</span>
-<span style="color:#a6e22e">n1</span>(<span style="color:#ae81ff">0xc000018030</span>)=<span style="color:#ae81ff">3</span> <span style="color:#a6e22e">n2</span>(<span style="color:#ae81ff">0xc000018038</span>)=<span style="color:#ae81ff">7</span>
-<span style="color:#a6e22e">s1</span>(<span style="color:#ae81ff">0xc000010230</span>)=<span style="color:#a6e22e">world</span> <span style="color:#a6e22e">s2</span>(<span style="color:#ae81ff">0xc000010240</span>)=<span style="color:#a6e22e">universe</span>
-
-<span style="color:#ae81ff">2009</span><span style="color:#f92672">/</span><span style="color:#ae81ff">11</span><span style="color:#f92672">/</span><span style="color:#ae81ff">10</span> <span style="color:#ae81ff">23</span>:<span style="color:#ae81ff">00</span>:<span style="color:#ae81ff">00</span> <span style="color:#a6e22e">Back</span> <span style="color:#a6e22e">to</span> <span style="color:#a6e22e">main</span>()
-<span style="color:#a6e22e">n1</span>(<span style="color:#ae81ff">0xc000018030</span>)=<span style="color:#ae81ff">3</span> <span style="color:#a6e22e">n2</span>(<span style="color:#ae81ff">0xc000018038</span>)=<span style="color:#ae81ff">7</span>
-<span style="color:#a6e22e">s1</span>(<span style="color:#ae81ff">0xc000010230</span>)=<span style="color:#a6e22e">world</span> <span style="color:#a6e22e">s2</span>(<span style="color:#ae81ff">0xc000010240</span>)=<span style="color:#a6e22e">universe</span>
-</code></pre></div><p>The changes made in the <code>callByValue()</code> function are not visible in the <code>main()</code> function. However,
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#a6e22e">n1</span>(<span style="color:#ae81ff">0xc000018030</span>)=<span style="color:#ae81ff">1</span> <span style="color:#a6e22e">n2</span>(<span style="color:#ae81ff">0xc000018038</span>)=<span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">s1</span>(<span style="color:#ae81ff">0xc000010230</span>)=<span style="color:#a6e22e">hello</span> <span style="color:#a6e22e">s2</span>(<span style="color:#ae81ff">0xc000010240</span>)=<span style="color:#a6e22e">hello</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">2009</span><span style="color:#f92672">/</span><span style="color:#ae81ff">11</span><span style="color:#f92672">/</span><span style="color:#ae81ff">10</span> <span style="color:#ae81ff">23</span>:<span style="color:#ae81ff">00</span>:<span style="color:#ae81ff">00</span> <span style="color:#a6e22e">Calling</span> <span style="color:#a6e22e">function</span> <span style="color:#a6e22e">callByValue</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">n1</span>(<span style="color:#ae81ff">0xc000018098</span>)=<span style="color:#ae81ff">3</span> <span style="color:#a6e22e">n2</span>(<span style="color:#ae81ff">0xc0000180b0</span>)=<span style="color:#ae81ff">7</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">s1</span>(<span style="color:#ae81ff">0xc000010270</span>)=<span style="color:#a6e22e">world</span> <span style="color:#a6e22e">s2</span>(<span style="color:#ae81ff">0xc000010280</span>)=<span style="color:#a6e22e">universe</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">2009</span><span style="color:#f92672">/</span><span style="color:#ae81ff">11</span><span style="color:#f92672">/</span><span style="color:#ae81ff">10</span> <span style="color:#ae81ff">23</span>:<span style="color:#ae81ff">00</span>:<span style="color:#ae81ff">00</span> <span style="color:#a6e22e">Back</span> <span style="color:#a6e22e">to</span> <span style="color:#a6e22e">main</span>()
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">n1</span>(<span style="color:#ae81ff">0xc000018030</span>)=<span style="color:#ae81ff">1</span> <span style="color:#a6e22e">n2</span>(<span style="color:#ae81ff">0xc000018038</span>)=<span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">s1</span>(<span style="color:#ae81ff">0xc000010230</span>)=<span style="color:#a6e22e">hello</span> <span style="color:#a6e22e">s2</span>(<span style="color:#ae81ff">0xc000010240</span>)=<span style="color:#a6e22e">hello</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">2009</span><span style="color:#f92672">/</span><span style="color:#ae81ff">11</span><span style="color:#f92672">/</span><span style="color:#ae81ff">10</span> <span style="color:#ae81ff">23</span>:<span style="color:#ae81ff">00</span>:<span style="color:#ae81ff">00</span> <span style="color:#a6e22e">Calling</span> <span style="color:#a6e22e">function</span> <span style="color:#a6e22e">callByReference</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">n1</span>(<span style="color:#ae81ff">0xc000018030</span>)=<span style="color:#ae81ff">3</span> <span style="color:#a6e22e">n2</span>(<span style="color:#ae81ff">0xc000018038</span>)=<span style="color:#ae81ff">7</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">s1</span>(<span style="color:#ae81ff">0xc000010230</span>)=<span style="color:#a6e22e">world</span> <span style="color:#a6e22e">s2</span>(<span style="color:#ae81ff">0xc000010240</span>)=<span style="color:#a6e22e">universe</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">2009</span><span style="color:#f92672">/</span><span style="color:#ae81ff">11</span><span style="color:#f92672">/</span><span style="color:#ae81ff">10</span> <span style="color:#ae81ff">23</span>:<span style="color:#ae81ff">00</span>:<span style="color:#ae81ff">00</span> <span style="color:#a6e22e">Back</span> <span style="color:#a6e22e">to</span> <span style="color:#a6e22e">main</span>()
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">n1</span>(<span style="color:#ae81ff">0xc000018030</span>)=<span style="color:#ae81ff">3</span> <span style="color:#a6e22e">n2</span>(<span style="color:#ae81ff">0xc000018038</span>)=<span style="color:#ae81ff">7</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">s1</span>(<span style="color:#ae81ff">0xc000010230</span>)=<span style="color:#a6e22e">world</span> <span style="color:#a6e22e">s2</span>(<span style="color:#ae81ff">0xc000010240</span>)=<span style="color:#a6e22e">universe</span>
+</span></span></code></pre></div><p>The changes made in the <code>callByValue()</code> function are not visible in the <code>main()</code> function. However,
 the changes made inside the second function are.</p>
 <p>When we called the <code>callByValue()</code> function, we created a new set of variables containing the values of the
 existing variables. Hence, we changed the values of these new variables, the values of the existing variables
@@ -216,42 +215,42 @@ a <em>shallow copy</em>, use <em>memory addresses</em> for basic data types.</p>
 <p>Next, let&rsquo;s explore what happens when we have basic data types as elements in a slice.</p>
 <h2 id="slice-of-integers-and-strings">Slice of integers and strings</h2>
 <p>Consider the following program: (<a href="https://go.dev/play/p/Wd490w3WJpU">Link to playground</a>)</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
-
-<span style="color:#f92672">import</span> (
-	<span style="color:#e6db74">&#34;fmt&#34;</span>
-	<span style="color:#e6db74">&#34;strings&#34;</span>
-)
-
-<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
-	<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">n1</span> []<span style="color:#66d9ef">int</span> = []<span style="color:#66d9ef">int</span>{<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>}
-	<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">s1</span> []<span style="color:#66d9ef">string</span> = []<span style="color:#66d9ef">string</span>{<span style="color:#e6db74">&#34;hello&#34;</span>, <span style="color:#e6db74">&#34;world&#34;</span>}
-
-	<span style="color:#75715e">// slice of integers
-</span><span style="color:#75715e"></span>	<span style="color:#a6e22e">n2</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">n1</span>
-	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;n1(%p)=%v n2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n1</span>, <span style="color:#a6e22e">n1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n2</span>, <span style="color:#a6e22e">n2</span>)
-
-	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Update n2[0]&#34;</span>)
-	<span style="color:#a6e22e">n2</span>[<span style="color:#ae81ff">0</span>] = <span style="color:#a6e22e">n2</span>[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">*</span> <span style="color:#ae81ff">10</span>
-	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;n1(%p)=%v n2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n1</span>, <span style="color:#a6e22e">n1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n2</span>, <span style="color:#a6e22e">n2</span>)
-
-	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Assign new slice to n2&#34;</span>)
-	<span style="color:#a6e22e">n2</span> = []<span style="color:#66d9ef">int</span>{<span style="color:#ae81ff">100</span>, <span style="color:#ae81ff">110</span>, <span style="color:#ae81ff">120</span>}
-	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;n1(%p)=%v n2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n1</span>, <span style="color:#a6e22e">n1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n2</span>, <span style="color:#a6e22e">n2</span>)
-
-	<span style="color:#75715e">// strings
-</span><span style="color:#75715e"></span>	<span style="color:#a6e22e">s2</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">s1</span>
-	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;s1(%p)=%v s2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s1</span>, <span style="color:#a6e22e">s1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s2</span>, <span style="color:#a6e22e">s2</span>)
-
-	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Update s2[0]&#34;</span>)
-	<span style="color:#a6e22e">s2</span>[<span style="color:#ae81ff">0</span>] = <span style="color:#a6e22e">strings</span>.<span style="color:#a6e22e">ToUpper</span>(<span style="color:#a6e22e">s2</span>[<span style="color:#ae81ff">0</span>])
-	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;s1(%p)=%v s2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s1</span>, <span style="color:#a6e22e">s1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s2</span>, <span style="color:#a6e22e">s2</span>)
-
-	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Assign new slice to s2&#34;</span>)
-	<span style="color:#a6e22e">s2</span> = []<span style="color:#66d9ef">string</span>{<span style="color:#e6db74">&#34;Hi&#34;</span>, <span style="color:#e6db74">&#34;go play ground&#34;</span>}
-	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;s1(%p)=%v s2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s1</span>, <span style="color:#a6e22e">s1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s2</span>, <span style="color:#a6e22e">s2</span>)
-}
-</code></pre></div><p>We define a slice, <code>n1</code> containing integers. We create a new slice, <code>n2</code> using the statement, <code>n2 := n1</code>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> (
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;fmt&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;strings&#34;</span>
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">n1</span> []<span style="color:#66d9ef">int</span> = []<span style="color:#66d9ef">int</span>{<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>}
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">s1</span> []<span style="color:#66d9ef">string</span> = []<span style="color:#66d9ef">string</span>{<span style="color:#e6db74">&#34;hello&#34;</span>, <span style="color:#e6db74">&#34;world&#34;</span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#75715e">// slice of integers
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>	<span style="color:#a6e22e">n2</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">n1</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;n1(%p)=%v n2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n1</span>, <span style="color:#a6e22e">n1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n2</span>, <span style="color:#a6e22e">n2</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Update n2[0]&#34;</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">n2</span>[<span style="color:#ae81ff">0</span>] = <span style="color:#a6e22e">n2</span>[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">*</span> <span style="color:#ae81ff">10</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;n1(%p)=%v n2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n1</span>, <span style="color:#a6e22e">n1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n2</span>, <span style="color:#a6e22e">n2</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Assign new slice to n2&#34;</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">n2</span> = []<span style="color:#66d9ef">int</span>{<span style="color:#ae81ff">100</span>, <span style="color:#ae81ff">110</span>, <span style="color:#ae81ff">120</span>}
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;n1(%p)=%v n2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n1</span>, <span style="color:#a6e22e">n1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n2</span>, <span style="color:#a6e22e">n2</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#75715e">// strings
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>	<span style="color:#a6e22e">s2</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">s1</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;s1(%p)=%v s2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s1</span>, <span style="color:#a6e22e">s1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s2</span>, <span style="color:#a6e22e">s2</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Update s2[0]&#34;</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">s2</span>[<span style="color:#ae81ff">0</span>] = <span style="color:#a6e22e">strings</span>.<span style="color:#a6e22e">ToUpper</span>(<span style="color:#a6e22e">s2</span>[<span style="color:#ae81ff">0</span>])
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;s1(%p)=%v s2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s1</span>, <span style="color:#a6e22e">s1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s2</span>, <span style="color:#a6e22e">s2</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Assign new slice to s2&#34;</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">s2</span> = []<span style="color:#66d9ef">string</span>{<span style="color:#e6db74">&#34;Hi&#34;</span>, <span style="color:#e6db74">&#34;go play ground&#34;</span>}
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;s1(%p)=%v s2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s1</span>, <span style="color:#a6e22e">s1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s2</span>, <span style="color:#a6e22e">s2</span>)
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>We define a slice, <code>n1</code> containing integers. We create a new slice, <code>n2</code> using the statement, <code>n2 := n1</code>.</p>
 <p>We then, update the value of the first element of <code>n2</code> using <code>n2[0] = n2[0]*10</code>.</p>
 <p>At this stage when we print the two slices, we see that the first element of <em>both</em> the slices, <code>n1</code> and <code>n2</code>
 has been updated. This is because when we created a copy of <code>n1</code>, it performed a <em>shallow copy</em>. Hence, even
@@ -261,7 +260,7 @@ they contain were pointing to the same underlying <em>memory addresses</em>.</p>
 <code>n2</code>. Hence, the slice, <code>n1</code> is not affected.</p>
 <p>The same behavior is seen for the slice of strings, <code>s1</code> and <code>s2</code>.</p>
 <p>When we run the program, you will see the following output:</p>
-<pre><code>n1(0xc00000c030)=[1 2 3] n2(0xc00000c060)=[1 2 3]
+<pre tabindex="0"><code>n1(0xc00000c030)=[1 2 3] n2(0xc00000c060)=[1 2 3]
 Update n2[0]
 n1(0xc00000c030)=[10 2 3] n2(0xc00000c060)=[10 2 3]
 Assign new slice to n2
@@ -289,35 +288,35 @@ the <a href="https://go.dev/doc/effective_go#slices">answer</a>:</p>
 <h2 id="arrays-of-strings-and-integers">Arrays of strings and integers</h2>
 <p>Consider the following program. Compared to the previous program, we use arrays instead
 of slices (<a href="https://play.golang.org/p/7UPwSyR6628">Link to the playground</a>):</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go">
-<span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
-
-<span style="color:#f92672">import</span> (
-	<span style="color:#e6db74">&#34;fmt&#34;</span>
-	<span style="color:#e6db74">&#34;strings&#34;</span>
-)
-
-<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
-	<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">n1</span> [<span style="color:#ae81ff">3</span>]<span style="color:#66d9ef">int</span> = [<span style="color:#ae81ff">3</span>]<span style="color:#66d9ef">int</span>{<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>}
-	<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">s1</span> [<span style="color:#ae81ff">2</span>]<span style="color:#66d9ef">string</span> = [<span style="color:#ae81ff">2</span>]<span style="color:#66d9ef">string</span>{<span style="color:#e6db74">&#34;hello&#34;</span>, <span style="color:#e6db74">&#34;world&#34;</span>}
-
-	<span style="color:#75715e">// array of integers
-</span><span style="color:#75715e"></span>	<span style="color:#a6e22e">n2</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">n1</span>
-	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;n1(%p)=%v n2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n1</span>, <span style="color:#a6e22e">n1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n2</span>, <span style="color:#a6e22e">n2</span>)
-	<span style="color:#a6e22e">n2</span>[<span style="color:#ae81ff">0</span>] = <span style="color:#a6e22e">n2</span>[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">*</span> <span style="color:#ae81ff">10</span>
-	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;n1(%p)=%v n2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n1</span>, <span style="color:#a6e22e">n1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n2</span>, <span style="color:#a6e22e">n2</span>)
-	<span style="color:#a6e22e">n2</span> = [<span style="color:#ae81ff">3</span>]<span style="color:#66d9ef">int</span>{<span style="color:#ae81ff">100</span>, <span style="color:#ae81ff">110</span>, <span style="color:#ae81ff">120</span>}
-	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;n1(%p)=%v n2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n1</span>, <span style="color:#a6e22e">n1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n2</span>, <span style="color:#a6e22e">n2</span>)
-
-	<span style="color:#75715e">// array of strings
-</span><span style="color:#75715e"></span>	<span style="color:#a6e22e">s2</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">s1</span>
-	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;s1(%p)=%v s2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s1</span>, <span style="color:#a6e22e">s1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s2</span>, <span style="color:#a6e22e">s2</span>)
-	<span style="color:#a6e22e">s2</span>[<span style="color:#ae81ff">0</span>] = <span style="color:#a6e22e">strings</span>.<span style="color:#a6e22e">ToUpper</span>(<span style="color:#a6e22e">s2</span>[<span style="color:#ae81ff">0</span>])
-	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;s1(%p)=%v s2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s1</span>, <span style="color:#a6e22e">s1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s2</span>, <span style="color:#a6e22e">s2</span>)
-	<span style="color:#a6e22e">s2</span> = [<span style="color:#ae81ff">2</span>]<span style="color:#66d9ef">string</span>{<span style="color:#e6db74">&#34;Hi&#34;</span>, <span style="color:#e6db74">&#34;go play ground&#34;</span>}
-	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;s1(%p)=%v s2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s1</span>, <span style="color:#a6e22e">s1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s2</span>, <span style="color:#a6e22e">s2</span>)
-}
-</code></pre></div><p>We define an array, <code>n1</code> containing integers. We create a new array, <code>n2</code> using the statement, <code>n2 := n1</code>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> (
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;fmt&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;strings&#34;</span>
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">n1</span> [<span style="color:#ae81ff">3</span>]<span style="color:#66d9ef">int</span> = [<span style="color:#ae81ff">3</span>]<span style="color:#66d9ef">int</span>{<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>}
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">s1</span> [<span style="color:#ae81ff">2</span>]<span style="color:#66d9ef">string</span> = [<span style="color:#ae81ff">2</span>]<span style="color:#66d9ef">string</span>{<span style="color:#e6db74">&#34;hello&#34;</span>, <span style="color:#e6db74">&#34;world&#34;</span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#75715e">// array of integers
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>	<span style="color:#a6e22e">n2</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">n1</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;n1(%p)=%v n2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n1</span>, <span style="color:#a6e22e">n1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n2</span>, <span style="color:#a6e22e">n2</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">n2</span>[<span style="color:#ae81ff">0</span>] = <span style="color:#a6e22e">n2</span>[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">*</span> <span style="color:#ae81ff">10</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;n1(%p)=%v n2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n1</span>, <span style="color:#a6e22e">n1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n2</span>, <span style="color:#a6e22e">n2</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">n2</span> = [<span style="color:#ae81ff">3</span>]<span style="color:#66d9ef">int</span>{<span style="color:#ae81ff">100</span>, <span style="color:#ae81ff">110</span>, <span style="color:#ae81ff">120</span>}
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;n1(%p)=%v n2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n1</span>, <span style="color:#a6e22e">n1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">n2</span>, <span style="color:#a6e22e">n2</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#75715e">// array of strings
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>	<span style="color:#a6e22e">s2</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">s1</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;s1(%p)=%v s2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s1</span>, <span style="color:#a6e22e">s1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s2</span>, <span style="color:#a6e22e">s2</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">s2</span>[<span style="color:#ae81ff">0</span>] = <span style="color:#a6e22e">strings</span>.<span style="color:#a6e22e">ToUpper</span>(<span style="color:#a6e22e">s2</span>[<span style="color:#ae81ff">0</span>])
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;s1(%p)=%v s2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s1</span>, <span style="color:#a6e22e">s1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s2</span>, <span style="color:#a6e22e">s2</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">s2</span> = [<span style="color:#ae81ff">2</span>]<span style="color:#66d9ef">string</span>{<span style="color:#e6db74">&#34;Hi&#34;</span>, <span style="color:#e6db74">&#34;go play ground&#34;</span>}
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;s1(%p)=%v s2(%p)=%v\n&#34;</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s1</span>, <span style="color:#a6e22e">s1</span>, <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s2</span>, <span style="color:#a6e22e">s2</span>)
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>We define an array, <code>n1</code> containing integers. We create a new array, <code>n2</code> using the statement, <code>n2 := n1</code>.</p>
 <p>We then, update the value of the first element of <code>n2</code> using <code>n2[0] = n2[0]*10</code>.</p>
 <p>At this stage when we print the two arrays, we see that the first element of only the second array has been updated.
 <code>n1</code> hasn&rsquo;t been affected. Thus, we are working with a deep copy of our original array.</p>
@@ -326,7 +325,7 @@ of slices (<a href="https://play.golang.org/p/7UPwSyR6628">Link to the playgroun
 <p>The same behavior is seen for the array of strings, <code>s1</code> and <code>s2</code>.</p>
 <p>When we run the program, you will see the following output:</p>
 <p>Output:</p>
-<pre><code>n1(0xc0000b8000)=[1 2 3] n2(0xc0000b8018)=[1 2 3]
+<pre tabindex="0"><code>n1(0xc0000b8000)=[1 2 3] n2(0xc0000b8018)=[1 2 3]
 n1(0xc0000b8000)=[1 2 3] n2(0xc0000b8018)=[10 2 3]
 n1(0xc0000b8000)=[1 2 3] n2(0xc0000b8018)=[100 110 120]
 s1(0xc0000ba000)=[hello world] s2(0xc0000ba020)=[hello world]
@@ -337,15 +336,15 @@ s1(0xc0000ba000)=[hello world] s2(0xc0000ba020)=[Hi go play ground]
 we want to modify in another function and want the updated result to be reflected in the original array, we
 should pass the array by reference. <a href="https://go.dev/play/p/PDiSKXsQmtP">This playground link</a> has an example.</p>
 <p>It looks like this:</p>
-<pre><code>func callByReference(n1, n2 *[3]int, s1, s2 *[3]string) {
+<pre tabindex="0"><code>func callByReference(n1, n2 *[3]int, s1, s2 *[3]string) {
 	n1[0] = 3
 	n2[0] = 7
-	fmt.Printf(&quot;n1(%p)=%v n2(%p)=%v\n&quot;, &amp;n1, n1, &amp;n2, n2)
+	fmt.Printf(&#34;n1(%p)=%v n2(%p)=%v\n&#34;, &amp;n1, n1, &amp;n2, n2)
 
-	s1[0] = &quot;world&quot;
-	s2[0] = &quot;universe&quot;
+	s1[0] = &#34;world&#34;
+	s2[0] = &#34;universe&#34;
 
-	fmt.Printf(&quot;s1(%p)=%v s2(%p)=%v\n&quot;, &amp;s1, s1, &amp;s2, s2)
+	fmt.Printf(&#34;s1(%p)=%v s2(%p)=%v\n&#34;, &amp;s1, s1, &amp;s2, s2)
 }
 
 
@@ -378,58 +377,58 @@ are not elements of a struct type. That is:</p>
 <li>A slice will be shallow copied when a struct or a map is copied.</li>
 </ul>
 <p>Consider the following code for an example (<a href="https://go.dev/play/p/D6hRpNroZoP">link to playground</a>):</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
-
-<span style="color:#f92672">import</span> (
-	<span style="color:#e6db74">&#34;fmt&#34;</span>
-	<span style="color:#e6db74">&#34;log&#34;</span>
-	<span style="color:#e6db74">&#34;strings&#34;</span>
-)
-
-<span style="color:#66d9ef">type</span> <span style="color:#a6e22e">myStruct</span> <span style="color:#66d9ef">struct</span> {
-	<span style="color:#a6e22e">a</span>    <span style="color:#66d9ef">string</span>
-	<span style="color:#a6e22e">arr</span>  [<span style="color:#ae81ff">3</span>]<span style="color:#66d9ef">int</span>
-	<span style="color:#a6e22e">arr1</span> []<span style="color:#66d9ef">string</span>
-}
-
-<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">callByValue</span>(<span style="color:#a6e22e">s</span> <span style="color:#a6e22e">myStruct</span>) {
-	<span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">a</span> = <span style="color:#a6e22e">strings</span>.<span style="color:#a6e22e">ToUpper</span>(<span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">a</span>)
-	<span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">arr</span>[<span style="color:#ae81ff">0</span>] = <span style="color:#ae81ff">100</span>
-	<span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">arr1</span>[<span style="color:#ae81ff">1</span>] = <span style="color:#e6db74">&#34;ih&#34;</span>
-}
-
-<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">callByReference</span>(<span style="color:#a6e22e">s</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">myStruct</span>) {
-	<span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">a</span> = <span style="color:#a6e22e">strings</span>.<span style="color:#a6e22e">ToUpper</span>(<span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">a</span>)
-	<span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">arr</span>[<span style="color:#ae81ff">0</span>] = <span style="color:#ae81ff">100</span>
-	<span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">arr1</span>[<span style="color:#ae81ff">1</span>] = <span style="color:#e6db74">&#34;ih&#34;</span>
-}
-
-<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
-
-	<span style="color:#a6e22e">s</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">myStruct</span>{
-		<span style="color:#a6e22e">a</span>:    <span style="color:#e6db74">&#34;hello&#34;</span>,
-		<span style="color:#a6e22e">arr</span>:  [<span style="color:#ae81ff">3</span>]<span style="color:#66d9ef">int</span>{<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>},
-		<span style="color:#a6e22e">arr1</span>: []<span style="color:#66d9ef">string</span>{<span style="color:#e6db74">&#34;hi&#34;</span>, <span style="color:#e6db74">&#34;there&#34;</span>},
-	}
-
-	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;%#v\n&#34;</span>, <span style="color:#a6e22e">s</span>)
-
-	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>()
-
-	<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Calling function callByValue&#34;</span>)
-	<span style="color:#a6e22e">callByValue</span>(<span style="color:#a6e22e">s</span>)
-	<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Back to main()&#34;</span>)
-	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;%#v\n&#34;</span>, <span style="color:#a6e22e">s</span>)
-
-	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>()
-
-	<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Calling function callByReference&#34;</span>)
-	<span style="color:#a6e22e">callByReference</span>(<span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s</span>)
-	<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Back to main()&#34;</span>)
-	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;%#v\n&#34;</span>, <span style="color:#a6e22e">s</span>)
-}
-</code></pre></div><p>We define a <code>struct</code> type:</p>
-<pre><code>type myStruct struct {
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> (
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;fmt&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;log&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;strings&#34;</span>
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">myStruct</span> <span style="color:#66d9ef">struct</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">a</span>    <span style="color:#66d9ef">string</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">arr</span>  [<span style="color:#ae81ff">3</span>]<span style="color:#66d9ef">int</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">arr1</span> []<span style="color:#66d9ef">string</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">callByValue</span>(<span style="color:#a6e22e">s</span> <span style="color:#a6e22e">myStruct</span>) {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">a</span> = <span style="color:#a6e22e">strings</span>.<span style="color:#a6e22e">ToUpper</span>(<span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">a</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">arr</span>[<span style="color:#ae81ff">0</span>] = <span style="color:#ae81ff">100</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">arr1</span>[<span style="color:#ae81ff">1</span>] = <span style="color:#e6db74">&#34;ih&#34;</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">callByReference</span>(<span style="color:#a6e22e">s</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">myStruct</span>) {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">a</span> = <span style="color:#a6e22e">strings</span>.<span style="color:#a6e22e">ToUpper</span>(<span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">a</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">arr</span>[<span style="color:#ae81ff">0</span>] = <span style="color:#ae81ff">100</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">s</span>.<span style="color:#a6e22e">arr1</span>[<span style="color:#ae81ff">1</span>] = <span style="color:#e6db74">&#34;ih&#34;</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">s</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">myStruct</span>{
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">a</span>:    <span style="color:#e6db74">&#34;hello&#34;</span>,
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">arr</span>:  [<span style="color:#ae81ff">3</span>]<span style="color:#66d9ef">int</span>{<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>},
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">arr1</span>: []<span style="color:#66d9ef">string</span>{<span style="color:#e6db74">&#34;hi&#34;</span>, <span style="color:#e6db74">&#34;there&#34;</span>},
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;%#v\n&#34;</span>, <span style="color:#a6e22e">s</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Calling function callByValue&#34;</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">callByValue</span>(<span style="color:#a6e22e">s</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Back to main()&#34;</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;%#v\n&#34;</span>, <span style="color:#a6e22e">s</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Println</span>()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Calling function callByReference&#34;</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">callByReference</span>(<span style="color:#f92672">&amp;</span><span style="color:#a6e22e">s</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Println</span>(<span style="color:#e6db74">&#34;Back to main()&#34;</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;%#v\n&#34;</span>, <span style="color:#a6e22e">s</span>)
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>We define a <code>struct</code> type:</p>
+<pre tabindex="0"><code>type myStruct struct {
 	a    string
 	arr  [3]int
 	arr1 []string
@@ -440,15 +439,15 @@ The change to <code>arr</code> is not reflected as we would expect based on our 
 we then invoke the <code>callByReference()</code> function, all the three changes are reflected in <code>main()</code>, as we
 are working with a pointer to the struct value.</p>
 <p>Running the above program will show the following output:</p>
-<pre><code>main.myStruct{a:&quot;hello&quot;, arr:[3]int{1, 2, 3}, arr1:[]string{&quot;hi&quot;, &quot;there&quot;}}
+<pre tabindex="0"><code>main.myStruct{a:&#34;hello&#34;, arr:[3]int{1, 2, 3}, arr1:[]string{&#34;hi&#34;, &#34;there&#34;}}
 
 2009/11/10 23:00:00 Calling function callByValue
 2009/11/10 23:00:00 Back to main()
-main.myStruct{a:&quot;hello&quot;, arr:[3]int{1, 2, 3}, arr1:[]string{&quot;hi&quot;, &quot;ih&quot;}}
+main.myStruct{a:&#34;hello&#34;, arr:[3]int{1, 2, 3}, arr1:[]string{&#34;hi&#34;, &#34;ih&#34;}}
 
 2009/11/10 23:00:00 Calling function callByReference
 2009/11/10 23:00:00 Back to main()
-main.myStruct{a:&quot;HELLO&quot;, arr:[3]int{100, 2, 3}, arr1:[]string{&quot;hi&quot;, &quot;ih&quot;}}
+main.myStruct{a:&#34;HELLO&#34;, arr:[3]int{100, 2, 3}, arr1:[]string{&#34;hi&#34;, &#34;ih&#34;}}
 </code></pre><p><a href="https://alenkacz.medium.com/shallow-copy-of-a-go-struct-in-golang-is-never-a-good-idea-83be60106af8">This</a>
 article specifically discusses a bit more around why you should never shallow copy a struct type. The author
 makes an interesting observation (Quoted) - &ldquo;structs evolve over time&rdquo;. Thus, it&rsquo;s a better idea to

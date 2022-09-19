@@ -35,7 +35,7 @@
     <header id="post-header">
         <h1>Nginx &#43; strace</h1><time>June 19, 2019</time></header><p>I was debugging a issue where we were getting truncated logs in ElasticSearch
 in the context of a setup as follows:</p>
-<pre><code>Application Logs -&gt; Fluentd (logging) -&gt; Nginx -&gt; ElasticSearch
+<pre tabindex="0"><code>Application Logs -&gt; Fluentd (logging) -&gt; Nginx -&gt; ElasticSearch
 </code></pre><p>The original problem turned out to be on the application side, but my first
 point of investigation was what are we getting on the nginx side? Do we get the
 entire message that we are expecting and something is going on the ElasticSearch
@@ -43,9 +43,9 @@ side? To do so, I used <code>strace</code>.</p>
 <h1 id="setup">Setup</h1>
 <p>Install <code>nginx</code> using your distribution&rsquo;s package manager. On Fedora, <code>sudo dnf install nginx</code>
 did it for me. Once installed, start <code>nginx</code>:</p>
-<pre><code>$ sudo systemctl start nginx
+<pre tabindex="0"><code>$ sudo systemctl start nginx
 </code></pre><p>Test if <code>nginx</code> is up and running:</p>
-<pre><code>$ curl localhost
+<pre tabindex="0"><code>$ curl localhost
 </code></pre><p>If the above request succeeds, we are good to proceed.</p>
 <p>Install <code>strace</code> on your system using your package manager. On Fedora, <code>sudo dnf install strace</code>
 was sufficient.</p>
@@ -55,11 +55,11 @@ the nginx process. However, <code>nginx</code> <a href="https://www.nginx.com/bl
 so which process should we attach to? The solution is to ask <code>strace</code> to attach to the master process and ask it
 to trace system calls made by any children forked by the master process.</p>
 <p>Let&rsquo;s find out the process ID of the nginx master process:</p>
-<pre><code>[vagrant@ip-10-0-2-15 ~]$ ps -ef --forest | grep nginx
+<pre tabindex="0"><code>[vagrant@ip-10-0-2-15 ~]$ ps -ef --forest | grep nginx
 root      1536     1  0 02:28 ?        00:00:00 nginx: master process /usr/sbin/nginx
 nginx     1537  1536  0 02:28 ?        00:00:00  \_ nginx: worker process
 </code></pre><p>Now that we have process ID of the master, we will run <code>strace</code>:</p>
-<pre><code>$ sudo strace -p 1536 -s 10000 -v -f
+<pre tabindex="0"><code>$ sudo strace -p 1536 -s 10000 -v -f
 </code></pre><p>An explanation of the various switches are in order:</p>
 <ul>
 <li><code>-p</code>: Process ID to attach to</li>
@@ -70,10 +70,10 @@ nginx     1537  1536  0 02:28 ?        00:00:00  \_ nginx: worker process
 <p>(Learn more <a href="https://linux.die.net/man/1/strace">here</a>)</p>
 <p>On a new terminal, we will perform a nginx reload operation so that it kills the old
 worker process and creates a new one:</p>
-<pre><code>$ sudo systemctl  reload nginx
+<pre tabindex="0"><code>$ sudo systemctl  reload nginx
 </code></pre><p>This is needed since <code>strace</code> can only trace children created after we attached to the master process.</p>
 <p>Now, on the same new terminal, we can make a request to our nginx server via curl:</p>
-<pre><code>$ curl --request POST --data '{&quot;key&quot;:&quot;value&quot;}' localhost
+<pre tabindex="0"><code>$ curl --request POST --data &#39;{&#34;key&#34;:&#34;value&#34;}&#39; localhost
 &lt;html&gt;
 &lt;head&gt;&lt;title&gt;405 Not Allowed&lt;/title&gt;&lt;/head&gt;
 &lt;body&gt;
@@ -81,17 +81,16 @@ worker process and creates a new one:</p>
 &lt;hr&gt;&lt;center&gt;nginx/1.16.0&lt;/center&gt;
 &lt;/body&gt;
 &lt;/html&gt;
-
 </code></pre><p>Let&rsquo;s see what we have on the terminal we have <code>strace</code> open. The most relevant system calls are:</p>
-<pre><code>[pid  1661] recvfrom(3, &quot;POST / HTTP/1.1\r\nHost: localhost\r\nUser-Agent: curl/7.64.0\r\nAccept: */*\r\nContent-Length: 15\r\nContent-Type: application/x-www-form-urlencoded\r\n\r\n{\&quot;key\&quot;:\&quot;value\&quot;}&quot;, 1024, 0, NULL, NULL) = 158
+<pre tabindex="0"><code>[pid  1661] recvfrom(3, &#34;POST / HTTP/1.1\r\nHost: localhost\r\nUser-Agent: curl/7.64.0\r\nAccept: */*\r\nContent-Length: 15\r\nContent-Type: application/x-www-form-urlencoded\r\n\r\n{\&#34;key\&#34;:\&#34;value\&#34;}&#34;, 1024, 0, NULL, NULL) = 158
 
-[pid  1661] stat(&quot;/usr/share/nginx/html/index.html&quot;, {st_dev=makedev(0x8, 0x1), st_ino=923644, st_mode=S_IFREG|0644, st_nlink=1, st_uid=0, st_gid=0, st_blksize=4096, st_blocks=16, st_size=5683, st_atime=1560911325 /* 2019-06-19T02:28:45.355163487+0000 */, st_atime_nsec=355163487, st_mtime=1538675049 /* 2018-10-04T17:44:09+0000 */, st_mtime_nsec=0, st_ctime=1560910132 /* 2019-06-19T02:08:52.339205227+0000 */, st_ctime_nsec=339205227}) = 0
+[pid  1661] stat(&#34;/usr/share/nginx/html/index.html&#34;, {st_dev=makedev(0x8, 0x1), st_ino=923644, st_mode=S_IFREG|0644, st_nlink=1, st_uid=0, st_gid=0, st_blksize=4096, st_blocks=16, st_size=5683, st_atime=1560911325 /* 2019-06-19T02:28:45.355163487+0000 */, st_atime_nsec=355163487, st_mtime=1538675049 /* 2018-10-04T17:44:09+0000 */, st_mtime_nsec=0, st_ctime=1560910132 /* 2019-06-19T02:08:52.339205227+0000 */, st_ctime_nsec=339205227}) = 0
 
-[pid  1661] openat(AT_FDCWD, &quot;/usr/share/nginx/html/index.html&quot;, O_RDONLY|O_NONBLOCK) = 4
+[pid  1661] openat(AT_FDCWD, &#34;/usr/share/nginx/html/index.html&#34;, O_RDONLY|O_NONBLOCK) = 4
 
 [pid  1661] fstat(4, {st_dev=makedev(0x8, 0x1), st_ino=923644, st_mode=S_IFREG|0644, st_nlink=1, st_uid=0, st_gid=0, st_blksize=4096, st_blocks=16, st_size=5683, st_atime=1560911325 /* 2019-06-19T02:28:45.355163487+0000 */, st_atime_nsec=355163487, st_mtime=1538675049 /* 2018-10-04T17:44:09+0000 */, st_mtime_nsec=0, st_ctime=1560910132 /* 2019-06-19T02:08:52.339205227+0000 */, st_ctime_nsec=339205227}) = 0
 
-[pid  1661] writev(3, [{iov_base=&quot;HTTP/1.1 405 Not Allowed\r\nServer: nginx/1.16.0\r\nDate: Wed, 19 Jun 2019 03:22:14 GMT\r\nContent-Type: text/html\r\nContent-Length: 157\r\nConnection: keep-alive\r\n\r\n&quot;, iov_len=157}, {iov_base=&quot;&lt;html&gt;\r\n&lt;head&gt;&lt;title&gt;405 Not Allowed&lt;/title&gt;&lt;/head&gt;\r\n&lt;body&gt;\r\n&lt;center&gt;&lt;h1&gt;405 Not Allowed&lt;/h1&gt;&lt;/center&gt;\r\n&quot;, iov_len=104}, {iov_base=&quot;&lt;hr&gt;&lt;center&gt;nginx/1.16.0&lt;/center&gt;\r\n&lt;/body&gt;\r\n&lt;/html&gt;\r\n&quot;, iov_len=53}], 3) = 314
+[pid  1661] writev(3, [{iov_base=&#34;HTTP/1.1 405 Not Allowed\r\nServer: nginx/1.16.0\r\nDate: Wed, 19 Jun 2019 03:22:14 GMT\r\nContent-Type: text/html\r\nContent-Length: 157\r\nConnection: keep-alive\r\n\r\n&#34;, iov_len=157}, {iov_base=&#34;&lt;html&gt;\r\n&lt;head&gt;&lt;title&gt;405 Not Allowed&lt;/title&gt;&lt;/head&gt;\r\n&lt;body&gt;\r\n&lt;center&gt;&lt;h1&gt;405 Not Allowed&lt;/h1&gt;&lt;/center&gt;\r\n&#34;, iov_len=104}, {iov_base=&#34;&lt;hr&gt;&lt;center&gt;nginx/1.16.0&lt;/center&gt;\r\n&lt;/body&gt;\r\n&lt;/html&gt;\r\n&#34;, iov_len=53}], 3) = 314
 </code></pre><p>The <code>recvfrom()</code> call has the HTTP request sent by our <code>curl</code> command and the <code>writev()</code> call has the HTTP response being
 sent to the client.</p>
 <h1 id="summary">Summary</h1>

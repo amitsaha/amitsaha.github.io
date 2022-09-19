@@ -48,60 +48,60 @@ the tutorial though, I assume that you already have the VPC and subnets you want
 <li>EKS master</li>
 </ul>
 <h3 id="iam-role">IAM role</h3>
-<pre><code>resource &quot;aws_iam_role&quot; &quot;cluster&quot; {
-  name = &quot;eks-cluster-${var.environment}&quot;
+<pre tabindex="0"><code>resource &#34;aws_iam_role&#34; &#34;cluster&#34; {
+  name = &#34;eks-cluster-${var.environment}&#34;
 
   assume_role_policy = &lt;&lt;POLICY
 {
-  &quot;Version&quot;: &quot;2012-10-17&quot;,
-  &quot;Statement&quot;: [
+  &#34;Version&#34;: &#34;2012-10-17&#34;,
+  &#34;Statement&#34;: [
     {
-      &quot;Effect&quot;: &quot;Allow&quot;,
-      &quot;Principal&quot;: {
-        &quot;Service&quot;: &quot;eks.amazonaws.com&quot;
+      &#34;Effect&#34;: &#34;Allow&#34;,
+      &#34;Principal&#34;: {
+        &#34;Service&#34;: &#34;eks.amazonaws.com&#34;
       },
-      &quot;Action&quot;: &quot;sts:AssumeRole&quot;
+      &#34;Action&#34;: &#34;sts:AssumeRole&#34;
     }
   ]
 }
 POLICY
 }
 
-resource &quot;aws_iam_role_policy_attachment&quot; &quot;cluster-AmazonEKSClusterPolicy&quot; {
-  policy_arn = &quot;arn:aws:iam::aws:policy/AmazonEKSClusterPolicy&quot;
-  role       = &quot;${aws_iam_role.cluster.name}&quot;
+resource &#34;aws_iam_role_policy_attachment&#34; &#34;cluster-AmazonEKSClusterPolicy&#34; {
+  policy_arn = &#34;arn:aws:iam::aws:policy/AmazonEKSClusterPolicy&#34;
+  role       = &#34;${aws_iam_role.cluster.name}&#34;
 }
 
-resource &quot;aws_iam_role_policy_attachment&quot; &quot;cluster-AmazonEKSServicePolicy&quot; {
-  policy_arn = &quot;arn:aws:iam::aws:policy/AmazonEKSServicePolicy&quot;
-  role       = &quot;${aws_iam_role.cluster.name}&quot;
+resource &#34;aws_iam_role_policy_attachment&#34; &#34;cluster-AmazonEKSServicePolicy&#34; {
+  policy_arn = &#34;arn:aws:iam::aws:policy/AmazonEKSServicePolicy&#34;
+  role       = &#34;${aws_iam_role.cluster.name}&#34;
 }
 </code></pre><h3 id="security-group-and-rules">Security group and rules</h3>
-<pre><code>resource &quot;aws_security_group&quot; &quot;cluster&quot; {
-  name        = &quot;eks-cluster-${var.environment}&quot;
-  description = &quot;Cluster communication with worker nodes&quot;
-  vpc_id      = &quot;${var.vpc_id}&quot;
+<pre tabindex="0"><code>resource &#34;aws_security_group&#34; &#34;cluster&#34; {
+  name        = &#34;eks-cluster-${var.environment}&#34;
+  description = &#34;Cluster communication with worker nodes&#34;
+  vpc_id      = &#34;${var.vpc_id}&#34;
 
   egress {
     from_port   = 0
     to_port     = 0
-    protocol    = &quot;-1&quot;
-    cidr_blocks = [&quot;0.0.0.0/0&quot;]
+    protocol    = &#34;-1&#34;
+    cidr_blocks = [&#34;0.0.0.0/0&#34;]
   }
 
   tags = {
-    Name = &quot;eks-cluster-${var.environment}&quot;
+    Name = &#34;eks-cluster-${var.environment}&#34;
   }
 }
 
-resource &quot;aws_security_group_rule&quot; &quot;cluster-ingress-workstation-https&quot; {
-  cidr_blocks       = &quot;${var.ssh_access_ip}&quot;
-  description       = &quot;Allow local workstation to communicate with the cluster API Server&quot;
+resource &#34;aws_security_group_rule&#34; &#34;cluster-ingress-workstation-https&#34; {
+  cidr_blocks       = &#34;${var.ssh_access_ip}&#34;
+  description       = &#34;Allow local workstation to communicate with the cluster API Server&#34;
   from_port         = 443
-  protocol          = &quot;tcp&quot;
-  security_group_id = &quot;${aws_security_group.cluster.id}&quot;
+  protocol          = &#34;tcp&#34;
+  security_group_id = &#34;${aws_security_group.cluster.id}&#34;
   to_port           = 443
-  type              = &quot;ingress&quot;
+  type              = &#34;ingress&#34;
 }
 </code></pre><h3 id="eks-master">EKS master</h3>
 <p>We create an EKS master with the following key attributes:</p>
@@ -114,30 +114,30 @@ resource &quot;aws_security_group_rule&quot; &quot;cluster-ingress-workstation-h
 <p>These private subnet IDs must have a tag - <code>kubernetes.io/cluster/&lt;your cluster name&gt;: shared</code> where the cluster name
 is the same as that you use in the your terraform configuration.</p>
 <p>The following Terraform configuration will create the EKS master:</p>
-<pre><code>resource &quot;aws_eks_cluster&quot; &quot;cluster&quot; {
-  name            = &quot;${var.cluster_name}&quot;
-  role_arn        = &quot;${aws_iam_role.cluster.arn}&quot;
+<pre tabindex="0"><code>resource &#34;aws_eks_cluster&#34; &#34;cluster&#34; {
+  name            = &#34;${var.cluster_name}&#34;
+  role_arn        = &#34;${aws_iam_role.cluster.arn}&#34;
 
   enabled_cluster_log_types = [
-      &quot;api&quot;,&quot;audit&quot;,&quot;authenticator&quot;,&quot;controllerManager&quot;,&quot;scheduler&quot;,
+      &#34;api&#34;,&#34;audit&#34;,&#34;authenticator&#34;,&#34;controllerManager&#34;,&#34;scheduler&#34;,
   ]
 
   vpc_config {
     endpoint_private_access = true
     endpoint_public_access = false
-    security_group_ids = [&quot;${aws_security_group.cluster.id}&quot;]
-    subnet_ids         = [&quot;${var.private_subnet_ids}&quot;]
+    security_group_ids = [&#34;${aws_security_group.cluster.id}&#34;]
+    subnet_ids         = [&#34;${var.private_subnet_ids}&#34;]
   }
 
   depends_on = [
-    &quot;aws_iam_role_policy_attachment.cluster-AmazonEKSClusterPolicy&quot;,
-    &quot;aws_iam_role_policy_attachment.cluster-AmazonEKSServicePolicy&quot;,
+    &#34;aws_iam_role_policy_attachment.cluster-AmazonEKSClusterPolicy&#34;,
+    &#34;aws_iam_role_policy_attachment.cluster-AmazonEKSServicePolicy&#34;,
   ]
 }
 </code></pre><h2 id="terraform-configuration-for-nodes">Terraform configuration for nodes</h2>
 <h2 id="public-subnet-tagging">Public subnet tagging</h2>
 <p>Public subnets will need the following key-value pairs as tags:</p>
-<pre><code>kubernetes.io/cluster/&lt;cluster-name&gt;: shared 
+<pre tabindex="0"><code>kubernetes.io/cluster/&lt;cluster-name&gt;: shared 
 kubernetes.io/role/elb: 1
 </code></pre><p>This is so that public load balancers can be created for services and/or ingress controllers.</p>
 <h2 id="eks-private-master-and-dns-resolution">EKS private master and DNS resolution</h2>
@@ -153,7 +153,7 @@ you are trying to currently perform. For EKS clusters, using AWS IAM is the most
 approach for authentication. The user who sets up the EKS cluster are automatically given access to
 the cluster as a member of the <code>system:masters</code> kubernetes group and the authentication setup in
 kubeconfig looks as follows:</p>
-<pre><code>- name: mycluster-admin
+<pre tabindex="0"><code>- name: mycluster-admin
   user:
     exec:
       apiVersion: client.authentication.k8s.io/v1alpha1
@@ -171,8 +171,8 @@ the terraform output, or via using the AWS CLI or directly via the API.</li>
 </ul>
 <p>A complete <code>~/.kube/config</code> file for admin access for the cluster creator will look like
 as follows:</p>
-<pre><code>apiVersion: v1
-current-context: &quot;&quot;
+<pre tabindex="0"><code>apiVersion: v1
+current-context: &#34;&#34;
 clusters:
 - cluster:
     certificate-authority-data: foobar 
@@ -199,7 +199,7 @@ users:
 <p>Once you have configured the above kubeconfig correctly, if you run <code>kubectl get nodes</code>,
 you will see that no nodes have joined the cluster. That is because, we will need to
 first update a special <code>ConfigMap</code> to allow the nodes to authenticate to the cluster:</p>
-<pre><code>apiVersion: v1
+<pre tabindex="0"><code>apiVersion: v1
 data:
   mapRoles: |
     - rolearn: arn:aws:iam::AWS-ACCOUN-ID:role/myrole
@@ -211,7 +211,6 @@ kind: ConfigMap
 metadata:
   name: aws-auth
   namespace: kube-system
-
 </code></pre><p>The <code>mapRoles</code> array lists all the IAM roles that we want to allow to authenticate
 successfully to the cluster. We add the role to the kubernetes groups <code>system:bootstrappers</code>
 and <code>system:nodes</code>. We have to add all the IAM roles of the nodes in our cluster to this
@@ -225,77 +224,74 @@ ConfigMap. Once we apply this manifest, you should see the nodes are ready when 
 <h1 id="secret-management">Secret management</h1>
 <h1 id="nginx-ingress-with-ssl-throughout">Nginx Ingress with SSL throughout</h1>
 <p>The following specification enables Nginx ingress with SSL to your backend as well:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">extensions/v1beta1</span>
-<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Ingress</span>
-<span style="color:#f92672">metadata</span>:
-  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">api-ingress</span>
-  <span style="color:#f92672">namespace</span>: <span style="color:#ae81ff">mynamespace</span>
-  <span style="color:#f92672">annotations</span>:
-    <span style="color:#f92672">nginx.ingress.kubernetes.io/rewrite-target</span>: <span style="color:#ae81ff">/</span>
-    <span style="color:#f92672">kubernetes/ingress.class</span>: <span style="color:#ae81ff">nginx</span>
-    <span style="color:#f92672">nginx.ingress.kubernetes.io/backend-protocol</span>: <span style="color:#e6db74">&#34;HTTPS&#34;</span>
-<span style="color:#f92672">spec</span>:
-  <span style="color:#f92672">tls</span>:
-  - <span style="color:#f92672">hosts</span>:
-    - <span style="color:#e6db74">&#34;myhost.dns.com&#34;</span>
-    <span style="color:#f92672">secretName</span>: <span style="color:#ae81ff">myhost-tls</span>
-  <span style="color:#f92672">rules</span>:
-    - <span style="color:#f92672">host</span>: <span style="color:#ae81ff">myhost.dns.com</span>
-      <span style="color:#f92672">http</span>:
-        <span style="color:#f92672">paths</span>:
-        - <span style="color:#f92672">path</span>: <span style="color:#ae81ff">/</span>
-          <span style="color:#f92672">backend</span>:
-            <span style="color:#f92672">serviceName</span>: <span style="color:#ae81ff">xledger</span>
-            <span style="color:#f92672">servicePort</span>: <span style="color:#ae81ff">443</span>
-
-</code></pre></div><p>However when trying to use the above with AWS ELB, I had to:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">extensions/v1beta1</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Ingress</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">metadata</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">api-ingress</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">namespace</span>: <span style="color:#ae81ff">mynamespace</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">annotations</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">nginx.ingress.kubernetes.io/rewrite-target</span>: <span style="color:#ae81ff">/</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">kubernetes/ingress.class</span>: <span style="color:#ae81ff">nginx</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">nginx.ingress.kubernetes.io/backend-protocol</span>: <span style="color:#e6db74">&#34;HTTPS&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">spec</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">tls</span>:
+</span></span><span style="display:flex;"><span>  - <span style="color:#f92672">hosts</span>:
+</span></span><span style="display:flex;"><span>    - <span style="color:#e6db74">&#34;myhost.dns.com&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">secretName</span>: <span style="color:#ae81ff">myhost-tls</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">rules</span>:
+</span></span><span style="display:flex;"><span>    - <span style="color:#f92672">host</span>: <span style="color:#ae81ff">myhost.dns.com</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">http</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">paths</span>:
+</span></span><span style="display:flex;"><span>        - <span style="color:#f92672">path</span>: <span style="color:#ae81ff">/</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">backend</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">serviceName</span>: <span style="color:#ae81ff">xledger</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">servicePort</span>: <span style="color:#ae81ff">443</span>
+</span></span></code></pre></div><p>However when trying to use the above with AWS ELB, I had to:</p>
 <ul>
 <li>Follow the docs <a href="https://kubernetes.github.io/ingress-nginx/deploy/">here</a> for AWS ELB L7</li>
 <li>Update config map with the following:</li>
 </ul>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">kind</span>: <span style="color:#ae81ff">ConfigMap</span>
-<span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">v1</span>
-<span style="color:#f92672">metadata</span>:
-  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">nginx-configuration</span>
-  <span style="color:#f92672">namespace</span>: <span style="color:#ae81ff">ingress-nginx</span>
-  <span style="color:#f92672">labels</span>:
-    <span style="color:#f92672">app.kubernetes.io/name</span>: <span style="color:#ae81ff">ingress-nginx</span>
-    <span style="color:#f92672">app.kubernetes.io/part-of</span>: <span style="color:#ae81ff">ingress-nginx</span>
-<span style="color:#f92672">data</span>:
-  <span style="color:#f92672">use-proxy-protocol</span>: <span style="color:#e6db74">&#34;false&#34;</span>
-  <span style="color:#f92672">use-forwarded-headers</span>: <span style="color:#e6db74">&#34;true&#34;</span>
-  <span style="color:#f92672">proxy-real-ip-cidr</span>: <span style="color:#e6db74">&#34;0.0.0.0/0&#34;</span> <span style="color:#75715e"># restrict this to the IP addresses of ELB</span>
-  <span style="color:#f92672">ssl-ciphers</span>: <span style="color:#e6db74">&#34;ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-DSS-AES128-GCM-SHA256:kEDH+AESGCM:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA:ECDHE-ECDSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-DSS-AES128-SHA256:DHE-RSA-AES256-SHA256:DHE-DSS-AES256-SHA:DHE-RSA-AES256-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:AES:CAMELLIA:DES-CBC3-SHA:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!PSK:!aECDH:!EDH-DSS-DES-CBC3-SHA:!EDH-RSA-DES-CBC3-SHA:!KRB5-DES-CBC3-SHA&#34;</span>
-  <span style="color:#f92672">ssl-protocols</span>: <span style="color:#e6db74">&#34;TLSv1 TLSv1.1 TLSv1.2&#34;</span>
-
-</code></pre></div><p>The key parts that I struggled with was having to set <code>ssl-ciphers</code> and <code>ssl-protocols</code>. Without those, the connections
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">kind</span>: <span style="color:#ae81ff">ConfigMap</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">v1</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">metadata</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">nginx-configuration</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">namespace</span>: <span style="color:#ae81ff">ingress-nginx</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">labels</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">app.kubernetes.io/name</span>: <span style="color:#ae81ff">ingress-nginx</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">app.kubernetes.io/part-of</span>: <span style="color:#ae81ff">ingress-nginx</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">data</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">use-proxy-protocol</span>: <span style="color:#e6db74">&#34;false&#34;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">use-forwarded-headers</span>: <span style="color:#e6db74">&#34;true&#34;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">proxy-real-ip-cidr</span>: <span style="color:#e6db74">&#34;0.0.0.0/0&#34;</span> <span style="color:#75715e"># restrict this to the IP addresses of ELB</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">ssl-ciphers</span>: <span style="color:#e6db74">&#34;ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-DSS-AES128-GCM-SHA256:kEDH+AESGCM:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA:ECDHE-ECDSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-DSS-AES128-SHA256:DHE-RSA-AES256-SHA256:DHE-DSS-AES256-SHA:DHE-RSA-AES256-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:AES:CAMELLIA:DES-CBC3-SHA:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!PSK:!aECDH:!EDH-DSS-DES-CBC3-SHA:!EDH-RSA-DES-CBC3-SHA:!KRB5-DES-CBC3-SHA&#34;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">ssl-protocols</span>: <span style="color:#e6db74">&#34;TLSv1 TLSv1.1 TLSv1.2&#34;</span>
+</span></span></code></pre></div><p>The key parts that I struggled with was having to set <code>ssl-ciphers</code> and <code>ssl-protocols</code>. Without those, the connections
 from ALB was just hanging and eventually would give me a 408. For reference, here&rsquo;s a <code>service-l7.yaml</code> I used:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Service</span>
-<span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">v1</span>
-<span style="color:#f92672">metadata</span>:
-  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">ingress-nginx</span>
-  <span style="color:#f92672">namespace</span>: <span style="color:#ae81ff">ingress-nginx</span>
-  <span style="color:#f92672">labels</span>:
-    <span style="color:#f92672">app.kubernetes.io/name</span>: <span style="color:#ae81ff">ingress-nginx</span>
-    <span style="color:#f92672">app.kubernetes.io/part-of</span>: <span style="color:#ae81ff">ingress-nginx</span>
-  <span style="color:#f92672">annotations</span>:
-    <span style="color:#f92672">service.beta.kubernetes.io/aws-load-balancer-ssl-cert</span>: <span style="color:#e6db74">&#34;your certificate arn&#34;</span>
-    <span style="color:#f92672">service.beta.kubernetes.io/aws-load-balancer-backend-protocol</span>: <span style="color:#e6db74">&#34;https&#34;</span>
-    <span style="color:#f92672">service.beta.kubernetes.io/aws-load-balancer-ssl-ports</span>: <span style="color:#e6db74">&#34;https&#34;</span>
-    <span style="color:#f92672">service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout</span>: <span style="color:#e6db74">&#34;60&#34;</span>
-<span style="color:#f92672">spec</span>:
-  <span style="color:#f92672">type</span>: <span style="color:#ae81ff">LoadBalancer</span>
-  <span style="color:#f92672">selector</span>:
-    <span style="color:#f92672">app.kubernetes.io/name</span>: <span style="color:#ae81ff">ingress-nginx</span>
-    <span style="color:#f92672">app.kubernetes.io/part-of</span>: <span style="color:#ae81ff">ingress-nginx</span>
-  <span style="color:#f92672">ports</span>:
-   - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">https</span>
-     <span style="color:#f92672">port</span>: <span style="color:#ae81ff">443</span>
-     <span style="color:#f92672">targetPort</span>: <span style="color:#ae81ff">443</span>
-
-</code></pre></div><h1 id="jobs">Jobs</h1>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Service</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">v1</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">metadata</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">ingress-nginx</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">namespace</span>: <span style="color:#ae81ff">ingress-nginx</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">labels</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">app.kubernetes.io/name</span>: <span style="color:#ae81ff">ingress-nginx</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">app.kubernetes.io/part-of</span>: <span style="color:#ae81ff">ingress-nginx</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">annotations</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">service.beta.kubernetes.io/aws-load-balancer-ssl-cert</span>: <span style="color:#e6db74">&#34;your certificate arn&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">service.beta.kubernetes.io/aws-load-balancer-backend-protocol</span>: <span style="color:#e6db74">&#34;https&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">service.beta.kubernetes.io/aws-load-balancer-ssl-ports</span>: <span style="color:#e6db74">&#34;https&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout</span>: <span style="color:#e6db74">&#34;60&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">spec</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">type</span>: <span style="color:#ae81ff">LoadBalancer</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">selector</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">app.kubernetes.io/name</span>: <span style="color:#ae81ff">ingress-nginx</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">app.kubernetes.io/part-of</span>: <span style="color:#ae81ff">ingress-nginx</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">ports</span>:
+</span></span><span style="display:flex;"><span>   - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">https</span>
+</span></span><span style="display:flex;"><span>     <span style="color:#f92672">port</span>: <span style="color:#ae81ff">443</span>
+</span></span><span style="display:flex;"><span>     <span style="color:#f92672">targetPort</span>: <span style="color:#ae81ff">443</span>
+</span></span></code></pre></div><h1 id="jobs">Jobs</h1>
 <p>Jobs are useful for running one off tasks - database migrations for example. Here&rsquo;s a sample spec:</p>
-<pre><code>apiVersion: batch/v1
+<pre tabindex="0"><code>apiVersion: batch/v1
 kind: Job
 metadata:
   name: my-job-name
@@ -319,44 +315,43 @@ spec:
                 name: secret-token
                 key: token
       nodeSelector:
-        nodegroup: &quot;services&quot;
-        environment: &quot;qa&quot;
+        nodegroup: &#34;services&#34;
+        environment: &#34;qa&#34;
       restartPolicy: Never
   backoffLimit: 4
 </code></pre><h1 id="cron-jobs">Cron jobs</h1>
 <p>Cron jobs are useful for running scheduled jobs:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">batch/v1beta1</span>
-<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">CronJob</span>
-<span style="color:#f92672">metadata</span>:
-  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">cron</span>
-  <span style="color:#f92672">namespace</span>: <span style="color:#ae81ff">my-namespace</span>
-<span style="color:#f92672">spec</span>:
-  <span style="color:#f92672">schedule</span>: <span style="color:#e6db74">&#34;* * * * *&#34;</span>
-  <span style="color:#f92672">jobTemplate</span>:
-    <span style="color:#f92672">spec</span>:
-      <span style="color:#f92672">template</span>:
-        <span style="color:#f92672">spec</span>:
-          <span style="color:#f92672">containers</span>:
-          - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">cron</span>
-            <span style="color:#f92672">image</span>: <span style="color:#ae81ff">myproject/cron-job</span>
-            <span style="color:#f92672">args</span>:
-            - <span style="color:#ae81ff">bash</span>
-            - -<span style="color:#ae81ff">c</span>
-            - <span style="color:#ae81ff">/schedule.sh</span>
-            <span style="color:#f92672">env</span>:
-              - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">ENVIRONMENT</span>
-                <span style="color:#f92672">value</span>: <span style="color:#ae81ff">qa</span>
-              - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">TOKEN</span>
-                <span style="color:#f92672">valueFrom</span>:
-                  <span style="color:#f92672">secretKeyRef</span>:
-                    <span style="color:#f92672">name</span>: <span style="color:#ae81ff">secret-token</span>
-                    <span style="color:#f92672">key</span>: <span style="color:#ae81ff">token</span>
-          <span style="color:#f92672">restartPolicy</span>: <span style="color:#ae81ff">OnFailure</span>
-          <span style="color:#f92672">nodeSelector</span>:
-            <span style="color:#f92672">nodegroup</span>: <span style="color:#e6db74">&#34;services&#34;</span>
-            <span style="color:#f92672">environment</span>: <span style="color:#e6db74">&#34;qa&#34;</span>
-
-</code></pre></div><h1 id="accessing-internal-network-services">Accessing internal network services</h1>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">batch/v1beta1</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">kind</span>: <span style="color:#ae81ff">CronJob</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">metadata</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">cron</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">namespace</span>: <span style="color:#ae81ff">my-namespace</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">spec</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">schedule</span>: <span style="color:#e6db74">&#34;* * * * *&#34;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">jobTemplate</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">spec</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">template</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">spec</span>:
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">containers</span>:
+</span></span><span style="display:flex;"><span>          - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">cron</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">image</span>: <span style="color:#ae81ff">myproject/cron-job</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">args</span>:
+</span></span><span style="display:flex;"><span>            - <span style="color:#ae81ff">bash</span>
+</span></span><span style="display:flex;"><span>            - -<span style="color:#ae81ff">c</span>
+</span></span><span style="display:flex;"><span>            - <span style="color:#ae81ff">/schedule.sh</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">env</span>:
+</span></span><span style="display:flex;"><span>              - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">ENVIRONMENT</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#f92672">value</span>: <span style="color:#ae81ff">qa</span>
+</span></span><span style="display:flex;"><span>              - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">TOKEN</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#f92672">valueFrom</span>:
+</span></span><span style="display:flex;"><span>                  <span style="color:#f92672">secretKeyRef</span>:
+</span></span><span style="display:flex;"><span>                    <span style="color:#f92672">name</span>: <span style="color:#ae81ff">secret-token</span>
+</span></span><span style="display:flex;"><span>                    <span style="color:#f92672">key</span>: <span style="color:#ae81ff">token</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">restartPolicy</span>: <span style="color:#ae81ff">OnFailure</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">nodeSelector</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">nodegroup</span>: <span style="color:#e6db74">&#34;services&#34;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">environment</span>: <span style="color:#e6db74">&#34;qa&#34;</span>
+</span></span></code></pre></div><h1 id="accessing-internal-network-services">Accessing internal network services</h1>
 <p><code>kubectl exec</code> allows us to exec into a pod and run arbitrary commands inside the pod. However, let&rsquo;s say
 we wanted to run a graphical database client locally and wanted to connect to a database pod. We cannot make
 use of <code>kubectl exec</code>. <code>kubectl port-forward</code> helps us here. We can setup a port forward from our local workstation
@@ -364,7 +359,7 @@ on port XXXX to the DB port and we are done. However, things get complicated whe
 and we should. In this particular case, network policies were setup for the database pod to allow only ingress
 traffic from within the namespace. Hence, when we try to access the DB pod via port forwarding, it doesn&rsquo;t work.</p>
 <p>In such a case, we can make use of the <code>ipBlock</code> object in the policy definition, for example:</p>
-<pre><code>kind: NetworkPolicy
+<pre tabindex="0"><code>kind: NetworkPolicy
 apiVersion: networking.k8s.io/v1
 metadata:
   name: db-policy
@@ -388,20 +383,20 @@ in the specified subnet  IPv4 ranges, so that may be something which makes this 
 kubernetes setup.</p>
 <p>The nice thing about using <code>kubectl port-forward</code> here is that we have both authentication and authorization being enforced
 to even obtain the IP address of the DB pod, since we can allow/disallow <code>port-forward</code> via a custom <code>Role</code>:</p>
-<pre><code>kind: Role
+<pre tabindex="0"><code>kind: Role
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: team-access-services
 rules:
 
-- apiGroups: [&quot;&quot;]
-  resources: [&quot;pods/exec&quot;, &quot;pods/portforward&quot;]
-  verbs: [&quot;create&quot;]
+- apiGroups: [&#34;&#34;]
+  resources: [&#34;pods/exec&#34;, &#34;pods/portforward&#34;]
+  verbs: [&#34;create&#34;]
 </code></pre><h1 id="pod-security-policies">Pod security policies</h1>
 <p>I have written about this in a <a href="https://echorand.me/posts/kubernetes-pod-security-policies/">separate blog post</a></p>
 <h1 id="exposing-statefulsets-and-headless-services">Exposing StatefulSets and Headless services</h1>
 <p>Let&rsquo;s say we have a <code>StatefulSet</code>:</p>
-<pre><code>apiVersion: apps/v1
+<pre tabindex="0"><code>apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: prometheus
@@ -436,7 +431,7 @@ spec:
         ..
 ---
 </code></pre><p>It is exposed via a Headless service:</p>
-<pre><code>
+<pre tabindex="0"><code>
 apiVersion: v1
 kind: Service
 metadata:
@@ -451,7 +446,7 @@ spec:
     project: monitoring
 ---
 </code></pre><p>To expose it via an ingress controller as an ingress object:</p>
-<pre><code>apiVersion: extensions/v1beta1
+<pre tabindex="0"><code>apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   annotations:

@@ -46,12 +46,12 @@ ourselves with the Rego language. One point worth nothing is Rego and OPA can be
 enforcement beyond Kubernetes, however, we are going to focus on Kubernetes <em>objects</em>.</p>
 <h1 id="writing-our-first-policy">Writing our first policy</h1>
 <p>Let&rsquo;s look at a policy which will fail if the <code>namespace</code> of an object is <code>default</code>:</p>
-<pre><code>package k8svalidnamespace
+<pre tabindex="0"><code>package k8svalidnamespace
         
-violation[{&quot;msg&quot;: msg, &quot;details&quot;: {}}] {
+violation[{&#34;msg&#34;: msg, &#34;details&#34;: {}}] {
   value := input.review.object.metadata.namespace
-  value == &quot;default&quot;
-  msg := sprintf(&quot;Namespace should not be default: %v&quot;, [value])
+  value == &#34;default&#34;
+  msg := sprintf(&#34;Namespace should not be default: %v&#34;, [value])
 }
 </code></pre><p>The first line of this policy defines a namespace  or package for the policy. Each policy must reside in a package.</p>
 <p>Next, we define a <code>violation</code> <em>block</em> which &ldquo;returns&rdquo; two objects, &ldquo;msg&rdquo; and &ldquo;details&rdquo; to the calling framework.
@@ -70,32 +70,31 @@ must evaluate to <code>true</code> for the policy to be evaluted (see next examp
 object and hence automatically &ldquo;returned&rdquo;.</p>
 <p>Given the above policy and an input document, let&rsquo;s test it out in the <a href="https://play.openpolicyagent.org/p/SI62cRuOEh">Rego playground</a>.</p>
 <p>For reference, the input is:</p>
-<pre><code>{
-    &quot;kind&quot;: &quot;AdmissionReview&quot;,
-    &quot;parameters&quot;: {},
-    &quot;review&quot;: {
-        &quot;kind&quot;: {
-            &quot;kind&quot;: &quot;Pod&quot;,
-            &quot;version&quot;: &quot;v1&quot;
+<pre tabindex="0"><code>{
+    &#34;kind&#34;: &#34;AdmissionReview&#34;,
+    &#34;parameters&#34;: {},
+    &#34;review&#34;: {
+        &#34;kind&#34;: {
+            &#34;kind&#34;: &#34;Pod&#34;,
+            &#34;version&#34;: &#34;v1&#34;
         },
-        &quot;object&quot;: {
-            &quot;metadata&quot;: {
-                &quot;name&quot;: &quot;myapp&quot;,
-                &quot;namespace&quot;: &quot;default&quot;
+        &#34;object&#34;: {
+            &#34;metadata&#34;: {
+                &#34;name&#34;: &#34;myapp&#34;,
+                &#34;namespace&#34;: &#34;default&#34;
             },
-            &quot;spec&quot;: {
-                &quot;containers&quot;: []
+            &#34;spec&#34;: {
+                &#34;containers&#34;: []
             }
         }
     }
 }
-
 </code></pre><p>The output you will see is:</p>
-<pre><code>{
-    &quot;violation&quot;: [
+<pre tabindex="0"><code>{
+    &#34;violation&#34;: [
         {
-            &quot;details&quot;: {},
-            &quot;msg&quot;: &quot;Namespace should not be default: default&quot;
+            &#34;details&#34;: {},
+            &#34;msg&#34;: &#34;Namespace should not be default: default&#34;
         }
     ]
 }
@@ -103,34 +102,34 @@ object and hence automatically &ldquo;returned&rdquo;.</p>
 <p>Let&rsquo;s now say that in addition to check if the <code>namespace</code> is default, we also want to check if the namespace
 is an empty string. In other words, we want the policy to be violated if either the namespace is empty or the
 namespace is default. Here&rsquo;s the first version of the policy which doesn&rsquo;t work as expected:</p>
-<pre><code>package k8svalidnamespace
+<pre tabindex="0"><code>package k8svalidnamespace
         
-violation[{&quot;msg&quot;: msg, &quot;details&quot;: {}}] {          
+violation[{&#34;msg&#34;: msg, &#34;details&#34;: {}}] {          
   value := input.review.object.metadata.namespace          
-  value == &quot;&quot;
-  value == &quot;default&quot;
-  msg := sprintf(&quot;Namespace should not be default: %v&quot;, [value])
+  value == &#34;&#34;
+  value == &#34;default&#34;
+  msg := sprintf(&#34;Namespace should not be default: %v&#34;, [value])
 }
 </code></pre><p>I wrote this version in a hurry and I don&rsquo;t know what I was expecting. Someone in open policy agent slack then pointed me
 to the issue. Even then we can use the above wrong policy to understand a bit more about how policy evaluation works.
 Given the same input as the first policy, the policy evaluation will <em>stop</em> at the expression, <code>value == &quot;&quot;</code>. It evaluates
 to false and hence the above rule is not violated and hence we wouldn&rsquo;t see any violations.</p>
 <p>In addition, consider the following input document:</p>
-<pre><code>{
-    &quot;kind&quot;: &quot;AdmissionReview&quot;,
-    &quot;parameters&quot;: {},
-    &quot;review&quot;: {
-        &quot;kind&quot;: {
-            &quot;kind&quot;: &quot;Pod&quot;,
-            &quot;version&quot;: &quot;v1&quot;
+<pre tabindex="0"><code>{
+    &#34;kind&#34;: &#34;AdmissionReview&#34;,
+    &#34;parameters&#34;: {},
+    &#34;review&#34;: {
+        &#34;kind&#34;: {
+            &#34;kind&#34;: &#34;Pod&#34;,
+            &#34;version&#34;: &#34;v1&#34;
         },
-        &quot;object&quot;: {
-            &quot;metadata&quot;: {
-                &quot;name&quot;: &quot;myapp&quot;,
-                &quot;namespace&quot;: &quot;&quot;
+        &#34;object&#34;: {
+            &#34;metadata&#34;: {
+                &#34;name&#34;: &#34;myapp&#34;,
+                &#34;namespace&#34;: &#34;&#34;
             },
-            &quot;spec&quot;: {
-                &quot;containers&quot;: []
+            &#34;spec&#34;: {
+                &#34;containers&#34;: []
             }
         }
     }
@@ -139,20 +138,20 @@ to false and hence the above rule is not violated and hence we wouldn&rsquo;t se
 but the second comparsion <code>(value == &quot;default&quot;)</code> evaluates to false. Hence, the policy isn&rsquo;t violated - not what
 we wanted.</p>
 <p>As the last case, let&rsquo;s consider an input document with no <code>namespace</code> defined at all:</p>
-<pre><code>{
-    &quot;kind&quot;: &quot;AdmissionReview&quot;,
-    &quot;parameters&quot;: {},
-    &quot;review&quot;: {
-        &quot;kind&quot;: {
-            &quot;kind&quot;: &quot;Pod&quot;,
-            &quot;version&quot;: &quot;v1&quot;
+<pre tabindex="0"><code>{
+    &#34;kind&#34;: &#34;AdmissionReview&#34;,
+    &#34;parameters&#34;: {},
+    &#34;review&#34;: {
+        &#34;kind&#34;: {
+            &#34;kind&#34;: &#34;Pod&#34;,
+            &#34;version&#34;: &#34;v1&#34;
         },
-        &quot;object&quot;: {
-            &quot;metadata&quot;: {
-                &quot;name&quot;: &quot;myapp&quot;                
+        &#34;object&#34;: {
+            &#34;metadata&#34;: {
+                &#34;name&#34;: &#34;myapp&#34;                
             },
-            &quot;spec&quot;: {
-                &quot;containers&quot;: []
+            &#34;spec&#34;: {
+                &#34;containers&#34;: []
             }
         }
     }
@@ -163,150 +162,146 @@ no violation of the policy.</p>
 <h2 id="or-rules">OR rules</h2>
 <p>Let&rsquo;s now write the correct version of the policy to cause a violation if either the namespace is undefined,
 empty string or <code>default</code>:</p>
-<pre><code>package k8svalidnamespace
+<pre tabindex="0"><code>package k8svalidnamespace
      
-violation[{&quot;msg&quot;: msg, &quot;details&quot;: {}}] {
+violation[{&#34;msg&#34;: msg, &#34;details&#34;: {}}] {
   not input.review.object.metadata.namespace
-  msg := &quot;Namespace should not be unspecified&quot;          
+  msg := &#34;Namespace should not be unspecified&#34;          
 }
         
-violation[{&quot;msg&quot;: msg, &quot;details&quot;: {}}] {
+violation[{&#34;msg&#34;: msg, &#34;details&#34;: {}}] {
   value := input.review.object.metadata.namespace
   count(value) == 0
-  msg := sprintf(&quot;Namespace should not be empty: %v&quot;, [value])          
+  msg := sprintf(&#34;Namespace should not be empty: %v&#34;, [value])          
 }
         
-violation[{&quot;msg&quot;: msg, &quot;details&quot;: {}}] {
+violation[{&#34;msg&#34;: msg, &#34;details&#34;: {}}] {
   value := input.input.review.object.metadata.namespace
-  value == &quot;default&quot;
-  msg := sprintf(&quot;Namespace should not be default: %v&quot;, [value])          
+  value == &#34;default&#34;
+  msg := sprintf(&#34;Namespace should not be default: %v&#34;, [value])          
 }
 </code></pre><p>We have three <code>violation</code> blocks in the above policy each containing one conditional expression. The entire policy
 will be violated if any of the violation blocks are true.</p>
 <h3 id="invalid-input---unspecified-namespace">Invalid input - Unspecified namespace</h3>
 <p>Let&rsquo;s consider an input document with no namespace specified:</p>
-<pre><code>
+<pre tabindex="0"><code>
  {
-        &quot;kind&quot;: &quot;AdmissionReview&quot;,
-        &quot;parameters&quot;: {},
-        &quot;review&quot;: {
-            &quot;kind&quot;: {
-                &quot;kind&quot;: &quot;Pod&quot;,
-                &quot;version&quot;: &quot;v1&quot;
+        &#34;kind&#34;: &#34;AdmissionReview&#34;,
+        &#34;parameters&#34;: {},
+        &#34;review&#34;: {
+            &#34;kind&#34;: {
+                &#34;kind&#34;: &#34;Pod&#34;,
+                &#34;version&#34;: &#34;v1&#34;
             },
-            &quot;object&quot;: {
-                &quot;metadata&quot;: {
-                    &quot;name&quot;: &quot;myapp&quot;
+            &#34;object&#34;: {
+                &#34;metadata&#34;: {
+                    &#34;name&#34;: &#34;myapp&#34;
                 },
-                &quot;spec&quot;: {
-                    &quot;containers&quot;: []
+                &#34;spec&#34;: {
+                    &#34;containers&#34;: []
                 }
             }
         }
     }
-
 </code></pre><p>When the above policy is evaluated given the above input document, the first rule evaluates to <code>true</code>
 and hence we have a violation. The other rules are not evaluated at all - not because the first rule
 evaluates to <code>true</code>, but because the object doesn&rsquo;t have the <code>namespace</code> field.</p>
 <h3 id="invalid-input---empty-namespace">Invalid input - Empty namespace</h3>
 <p>Let&rsquo;s now consider the following input document:</p>
-<pre><code>
+<pre tabindex="0"><code>
  {
-        &quot;kind&quot;: &quot;AdmissionReview&quot;,
-        &quot;parameters&quot;: {},
-        &quot;review&quot;: {
-            &quot;kind&quot;: {
-                &quot;kind&quot;: &quot;Pod&quot;,
-                &quot;version&quot;: &quot;v1&quot;
+        &#34;kind&#34;: &#34;AdmissionReview&#34;,
+        &#34;parameters&#34;: {},
+        &#34;review&#34;: {
+            &#34;kind&#34;: {
+                &#34;kind&#34;: &#34;Pod&#34;,
+                &#34;version&#34;: &#34;v1&#34;
             },
-            &quot;object&quot;: {
-                &quot;metadata&quot;: {
-                    &quot;name&quot;: &quot;myapp&quot;,
-                    &quot;namespace&quot;: &quot;&quot;
+            &#34;object&#34;: {
+                &#34;metadata&#34;: {
+                    &#34;name&#34;: &#34;myapp&#34;,
+                    &#34;namespace&#34;: &#34;&#34;
                     
                 },
-                &quot;spec&quot;: {
-                    &quot;containers&quot;: []
+                &#34;spec&#34;: {
+                    &#34;containers&#34;: []
                 }
             }
         }
     }
-
 </code></pre><p>For this policy, the first rule is not violated, but the second rule is, and the third rule is not violated
 either.</p>
 <h3 id="invalid-input---default-namespace">Invalid input - default namespace</h3>
 <p>Now, consider the input document as:</p>
-<pre><code>
+<pre tabindex="0"><code>
  {
-        &quot;kind&quot;: &quot;AdmissionReview&quot;,
-        &quot;parameters&quot;: {},
-        &quot;review&quot;: {
-            &quot;kind&quot;: {
-                &quot;kind&quot;: &quot;Pod&quot;,
-                &quot;version&quot;: &quot;v1&quot;
+        &#34;kind&#34;: &#34;AdmissionReview&#34;,
+        &#34;parameters&#34;: {},
+        &#34;review&#34;: {
+            &#34;kind&#34;: {
+                &#34;kind&#34;: &#34;Pod&#34;,
+                &#34;version&#34;: &#34;v1&#34;
             },
-            &quot;object&quot;: {
-                &quot;metadata&quot;: {
-                    &quot;name&quot;: &quot;myapp&quot;,
-                    &quot;namespace&quot;: &quot;default&quot;
+            &#34;object&#34;: {
+                &#34;metadata&#34;: {
+                    &#34;name&#34;: &#34;myapp&#34;,
+                    &#34;namespace&#34;: &#34;default&#34;
                     
                 },
-                &quot;spec&quot;: {
-                    &quot;containers&quot;: []
+                &#34;spec&#34;: {
+                    &#34;containers&#34;: []
                 }
             }
         }
     }
-
 </code></pre><p>For this input document, only the last rule is violated and we get a violation from the policy.</p>
 <h3 id="valid-input">Valid Input</h3>
 <p>Now, consider the following input document:</p>
-<pre><code>
+<pre tabindex="0"><code>
  {
-        &quot;kind&quot;: &quot;AdmissionReview&quot;,
-        &quot;parameters&quot;: {},
-        &quot;review&quot;: {
-            &quot;kind&quot;: {
-                &quot;kind&quot;: &quot;Pod&quot;,
-                &quot;version&quot;: &quot;v1&quot;
+        &#34;kind&#34;: &#34;AdmissionReview&#34;,
+        &#34;parameters&#34;: {},
+        &#34;review&#34;: {
+            &#34;kind&#34;: {
+                &#34;kind&#34;: &#34;Pod&#34;,
+                &#34;version&#34;: &#34;v1&#34;
             },
-            &quot;object&quot;: {
-                &quot;metadata&quot;: {
-                    &quot;name&quot;: &quot;myapp&quot;,
-                    &quot;namespace&quot;: &quot;default1&quot;
+            &#34;object&#34;: {
+                &#34;metadata&#34;: {
+                    &#34;name&#34;: &#34;myapp&#34;,
+                    &#34;namespace&#34;: &#34;default1&#34;
                     
                 },
-                &quot;spec&quot;: {
-                    &quot;containers&quot;: []
+                &#34;spec&#34;: {
+                    &#34;containers&#34;: []
                 }
             }
         }
     }
-
 </code></pre><p>For the above input, the policy will report no violations.</p>
 <h1 id="a-more-complicated-policy">A more complicated policy</h1>
 <p>Let&rsquo;s now write a policy to ensure that only containers from certain repositories
 should be allowed to run on the cluster:</p>
-<pre><code>package k8sallowedrepos
+<pre tabindex="0"><code>package k8sallowedrepos
 
-violation[{&quot;msg&quot;: msg}] {
+violation[{&#34;msg&#34;: msg}] {
   container := input.review.object.spec.containers[_]
   satisfied := [good | repo = input.parameters.repos[_] ; good = startswith(container.image, repo)]
   not any(satisfied)
-  msg := sprintf(&quot;container &lt;%v&gt; has an invalid image repo &lt;%v&gt;, allowed repos are %v&quot;, [container.name, container.image, input.parameters.repos])
+  msg := sprintf(&#34;container &lt;%v&gt; has an invalid image repo &lt;%v&gt;, allowed repos are %v&#34;, [container.name, container.image, input.parameters.repos])
 }
 </code></pre><p>The first line of the <code>violation</code> block is:</p>
-<pre><code>container := input.review.object.spec.containers[_]
+<pre tabindex="0"><code>container := input.review.object.spec.containers[_]
 </code></pre><p>The above expression essentially boils down to the <code>container</code> variable containing
 a list of all elements in input the <code>containers</code> object. To learn more about
 the special <code>_</code> index, see the <a href="https://www.openpolicyagent.org/docs/latest/policy-language/#variable-keys">documentation</a>.</p>
 <p>The second line of the <code>violation</code> block is:</p>
-<pre><code>satisfied := [good | repo = input.parameters.repos[_] ; good = startswith(container.image, repo)]
+<pre tabindex="0"><code>satisfied := [good | repo = input.parameters.repos[_] ; good = startswith(container.image, repo)]
 </code></pre><p>The above line is an example of <a href="https://www.openpolicyagent.org/docs/latest/policy-language/#comprehensions">comprehension</a> and it essentially executes the following pseudocode:</p>
-<pre><code>For each repo in the list of allowed repos
+<pre tabindex="0"><code>For each repo in the list of allowed repos
   For each container in the list of container objects
     Is container.image starting with any of the repos in the list of allowed repos?
-    If so, append &quot;true&quot; to the array &quot;satisfied&quot;, else append &quot;false&quot;
+    If so, append &#34;true&#34; to the array &#34;satisfied&#34;, else append &#34;false&#34;
   End For
   # Evalute the rule not any(satisfied) and report violation if any
 End For
@@ -318,44 +313,44 @@ evaluates to <code>true</code> if any of the values in the <code>satisfied</code
 It&rsquo;s really important to note here that lines 2-4 in the violation block are &ldquo;executed&rdquo; for
 each item in the <code>container</code> array.</p>
 <p>Hence, given the following input document:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">{
-  <span style="color:#f92672">&#34;kind&#34;</span>: <span style="color:#e6db74">&#34;AdmissionReview&#34;</span>,
-  <span style="color:#f92672">&#34;parameters&#34;</span>: {
-    <span style="color:#f92672">&#34;repos&#34;</span>: [      
-      <span style="color:#e6db74">&#34;quay.io/calico&#34;</span>,      
-      <span style="color:#e6db74">&#34;k8s.gcr.io&#34;</span>,
-      <span style="color:#e6db74">&#34;602401143452.dkr.ecr.us-west-2.amazonaws.com/amazon-k8s-cni&#34;</span>
-    ]
-  },
-  <span style="color:#f92672">&#34;review&#34;</span>: {
-    <span style="color:#f92672">&#34;kind&#34;</span>: {
-      <span style="color:#f92672">&#34;kind&#34;</span>: <span style="color:#e6db74">&#34;Pod&#34;</span>,
-      <span style="color:#f92672">&#34;version&#34;</span>: <span style="color:#e6db74">&#34;v1&#34;</span>
-    },
-    <span style="color:#f92672">&#34;object&#34;</span>: {
-      <span style="color:#f92672">&#34;spec&#34;</span>: {
-        <span style="color:#f92672">&#34;containers&#34;</span>: [
-          {
-            <span style="color:#f92672">&#34;image&#34;</span>: <span style="color:#e6db74">&#34;amazon-k8s-cni&#34;</span>,
-            <span style="color:#f92672">&#34;name&#34;</span>: <span style="color:#e6db74">&#34;mysql-backend&#34;</span>
-          },
-          {
-            <span style="color:#f92672">&#34;image&#34;</span>: <span style="color:#e6db74">&#34;nginx&#34;</span>,
-            <span style="color:#f92672">&#34;name&#34;</span>: <span style="color:#e6db74">&#34;nginx-frontend&#34;</span>
-          }          
-        ]
-      }
-    }
-  }
-}
-</code></pre></div><p>We will see the following as the output: (<a href="https://play.openpolicyagent.org/p/7zMy2YH8Pu">Rego playground link</a>)</p>
-<pre><code>{
-    &quot;violation&quot;: [
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;kind&#34;</span>: <span style="color:#e6db74">&#34;AdmissionReview&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;parameters&#34;</span>: {
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;repos&#34;</span>: [      
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">&#34;quay.io/calico&#34;</span>,      
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">&#34;k8s.gcr.io&#34;</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#e6db74">&#34;602401143452.dkr.ecr.us-west-2.amazonaws.com/amazon-k8s-cni&#34;</span>
+</span></span><span style="display:flex;"><span>    ]
+</span></span><span style="display:flex;"><span>  },
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;review&#34;</span>: {
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;kind&#34;</span>: {
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">&#34;kind&#34;</span>: <span style="color:#e6db74">&#34;Pod&#34;</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">&#34;version&#34;</span>: <span style="color:#e6db74">&#34;v1&#34;</span>
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;object&#34;</span>: {
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">&#34;spec&#34;</span>: {
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&#34;containers&#34;</span>: [
+</span></span><span style="display:flex;"><span>          {
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;image&#34;</span>: <span style="color:#e6db74">&#34;amazon-k8s-cni&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;name&#34;</span>: <span style="color:#e6db74">&#34;mysql-backend&#34;</span>
+</span></span><span style="display:flex;"><span>          },
+</span></span><span style="display:flex;"><span>          {
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;image&#34;</span>: <span style="color:#e6db74">&#34;nginx&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&#34;name&#34;</span>: <span style="color:#e6db74">&#34;nginx-frontend&#34;</span>
+</span></span><span style="display:flex;"><span>          }          
+</span></span><span style="display:flex;"><span>        ]
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>We will see the following as the output: (<a href="https://play.openpolicyagent.org/p/7zMy2YH8Pu">Rego playground link</a>)</p>
+<pre tabindex="0"><code>{
+    &#34;violation&#34;: [
         {
-            &quot;msg&quot;: &quot;container &lt;mysql-backend&gt; has an invalid image repo &lt;amazon-k8s-cni&gt;, allowed repos are [\&quot;277433404353.dkr.ecr.eu-central-1.amazonaws.com\&quot;, \&quot;quay.io/open-policy-agent\&quot;, \&quot;quay.io/calico\&quot;, \&quot;quay.io/kubernetes-ingress-controller\&quot;, \&quot;k8s.gcr.io\&quot;, \&quot;602401143452.dkr.ecr.us-west-2.amazonaws.com/amazon-k8s-cni\&quot;], satisfied: [false, false, false, false, false, false]&quot;
+            &#34;msg&#34;: &#34;container &lt;mysql-backend&gt; has an invalid image repo &lt;amazon-k8s-cni&gt;, allowed repos are [\&#34;277433404353.dkr.ecr.eu-central-1.amazonaws.com\&#34;, \&#34;quay.io/open-policy-agent\&#34;, \&#34;quay.io/calico\&#34;, \&#34;quay.io/kubernetes-ingress-controller\&#34;, \&#34;k8s.gcr.io\&#34;, \&#34;602401143452.dkr.ecr.us-west-2.amazonaws.com/amazon-k8s-cni\&#34;], satisfied: [false, false, false, false, false, false]&#34;
         },
         {
-            &quot;msg&quot;: &quot;container &lt;nginx-frontend&gt; has an invalid image repo &lt;nginx&gt;, allowed repos are [\&quot;277433404353.dkr.ecr.eu-central-1.amazonaws.com\&quot;, \&quot;quay.io/open-policy-agent\&quot;, \&quot;quay.io/calico\&quot;, \&quot;quay.io/kubernetes-ingress-controller\&quot;, \&quot;k8s.gcr.io\&quot;, \&quot;602401143452.dkr.ecr.us-west-2.amazonaws.com/amazon-k8s-cni\&quot;], satisfied: [false, false, false, false, false, false]&quot;
+            &#34;msg&#34;: &#34;container &lt;nginx-frontend&gt; has an invalid image repo &lt;nginx&gt;, allowed repos are [\&#34;277433404353.dkr.ecr.eu-central-1.amazonaws.com\&#34;, \&#34;quay.io/open-policy-agent\&#34;, \&#34;quay.io/calico\&#34;, \&#34;quay.io/kubernetes-ingress-controller\&#34;, \&#34;k8s.gcr.io\&#34;, \&#34;602401143452.dkr.ecr.us-west-2.amazonaws.com/amazon-k8s-cni\&#34;], satisfied: [false, false, false, false, false, false]&#34;
         }
     ]
 }
@@ -367,7 +362,7 @@ each item in the <code>container</code> array.</p>
 </ol>
 <h1 id="setting-up-gatekeeper">Setting up Gatekeeper</h1>
 <p>Install Gatekeeper as per instructions <a href="https://github.com/open-policy-agent/gatekeeper#installation-instructions">here</a>. The following resources are created:</p>
-<pre><code>ClusterRole:
+<pre tabindex="0"><code>ClusterRole:
 
         - gatekeeper-manager-role from gatekeeper.yaml
 
@@ -411,14 +406,13 @@ ServiceAccount:
 ValidatingWebhookConfiguration:
 
         - gatekeeper-validating-webhook-configuration from gatekeeper.yaml
-
 </code></pre><p>In addition, you may need to create sync configuration for <a href="https://github.com/open-policy-agent/gatekeeper/#replicating-data">replicating data</a>.</p>
 <h1 id="creating-a-constraint-template">Creating a constraint template</h1>
 <p>Now that we have gatekeeper components installed, the first concept we need to learn is that of a
 <code>ConstraintTemplate</code> - which lays down the schema of the data as well as the policy itself in the
 <a href="https://www.openpolicyagent.org/docs/latest/policy-language/">Rego</a> language.</p>
 <p>The <code>ConstraintTemplate</code> kind is used to create a new constraint template with the name being <code>K8sRequiredLabels</code>:</p>
-<pre><code>apiVersion: templates.gatekeeper.sh/v1beta1
+<pre tabindex="0"><code>apiVersion: templates.gatekeeper.sh/v1beta1
 kind: ConstraintTemplate
 metadata:
   name: k8srequiredlabels
@@ -442,54 +436,52 @@ spec:
       rego: |
         package k8srequiredlabels
 
-        violation[{&quot;msg&quot;: msg, &quot;details&quot;: {&quot;missing_labels&quot;: missing}}] {
+        violation[{&#34;msg&#34;: msg, &#34;details&#34;: {&#34;missing_labels&#34;: missing}}] {
           provided := {label | input.review.object.metadata.labels[label]}
           required := {label | label := input.parameters.labels[_]}
           missing := required - provided
           count(missing) &gt; 0
-          msg := sprintf(&quot;you must provide labels: %v&quot;, [missing])
+          msg := sprintf(&#34;you must provide labels: %v&#34;, [missing])
         }
-
 </code></pre><p>Once we create the above constraint template, we can list it using <code>kubectl</code>:</p>
-<pre><code>$ kubectl get constrainttemplates.templates.gatekeeper.sh                                                            │
+<pre tabindex="0"><code>$ kubectl get constrainttemplates.templates.gatekeeper.sh                                                            │
 NAME                AGE                                                                                                                      
 k8srequiredlabels   99s   
 </code></pre><h1 id="creating-a-constraint">Creating a constraint</h1>
 <p>Let&rsquo;s now define a constraint using the constraint template, <code>K8sRequiredLabels</code> (<code>kind: K8sRequiredLabels</code>):</p>
-<pre><code>apiVersion: constraints.gatekeeper.sh/v1beta1
+<pre tabindex="0"><code>apiVersion: constraints.gatekeeper.sh/v1beta1
 kind: K8sRequiredLabels
 metadata:
   name: ns-must-have-gk
 spec:
   match:
     kinds:
-      - apiGroups: [&quot;&quot;]
-        kinds: [&quot;Namespace&quot;]
+      - apiGroups: [&#34;&#34;]
+        kinds: [&#34;Namespace&#34;]
   parameters:
-    labels: [&quot;gatekeeper&quot;]
+    labels: [&#34;gatekeeper&#34;]
 </code></pre><p>Let&rsquo;s create the constraint:</p>
-<pre><code>$ kubectl apply -f required_labels.yaml 
+<pre tabindex="0"><code>$ kubectl apply -f required_labels.yaml 
 k8srequiredlabels.constraints.gatekeeper.sh/ns-must-have-gk created
 </code></pre><p>We can use <code>kubectl get</code> to fetch constraints of this template type:</p>
-<pre><code>$ kubectl get k8srequiredlabels.constraints.gatekeeper.sh
+<pre tabindex="0"><code>$ kubectl get k8srequiredlabels.constraints.gatekeeper.sh
 NAME              AGE
 ns-must-have-gk   77s
 </code></pre><h1 id="testing-the-constraint">Testing the constraint</h1>
 <p>Let&rsquo;s now test this constraint by creating a namespace without the label:</p>
-<pre><code>apiVersion: v1
+<pre tabindex="0"><code>apiVersion: v1
 kind: Namespace
 metadata:
   name: test
 </code></pre><p>If we now run <code>kubectl apply</code> on the above definition, we will get:</p>
-<pre><code>$ kubectl apply -f ns.yaml 
-Error from server ([denied by ns-must-have-gk] you must provide labels: {&quot;gatekeeper&quot;}): error when creating &quot;ns.yaml&quot;: admission webhook &quot;validation.gatekeeper.sh&quot; denied the request: [denied by ns-must-have-gk] you must provide labels: {&quot;gatekeeper&quot;}
-
+<pre tabindex="0"><code>$ kubectl apply -f ns.yaml 
+Error from server ([denied by ns-must-have-gk] you must provide labels: {&#34;gatekeeper&#34;}): error when creating &#34;ns.yaml&#34;: admission webhook &#34;validation.gatekeeper.sh&#34; denied the request: [denied by ns-must-have-gk] you must provide labels: {&#34;gatekeeper&#34;}
 </code></pre><h1 id="audit">Audit</h1>
 <p>Gatekeeper by default has an auditing functionality via which it evaluates the constraints and stores the audit
 results on the constraint&rsquo;s <code>status</code> field. For this purpose, Gatekeeper will query the Kubernetes API for the
 resources that your constraint specifies and validate the resources against the constraints.</p>
 <p>Here&rsquo;s an example:</p>
-<pre><code>$ kubectl get k8srequiredlabels.constraints.gatekeeper.sh -o yaml                                                    
+<pre tabindex="0"><code>$ kubectl get k8srequiredlabels.constraints.gatekeeper.sh -o yaml                                                    
 apiVersion: v1
 items:
 - apiVersion: constraints.gatekeeper.sh/v1beta1
@@ -497,25 +489,25 @@ items:
   metadata:
     annotations:
       kubectl.kubernetes.io/last-applied-configuration: |
-        {&quot;apiVersion&quot;:&quot;constraints.gatekeeper.sh/v1beta1&quot;,&quot;kind&quot;:&quot;K8sRequiredLabels&quot;,&quot;metadata&quot;:{&quot;annotations&quot;:{},&quot;name&quot;:&quot;ns-must-have-gk&quot;},&quot;spec&quot;:{&quot;match&quot;:{&quot;kinds&quot;:[{&quot;apiGroups&quot;:[&quot;&quot;],&quot;kinds&quot;:[&quot;Namespace&quot;]}]},&quot;parameters&quot;:{&quot;labels&quot;:[&quot;gatekeeper&quot;]}}}
-    creationTimestamp: &quot;2020-05-21T04:21:17Z&quot;
+        {&#34;apiVersion&#34;:&#34;constraints.gatekeeper.sh/v1beta1&#34;,&#34;kind&#34;:&#34;K8sRequiredLabels&#34;,&#34;metadata&#34;:{&#34;annotations&#34;:{},&#34;name&#34;:&#34;ns-must-have-gk&#34;},&#34;spec&#34;:{&#34;match&#34;:{&#34;kinds&#34;:[{&#34;apiGroups&#34;:[&#34;&#34;],&#34;kinds&#34;:[&#34;Namespace&#34;]}]},&#34;parameters&#34;:{&#34;labels&#34;:[&#34;gatekeeper&#34;]}}}
+    creationTimestamp: &#34;2020-05-21T04:21:17Z&#34;
     generation: 1
     name: ns-must-have-gk
-    resourceVersion: &quot;1722780&quot;
+    resourceVersion: &#34;1722780&#34;
     selfLink: /apis/constraints.gatekeeper.sh/v1beta1/k8srequiredlabels/ns-must-have-gk
     uid: 640dee9f-8f3e-4f3a-9716-599f54cbd18b
   spec:
     match:
       kinds:
       - apiGroups:
-        - &quot;&quot;
+        - &#34;&#34;
         kinds:
         - Namespace
     parameters:
       labels:
       - gatekeeper
   status:
-    auditTimestamp: &quot;2020-05-21T04:40:17Z&quot;
+    auditTimestamp: &#34;2020-05-21T04:40:17Z&#34;
     byPod:
     - enforced: true
       id: gatekeeper-controller-manager-55bfb4d454-w6424
@@ -524,72 +516,71 @@ items:
     violations:
     - enforcementAction: deny
       kind: Namespace
-      message: 'you must provide labels: {&quot;gatekeeper&quot;}'
+      message: &#39;you must provide labels: {&#34;gatekeeper&#34;}&#39;
       name: default
     - enforcementAction: deny
       kind: Namespace
-      message: 'you must provide labels: {&quot;gatekeeper&quot;}'
+      message: &#39;you must provide labels: {&#34;gatekeeper&#34;}&#39;
       name: gatekeeper-system
     - enforcementAction: deny
       kind: Namespace
-      message: 'you must provide labels: {&quot;gatekeeper&quot;}'
+      message: &#39;you must provide labels: {&#34;gatekeeper&#34;}&#39;
       name: gitlab
     - enforcementAction: deny
       kind: Namespace
-      message: 'you must provide labels: {&quot;gatekeeper&quot;}'
+      message: &#39;you must provide labels: {&#34;gatekeeper&#34;}&#39;
       name: kube-node-lease
     - enforcementAction: deny
       kind: Namespace
-      message: 'you must provide labels: {&quot;gatekeeper&quot;}'
+      message: &#39;you must provide labels: {&#34;gatekeeper&#34;}&#39;
       name: kube-public
     - enforcementAction: deny
       kind: Namespace
-      message: 'you must provide labels: {&quot;gatekeeper&quot;}'
+      message: &#39;you must provide labels: {&#34;gatekeeper&#34;}&#39;
       name: kube-system
     - enforcementAction: deny
       kind: Namespace
-      message: 'you must provide labels: {&quot;gatekeeper&quot;}'
+      message: &#39;you must provide labels: {&#34;gatekeeper&#34;}&#39;
       name: logging
 kind: List
 metadata:
-  resourceVersion: &quot;&quot;
-  selfLink: &quot;&quot;
-
+  resourceVersion: &#34;&#34;
+  selfLink: &#34;&#34;
 </code></pre><p>The above shows us the audit results on all the existing namespaces.</p>
 <h1 id="rego-playground-and-gatekeeper-policies">Rego playground and gatekeeper policies</h1>
 <p>To test a gatekeeper policy on the <a href="https://play.openpolicyagent.org/">Rego playground</a>, copy the entire rego
 policy in the <code>rego</code> object above. Now, for the input, we need to have an object like this:</p>
-<pre><code>{
-  &quot;kind&quot;: &quot;AdmissionReview&quot;,
-  &quot;parameters&quot;: {
-    &quot;cpu&quot;: &quot;300m&quot;,
-    &quot;memory&quot;: &quot;2Gi&quot;
+<pre tabindex="0"><code>{
+  &#34;kind&#34;: &#34;AdmissionReview&#34;,
+  &#34;parameters&#34;: {
+    &#34;cpu&#34;: &#34;300m&#34;,
+    &#34;memory&#34;: &#34;2Gi&#34;
   },
-  &quot;review&quot;: {
-    &quot;kind&quot;: {
-      &quot;kind&quot;: &quot;Pod&quot;,
-      &quot;version&quot;: &quot;v1&quot;
+  &#34;review&#34;: {
+    &#34;kind&#34;: {
+      &#34;kind&#34;: &#34;Pod&#34;,
+      &#34;version&#34;: &#34;v1&#34;
     },
-    &quot;object&quot;: {
-      &quot;spec&quot;: {
-        &quot;containers&quot;: [
+    &#34;object&#34;: {
+      &#34;spec&#34;: {
+        &#34;containers&#34;: [
           {
-            &quot;image&quot;: &quot;quay.io/calico/nginx&quot;,
-            &quot;name&quot;: &quot;nginx-frontend&quot;,
-            &quot;resources&quot;: {
-              &quot;limits&quot;: {
-                &quot;cpu&quot;: &quot;290m&quot;
+            &#34;image&#34;: &#34;quay.io/calico/nginx&#34;,
+            &#34;name&#34;: &#34;nginx-frontend&#34;,
+            &#34;resources&#34;: {
+              &#34;limits&#34;: {
+                &#34;cpu&#34;: &#34;290m&#34;
                 
               }
             }
           },
           {
-            &quot;image&quot;: &quot;602401143452.dkr.ecr.us-west-2.amazonaws.com/amazon-k8s-cni&quot;,
-            &quot;name&quot;: &quot;mysql-backend&quot;,
-            &quot;resources&quot;: {
-              &quot;limits&quot;: {
-                &quot;cpu&quot;: &quot;400m&quot;,
-                &quot;memory&quot;: &quot;1Gi&quot;
+            &#34;image&#34;: &#34;602401143452.dkr.ecr.us-west-2.amazonaws.com/amazon-k8s-cni&#34;,
+            &#34;name&#34;: &#34;mysql-backend&#34;,
+            &#34;resources&#34;: {
+              &#34;limits&#34;: {
+                &#34;cpu&#34;: &#34;400m&#34;,
+                &#34;memory&#34;: &#34;1Gi&#34;
               }
             }
           }
@@ -598,9 +589,6 @@ policy in the <code>rego</code> object above. Now, for the input, we need to hav
     }
   }
 }
-
-
-
 </code></pre><p>The above object is available to your rego code as <code>input</code> object.</p>
 <h1 id="gatekeeper-constraint-library">Gatekeeper constraint library</h1>
 <p>The gatekeeper <a href="https://github.com/open-policy-agent/gatekeeper/tree/master/library/general">library</a> contains
@@ -614,22 +602,21 @@ making use of Gatekeeper constraints. The repository has a few examples <a href=
 existing and new resources. This will not disallow non-conformant resoures. This can be especially useful when
 rolling out constraints to an environment with existing workloads.</p>
 <p>Example constraint spec:</p>
-<pre><code>apiVersion: constraints.gatekeeper.sh/v1beta1
+<pre tabindex="0"><code>apiVersion: constraints.gatekeeper.sh/v1beta1
 kind: K8sValidNamespace
 metadata:
   name: namespace-must-be-valid
 spec:
   enforcementAction: dryrun
   ..
-
 </code></pre><p>For constraints created with the enforcement action as <code>dryrun</code>, we can then find out the audit results in
 the output of <code>kubectel get</code>, like so:</p>
-<pre><code>kubectl describe k8svalidnamespace.constraints.gatekeeper.sh namespace-must-be-valid
+<pre tabindex="0"><code>kubectl describe k8svalidnamespace.constraints.gatekeeper.sh namespace-must-be-valid
 Name:         namespace-must-be-valid
 Namespace:    
 Labels:       &lt;none&gt;
 Annotations:  kubectl.kubernetes.io/last-applied-configuration:
-                {&quot;apiVersion&quot;:&quot;constraints.gatekeeper.sh/v1beta1&quot;,&quot;kind&quot;:&quot;K8sValidNamespace&quot;,&quot;metadata&quot;:{&quot;annotations&quot;:{},&quot;name&quot;:&quot;namespace-must-be-valid&quot;...
+                {&#34;apiVersion&#34;:&#34;constraints.gatekeeper.sh/v1beta1&#34;,&#34;kind&#34;:&#34;K8sValidNamespace&#34;,&#34;metadata&#34;:{&#34;annotations&#34;:{},&#34;name&#34;:&#34;namespace-must-be-valid&#34;...
 API Version:  constraints.gatekeeper.sh/v1beta1
 Kind:         K8sValidNamespace
 Metadata:
@@ -692,7 +679,7 @@ Events:                  &lt;none&gt;
 <p>Gatekeeper exports several prometheus metrics covering various aspects of the behavior. If you have an existing
 prometheus setup in your cluster, all you need to do is add the following annotations to Gatekeeper&rsquo;s <code>controller-manager</code>
 deployment:</p>
-<pre><code>apiVersion: apps/v1
+<pre tabindex="0"><code>apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: gatekeeper-controller-manager
@@ -702,8 +689,8 @@ spec:
   template:
     metadata:
       annotations:
-        prometheus.io/port: &quot;8888&quot;
-        prometheus.io/scrape: &quot;true&quot;
+        prometheus.io/port: &#34;8888&#34;
+        prometheus.io/scrape: &#34;true&#34;
         ..
 </code></pre><p>Some of the key counter metrics to monitor are:</p>
 <ul>

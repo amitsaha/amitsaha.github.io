@@ -40,19 +40,19 @@ it also by default creates an initial lifecycle hook which ensuresthat a new cod
 when you are managing your infrastructure as code. The troublesome behavior happens as a result of the lifecycle hook creation being
 a side-effect of creating a deployment group rather than an explicit operation that the user performs.</p>
 <p>Let&rsquo;s consider this example terraform snippet:</p>
-<pre><code>resource &quot;aws_codedeploy_app&quot; &quot;code_deploy_app&quot; {
-  compute_platform = &quot;Server&quot;
-  name             = &quot;${var.service_name}&quot;
+<pre tabindex="0"><code>resource &#34;aws_codedeploy_app&#34; &#34;code_deploy_app&#34; {
+  compute_platform = &#34;Server&#34;
+  name             = &#34;${var.service_name}&#34;
 }
 
-resource &quot;aws_codedeploy_deployment_group&quot; &quot;deploy_group&quot; {  
-  app_name              = &quot;${aws_codedeploy_app.code_deploy_app.name}&quot;
-  deployment_group_name = &quot;${var.service_name}-DeploymentGroup${var.environment}&quot;
-  service_role_arn      = &quot;..&quot;
-  autoscaling_groups = [&quot;${aws_autoscaling_group.autoscaling_group.name}&quot;]
+resource &#34;aws_codedeploy_deployment_group&#34; &#34;deploy_group&#34; {  
+  app_name              = &#34;${aws_codedeploy_app.code_deploy_app.name}&#34;
+  deployment_group_name = &#34;${var.service_name}-DeploymentGroup${var.environment}&#34;
+  service_role_arn      = &#34;..&#34;
+  autoscaling_groups = [&#34;${aws_autoscaling_group.autoscaling_group.name}&#34;]
 }
 
-resource &quot;aws_launch_configuration&quot; &quot;launch_configuration&quot; {
+resource &#34;aws_launch_configuration&#34; &#34;launch_configuration&#34; {
 
   lifecycle {
     create_before_destroy = true
@@ -61,10 +61,10 @@ resource &quot;aws_launch_configuration&quot; &quot;launch_configuration&quot; {
 }
 
 
-resource &quot;aws_autoscaling_group&quot; &quot;autoscaling_group&quot; {
+resource &#34;aws_autoscaling_group&#34; &#34;autoscaling_group&#34; {
 
-  name_prefix = &quot;${var.service_name}-AutoscalingGroup&quot;
-  launch_configuration = &quot;${aws_launch_configuration.launch_configuration.name}&quot;
+  name_prefix = &#34;${var.service_name}-AutoscalingGroup&#34;
+  launch_configuration = &#34;${aws_launch_configuration.launch_configuration.name}&#34;
   ..  
 }
 </code></pre><p>When we apply the above change to our AWS infrastructure it will:</p>
@@ -76,39 +76,39 @@ resource &quot;aws_autoscaling_group&quot; &quot;autoscaling_group&quot; {
 </ul>
 <p>The above infrastructure changes are all explicit and they map to what we have in code. Let&rsquo;s use the AWS CLI to describe
 the deployment group we created above:</p>
-<pre><code>$ aws deploy get-deployment-group --application-name MyService --deployment-group-name MyService-DeploymentGroup
+<pre tabindex="0"><code>$ aws deploy get-deployment-group --application-name MyService --deployment-group-name MyService-DeploymentGroup
 {
-    &quot;deploymentGroupInfo&quot;: {
-        &quot;applicationName&quot;: &quot;MyService&quot;,
-        &quot;deploymentGroupId&quot;: &quot;b7a6653a-407d-47d8-b9ff-3e0a10b028b3&quot;,
-        &quot;deploymentGroupName&quot;: &quot;MyServiceDeploymentGroup&quot;,
-        &quot;deploymentConfigName&quot;: &quot;CodeDeployDefault.OneAtATime&quot;,
-        &quot;ec2TagFilters&quot;: [],
-        &quot;onPremisesInstanceTagFilters&quot;: [],
-        &quot;autoScalingGroups&quot;: [
+    &#34;deploymentGroupInfo&#34;: {
+        &#34;applicationName&#34;: &#34;MyService&#34;,
+        &#34;deploymentGroupId&#34;: &#34;b7a6653a-407d-47d8-b9ff-3e0a10b028b3&#34;,
+        &#34;deploymentGroupName&#34;: &#34;MyServiceDeploymentGroup&#34;,
+        &#34;deploymentConfigName&#34;: &#34;CodeDeployDefault.OneAtATime&#34;,
+        &#34;ec2TagFilters&#34;: [],
+        &#34;onPremisesInstanceTagFilters&#34;: [],
+        &#34;autoScalingGroups&#34;: [
             {
-                &quot;name&quot;: &quot;MyServiceAutoscalingGroup&quot;,
-                &quot;hook&quot;: &quot;CodeDeploy-managed-automatic-launch-deployment-hook-myservice-a2d358c8-3525-452c-b76e-978f1746ae74&quot;
+                &#34;name&#34;: &#34;MyServiceAutoscalingGroup&#34;,
+                &#34;hook&#34;: &#34;CodeDeploy-managed-automatic-launch-deployment-hook-myservice-a2d358c8-3525-452c-b76e-978f1746ae74&#34;
             }
         ],
    ...
    }
 </code></pre><p>We see that our deployment group has been created, has been associated with the autoscaling group, and we have a hook associated with it which was implicitly created for us.</p>
 <p>Next, let&rsquo;s see what this hook does using the AWS CLI:</p>
-<pre><code>$ aws autoscaling describe-lifecycle-hooks \
-    --auto-scaling-group-name &quot;MyServiceAutoscalingGroup&quot; \
-    --lifecycle-hook-names &quot;CodeDeploy-managed-automatic-launch-deployment-hook-myservice-a2d358c8-3525-452c-b76e-978f1746ae74&quot;
+<pre tabindex="0"><code>$ aws autoscaling describe-lifecycle-hooks \
+    --auto-scaling-group-name &#34;MyServiceAutoscalingGroup&#34; \
+    --lifecycle-hook-names &#34;CodeDeploy-managed-automatic-launch-deployment-hook-myservice-a2d358c8-3525-452c-b76e-978f1746ae74&#34;
 {
-    &quot;LifecycleHooks&quot;: [
+    &#34;LifecycleHooks&#34;: [
         {
-            &quot;LifecycleHookName&quot;: &quot;&quot;CodeDeploy-managed-automatic-launch-deployment-hook-myservice-a2d358c8-3525-452c-b76e-978f1746ae74&quot;,
-            &quot;AutoScalingGroupName&quot;: MyServiceAutoscalingGroup&quot;,
-            &quot;LifecycleTransition&quot;: &quot;autoscaling:EC2_INSTANCE_LAUNCHING&quot;,
-            &quot;NotificationTargetARN&quot;: &quot;arn:aws:sqs:ap-southeast-2:062506839004:razorbill-ap-southeast-2-prod-default-autoscaling-lifecycle-hook&quot;,
-            &quot;NotificationMetadata&quot;: &quot;b7a6653a-407d-47d8-b9ff-3e0a10b028b3&quot;,
-            &quot;HeartbeatTimeout&quot;: 600,
-            &quot;GlobalTimeout&quot;: 60000,
-            &quot;DefaultResult&quot;: &quot;ABANDON&quot;
+            &#34;LifecycleHookName&#34;: &#34;&#34;CodeDeploy-managed-automatic-launch-deployment-hook-myservice-a2d358c8-3525-452c-b76e-978f1746ae74&#34;,
+            &#34;AutoScalingGroupName&#34;: MyServiceAutoscalingGroup&#34;,
+            &#34;LifecycleTransition&#34;: &#34;autoscaling:EC2_INSTANCE_LAUNCHING&#34;,
+            &#34;NotificationTargetARN&#34;: &#34;arn:aws:sqs:ap-southeast-2:062506839004:razorbill-ap-southeast-2-prod-default-autoscaling-lifecycle-hook&#34;,
+            &#34;NotificationMetadata&#34;: &#34;b7a6653a-407d-47d8-b9ff-3e0a10b028b3&#34;,
+            &#34;HeartbeatTimeout&#34;: 600,
+            &#34;GlobalTimeout&#34;: 60000,
+            &#34;DefaultResult&#34;: &#34;ABANDON&#34;
         }
     ]
 }

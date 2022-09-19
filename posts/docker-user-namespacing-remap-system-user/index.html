@@ -59,7 +59,7 @@ after the build. However, <code>user namespaces</code> via <code>userns-remap</c
 directory and is most useful for running daemons and other processes, like a CI slave for example.</p>
 <p><code>/etc/subuid</code> is explained in the <a href="http://man7.org/linux/man-pages/man5/subuid.5.html">subuid(5)</a> manual page.
 Basically, it is a file whose lines are similar to:</p>
-<pre><code>root:100000:65536
+<pre tabindex="0"><code>root:100000:65536
 ubuntu:165536:65536
 </code></pre><p>The first column is a username, the second column is the starting <em>subordinate</em> user ID that this user is allowed
 to use in a user namespace upto a maximum number of user IDs given by the third column. You can also see that
@@ -81,35 +81,35 @@ we want to specify another user on the host that the root user inside the contai
 <code>subuid</code> starting user ID to be the same as the user ID on the host. If we don&rsquo;t do this, any changes to the volume
 mounted directory will have a different owner/group associated with them.</p>
 <p>This is how we can go about doing so:</p>
-<pre><code>$ username=&quot;agent&quot;
-$ uid=$(id -u &quot;$username&quot;)
-$ gid=$(id -g &quot;$username&quot;)
+<pre tabindex="0"><code>$ username=&#34;agent&#34;
+$ uid=$(id -u &#34;$username&#34;)
+$ gid=$(id -g &#34;$username&#34;)
 $ lastuid=$(( uid + 65536 ))
 $ lastgid=$(( gid + 65536 ))
 
-$ sudo usermod --add-subuids &quot;$uid&quot;-&quot;$lastuid&quot; &quot;$username&quot;
-$ sudo usermod --add-subgids &quot;$gid&quot;-&quot;$lastgid&quot; &quot;$username&quot;
+$ sudo usermod --add-subuids &#34;$uid&#34;-&#34;$lastuid&#34; &#34;$username&#34;
+$ sudo usermod --add-subgids &#34;$gid&#34;-&#34;$lastgid&#34; &#34;$username&#34;
 </code></pre><p>We are now ready to enable <code>userns-remap</code> and specify <code>docker engine</code> to use the <code>agent</code> user.</p>
 <p>Note that if you are trying to use this feature with a non-system user, you will have to manually modify the <code>subuid</code>
 and <code>subgid</code> entries so that your starting subuid is the same as the User ID.</p>
 <h1 id="enabling-dockers-userns-remap">Enabling <code>docker's</code> userns-remap</h1>
 <p>You could modify docker&rsquo;s daemon.json file to enable <code>userns-remap</code>. I went with the approach of using a
 drop in systemd unit file to update the <code>dockerd</code> flags:</p>
-<pre><code>$ sudo mkdir -p /etc/systemd/system/docker.service.d
-$ echo &quot;[Service]&quot; | sudo tee /etc/systemd/system/docker.service.d/docker-userns-remap.conf &gt; /dev/null
+<pre tabindex="0"><code>$ sudo mkdir -p /etc/systemd/system/docker.service.d
+$ echo &#34;[Service]&#34; | sudo tee /etc/systemd/system/docker.service.d/docker-userns-remap.conf &gt; /dev/null
 $ # First clear ExecStart (https://github.com/moby/moby/issues/14491)
-$ echo &quot;ExecStart=&quot; | sudo tee --append  /etc/systemd/system/docker.service.d/docker-userns-remap.conf &gt; /dev/null
+$ echo &#34;ExecStart=&#34; | sudo tee --append  /etc/systemd/system/docker.service.d/docker-userns-remap.conf &gt; /dev/null
 $ # Now, override to apply userns-remap
-$ echo &quot;ExecStart=/usr/bin/dockerd -H fd:// --userns-remap=\&quot;agent:agent\&quot;&quot; | sudo tee --append  /etc/systemd/system/docker.service.d/docker-userns-remap.conf &gt; /dev/null
+$ echo &#34;ExecStart=/usr/bin/dockerd -H fd:// --userns-remap=\&#34;agent:agent\&#34;&#34; | sudo tee --append  /etc/systemd/system/docker.service.d/docker-userns-remap.conf &gt; /dev/null
 
 $ sudo systemctl daemon-reload
 $sudo systemctl restart docker
 </code></pre><h1 id="user-namespace-in-action">User namespace in action</h1>
 <p>Now, if we run a container and note the PID from the host:</p>
-<pre><code>ubuntu@ip-172-34-54-228:~$ cat /proc/18407/uid_map
+<pre tabindex="0"><code>ubuntu@ip-172-34-54-228:~$ cat /proc/18407/uid_map
          0        999      65537
 </code></pre><p>Inside the container, we see:</p>
-<pre><code>root@028c3d79babd:/# cat /proc/1/uid_map
+<pre tabindex="0"><code>root@028c3d79babd:/# cat /proc/1/uid_map
          0        999      65537
 </code></pre><p>Please see <a href="http://man7.org/linux/man-pages/man7/user_namespaces.7.html">user_namespaces(7)</a> for description of these
 files.</p>

@@ -65,7 +65,7 @@ existing requests can finish</li>
 <code>linkerd</code> will see that your service instance is unhealthy, so it will not proxy any more requests to it.</p>
 <h1 id="proposed-solution-implementation">Proposed solution implementation</h1>
 <p>The proposed solution is a systemd unit - let&rsquo;s call it <code>drain-connections</code> which is defined as follows:</p>
-<pre><code>#  cat /etc/systemd/system/drain-connections.service
+<pre tabindex="0"><code>#  cat /etc/systemd/system/drain-connections.service
 
 [Unit]
 Description=Shutdown hook to run before supervisord is stopped
@@ -98,7 +98,7 @@ WantedBy=multi-user.target
 of 300 seconds can finish</li>
 </ol>
 <p>In addition, we setup <code>supervisord</code> systemd unit override as follows:</p>
-<pre><code># /etc/systemd/system/supervisord.service.d/supervisord.conf
+<pre tabindex="0"><code># /etc/systemd/system/supervisord.service.d/supervisord.conf
 
 [Unit]
 Wants=drain-connections.service

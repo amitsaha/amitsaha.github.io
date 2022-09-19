@@ -34,27 +34,27 @@
 <article>
     <header id="post-header">
         <h1>Sorted Sets in Redis from CLI, Python and Golang</h1><time>February 19, 2018</time></header><p>In this post, we will see a demo of <em>sorted sets</em> in <a href="https://redis.io/">redis</a>. I just learned about them and I think they are really cool! This post shows how we can play with sorted sets first via the <code>redis-cli</code>, then from Python and Golang.</p>
-<pre><code>                            ┌────────────┐
+<pre tabindex="0"><code>                            ┌────────────┐
  .───────────────.          │            │           .─────────────.
 (    Redis CLI    )   ───▶  │   Redis    │  ◀─────  (    Golang     )
- `───────────────'          │            │           `─────────────'
+ `───────────────&#39;          │            │           `─────────────&#39;
                             └────────────┘
                                   ▲
                                   │
                                   │
                            .─────────────.
                           (    Python     )
-                           `─────────────'
+                           `─────────────&#39;
 </code></pre><p>We will first need a local redis server running. We will see how we do so on Fedora Linux next. If you are running
 another operating system, please see the <a href="https://redis.io/download">download page</a>.</p>
 <h1 id="installation-and-server-setup-on-fedora-linux">Installation and server setup on Fedora Linux</h1>
 <p>We can install <code>redis</code> server using <code>dnf</code>, like so:</p>
-<pre><code>$ sudo dnf install redis
+<pre tabindex="0"><code>$ sudo dnf install redis
 ..
 $ redis-server --version
 Redis server v=4.0.6 sha=00000000:0 malloc=jemalloc-4.5.0 bits=64 build=427484a80e1b4515
 </code></pre><p>Let&rsquo;s start the server:</p>
-<pre><code>$ sudo systemctl start redis
+<pre tabindex="0"><code>$ sudo systemctl start redis
 $ sudo systemctl status redis
 ● redis.service - Redis persistent key-value database
    Loaded: loaded (/usr/lib/systemd/system/redis.service; disabled; vendor preset: disabled)
@@ -71,10 +71,10 @@ Feb 18 00:08:22 fedora.home systemd[1]: Started Redis persistent key-value datab
 ..
 </code></pre><h1 id="check-if-redis-is-alive">Check if Redis is alive</h1>
 <p>Once the server has started, let&rsquo;s check if our server is up and running:</p>
-<pre><code>$ redis-cli ping
+<pre tabindex="0"><code>$ redis-cli ping
 PONG
 </code></pre><h1 id="sorted-sets">Sorted Sets</h1>
-<p>Redis' sorted set is a set data structure but each element in the set is also associated with a <code>score</code>. It is a
+<p>Redis&rsquo; sorted set is a set data structure but each element in the set is also associated with a <code>score</code>. It is a
 hash map but with an interesting property - the set is ordered based on this <code>score</code> value.</p>
 <p>This allows us to perform the following operations easily:</p>
 <ul>
@@ -89,162 +89,159 @@ system where entries can have one or more tags associated with them. At any give
 know what are the top 5 tags in our system.</p>
 <h1 id="redis-cli-demo"><code>redis-cli</code> demo</h1>
 <p>We will first add a few tags to our sorted set <code>tags</code> using the <a href="https://redis.io/commands/zadd">ZADD</a> command:</p>
-<pre><code>127.0.0.1:6379&gt; ZADD tags 1 &quot;python&quot;
+<pre tabindex="0"><code>127.0.0.1:6379&gt; ZADD tags 1 &#34;python&#34;
 (integer) 1
-127.0.0.1:6379&gt; ZADD tags 1 &quot;golang&quot;
+127.0.0.1:6379&gt; ZADD tags 1 &#34;golang&#34;
 (integer) 1
-127.0.0.1:6379&gt; ZADD tags 1 &quot;redis&quot;
+127.0.0.1:6379&gt; ZADD tags 1 &#34;redis&#34;
 (integer) 1
-127.0.0.1:6379&gt; ZADD tags 1 &quot;flask&quot;
+127.0.0.1:6379&gt; ZADD tags 1 &#34;flask&#34;
 (integer) 1
-127.0.0.1:6379&gt; ZADD tags 1 &quot;rust&quot;
+127.0.0.1:6379&gt; ZADD tags 1 &#34;rust&#34;
 (integer) 1
-127.0.0.1:6379&gt; ZADD tags 2 &quot;rust&quot;
+127.0.0.1:6379&gt; ZADD tags 2 &#34;rust&#34;
 (integer) 0
-127.0.0.1:6379&gt; ZADD tags 3 &quot;python&quot;
+127.0.0.1:6379&gt; ZADD tags 3 &#34;python&#34;
 (integer) 0
-127.0.0.1:6379&gt; ZADD tags 1 &quot;docker&quot;
+127.0.0.1:6379&gt; ZADD tags 1 &#34;docker&#34;
 (integer) 1
-127.0.0.1:6379&gt; ZADD tags 1 &quot;linux&quot;
+127.0.0.1:6379&gt; ZADD tags 1 &#34;linux&#34;
 (integer) 1
-127.0.0.1:6379&gt; ZADD tags 1 &quot;c&quot;
+127.0.0.1:6379&gt; ZADD tags 1 &#34;c&#34;
 (integer) 1
-127.0.0.1:6379&gt; ZADD tags 1 &quot;software&quot;
+127.0.0.1:6379&gt; ZADD tags 1 &#34;software&#34;
 (integer) 1
 1
-127.0.0.1:6379&gt; ZADD tags 1 &quot;memcache&quot;
+127.0.0.1:6379&gt; ZADD tags 1 &#34;memcache&#34;
 (integer) 1
-
 </code></pre><p>Above, I used the command to update the score of <code>rust</code> and <code>python</code> twice to be 2 and 3 respectively. I could have used
 <a href="https://redis.io/commands/zincrby">ZINCRBY</a> as well. Now, I will list all the keys using the <a href="https://redis.io/commands/zrange">zrange</a> command:</p>
-<pre><code>127.0.0.1:6379&gt; zrange tags 0 -1
- 1) &quot;c&quot;
- 2) &quot;docker&quot;
- 3) &quot;flask&quot;
- 4) &quot;golang&quot;
- 5) &quot;linux&quot;
- 6) &quot;memcache&quot;
- 7) &quot;redis&quot;
- 8) &quot;software&quot;
- 9) &quot;rust&quot;
-10) &quot;python&quot;
+<pre tabindex="0"><code>127.0.0.1:6379&gt; zrange tags 0 -1
+ 1) &#34;c&#34;
+ 2) &#34;docker&#34;
+ 3) &#34;flask&#34;
+ 4) &#34;golang&#34;
+ 5) &#34;linux&#34;
+ 6) &#34;memcache&#34;
+ 7) &#34;redis&#34;
+ 8) &#34;software&#34;
+ 9) &#34;rust&#34;
+10) &#34;python&#34;
 </code></pre><p>Note how the last two keys are <code>rust</code> and <code>python</code> - as they have the highest scores (2 and 3 respectively). The others are
 sorted lexicographically.</p>
 <p>To reverse the order, we will use the <a href="https://redis.io/commands/zrevrange">zrevrange</a> command:</p>
-<pre><code>127.0.0.1:6379&gt; ZREVRANGE tags 0 -1 withscores
- 1) &quot;python&quot;
- 2) &quot;3&quot;
- 3) &quot;rust&quot;
- 4) &quot;2&quot;
- 5) &quot;redis&quot;
- 6) &quot;1&quot;
- 7) &quot;golang&quot;
- 8) &quot;1&quot;
- 9) &quot;flask&quot;
-10) &quot;1&quot;
-
+<pre tabindex="0"><code>127.0.0.1:6379&gt; ZREVRANGE tags 0 -1 withscores
+ 1) &#34;python&#34;
+ 2) &#34;3&#34;
+ 3) &#34;rust&#34;
+ 4) &#34;2&#34;
+ 5) &#34;redis&#34;
+ 6) &#34;1&#34;
+ 7) &#34;golang&#34;
+ 8) &#34;1&#34;
+ 9) &#34;flask&#34;
+10) &#34;1&#34;
 </code></pre><p>Above, we can see how with the <code>withscores</code> command, we also get the scores back.</p>
 <p>Now, to get the top 5 tags, we will do the following:</p>
-<pre><code>127.0.0.1:6379&gt; ZREVRANGE tags 0 4 withscores
- 1) &quot;python&quot;
- 2) &quot;3&quot;
- 3) &quot;rust&quot;
- 4) &quot;2&quot;
- 5) &quot;software&quot;
- 6) &quot;1&quot;
- 7) &quot;redis&quot;
- 8) &quot;1&quot;
- 9) &quot;memcache&quot;
-10) &quot;1&quot;
+<pre tabindex="0"><code>127.0.0.1:6379&gt; ZREVRANGE tags 0 4 withscores
+ 1) &#34;python&#34;
+ 2) &#34;3&#34;
+ 3) &#34;rust&#34;
+ 4) &#34;2&#34;
+ 5) &#34;software&#34;
+ 6) &#34;1&#34;
+ 7) &#34;redis&#34;
+ 8) &#34;1&#34;
+ 9) &#34;memcache&#34;
+10) &#34;1&#34;
 1
 </code></pre><h1 id="python-demo">Python demo</h1>
 <p>We will use the <a href="https://github.com/andymccurdy/redis-py">redis-py</a> package to talk to redis and perform the above operations. The Python client looks as follows:</p>
-<pre><code>import redis
-r = redis.StrictRedis(host='localhost', port=6379, db=0)
+<pre tabindex="0"><code>import redis
+r = redis.StrictRedis(host=&#39;localhost&#39;, port=6379, db=0)
 
 tags_scores = {
-    'rust': 2,
-    'python': 3,
-    'golang': 1,
-    'redis': 1,
-    'docker': 1,
-    'linux': 1,
-    'software': 1,
-    'c': 1,
-    'memcache': 1,
-    'flask': 1,
+    &#39;rust&#39;: 2,
+    &#39;python&#39;: 3,
+    &#39;golang&#39;: 1,
+    &#39;redis&#39;: 1,
+    &#39;docker&#39;: 1,
+    &#39;linux&#39;: 1,
+    &#39;software&#39;: 1,
+    &#39;c&#39;: 1,
+    &#39;memcache&#39;: 1,
+    &#39;flask&#39;: 1,
 }
     
 
 # Add the keys with scores     
 for tag, score in tags_scores.items():
-    r.zadd('tags', score, tag)
+    r.zadd(&#39;tags&#39;, score, tag)
 
 # Retrieve the top 5 keys
-for key, score in r.zrevrange('tags', 0, 4, 'withscores'):
+for key, score in r.zrevrange(&#39;tags&#39;, 0, 4, &#39;withscores&#39;):
     print(key, score)
 </code></pre><p>Running the above (<a href="https://github.com/amitsaha/python-redis-demo">How?</a>) will give us the output:</p>
-<pre><code>b'python' 3.0
-b'rust' 2.0
-b'software' 1.0
-b'redis' 1.0
-b'memcache' 1.0
+<pre tabindex="0"><code>b&#39;python&#39; 3.0
+b&#39;rust&#39; 2.0
+b&#39;software&#39; 1.0
+b&#39;redis&#39; 1.0
+b&#39;memcache&#39; 1.0
 </code></pre><p>Note above how the syntax for the Python wrappers  are almost the same as the corresponding redis CLI command.</p>
 <h1 id="golang-demo">Golang demo</h1>
 <p>We will use the <a href="https://github.com/go-redis/redis">go-redis</a> package to interact with redis. The following program shows
 how we can achieve the above in Go:</p>
-<pre><code>package main
+<pre tabindex="0"><code>package main
 
 import (
-	&quot;log&quot;
+	&#34;log&#34;
 
-	&quot;github.com/go-redis/redis&quot;
+	&#34;github.com/go-redis/redis&#34;
 )
 
 func main() {
 	client := redis.NewClient(&amp;redis.Options{
-		Addr:     &quot;localhost:6379&quot;,
-		Password: &quot;&quot;, // no password set
+		Addr:     &#34;localhost:6379&#34;,
+		Password: &#34;&#34;, // no password set
 		DB:       0,  // use default DB
 	})
 
 	tags := map[string]float64{
-		&quot;python&quot;:   3,
-		&quot;memcache&quot;: 1,
-		&quot;rust&quot;:     2,
-		&quot;c&quot;:        1,
-		&quot;redis&quot;:    1,
-		&quot;software&quot;: 1,
-		&quot;docker&quot;:   1,
-		&quot;go&quot;:       1,
-		&quot;linux&quot;:    1,
-		&quot;flask&quot;:    1,
+		&#34;python&#34;:   3,
+		&#34;memcache&#34;: 1,
+		&#34;rust&#34;:     2,
+		&#34;c&#34;:        1,
+		&#34;redis&#34;:    1,
+		&#34;software&#34;: 1,
+		&#34;docker&#34;:   1,
+		&#34;go&#34;:       1,
+		&#34;linux&#34;:    1,
+		&#34;flask&#34;:    1,
 	}
 
 	for tag, score := range tags {
-		_, err := client.ZAdd(&quot;tags&quot;, redis.Z{score, tag}).Result()
+		_, err := client.ZAdd(&#34;tags&#34;, redis.Z{score, tag}).Result()
 		if err != nil {
-			log.Fatalf(&quot;Error adding %s&quot;, tag)
+			log.Fatalf(&#34;Error adding %s&#34;, tag)
 		}
 	}
 
-	result, err := client.ZRevRangeWithScores(&quot;tags&quot;, 0, 4).Result()
+	result, err := client.ZRevRangeWithScores(&#34;tags&#34;, 0, 4).Result()
 	if err != nil {
-		log.Fatalf(&quot;Error retrieving top 5 keys: %v&quot;, err)
+		log.Fatalf(&#34;Error retrieving top 5 keys: %v&#34;, err)
 	}
 	for _, zItem := range result {
-		log.Printf(&quot;%v\n&quot;, zItem)
+		log.Printf(&#34;%v\n&#34;, zItem)
 	}
 }
 </code></pre><p>When we run the program after having done the necessary <a href="https://github.com/amitsaha/golang-redis-demo">setup</a>, we will
 see the following output:</p>
-<pre><code>$ go run sorted_sets.go
+<pre tabindex="0"><code>$ go run sorted_sets.go
 2018/02/18 23:28:41 {3 python}
 2018/02/18 23:28:41 {2 rust}
 2018/02/18 23:28:41 {1 software}
 2018/02/18 23:28:41 {1 redis}
 2018/02/18 23:28:41 {1 memcache}
-
 </code></pre><p>And that&rsquo;s all for this post.</p>
 <h1 id="resources">Resources</h1>
 <ul>

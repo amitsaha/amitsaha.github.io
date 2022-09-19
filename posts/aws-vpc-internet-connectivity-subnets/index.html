@@ -69,13 +69,13 @@ in the above scenario.</p>
 responds accordingly. The response goes via Internet Gateway configured for the subnet. The Internet Gateway
 perfroms a Network Address translation where it changes the source IP address of the response packet
 to match the public IP address of E, so that A gets the response from E, and not E&rsquo;s internal IP address.</p>
-<pre><code>A -&gt; (Public IP) E -&gt; (Routing) -&gt; IGW -&gt; (Change source IP to public IP of E) -&gt; A
+<pre tabindex="0"><code>A -&gt; (Public IP) E -&gt; (Routing) -&gt; IGW -&gt; (Change source IP to public IP of E) -&gt; A
 </code></pre><h2 id="egress">Egress</h2>
 <p>Instance E tries to access an Internet resource, B. The traffic goes via the Internet Gateway where a network
 address translation takes place - the source IP address is changed from the internal IP to the public facing
 IP. When the response is received by the Internet Gateway, the destination IP is changed from the public IP of instance
 E to the private IP.</p>
-<pre><code>E -&gt; (Routing) -&gt; IGW -&gt; (Change source IP to public IP of E) -&gt; B -&gt; IGW -&gt; (Change destination IP to private IP of E) -&gt; E
+<pre tabindex="0"><code>E -&gt; (Routing) -&gt; IGW -&gt; (Change source IP to public IP of E) -&gt; B -&gt; IGW -&gt; (Change destination IP to private IP of E) -&gt; E
 </code></pre><h1 id="public-subnet---no-public-ip">Public subnet - No Public IP</h1>
 <p>Considering the above address translation, AWS will <em>not</em> prevent you from having an instance with no public IP,
 but you will not be able to talk to any &ldquo;Internet&rdquo; resource and of course, vice-versa - i.e. no ingress or egress
@@ -89,13 +89,13 @@ The NAT device performs a Source address translation replacing the private IP of
 IP address. The acknowledgement makes it way back to the device B&rsquo;s &ldquo;edge&rdquo; device (firewall for example) and doesn&rsquo;t recognize
 the public NAT IP as part of an ongoing connection and just drops it. Hence, although, device B can attempt to
 initiate connection to F, it never actually succeeds.</p>
-<pre><code>A -&gt; (Public IP) F -&gt; (Routing) -&gt; NAT -&gt; (Change source IP to public IP of NAT) -&gt; Drops packet
+<pre tabindex="0"><code>A -&gt; (Public IP) F -&gt; (Routing) -&gt; NAT -&gt; (Change source IP to public IP of NAT) -&gt; Drops packet
 </code></pre><h1 id="egress-1">Egress</h1>
 <p>F tries to talk an Internet resource, I. The routing table forwards the request to the NAT instance/device. This device
 then replaces the source IP of the request which currently is the private IP by the NAT device&rsquo;s Public IP addres and
 forwards the request to the destination resource. When the response is received, the NAT device changes the destination
 IP address from itself to that of the private IP address of the instance.</p>
-<pre><code>F -&gt; (Routing) -&gt; NAT -&gt; (Change source IP to public IP of NAT) -&gt; I -&gt; NAT -&gt; (Change dest IP to private IP of F) -&gt; F
+<pre tabindex="0"><code>F -&gt; (Routing) -&gt; NAT -&gt; (Change source IP to public IP of NAT) -&gt; I -&gt; NAT -&gt; (Change dest IP to private IP of F) -&gt; F
 </code></pre><h1 id="private-subnet---no-public-ip">Private subnet - No Public IP</h1>
 <p>Consider a EC2 instance, G in a private subnet having no public IP</p>
 <h1 id="ingress-2">Ingress</h1>
@@ -105,7 +105,7 @@ IP address from itself to that of the private IP address of the instance.</p>
 then replaces the source IP of the request which currently is the private IP by the NAT device&rsquo;s Public IP addres and
 forwards the request to the destination resource. When the response is received, the NAT device changes the destination
 IP address from itself to that of the private IP address of the instance.</p>
-<pre><code>G -&gt; (Routing) -&gt; NAT -&gt; (Change source IP to public IP of NAT) -&gt; J -&gt; NAT -&gt; (Change dest IP to private IP of G) -&gt; G
+<pre tabindex="0"><code>G -&gt; (Routing) -&gt; NAT -&gt; (Change source IP to public IP of NAT) -&gt; J -&gt; NAT -&gt; (Change dest IP to private IP of G) -&gt; G
 </code></pre><h1 id="learn-more">Learn more</h1>
 <ul>
 <li><a href="https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Internet_Gateway.html">VPC Internet Gateway</a></li>

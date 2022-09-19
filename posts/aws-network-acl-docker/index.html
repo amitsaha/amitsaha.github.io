@@ -63,7 +63,7 @@ operating system.</p>
 <h1 id="docker-networks">Docker networks</h1>
 <p>I mentioned in the symptoms above that I am using docker&rsquo;s default <code>docker0</code> which by default works in a NAT mode and
 hence any outgoing traffic from a docker container will have it&rsquo;s source IP as the host&rsquo;s IP. For example:</p>
-<pre><code>ubuntu@ip-172-34-59-184:~$ sudo tcpdump -i eth0 port 10001
+<pre tabindex="0"><code>ubuntu@ip-172-34-59-184:~$ sudo tcpdump -i eth0 port 10001
 ..
 07:32:49.696954 IP ip-172-34-59-184.51990 &gt; 172.34.1.252.10001: Flags [S], seq 238158991, win 29200, options [mss 1460,sackOK,TS val 2420016438 ecr 0,nop,wscale 7], length 0
 ..
@@ -79,15 +79,15 @@ one in the list of allowed ranges in the Network ACL. This port was not in the l
 <p>The solution is to basically set the ephemeral range so that it matches the one allowed in the network ACL.</p>
 <h1 id="set-the-ephemeral-port-range-on-a-linux-vm">Set the ephemeral port range on a Linux VM</h1>
 <p>We will add an entry to <code>sysctl.conf</code>:</p>
-<pre><code>$ echo 'net.ipv4.ip_local_port_range=49152 65535' | sudo tee --append /etc/sysctl.conf
+<pre tabindex="0"><code>$ echo &#39;net.ipv4.ip_local_port_range=49152 65535&#39; | sudo tee --append /etc/sysctl.conf
 </code></pre><p>To effect the above change on a running system, <code>$sudo sysctl -p</code>.</p>
 <h1 id="set-the-ephemeral-port-range-in-a-linux-docker-container">Set the ephemeral port range in a Linux docker container</h1>
 <p>Pass it at <code>docker run</code> time:</p>
-<pre><code>$ docker run --sysctl net.ipv4.ip_local_port_range=&quot;49152 65535&quot; ...
+<pre tabindex="0"><code>$ docker run --sysctl net.ipv4.ip_local_port_range=&#34;49152 65535&#34; ...
 </code></pre><p>Learn more about <a href="https://docs.docker.com/engine/reference/commandline/run/#configure-namespaced-kernel-parameters-sysctls-at-runtime">sysctl for docker</a>.</p>
 <h1 id="set-the-ephemeral-port-range-on-windows">Set the ephemeral port range on Windows</h1>
 <p>Use the <code>netsh</code> command:</p>
-<pre><code>PS C:\&gt; netsh int ipv4 show dynamicport tcp
+<pre tabindex="0"><code>PS C:\&gt; netsh int ipv4 show dynamicport tcp
 
 Protocol tcp Dynamic Port Range
 ---------------------------------

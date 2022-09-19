@@ -58,7 +58,7 @@ attributes of a pod. Hence, the <a href="https://kubernetes.io/docs/reference/ge
 </ul>
 <p>On an AWS <a href="https://docs.aws.amazon.com/eks/latest/userguide/pod-security-policy.html">EKS cluster</a>, we can see there
 is an existing policy already defined:</p>
-<pre><code>$ kubectl describe psp
+<pre tabindex="0"><code>$ kubectl describe psp
 Name:  eks.privileged
 
 Settings:
@@ -84,15 +84,14 @@ Settings:
     Ranges:                               &lt;none&gt;
   Supplemental Groups Strategy: RunAsAny  
     Ranges:                               &lt;none&gt;
-
 </code></pre><p>The granular permissions are documented <a href="https://kubernetes.io/docs/concepts/policy/pod-security-policy/#policy-reference">here</a>, but the above policy essentially allows pods to be created with all the permissions available.</p>
 <p>We also have an associated cluster role binding:</p>
-<pre><code>$ kubectl describe clusterrolebinding eks:podsecuritypolicy:authenticated 
+<pre tabindex="0"><code>$ kubectl describe clusterrolebinding eks:podsecuritypolicy:authenticated 
 Name:         eks:podsecuritypolicy:authenticated
 Labels:       eks.amazonaws.com/component=pod-security-policy
               kubernetes.io/cluster-service=true
 Annotations:  kubectl.kubernetes.io/last-applied-configuration:
-                {&quot;apiVersion&quot;:&quot;rbac.authorization.k8s.io/v1&quot;,&quot;kind&quot;:&quot;ClusterRoleBinding&quot;,&quot;metadata&quot;:{&quot;annotations&quot;:{&quot;kubernetes.io/description&quot;:&quot;Allow all...
+                {&#34;apiVersion&#34;:&#34;rbac.authorization.k8s.io/v1&#34;,&#34;kind&#34;:&#34;ClusterRoleBinding&#34;,&#34;metadata&#34;:{&#34;annotations&#34;:{&#34;kubernetes.io/description&#34;:&#34;Allow all...
               kubernetes.io/description: Allow all authenticated users to create privileged pods.
 Role:
   Kind:  ClusterRole
@@ -101,12 +100,11 @@ Subjects:
   Kind   Name                  Namespace
   ----   ----                  ---------
   Group  system:authenticated  
-
 </code></pre><p>The details are documented in the EKS documentation above, but essentially the above role binding allows all
 authenticated users (group: <code>system:authenticated</code>) to make use of the above policy - or, any authenticated user
 is allowed to run privileged pods with <em>no</em> policy enforced. Now, if we see which policy <em>any</em> pod is running with, it
 will show that it is using the <code>eks.privileged</code> policy:</p>
-<pre><code>$ kubectl -n &lt;my-ns&gt; get pod xledger-api-79c745d7d7-ng2j2  -o jsonpath='{.metadata.annotations.kubernetes\.io\/psp}'
+<pre tabindex="0"><code>$ kubectl -n &lt;my-ns&gt; get pod xledger-api-79c745d7d7-ng2j2  -o jsonpath=&#39;{.metadata.annotations.kubernetes\.io\/psp}&#39;
 eks.privileged
 </code></pre><p>Now, the reason we have the default pod security policy and the binding is that there <em>must</em> be a pod security policy
 that is defined in your cluster to allow a pod to be scheduled for running if you have the admission controller
@@ -116,54 +114,54 @@ enabled. If there was no default policy, no pod would be &ldquo;admitted&rdquo; 
 default restricted policy. The workload specific policies would have certain privileged access, but not all
 and they would be explicitly granted via making use of service accounts. The default would however be the
 restricted policy. Let&rsquo;s first look at the restricted policy which will apply to all authenticated &ldquo;users&rdquo;:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">policy/v1beta1</span>
-<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">PodSecurityPolicy</span>
-<span style="color:#f92672">metadata</span>:
-  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">default</span>
-<span style="color:#f92672">spec</span>:
-  <span style="color:#f92672">privileged</span>: <span style="color:#66d9ef">false</span>
-  <span style="color:#75715e"># Required to prevent escalations to root.</span>
-  <span style="color:#f92672">allowPrivilegeEscalation</span>: <span style="color:#66d9ef">false</span>
-  <span style="color:#75715e"># This is redundant with non-root + disallow privilege escalation,</span>
-  <span style="color:#75715e"># but we can provide it for defense in depth.</span>
-  <span style="color:#f92672">requiredDropCapabilities</span>:
-    - <span style="color:#ae81ff">ALL</span>
-  <span style="color:#75715e"># Allow core volume types.</span>
-  <span style="color:#f92672">volumes</span>:
-    - <span style="color:#e6db74">&#39;configMap&#39;</span>
-    - <span style="color:#e6db74">&#39;emptyDir&#39;</span>
-    - <span style="color:#e6db74">&#39;projected&#39;</span>
-    - <span style="color:#e6db74">&#39;secret&#39;</span>
-    <span style="color:#75715e"># Assume that persistentVolumes set up by the cluster admin are safe to use.</span>
-    - <span style="color:#e6db74">&#39;persistentVolumeClaim&#39;</span>
-  <span style="color:#f92672">hostNetwork</span>: <span style="color:#66d9ef">false</span>
-  <span style="color:#f92672">hostIPC</span>: <span style="color:#66d9ef">false</span>
-  <span style="color:#f92672">hostPID</span>: <span style="color:#66d9ef">false</span>
-  <span style="color:#f92672">runAsUser</span>:
-    <span style="color:#f92672">rule</span>: <span style="color:#e6db74">&#39;MustRunAsNonRoot&#39;</span>
-  <span style="color:#f92672">seLinux</span>:
-    <span style="color:#75715e"># This policy assumes the nodes are using AppArmor rather than SELinux.</span>
-    <span style="color:#f92672">rule</span>: <span style="color:#e6db74">&#39;RunAsAny&#39;</span>
-  <span style="color:#f92672">supplementalGroups</span>:
-    <span style="color:#f92672">rule</span>: <span style="color:#e6db74">&#39;MustRunAs&#39;</span>
-    <span style="color:#f92672">ranges</span>:
-      <span style="color:#75715e"># Forbid adding the root group.</span>
-      - <span style="color:#f92672">min</span>: <span style="color:#ae81ff">1</span>
-        <span style="color:#f92672">max</span>: <span style="color:#ae81ff">65535</span>
-  <span style="color:#f92672">fsGroup</span>:
-    <span style="color:#f92672">rule</span>: <span style="color:#e6db74">&#39;MustRunAs&#39;</span>
-    <span style="color:#f92672">ranges</span>:
-      <span style="color:#75715e"># Forbid adding the root group.</span>
-      - <span style="color:#f92672">min</span>: <span style="color:#ae81ff">1</span>
-        <span style="color:#f92672">max</span>: <span style="color:#ae81ff">65535</span>
-  <span style="color:#f92672">readOnlyRootFilesystem</span>: <span style="color:#66d9ef">false</span>
-</code></pre></div><p>To come up with the workload specific policies, we need to first figure out what kind of privileged access we need
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">policy/v1beta1</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">kind</span>: <span style="color:#ae81ff">PodSecurityPolicy</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">metadata</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">default</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">spec</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">privileged</span>: <span style="color:#66d9ef">false</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># Required to prevent escalations to root.</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">allowPrivilegeEscalation</span>: <span style="color:#66d9ef">false</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># This is redundant with non-root + disallow privilege escalation,</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># but we can provide it for defense in depth.</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">requiredDropCapabilities</span>:
+</span></span><span style="display:flex;"><span>    - <span style="color:#ae81ff">ALL</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># Allow core volume types.</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">volumes</span>:
+</span></span><span style="display:flex;"><span>    - <span style="color:#e6db74">&#39;configMap&#39;</span>
+</span></span><span style="display:flex;"><span>    - <span style="color:#e6db74">&#39;emptyDir&#39;</span>
+</span></span><span style="display:flex;"><span>    - <span style="color:#e6db74">&#39;projected&#39;</span>
+</span></span><span style="display:flex;"><span>    - <span style="color:#e6db74">&#39;secret&#39;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Assume that persistentVolumes set up by the cluster admin are safe to use.</span>
+</span></span><span style="display:flex;"><span>    - <span style="color:#e6db74">&#39;persistentVolumeClaim&#39;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">hostNetwork</span>: <span style="color:#66d9ef">false</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">hostIPC</span>: <span style="color:#66d9ef">false</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">hostPID</span>: <span style="color:#66d9ef">false</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">runAsUser</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">rule</span>: <span style="color:#e6db74">&#39;MustRunAsNonRoot&#39;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">seLinux</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># This policy assumes the nodes are using AppArmor rather than SELinux.</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">rule</span>: <span style="color:#e6db74">&#39;RunAsAny&#39;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">supplementalGroups</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">rule</span>: <span style="color:#e6db74">&#39;MustRunAs&#39;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">ranges</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#75715e"># Forbid adding the root group.</span>
+</span></span><span style="display:flex;"><span>      - <span style="color:#f92672">min</span>: <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">max</span>: <span style="color:#ae81ff">65535</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">fsGroup</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">rule</span>: <span style="color:#e6db74">&#39;MustRunAs&#39;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">ranges</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#75715e"># Forbid adding the root group.</span>
+</span></span><span style="display:flex;"><span>      - <span style="color:#f92672">min</span>: <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">max</span>: <span style="color:#ae81ff">65535</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">readOnlyRootFilesystem</span>: <span style="color:#66d9ef">false</span>
+</span></span></code></pre></div><p>To come up with the workload specific policies, we need to first figure out what kind of privileged access we need
 to allow them to have.  We will need to make sure that the custom policies we enforce account for
 the permissions that these pods need. <a href="https://github.com/sysdiglabs/kube-psp-advisor">kube-psp-advisor</a> is an useful
 tool that helps us here. The <code>inspect</code> sub-command can examine your cluster and generate pod security policies
 as well as grants for those policies. Thus a starting point would be to examine each namespace of your cluster
 where you have workloads and run:</p>
-<pre><code>$ kubectl-advise-psp inspect --grant -n &lt;your namespace&gt;
+<pre tabindex="0"><code>$ kubectl-advise-psp inspect --grant -n &lt;your namespace&gt;
 </code></pre><p>Once you have got all the policies you have for all the workloads, you will quickly see that for each workload,
 we will create a:</p>
 <ul>
@@ -174,7 +172,7 @@ we will create a:</p>
 <p>Hence, to minimize duplication, we can make use of <a href="https://kustomize.io/">kustomize</a>.</p>
 <h1 id="using-kustomize-to-manage-policies">Using <code>kustomize</code> to manage policies</h1>
 <p>We can use <code>kustomize</code> base and overlays in the following manner to manage the various policies:</p>
-<pre><code>.
+<pre tabindex="0"><code>.
 ├── base
 │   ├── kustomization.yaml
 │   ├── kustomizeconfig.yaml
@@ -192,64 +190,61 @@ we will create a:</p>
 
 ..
 </code></pre><p>Let&rsquo;s look at the <code>base/psp.yaml</code>:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">policy/v1beta1</span>
-<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">PodSecurityPolicy</span>
-<span style="color:#f92672">metadata</span>:
-  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">default</span>
-  <span style="color:#f92672">annotations</span>:
-    <span style="color:#f92672">seccomp.security.alpha.kubernetes.io/allowedProfileNames</span>: <span style="color:#e6db74">&#39;docker/default,runtime/default&#39;</span>
-    <span style="color:#f92672">seccomp.security.alpha.kubernetes.io/defaultProfileName</span>:  <span style="color:#e6db74">&#39;runtime/default&#39;</span>
-  <span style="color:#f92672">labels</span>:
-    <span style="color:#f92672">kubernetes.io/cluster-service</span>: <span style="color:#e6db74">&#34;true&#34;</span>
-
-</code></pre></div><p>We don&rsquo;t define any policy at all here, but just define the <code>PodSecurityPolicy</code> resource.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">policy/v1beta1</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">kind</span>: <span style="color:#ae81ff">PodSecurityPolicy</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">metadata</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">default</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">annotations</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">seccomp.security.alpha.kubernetes.io/allowedProfileNames</span>: <span style="color:#e6db74">&#39;docker/default,runtime/default&#39;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">seccomp.security.alpha.kubernetes.io/defaultProfileName</span>:  <span style="color:#e6db74">&#39;runtime/default&#39;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">labels</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">kubernetes.io/cluster-service</span>: <span style="color:#e6db74">&#34;true&#34;</span>
+</span></span></code></pre></div><p>We don&rsquo;t define any policy at all here, but just define the <code>PodSecurityPolicy</code> resource.</p>
 <p>Let&rsquo;s look at <code>base/role.yaml</code>:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">
-<span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">rbac.authorization.k8s.io/v1</span>
-<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">ClusterRole</span>
-<span style="color:#f92672">metadata</span>:
-  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">psp-default</span>
-  <span style="color:#f92672">labels</span>:
-    <span style="color:#f92672">kubernetes.io/cluster-service</span>: <span style="color:#e6db74">&#34;true&#34;</span>
-    <span style="color:#f92672">eks.amazonaws.com/component</span>: <span style="color:#ae81ff">pod-security-policy</span>
-<span style="color:#f92672">rules</span>:
-- <span style="color:#f92672">apiGroups</span>:
-  - <span style="color:#ae81ff">policy</span>
-  <span style="color:#f92672">resourceNames</span>:
-  - <span style="color:#ae81ff">default</span>
-  <span style="color:#f92672">resources</span>:
-  - <span style="color:#ae81ff">podsecuritypolicies</span>
-  <span style="color:#f92672">verbs</span>:
-  - <span style="color:#ae81ff">use</span>
-
-</code></pre></div><p>The above <code>ClusterRole</code> allows using the <code>default</code> pod security policy.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">rbac.authorization.k8s.io/v1</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">kind</span>: <span style="color:#ae81ff">ClusterRole</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">metadata</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">psp-default</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">labels</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">kubernetes.io/cluster-service</span>: <span style="color:#e6db74">&#34;true&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">eks.amazonaws.com/component</span>: <span style="color:#ae81ff">pod-security-policy</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">rules</span>:
+</span></span><span style="display:flex;"><span>- <span style="color:#f92672">apiGroups</span>:
+</span></span><span style="display:flex;"><span>  - <span style="color:#ae81ff">policy</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">resourceNames</span>:
+</span></span><span style="display:flex;"><span>  - <span style="color:#ae81ff">default</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">resources</span>:
+</span></span><span style="display:flex;"><span>  - <span style="color:#ae81ff">podsecuritypolicies</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">verbs</span>:
+</span></span><span style="display:flex;"><span>  - <span style="color:#ae81ff">use</span>
+</span></span></code></pre></div><p>The above <code>ClusterRole</code> allows using the <code>default</code> pod security policy.</p>
 <p>Tying the above <code>role</code> and <code>psp</code> resources is the <code>ClusterRoleBinding</code> as follows in <code>base/rolebinding.yaml</code>:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">rbac.authorization.k8s.io/v1</span>
-<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">ClusterRoleBinding</span>
-<span style="color:#f92672">metadata</span>:
-  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">psp-default</span>
-  <span style="color:#f92672">labels</span>:
-    <span style="color:#f92672">kubernetes.io/cluster-service</span>: <span style="color:#e6db74">&#34;true&#34;</span>
-<span style="color:#f92672">roleRef</span>:
-  <span style="color:#f92672">apiGroup</span>: <span style="color:#ae81ff">rbac.authorization.k8s.io</span>
-  <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">ClusterRole</span>
-  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">psp-default</span>
-
-</code></pre></div><p>The cluster role binding above doesn&rsquo;t specify any subjects.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">rbac.authorization.k8s.io/v1</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">kind</span>: <span style="color:#ae81ff">ClusterRoleBinding</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">metadata</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">psp-default</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">labels</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">kubernetes.io/cluster-service</span>: <span style="color:#e6db74">&#34;true&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">roleRef</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">apiGroup</span>: <span style="color:#ae81ff">rbac.authorization.k8s.io</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">ClusterRole</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">psp-default</span>
+</span></span></code></pre></div><p>The cluster role binding above doesn&rsquo;t specify any subjects.</p>
 <p>Before we look at the overlays, let&rsquo;s look at the <code>kustomization.yaml</code>:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">resources</span>:
-- <span style="color:#ae81ff">psp.yaml</span>
-- <span style="color:#ae81ff">role.yaml</span>
-- <span style="color:#ae81ff">rolebinding.yaml</span>
-<span style="color:#f92672">configurations</span>:
-- <span style="color:#ae81ff">kustomizeconfig.yaml</span>
-</code></pre></div><p>The interesting bit here for our purpose is the <code>kustomizeconfig.yaml</code> file:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">nameReference</span>:
-- <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">PodSecurityPolicy</span>
-  <span style="color:#f92672">fieldSpecs</span>:  
-  - <span style="color:#f92672">path</span>: <span style="color:#ae81ff">rules/resourceNames</span>
-    <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">ClusterRole</span>
-</code></pre></div><p><code>nameReference</code> transformer which I originally learned about from this
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">resources</span>:
+</span></span><span style="display:flex;"><span>- <span style="color:#ae81ff">psp.yaml</span>
+</span></span><span style="display:flex;"><span>- <span style="color:#ae81ff">role.yaml</span>
+</span></span><span style="display:flex;"><span>- <span style="color:#ae81ff">rolebinding.yaml</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">configurations</span>:
+</span></span><span style="display:flex;"><span>- <span style="color:#ae81ff">kustomizeconfig.yaml</span>
+</span></span></code></pre></div><p>The interesting bit here for our purpose is the <code>kustomizeconfig.yaml</code> file:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">nameReference</span>:
+</span></span><span style="display:flex;"><span>- <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">PodSecurityPolicy</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">fieldSpecs</span>:  
+</span></span><span style="display:flex;"><span>  - <span style="color:#f92672">path</span>: <span style="color:#ae81ff">rules/resourceNames</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">ClusterRole</span>
+</span></span></code></pre></div><p><code>nameReference</code> transformer which I originally learned about from this
 <a href="https://github.com/kubernetes-sigs/kustomize/issues/1646">issue</a> allows us to use the name of a resource in another
 resource. If you look at the base configuration above, you may have been thinking how do we refer to the pod
 security policy (<code>kind: PodSecurityPolicy</code>) we generated in a overlay in the cluster role (<code>kind: ClusterRole</code>) for
@@ -257,145 +252,144 @@ the overlay. <code>nameReference</code> allows us to do just that. In plain term
 essentially substitutes reference to <code>rules/resourceNames</code> in <code>ClusterRole</code> to the name of <code>PodSecurityPolicy</code>
 generated in that specific overlay.</p>
 <p>The result is that an overlay directory looks like this:</p>
-<pre><code>restricted
+<pre tabindex="0"><code>restricted
 ├── kustomization.yaml
 └── restricted.yaml
-
 </code></pre><p>The <code>kustomization.yaml</code> file has the following contents:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">kustomize.config.k8s.io/v1beta1</span>
-<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Kustomization</span>
-<span style="color:#f92672">bases</span>:
-- <span style="color:#ae81ff">../../base</span>
-<span style="color:#f92672">namePrefix</span>: <span style="color:#ae81ff">restricted-</span>
-<span style="color:#f92672">patches</span>:
-- <span style="color:#ae81ff">restricted.yaml</span>
-</code></pre></div><p>The <code>namePrefix</code> here is used to somewhat indicate the specific workload we are generating the policy for.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">kustomize.config.k8s.io/v1beta1</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Kustomization</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">bases</span>:
+</span></span><span style="display:flex;"><span>- <span style="color:#ae81ff">../../base</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">namePrefix</span>: <span style="color:#ae81ff">restricted-</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">patches</span>:
+</span></span><span style="display:flex;"><span>- <span style="color:#ae81ff">restricted.yaml</span>
+</span></span></code></pre></div><p>The <code>namePrefix</code> here is used to somewhat indicate the specific workload we are generating the policy for.</p>
 <p>The <code>restricted.yaml</code> file defines the overlay for the <code>PodSecurityPolicy</code> and the <code>ClusterRoleBinding</code>:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">policy/v1beta1</span>
-<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">PodSecurityPolicy</span>
-<span style="color:#f92672">metadata</span>:
-  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">default</span>
-<span style="color:#f92672">spec</span>:
-  <span style="color:#f92672">privileged</span>: <span style="color:#66d9ef">false</span>
-  <span style="color:#75715e"># Required to prevent escalations to root.</span>
-  <span style="color:#f92672">allowPrivilegeEscalation</span>: <span style="color:#66d9ef">false</span>
-  <span style="color:#75715e"># This is redundant with non-root + disallow privilege escalation,</span>
-  <span style="color:#75715e"># but we can provide it for defense in depth.</span>
-  <span style="color:#f92672">requiredDropCapabilities</span>:
-    - <span style="color:#ae81ff">ALL</span>
-  <span style="color:#75715e"># Allow core volume types.</span>
-  <span style="color:#f92672">volumes</span>:
-    - <span style="color:#e6db74">&#39;configMap&#39;</span>
-    - <span style="color:#e6db74">&#39;emptyDir&#39;</span>
-    - <span style="color:#e6db74">&#39;projected&#39;</span>
-    - <span style="color:#e6db74">&#39;secret&#39;</span>
-    <span style="color:#75715e"># Assume that persistentVolumes set up by the cluster admin are safe to use.</span>
-    - <span style="color:#e6db74">&#39;persistentVolumeClaim&#39;</span>
-  <span style="color:#f92672">hostNetwork</span>: <span style="color:#66d9ef">false</span>
-  <span style="color:#f92672">hostIPC</span>: <span style="color:#66d9ef">false</span>
-  <span style="color:#f92672">hostPID</span>: <span style="color:#66d9ef">false</span>
-  <span style="color:#f92672">runAsUser</span>:
-    <span style="color:#f92672">rule</span>: <span style="color:#e6db74">&#39;MustRunAsNonRoot&#39;</span>
-  <span style="color:#f92672">seLinux</span>:
-    <span style="color:#75715e"># This policy assumes the nodes are using AppArmor rather than SELinux.</span>
-    <span style="color:#f92672">rule</span>: <span style="color:#e6db74">&#39;RunAsAny&#39;</span>
-  <span style="color:#f92672">supplementalGroups</span>:
-    <span style="color:#f92672">rule</span>: <span style="color:#e6db74">&#39;MustRunAs&#39;</span>
-    <span style="color:#f92672">ranges</span>:
-      <span style="color:#75715e"># Forbid adding the root group.</span>
-      - <span style="color:#f92672">min</span>: <span style="color:#ae81ff">1</span>
-        <span style="color:#f92672">max</span>: <span style="color:#ae81ff">65535</span>
-  <span style="color:#f92672">fsGroup</span>:
-    <span style="color:#f92672">rule</span>: <span style="color:#e6db74">&#39;MustRunAs&#39;</span>
-    <span style="color:#f92672">ranges</span>:
-      <span style="color:#75715e"># Forbid adding the root group.</span>
-      - <span style="color:#f92672">min</span>: <span style="color:#ae81ff">1</span>
-        <span style="color:#f92672">max</span>: <span style="color:#ae81ff">65535</span>
-  <span style="color:#f92672">readOnlyRootFilesystem</span>: <span style="color:#66d9ef">false</span>
----
-<span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">rbac.authorization.k8s.io/v1</span>
-<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">ClusterRoleBinding</span>
-<span style="color:#f92672">metadata</span>:
-  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">psp-default</span>
-<span style="color:#f92672">subjects</span>:
-  - <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Group</span>
-    <span style="color:#f92672">apiGroup</span>: <span style="color:#ae81ff">rbac.authorization.k8s.io</span>
-    <span style="color:#f92672">name</span>: <span style="color:#ae81ff">system:authenticated</span>
-</code></pre></div><p>Note that we don&rsquo;t need to define the <code>ClusterRole</code> in the overlay at all. If we look at the <code>ClusterRole</code> definition
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">policy/v1beta1</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">kind</span>: <span style="color:#ae81ff">PodSecurityPolicy</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">metadata</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">default</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">spec</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">privileged</span>: <span style="color:#66d9ef">false</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># Required to prevent escalations to root.</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">allowPrivilegeEscalation</span>: <span style="color:#66d9ef">false</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># This is redundant with non-root + disallow privilege escalation,</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># but we can provide it for defense in depth.</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">requiredDropCapabilities</span>:
+</span></span><span style="display:flex;"><span>    - <span style="color:#ae81ff">ALL</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># Allow core volume types.</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">volumes</span>:
+</span></span><span style="display:flex;"><span>    - <span style="color:#e6db74">&#39;configMap&#39;</span>
+</span></span><span style="display:flex;"><span>    - <span style="color:#e6db74">&#39;emptyDir&#39;</span>
+</span></span><span style="display:flex;"><span>    - <span style="color:#e6db74">&#39;projected&#39;</span>
+</span></span><span style="display:flex;"><span>    - <span style="color:#e6db74">&#39;secret&#39;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Assume that persistentVolumes set up by the cluster admin are safe to use.</span>
+</span></span><span style="display:flex;"><span>    - <span style="color:#e6db74">&#39;persistentVolumeClaim&#39;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">hostNetwork</span>: <span style="color:#66d9ef">false</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">hostIPC</span>: <span style="color:#66d9ef">false</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">hostPID</span>: <span style="color:#66d9ef">false</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">runAsUser</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">rule</span>: <span style="color:#e6db74">&#39;MustRunAsNonRoot&#39;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">seLinux</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># This policy assumes the nodes are using AppArmor rather than SELinux.</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">rule</span>: <span style="color:#e6db74">&#39;RunAsAny&#39;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">supplementalGroups</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">rule</span>: <span style="color:#e6db74">&#39;MustRunAs&#39;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">ranges</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#75715e"># Forbid adding the root group.</span>
+</span></span><span style="display:flex;"><span>      - <span style="color:#f92672">min</span>: <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">max</span>: <span style="color:#ae81ff">65535</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">fsGroup</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">rule</span>: <span style="color:#e6db74">&#39;MustRunAs&#39;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">ranges</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#75715e"># Forbid adding the root group.</span>
+</span></span><span style="display:flex;"><span>      - <span style="color:#f92672">min</span>: <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">max</span>: <span style="color:#ae81ff">65535</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">readOnlyRootFilesystem</span>: <span style="color:#66d9ef">false</span>
+</span></span><span style="display:flex;"><span>---
+</span></span><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">rbac.authorization.k8s.io/v1</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">kind</span>: <span style="color:#ae81ff">ClusterRoleBinding</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">metadata</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">psp-default</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">subjects</span>:
+</span></span><span style="display:flex;"><span>  - <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Group</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">apiGroup</span>: <span style="color:#ae81ff">rbac.authorization.k8s.io</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">name</span>: <span style="color:#ae81ff">system:authenticated</span>
+</span></span></code></pre></div><p>Note that we don&rsquo;t need to define the <code>ClusterRole</code> in the overlay at all. If we look at the <code>ClusterRole</code> definition
 in the <code>base/role.yaml</code> file above, we will see that it only needs reference to the <code>PodSecurityPolicy</code> name that
 will be generated. The <code>nameReference</code> transformer takes care of that.</p>
 <p>With the above overlay, when we run <code>kustomize build</code>, we get the following:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">policy/v1beta1</span>
-<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">PodSecurityPolicy</span>
-<span style="color:#f92672">metadata</span>:
-  <span style="color:#f92672">annotations</span>:
-    <span style="color:#f92672">seccomp.security.alpha.kubernetes.io/allowedProfileNames</span>: <span style="color:#ae81ff">docker/default,runtime/default</span>
-    <span style="color:#f92672">seccomp.security.alpha.kubernetes.io/defaultProfileName</span>: <span style="color:#ae81ff">runtime/default</span>
-  <span style="color:#f92672">labels</span>:
-    <span style="color:#f92672">kubernetes.io/cluster-service</span>: <span style="color:#e6db74">&#34;true&#34;</span>
-  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">restricted-default</span>
-<span style="color:#f92672">spec</span>:
-  <span style="color:#f92672">allowPrivilegeEscalation</span>: <span style="color:#66d9ef">false</span>
-  <span style="color:#f92672">fsGroup</span>:
-    <span style="color:#f92672">ranges</span>:
-    - <span style="color:#f92672">max</span>: <span style="color:#ae81ff">65535</span>
-      <span style="color:#f92672">min</span>: <span style="color:#ae81ff">1</span>
-    <span style="color:#f92672">rule</span>: <span style="color:#ae81ff">MustRunAs</span>
-  <span style="color:#f92672">hostIPC</span>: <span style="color:#66d9ef">false</span>
-  <span style="color:#f92672">hostNetwork</span>: <span style="color:#66d9ef">false</span>
-  <span style="color:#f92672">hostPID</span>: <span style="color:#66d9ef">false</span>
-  <span style="color:#f92672">privileged</span>: <span style="color:#66d9ef">false</span>
-  <span style="color:#f92672">readOnlyRootFilesystem</span>: <span style="color:#66d9ef">false</span>
-  <span style="color:#f92672">requiredDropCapabilities</span>:
-  - <span style="color:#ae81ff">ALL</span>
-  <span style="color:#f92672">runAsUser</span>:
-    <span style="color:#f92672">rule</span>: <span style="color:#ae81ff">MustRunAsNonRoot</span>
-  <span style="color:#f92672">seLinux</span>:
-    <span style="color:#f92672">rule</span>: <span style="color:#ae81ff">RunAsAny</span>
-  <span style="color:#f92672">supplementalGroups</span>:
-    <span style="color:#f92672">ranges</span>:
-    - <span style="color:#f92672">max</span>: <span style="color:#ae81ff">65535</span>
-      <span style="color:#f92672">min</span>: <span style="color:#ae81ff">1</span>
-    <span style="color:#f92672">rule</span>: <span style="color:#ae81ff">MustRunAs</span>
-  <span style="color:#f92672">volumes</span>:
-  - <span style="color:#ae81ff">configMap</span>
-  - <span style="color:#ae81ff">emptyDir</span>
-  - <span style="color:#ae81ff">projected</span>
-  - <span style="color:#ae81ff">secret</span>
-  - <span style="color:#ae81ff">persistentVolumeClaim</span>
----
-<span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">rbac.authorization.k8s.io/v1</span>
-<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">ClusterRole</span>
-<span style="color:#f92672">metadata</span>:
-  <span style="color:#f92672">labels</span>:
-    <span style="color:#f92672">eks.amazonaws.com/component</span>: <span style="color:#ae81ff">pod-security-policy</span>
-    <span style="color:#f92672">kubernetes.io/cluster-service</span>: <span style="color:#e6db74">&#34;true&#34;</span>
-  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">restricted-psp-default</span>
-<span style="color:#f92672">rules</span>:
-- <span style="color:#f92672">apiGroups</span>:
-  - <span style="color:#ae81ff">policy</span>
-  <span style="color:#f92672">resourceNames</span>:
-  - <span style="color:#ae81ff">restricted-default</span>
-  <span style="color:#f92672">resources</span>:
-  - <span style="color:#ae81ff">podsecuritypolicies</span>
-  <span style="color:#f92672">verbs</span>:
-  - <span style="color:#ae81ff">use</span>
----
-<span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">rbac.authorization.k8s.io/v1</span>
-<span style="color:#f92672">kind</span>: <span style="color:#ae81ff">ClusterRoleBinding</span>
-<span style="color:#f92672">metadata</span>:
-  <span style="color:#f92672">labels</span>:
-    <span style="color:#f92672">kubernetes.io/cluster-service</span>: <span style="color:#e6db74">&#34;true&#34;</span>
-  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">restricted-psp-default</span>
-<span style="color:#f92672">roleRef</span>:
-  <span style="color:#f92672">apiGroup</span>: <span style="color:#ae81ff">rbac.authorization.k8s.io</span>
-  <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">ClusterRole</span>
-  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">restricted-psp-default</span>
-<span style="color:#f92672">subjects</span>:
-- <span style="color:#f92672">apiGroup</span>: <span style="color:#ae81ff">rbac.authorization.k8s.io</span>
-  <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Group</span>
-  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">system:authenticated</span>
-</code></pre></div><h1 id="rolling-the-policy-changes-out">Rolling the policy changes out</h1>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">policy/v1beta1</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">kind</span>: <span style="color:#ae81ff">PodSecurityPolicy</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">metadata</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">annotations</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">seccomp.security.alpha.kubernetes.io/allowedProfileNames</span>: <span style="color:#ae81ff">docker/default,runtime/default</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">seccomp.security.alpha.kubernetes.io/defaultProfileName</span>: <span style="color:#ae81ff">runtime/default</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">labels</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">kubernetes.io/cluster-service</span>: <span style="color:#e6db74">&#34;true&#34;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">restricted-default</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">spec</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">allowPrivilegeEscalation</span>: <span style="color:#66d9ef">false</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">fsGroup</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">ranges</span>:
+</span></span><span style="display:flex;"><span>    - <span style="color:#f92672">max</span>: <span style="color:#ae81ff">65535</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">min</span>: <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">rule</span>: <span style="color:#ae81ff">MustRunAs</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">hostIPC</span>: <span style="color:#66d9ef">false</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">hostNetwork</span>: <span style="color:#66d9ef">false</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">hostPID</span>: <span style="color:#66d9ef">false</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">privileged</span>: <span style="color:#66d9ef">false</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">readOnlyRootFilesystem</span>: <span style="color:#66d9ef">false</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">requiredDropCapabilities</span>:
+</span></span><span style="display:flex;"><span>  - <span style="color:#ae81ff">ALL</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">runAsUser</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">rule</span>: <span style="color:#ae81ff">MustRunAsNonRoot</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">seLinux</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">rule</span>: <span style="color:#ae81ff">RunAsAny</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">supplementalGroups</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">ranges</span>:
+</span></span><span style="display:flex;"><span>    - <span style="color:#f92672">max</span>: <span style="color:#ae81ff">65535</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">min</span>: <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">rule</span>: <span style="color:#ae81ff">MustRunAs</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">volumes</span>:
+</span></span><span style="display:flex;"><span>  - <span style="color:#ae81ff">configMap</span>
+</span></span><span style="display:flex;"><span>  - <span style="color:#ae81ff">emptyDir</span>
+</span></span><span style="display:flex;"><span>  - <span style="color:#ae81ff">projected</span>
+</span></span><span style="display:flex;"><span>  - <span style="color:#ae81ff">secret</span>
+</span></span><span style="display:flex;"><span>  - <span style="color:#ae81ff">persistentVolumeClaim</span>
+</span></span><span style="display:flex;"><span>---
+</span></span><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">rbac.authorization.k8s.io/v1</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">kind</span>: <span style="color:#ae81ff">ClusterRole</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">metadata</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">labels</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">eks.amazonaws.com/component</span>: <span style="color:#ae81ff">pod-security-policy</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">kubernetes.io/cluster-service</span>: <span style="color:#e6db74">&#34;true&#34;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">restricted-psp-default</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">rules</span>:
+</span></span><span style="display:flex;"><span>- <span style="color:#f92672">apiGroups</span>:
+</span></span><span style="display:flex;"><span>  - <span style="color:#ae81ff">policy</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">resourceNames</span>:
+</span></span><span style="display:flex;"><span>  - <span style="color:#ae81ff">restricted-default</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">resources</span>:
+</span></span><span style="display:flex;"><span>  - <span style="color:#ae81ff">podsecuritypolicies</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">verbs</span>:
+</span></span><span style="display:flex;"><span>  - <span style="color:#ae81ff">use</span>
+</span></span><span style="display:flex;"><span>---
+</span></span><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">rbac.authorization.k8s.io/v1</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">kind</span>: <span style="color:#ae81ff">ClusterRoleBinding</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">metadata</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">labels</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">kubernetes.io/cluster-service</span>: <span style="color:#e6db74">&#34;true&#34;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">restricted-psp-default</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">roleRef</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">apiGroup</span>: <span style="color:#ae81ff">rbac.authorization.k8s.io</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">ClusterRole</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">restricted-psp-default</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">subjects</span>:
+</span></span><span style="display:flex;"><span>- <span style="color:#f92672">apiGroup</span>: <span style="color:#ae81ff">rbac.authorization.k8s.io</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Group</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">system:authenticated</span>
+</span></span></code></pre></div><h1 id="rolling-the-policy-changes-out">Rolling the policy changes out</h1>
 <p>Once we have written our policies and applied them to the cluster, they will not affect any of the currently running
 workloads unless any of the pods has been killed and hence restarted, etc.</p>
 <p>Hence, to &ldquo;switch over&rdquo; the current workloads to use the policies we created, we will need to do the following:</p>

@@ -38,11 +38,11 @@ a <code>.exe</code> file was being made to appear as <code>.doc</code> files. We
 This meant that I nedded to detect the presence of the <code>RLO</code> character in the filename.</p>
 <p>Then, I came across <a href="https://stackoverflow.com/questions/17684990/python-testing-for-utf-8-character-in-string">this</a> post, where I learned about <a href="https://www.w3.org/International/articles/inline-bidi-markup/uba-basics">unicode bidirectional class</a> and Python&rsquo;s <a href="https://docs.python.org/2/library/unicodedata.html#unicodedata.bidirectional">bidirectional()</a> method.</p>
 <p>The final solution for detection looked like this:</p>
-<pre><code>import unicodedata
+<pre tabindex="0"><code>import unicodedata
 ..
-filename = 'arbitrary_filename.doc'
-if 'RLO' in [unicodedata.bidirectional(c) for c in unicode(filename)]:
-    raise ValueError('Invalid character in one or more of the file names')
+filename = &#39;arbitrary_filename.doc&#39;
+if &#39;RLO&#39; in [unicodedata.bidirectional(c) for c in unicode(filename)]:
+    raise ValueError(&#39;Invalid character in one or more of the file names&#39;)
 ..
 </code></pre></article>
 <footer id="footer">

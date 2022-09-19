@@ -51,29 +51,29 @@ Since we are going to use <a href="https://golang.github.io/dep/">dep</a>, it ha
 <code>GOPATH</code>. In my case, I will assume it is in
 <code>$GOPATH/src/github.com/amitsaha/packaging-demo</code>. The first file,
 I will create is a <code>main.go</code> which looks like this:</p>
-<pre><code>package main
+<pre tabindex="0"><code>package main
 
 import (
-	log &quot;github.com/sirupsen/logrus&quot;
+	log &#34;github.com/sirupsen/logrus&#34;
 )
 
 func main() {
-	log.Info(&quot;I love logrus!&quot;)
+	log.Info(&#34;I love logrus!&#34;)
 }
 </code></pre><p>This is a simple program, but it uses a thirdy party package
 <a href="https://github.com/sirupsen/logrus">logrus</a> (which is awesome btw).</p>
 <p><strong>Workflow - Step #1</strong></p>
 <p>Now, we come to the first step of our workflow - create a file
 called <code>Makefile</code> with the following contents:</p>
-<pre><code>GOPATH := $(shell go env GOPATH)
+<pre tabindex="0"><code>GOPATH := $(shell go env GOPATH)
 GODEP_BIN := $(GOPATH)/bin/dep
 GOLINT := $(GOPATH)/bin/golint
 VERSION := $(shell cat VERSION)-$(shell git rev-parse --short HEAD)
 
-packages = $$(go list ./... | egrep -v '/vendor/')
-files = $$(find . -name '*.go' | egrep -v '/vendor/')
+packages = $$(go list ./... | egrep -v &#39;/vendor/&#39;)
+files = $$(find . -name &#39;*.go&#39; | egrep -v &#39;/vendor/&#39;)
 
-ifeq &quot;$(HOST_BUILD)&quot; &quot;yes&quot;
+ifeq &#34;$(HOST_BUILD)&#34; &#34;yes&#34;
 	# Use host system for building
 	BUILD_SCRIPT =./build-deb-host.sh
 else
@@ -93,7 +93,7 @@ Gopkg.toml: $(GODEP)
 
 vendor:         # Vendor the packages using dep
 vendor: $(GODEP) Gopkg.toml Gopkg.lock
-	@ echo &quot;No vendor dir found. Fetching dependencies now...&quot;
+	@ echo &#34;No vendor dir found. Fetching dependencies now...&#34;
 	GOPATH=$(GOPATH):. $(GODEP_BIN) ensure
 
 version:
@@ -102,12 +102,12 @@ version:
 build:          # Build the binary
 build: vendor
 	test $(BINARY_NAME)
-	go build -o $(BINARY_NAME) -ldflags &quot;-X main.Version=$(VERSION)&quot; 
+	go build -o $(BINARY_NAME) -ldflags &#34;-X main.Version=$(VERSION)&#34; 
 
 build-deb:      # Build DEB package (needs other tools)
 	test $(BINARY_NAME)
 	test $(DEB_PACKAGE_NAME)
-	test &quot;$(DEB_PACKAGE_DESCRIPTION)&quot;
+	test &#34;$(DEB_PACKAGE_DESCRIPTION)&#34;
 	exec ${BUILD_SCRIPT}
 	
 test: vendor
@@ -128,21 +128,21 @@ clean:
 	rm -f $(BINARY_NAME) 
 
 help:           # Show this help
-	@fgrep -h &quot;#&quot; $(MAKEFILE_LIST) | fgrep -v fgrep | sed -e 's/\\$$//' | sed -e 's/#//'
+	@fgrep -h &#34;#&#34; $(MAKEFILE_LIST) | fgrep -v fgrep | sed -e &#39;s/\\$$//&#39; | sed -e &#39;s/#//&#39;
 </code></pre><p><strong>Workflow - Step #2</strong></p>
 <p>Next, we will create a file called <code>VERSION</code> in the project
 directory and write a string such as <code>0.1</code> into it:</p>
-<pre><code>$ echo &quot;0.1&quot; &gt; VERSION
+<pre tabindex="0"><code>$ echo &#34;0.1&#34; &gt; VERSION
 </code></pre><p>This will be our major version.</p>
 <p><strong>Workflow - Step #3</strong></p>
 <p>Initialize a git repository in the application directory:</p>
-<pre><code>$ git init
+<pre tabindex="0"><code>$ git init
 </code></pre><p>And we will make a first commit:</p>
-<pre><code>$ git add -A .
-$ git commit -m &quot;Initial commit&quot;
+<pre tabindex="0"><code>$ git add -A .
+$ git commit -m &#34;Initial commit&#34;
 </code></pre><p><strong>Workflow - Step #4</strong></p>
 <p>Let&rsquo;s first try and see what our <code>Makefile</code> allows us to do:</p>
-<pre><code>$ make help
+<pre tabindex="0"><code>$ make help
 vendor:          Vendor the packages using dep
 build:           Build the binary
 build-deb:       Build DEB package (needs other tools)
@@ -150,7 +150,7 @@ vet:             Run go vet
 lint:            Run go lint
 help:            Show this help
 </code></pre><p>Let&rsquo;s now use the <code>build</code> target to build a binary of our application:</p>
-<pre><code>$ make build BINARY_NAME=demo
+<pre tabindex="0"><code>$ make build BINARY_NAME=demo
 /home/asaha/go/bin/dep init
   Using ^1.0.4 as constraint for direct dep github.com/sirupsen/logrus
   Locking in v1.0.4 (d682213) for direct dep github.com/sirupsen/logrus
@@ -159,9 +159,9 @@ help:            Show this help
 No vendor dir found. Fetching dependencies now...
 GOPATH=/home/asaha/go:. /home/asaha/go/bin/dep ensure
 test demo
-go build -o demo -ldflags &quot;-X main.Version=0.1-c3c6990&quot;
+go build -o demo -ldflags &#34;-X main.Version=0.1-c3c6990&#34;
 </code></pre><p>Let&rsquo;s now run the <code>demo</code> binary that was created for us:</p>
-<pre><code>$ ./demo
+<pre tabindex="0"><code>$ ./demo
 INFO[0000] I love logrus!
 </code></pre><p>Great! We have built a binary of our application and since it is
 a statically linked binary, we are ready to deploy it to our
@@ -177,24 +177,24 @@ following approaches:</p>
 <p>The second approach has the advantage that it will work the same
 anywhere once you have <code>docker</code> engine installed and running.</p>
 <p>If you don&rsquo;t care about using <code>docker</code>, create a file, <code>build-deb-host.sh</code> with the following contents and mark it as executable:</p>
-<pre><code>#!/bin/bash
+<pre tabindex="0"><code>#!/bin/bash
 set -xe
 
-BUILD_ARTIFACTS_DIR=&quot;artifacts&quot;
+BUILD_ARTIFACTS_DIR=&#34;artifacts&#34;
 version=`git rev-parse --short HEAD`
-VERSION_STRING=&quot;$(cat VERSION)-${version}&quot;
+VERSION_STRING=&#34;$(cat VERSION)-${version}&#34;
 
 
 # check all the required environment variables are supplied
-[ -z &quot;$BINARY_NAME&quot; ] &amp;&amp; echo &quot;Need to set BINARY_NAME&quot; &amp;&amp; exit 1;
-[ -z &quot;$DEB_PACKAGE_NAME&quot; ] &amp;&amp; echo &quot;Need to set DEB_PACKAGE_NAME&quot; &amp;&amp; exit 1;
-[ -z &quot;$DEB_PACKAGE_DESCRIPTION&quot; ] &amp;&amp; echo &quot;Need to set DEB_PACKAGE_DESCRIPTION&quot; &amp;&amp; exit 1;
+[ -z &#34;$BINARY_NAME&#34; ] &amp;&amp; echo &#34;Need to set BINARY_NAME&#34; &amp;&amp; exit 1;
+[ -z &#34;$DEB_PACKAGE_NAME&#34; ] &amp;&amp; echo &#34;Need to set DEB_PACKAGE_NAME&#34; &amp;&amp; exit 1;
+[ -z &#34;$DEB_PACKAGE_DESCRIPTION&#34; ] &amp;&amp; echo &#34;Need to set DEB_PACKAGE_DESCRIPTION&#34; &amp;&amp; exit 1;
 
 if which go; then
     make build BINARY_NAME=${BINARY_NAME}
-    echo &quot;Binary built. Building DEB now.&quot;
+    echo &#34;Binary built. Building DEB now.&#34;
 else
-    echo &quot;golang not installed or not reachable&quot;
+    echo &#34;golang not installed or not reachable&#34;
     exit 1
 fi
 
@@ -204,16 +204,16 @@ if which fpm; then
       --input-type dir --chdir /$BUILD_ARTIFACTS_DIR \
       --prefix /usr/bin --name $BINARY_NAME \
       --version $VERSION_STRING \
-      --description '${DEB_PACKAGE_DESCRIPTION}' \
+      --description &#39;${DEB_PACKAGE_DESCRIPTION}&#39; \
       -p ${DEB_PACKAGE_NAME}-${VERSION_STRING}.deb \
       $BINARY_NAME &amp;&amp; cp *.deb /$BUILD_ARTIFACTS_DIR/
     rm -f $BUILD_ARTIFACTS_DIR/$BINARY_NAME
 else
-    echo &quot;fpm not installed or not reachable&quot;
+    echo &#34;fpm not installed or not reachable&#34;
     exit 1
 fi
 </code></pre><p>Now, we can build a debian package as follows:</p>
-<pre><code>$ make build-deb DEB_PACKAGE_DESCRIPTION=&quot;Logrus Demo&quot; DEB_PACKAGE_NA
+<pre tabindex="0"><code>$ make build-deb DEB_PACKAGE_DESCRIPTION=&#34;Logrus Demo&#34; DEB_PACKAGE_NA
 ME=demo BINARY_NAME=demo HOST_BUILD=yes
 ...
 </code></pre><p>You will see the resulting debian package in <code>ARTIFCATS</code> sub-directory.</p>
@@ -222,7 +222,7 @@ want to worry about having to install golang toolchain or fpm
 manually, <code>docker</code> comes to the rescue. We will create the following
 additional files:</p>
 <p><code>Dockerfile-go</code>:</p>
-<pre><code>FROM golang:1.9
+<pre tabindex="0"><code>FROM golang:1.9
 RUN go get -u github.com/golang/dep/cmd/dep
 ENV PACKAGE_PATH $GOPATH/src/git.host/mypackage
 RUN mkdir -p  $PACKAGE_PATH
@@ -230,10 +230,10 @@ COPY . $PACKAGE_PATH
 WORKDIR $PACKAGE_PATH
 ARG version_string
 ARG binary_name
-RUN dep ensure &amp;&amp; go build -o $GOPATH/bin/${binary_name} -ldflags &quot;-X main.Version=${version_string}&quot; &amp;&amp; cp $GOPATH/bin/${binary_name} /${binary_name}
-ENTRYPOINT &quot;/${binary_name}&quot;
+RUN dep ensure &amp;&amp; go build -o $GOPATH/bin/${binary_name} -ldflags &#34;-X main.Version=${version_string}&#34; &amp;&amp; cp $GOPATH/bin/${binary_name} /${binary_name}
+ENTRYPOINT &#34;/${binary_name}&#34;
 </code></pre><p><code>Dockerfile-fpm</code>:</p>
-<pre><code>FROM ruby:2.3
+<pre tabindex="0"><code>FROM ruby:2.3
 RUN  gem install --quiet --no-document fpm
 
 ARG binary_name
@@ -249,16 +249,16 @@ RUN fpm --output-type deb \
   --input-type dir --chdir /deb-package \
   --prefix /usr/bin --name $binary_name \
   --version $version_string \
-  --description '${deb_package_description}' \
+  --description &#39;${deb_package_description}&#39; \
   -p ${deb_package_name}-${version_string}.deb \
   $binary_name &amp;&amp; cp *.deb /deb-package/
-CMD [&quot;/bin/bash&quot;]
+CMD [&#34;/bin/bash&#34;]
 </code></pre><p><code>build-deb-docker.sh</code>:</p>
-<pre><code>#!/bin/bash
+<pre tabindex="0"><code>#!/bin/bash
 set -xe
 
 if ! which docker; then
-    echo &quot;docker engine not installed&quot;
+    echo &#34;docker engine not installed&#34;
     exit 1
 fi
 # Check if we have docker running and accessible
@@ -266,18 +266,18 @@ fi
 # If not bail out with the default error message
 docker ps
 
-BUILD_IMAGE='amitsaha/golang-binary-builder'
-FPM_IMAGE='amitsaha/golang-deb-builder'
-BUILD_ARTIFACTS_DIR=&quot;artifacts&quot;
+BUILD_IMAGE=&#39;amitsaha/golang-binary-builder&#39;
+FPM_IMAGE=&#39;amitsaha/golang-deb-builder&#39;
+BUILD_ARTIFACTS_DIR=&#34;artifacts&#34;
 
 version=`git rev-parse --short HEAD`
-VERSION_STRING=&quot;$(cat VERSION)-${version}&quot;
+VERSION_STRING=&#34;$(cat VERSION)-${version}&#34;
 
 
 # check all the required environment variables are supplied
-[ -z &quot;$BINARY_NAME&quot; ] &amp;&amp; echo &quot;Need to set BINARY_NAME&quot; &amp;&amp; exit 1;
-[ -z &quot;$DEB_PACKAGE_NAME&quot; ] &amp;&amp; echo &quot;Need to set DEB_PACKAGE_NAME&quot; &amp;&amp; exit 1;
-[ -z &quot;$DEB_PACKAGE_DESCRIPTION&quot; ] &amp;&amp; echo &quot;Need to set DEB_PACKAGE_DESCRIPTION&quot; &amp;&amp; exit 1;
+[ -z &#34;$BINARY_NAME&#34; ] &amp;&amp; echo &#34;Need to set BINARY_NAME&#34; &amp;&amp; exit 1;
+[ -z &#34;$DEB_PACKAGE_NAME&#34; ] &amp;&amp; echo &#34;Need to set DEB_PACKAGE_NAME&#34; &amp;&amp; exit 1;
+[ -z &#34;$DEB_PACKAGE_DESCRIPTION&#34; ] &amp;&amp; echo &#34;Need to set DEB_PACKAGE_DESCRIPTION&#34; &amp;&amp; exit 1;
 
 
 docker build --build-arg \
@@ -290,7 +290,7 @@ docker cp $containerID:/${BINARY_NAME} .
 sleep 1
 docker rm $containerID
 
-echo &quot;Binary built. Building DEB now.&quot;
+echo &#34;Binary built. Building DEB now.&#34;
 
 docker build --build-arg \
     version_string=$VERSION_STRING \
@@ -299,7 +299,7 @@ docker build --build-arg \
     --build-arg \
     deb_package_name=$DEB_PACKAGE_NAME  \
     --build-arg \
-    deb_package_description=&quot;$DEB_PACKAGE_DESCRIPTION&quot; \
+    deb_package_description=&#34;$DEB_PACKAGE_DESCRIPTION&#34; \
     -t $FPM_IMAGE -f Dockerfile-fpm .
 containerID=$(docker run -dt $FPM_IMAGE)
 # docker cp does not support wildcard:
@@ -310,7 +310,7 @@ sleep 1
 docker rm -f $containerID
 rm $BINARY_NAME
 </code></pre><p>We can build the debian package with:</p>
-<pre><code>$ make build-deb DEB_PACKAGE_DESCRIPTION=&quot;Logrus Demo&quot; DEB_PACKAGE_NA
+<pre tabindex="0"><code>$ make build-deb DEB_PACKAGE_DESCRIPTION=&#34;Logrus Demo&#34; DEB_PACKAGE_NA
 ME=demo BINARY_NAME=demo
 ...
 </code></pre><p>The resulting debian package will be in the <code>artifacts/</code>
@@ -326,7 +326,7 @@ management tool you are migrating from.</p>
 <h1 id="example-project">Example project</h1>
 <p>An example project with the above files is at
 <a href="https://github.com/amitsaha/golang-packaging-demo">golang-packaging-demo</a>. The files in the project are:</p>
-<pre><code>16:55 $ tree -L 1
+<pre tabindex="0"><code>16:55 $ tree -L 1
 .
 ├── build-deb-docker.sh
 ├── build-deb-host.sh

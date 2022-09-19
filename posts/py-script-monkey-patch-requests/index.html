@@ -52,38 +52,38 @@ Pyodide Gitter channel was to monkey patch the relevant code
 to use the <a href="https://pyodide.org/en/stable/usage/api/python-api.html?highlight=open_url#pyodide.open_url">pyodide.open_url()</a>
 function.</p>
 <p>First, I  implement a just enough <code>MyResponse</code> class to encapsulate the response:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">MyResponse</span>:
-    <span style="color:#66d9ef">def</span> __init__(self, status_code, message, json_body):
-        self<span style="color:#f92672">.</span>status_code <span style="color:#f92672">=</span> status_code
-        self<span style="color:#f92672">.</span>text <span style="color:#f92672">=</span> message
-        self<span style="color:#f92672">.</span>json_body <span style="color:#f92672">=</span> json_body
-
-    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">json</span>(self):
-       <span style="color:#66d9ef">return</span> self<span style="color:#f92672">.</span>json_body
-</code></pre></div><p>The class contains just enough attributes and functions needed by <code>pyowm</code> and specifically,
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">MyResponse</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> __init__(self, status_code, message, json_body):
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>status_code <span style="color:#f92672">=</span> status_code
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>text <span style="color:#f92672">=</span> message
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>json_body <span style="color:#f92672">=</span> json_body
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">json</span>(self):
+</span></span><span style="display:flex;"><span>       <span style="color:#66d9ef">return</span> self<span style="color:#f92672">.</span>json_body
+</span></span></code></pre></div><p>The class contains just enough attributes and functions needed by <code>pyowm</code> and specifically,
 the functionality I am using.</p>
 <p>Then, I create a <code>JustEnoughRequests</code> class to implement a <code>get()</code> method which will call the
 <code>pyodide.open_url()</code> function referred to earlier, essentially, intercepting the call to the
 <code>requests.get()</code> function and instead using the <code>pyodide.open_url()</code> function to make the
 HTTP GET call:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">JustEnoughRequests</span>:
-    <span style="color:#66d9ef">def</span> __init__(self):
-        <span style="color:#66d9ef">pass</span>
-
-    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">get</span>(self, uri, <span style="color:#f92672">**</span>kwargs):
-        <span style="color:#66d9ef">print</span>(<span style="color:#e6db74">&#34;Sending request to:&#34;</span>, uri)
-        <span style="color:#66d9ef">print</span>(<span style="color:#e6db74">&#34;Got kwargs, igoring everyting other than params&#34;</span>, kwargs)
-        query_params <span style="color:#f92672">=</span> []
-        <span style="color:#66d9ef">for</span> k, v <span style="color:#f92672">in</span> kwargs[<span style="color:#e6db74">&#34;params&#34;</span>]<span style="color:#f92672">.</span>items():
-            query_params<span style="color:#f92672">.</span>append(k <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;=&#34;</span> <span style="color:#f92672">+</span> v) 
-        query_string <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&amp;&#34;</span><span style="color:#f92672">.</span>join(query_params)
-        response <span style="color:#f92672">=</span> pyodide<span style="color:#f92672">.</span>open_url(uri <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;?&#34;</span> <span style="color:#f92672">+</span> query_string)
-        json_response <span style="color:#f92672">=</span> response<span style="color:#f92672">.</span>getvalue()
-        d <span style="color:#f92672">=</span> json<span style="color:#f92672">.</span>loads(json_response)
-        <span style="color:#66d9ef">return</span> MyResponse(int(d[<span style="color:#e6db74">&#34;cod&#34;</span>]), d[<span style="color:#e6db74">&#34;message&#34;</span>], json<span style="color:#f92672">.</span>loads(json_response))
- 
-just_enough_requests <span style="color:#f92672">=</span> JustEnoughRequests()
-</code></pre></div><p>As you can see in the implementation of the <code>get()</code> method, it accepts one positional argument
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">JustEnoughRequests</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> __init__(self):
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">pass</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">get</span>(self, uri, <span style="color:#f92672">**</span>kwargs):
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#34;Sending request to:&#34;</span>, uri)
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#34;Got kwargs, igoring everyting other than params&#34;</span>, kwargs)
+</span></span><span style="display:flex;"><span>        query_params <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> k, v <span style="color:#f92672">in</span> kwargs[<span style="color:#e6db74">&#34;params&#34;</span>]<span style="color:#f92672">.</span>items():
+</span></span><span style="display:flex;"><span>            query_params<span style="color:#f92672">.</span>append(k <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;=&#34;</span> <span style="color:#f92672">+</span> v) 
+</span></span><span style="display:flex;"><span>        query_string <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&amp;&#34;</span><span style="color:#f92672">.</span>join(query_params)
+</span></span><span style="display:flex;"><span>        response <span style="color:#f92672">=</span> pyodide<span style="color:#f92672">.</span>open_url(uri <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;?&#34;</span> <span style="color:#f92672">+</span> query_string)
+</span></span><span style="display:flex;"><span>        json_response <span style="color:#f92672">=</span> response<span style="color:#f92672">.</span>getvalue()
+</span></span><span style="display:flex;"><span>        d <span style="color:#f92672">=</span> json<span style="color:#f92672">.</span>loads(json_response)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> MyResponse(int(d[<span style="color:#e6db74">&#34;cod&#34;</span>]), d[<span style="color:#e6db74">&#34;message&#34;</span>], json<span style="color:#f92672">.</span>loads(json_response))
+</span></span><span style="display:flex;"><span> 
+</span></span><span style="display:flex;"><span>just_enough_requests <span style="color:#f92672">=</span> JustEnoughRequests()
+</span></span></code></pre></div><p>As you can see in the implementation of the <code>get()</code> method, it accepts one positional argument
 and one or more keyword arguments. From the keyword arguments it is called with, it ignores all,
 but the <code>params</code> keyword argument from which it constructs the query parameters, appends
 them to the <code>uri</code> (the target HTTP request host and path) and then invokes the <code>pyodide.open_url()</code>
@@ -95,12 +95,12 @@ and return it.</p>
 <p>Then, we create an object of type, <code>JustEnoughRequests</code> which will be what we replace the
 <code>requests</code> module with.</p>
 <p>The patching is done as follows:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">with</span> mock<span style="color:#f92672">.</span>patch(<span style="color:#e6db74">&#39;pyowm.commons.http_client.requests&#39;</span>, just_enough_requests):
-    <span style="color:#75715e"># Get a token from https://home.openweathermap.org/users/sign_up</span>
-    owm <span style="color:#f92672">=</span> OWM(<span style="color:#e6db74">&#39;your token&#39;</span>)
-    mgr <span style="color:#f92672">=</span> owm<span style="color:#f92672">.</span>weather_manager()
-    three_h_forecast <span style="color:#f92672">=</span> mgr<span style="color:#f92672">.</span>forecast_at_place(<span style="color:#e6db74">&#39;new york, us&#39;</span>, <span style="color:#e6db74">&#39;3h&#39;</span>)<span style="color:#f92672">.</span>forecast
-</code></pre></div><p>And that&rsquo;s it. Here&rsquo;s a complete <a href="https://raw.githubusercontent.com/doingmathwithpython/code/master/explorations/PyScript/chap2/nyc_forecast_owm.html">HTML file</a> which you can download. You will need an API key from open weather map. Once you have replaced
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">with</span> mock<span style="color:#f92672">.</span>patch(<span style="color:#e6db74">&#39;pyowm.commons.http_client.requests&#39;</span>, just_enough_requests):
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Get a token from https://home.openweathermap.org/users/sign_up</span>
+</span></span><span style="display:flex;"><span>    owm <span style="color:#f92672">=</span> OWM(<span style="color:#e6db74">&#39;your token&#39;</span>)
+</span></span><span style="display:flex;"><span>    mgr <span style="color:#f92672">=</span> owm<span style="color:#f92672">.</span>weather_manager()
+</span></span><span style="display:flex;"><span>    three_h_forecast <span style="color:#f92672">=</span> mgr<span style="color:#f92672">.</span>forecast_at_place(<span style="color:#e6db74">&#39;new york, us&#39;</span>, <span style="color:#e6db74">&#39;3h&#39;</span>)<span style="color:#f92672">.</span>forecast
+</span></span></code></pre></div><p>And that&rsquo;s it. Here&rsquo;s a complete <a href="https://raw.githubusercontent.com/doingmathwithpython/code/master/explorations/PyScript/chap2/nyc_forecast_owm.html">HTML file</a> which you can download. You will need an API key from open weather map. Once you have replaced
 the token in code, and open in your browser, you should see a graph.</p>
 <p><img src="/img/py_script_owm.png" alt="Graph of the forecast temperature" title="Graph of the forecast temperature"></p>
 <p>If nothing seems to happen, open the Console to look for any error logs.</p>

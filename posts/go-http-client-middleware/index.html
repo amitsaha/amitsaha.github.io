@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="echo $RANDOM. Exploring Software and writing about it.">
+    
+    <link rel="shortcut icon" href="https://echorand.me/favicon.ico">
+    
+    <link rel="stylesheet" href="/css/style.min.css">
+
+    <title>Writing HTTP client middleware in Go</title>
+</head>
+<body><header id="banner">
+    <h2><a href="https://echorand.me">Exploring Software</a></h2>
+    <nav>
+        <ul>
+            <li>
+                <a href="/about" title="">About</a>
+            </li><li>
+                <a href="/posts" title="">Posts</a>
+            </li><li>
+                <a href="/talks" title="">Talks</a>
+            </li><li>
+                <a href="/writings-trainings" title="">Writings and Trainings</a>
+            </li><li>
+                <a href="/categories" title="">Categories</a>
+            </li><li>
+                <a href="/index.xml" title="">Subscribe (RSS)</a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main id="content">
+<article>
+    <header id="post-header">
+        <h1>Writing HTTP client middleware in Go</h1><time>September 19, 2022</time></header><p>In this post, I am going to share what I have learned about writing HTTP client middleware
+in Go. Let&rsquo;s get started!</p>
+<ul>
+<li><a href="#http-client-and-transport">HTTP client and Transport</a></li>
+<li><a href="#writing-your-own-roundtripper-implementation">Writing your own RoundTripper implementation</a>
+<ul>
+<li><a href="#returning-static-responses">Returning static responses</a></li>
+</ul>
+</li>
+<li><a href="#summary">Summary</a></li>
+</ul>
+<h2 id="http-client-and-transport">HTTP client and Transport</h2>
+<p>Go&rsquo;s <a href="https://pkg.go.dev/net/http#Client">http.Client</a> defines a default value
+for the <code>Transport</code> field when one is not specified:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">Client</span> <span style="color:#66d9ef">struct</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Transport specifies the mechanism by which individual
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#75715e">// HTTP requests are made.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#75715e">// If nil, DefaultTransport is used.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#a6e22e">Transport</span> <span style="color:#a6e22e">RoundTripper</span>
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// other fields
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>}
+</span></span></code></pre></div><p>Graphically, the role and position of <code>http.DefaultTransport</code> can be shown as follows:</p>
+<p><img src="/img/go_http_client_transport_1.png" alt="http.Client by default uses http.DefaultTransport" title="http.DefaultTransport is the default RoundTripper implementation"></p>
+<p>The job of <code>DefaultTransport</code> is to send a HTTP request from your computer to the network server,
+over the network, over TCP.</p>
+<p>Now, as we can see above, <code>DefaultTransport</code> is of type <code>http.RoundTripper</code>, which
+is an interface defined as follows:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">RoundTripper</span> <span style="color:#66d9ef">interface</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">RoundTrip</span>(<span style="color:#f92672">*</span><span style="color:#a6e22e">Request</span>) (<span style="color:#f92672">*</span><span style="color:#a6e22e">Response</span>, <span style="color:#66d9ef">error</span>)
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Now, as with any other interface, we can write our own type which implements
+the <code>RoundTripper</code> interface and use that as the <code>Transport</code> for a HTTP client.
+That is the key to writing client side HTTP middleware.</p>
+<p>Let&rsquo;s see a first example.</p>
+<h2 id="writing-your-own-roundtripper-implementation">Writing your own RoundTripper implementation</h2>
+<p>Our first RoundTripper implementation will forward all requests to the <code>DefaultTransport</code>&rsquo;s <code>RoundTrip()</code>
+method.</p>
+<p><img src="/img/go_http_client_transport_2_middleware.png" alt="Custom RoundTripper implementation calling http.DefaultTransport.RoundTrip()" title="Custom RoundTripper calling http.DefaultTransport.RoundTripper() to forward the request to the server"></p>
+<p>First, define a struct, let&rsquo;s call it, <code>demoRoundTripper</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">demoRoundTripper</span> <span style="color:#66d9ef">struct</span>{}
+</span></span></code></pre></div><p>Then, define a <code>RoundTrip()</code> method on the struct with the following properties:</p>
+<ul>
+<li>It must have a pointer receiver, i.e. <code>*demoRoundTripper</code></li>
+<li>It must accept one argument of type, <code>*http.Request</code> - the outgoing HTTP request</li>
+<li>It must return two values of types, <code>*http.Response</code> and <code>error</code> respectively</li>
+</ul>
+<p>The function body will simply call <code>http.DefaultTransport.RoundTrip()</code> with
+the <code>*http.Request</code> value received and return the <code>*http.Response</code> and <code>error</code>
+values returned.</p>
+<p>The method definition will look as follows:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">t</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">demoRoundTripper</span>) <span style="color:#a6e22e">RoundTrip</span>(<span style="color:#a6e22e">r</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">Request</span>) (<span style="color:#f92672">*</span><span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">Response</span>, <span style="color:#66d9ef">error</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">DefaultTransport</span>.<span style="color:#a6e22e">RoundTrip</span>(<span style="color:#a6e22e">r</span>)
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Once you have defined the <code>demoRoundTripper</code> struct and a <code>RoundTrip()</code> method, you have
+a <code>http.RoundTripper</code> implementation.</p>
+<p>To configure a HTTP client to use the above RoundTripper implementation, all we need to do is
+to set the <code>Transport</code> field as follows:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#a6e22e">client</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">Client</span>{
+</span></span><span style="display:flex;"><span>       <span style="color:#a6e22e">Transport</span>: <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">demoRoundTripper</span>{},
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">resp</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">client</span>.<span style="color:#a6e22e">Get</span>(<span style="color:#e6db74">&#34;https://example.com&#34;</span>)
+</span></span></code></pre></div><p>There is absolutely no useful purpose of writing a middleware like the above. However, what is
+useful though is a <code>RoundTrip()</code> implementation which executes other code before and
+after calling <code>http.DefaultTransport.RoundTrip()</code>.</p>
+<p>This is the pattern followed by middleware that implements logging and metrics, adds common headers or
+implements caching. I cover examples of using this pattern of writing middleware in my book,
+<a href="https://practicalgobook.net">Practical Go</a> - for example, <a href="https://github.com/practicalgo/code/tree/master/chap4/logging-middleware">middleware to add logging</a>
+and a <a href="https://github.com/practicalgo/code/tree/master/chap4/header-middleware">middleware</a> that adds
+headers to outgoing requests. This <a href="https://lanre.wtf/blog/2017/07/24/roundtripper-go/">blog post</a> illustrates how you
+can implement client-side caching.</p>
+<p>Next, we will write a roundtripper implementation to return previously configured responses
+and not call the remote server at all.</p>
+<h3 id="returning-static-responses">Returning static responses</h3>
+<p>This pattern of writing middleware is useful for writing <em>stub</em> or <em>mock</em> implementation
+of remote servers. One situation in which this is extremely useful is in writing tests
+for your application where you don&rsquo;t want to interact with remote network servers.</p>
+<p>When you invoke the client&rsquo;s <code>GET</code> (or any other) method, the following steps occur in such a mdidleware:</p>
+<ol>
+<li>The <code>RoundTrip()</code> method of the custom roundtripper implementation is invoked.</li>
+<li>This method doesn&rsquo;t call <code>http.DefaultTransport.RoundTrip()</code>. Hence, the remote request never
+gets the request.</li>
+<li>Instead, it creates and returns a <code>*http.Response</code> value itself, with a <code>nil</code> error value
+<ul>
+<li>If the roundtripper wants to abort the request,  it can return a <code>nil</code> <code>*http.Response</code> value
+and non-nil error value.</li>
+</ul>
+</li>
+</ol>
+<p>Graphically, it works as follows:</p>
+<p><img src="/img/go_http_client_transport_3_middleware.png" alt="Custom RoundTripper implementation returning static responses" title="Custom RoundTripper implementation returning static responses"></p>
+<p>Let&rsquo;s see an example of such a roundtripper implementation.</p>
+<p>We define a <code>demoRoundTripper</code> struct and a <code>RoundTrip()</code> method on it as earlier:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">demoRoundTripper</span> <span style="color:#66d9ef">struct</span>{}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">t</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">demoRoundTripper</span>) <span style="color:#a6e22e">RoundTrip</span>(<span style="color:#a6e22e">r</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">Request</span>) (<span style="color:#f92672">*</span><span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">Response</span>, <span style="color:#66d9ef">error</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// roundtripper logic goes here
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>}
+</span></span></code></pre></div><p>Inside the <code>RoundTrip()</code> method, based on the <em>outgoing</em> request&rsquo;s URL, we
+can choose to either return a static response or call the <code>http.DefaultTransport.RoundTrip()</code>
+method, as follows:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span>        <span style="color:#66d9ef">switch</span> <span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">URL</span>.<span style="color:#a6e22e">String</span>() {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#34;https://github.com&#34;</span>:
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">responseBody</span> <span style="color:#f92672">:=</span> <span style="color:#e6db74">&#34;This is github.com stub&#34;</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">respReader</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">io</span>.<span style="color:#a6e22e">NopCloser</span>(<span style="color:#a6e22e">strings</span>.<span style="color:#a6e22e">NewReader</span>(<span style="color:#a6e22e">responseBody</span>))
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">resp</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">Response</span>{
+</span></span><span style="display:flex;"><span>                        <span style="color:#a6e22e">StatusCode</span>:    <span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">StatusOK</span>,
+</span></span><span style="display:flex;"><span>                        <span style="color:#a6e22e">Body</span>:          <span style="color:#a6e22e">respReader</span>,
+</span></span><span style="display:flex;"><span>                        <span style="color:#a6e22e">ContentLength</span>: int64(len(<span style="color:#a6e22e">responseBody</span>)),
+</span></span><span style="display:flex;"><span>                        <span style="color:#a6e22e">Header</span>: <span style="color:#66d9ef">map</span>[<span style="color:#66d9ef">string</span>][]<span style="color:#66d9ef">string</span>{
+</span></span><span style="display:flex;"><span>                                <span style="color:#e6db74">&#34;Content-Type&#34;</span>: {<span style="color:#e6db74">&#34;text/plain&#34;</span>},
+</span></span><span style="display:flex;"><span>                        },
+</span></span><span style="display:flex;"><span>                }
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">return</span> <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">resp</span>, <span style="color:#66d9ef">nil</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#34;https://example.com&#34;</span>:
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">DefaultTransport</span>.<span style="color:#a6e22e">RoundTrip</span>(<span style="color:#a6e22e">r</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">default</span>:
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">nil</span>, <span style="color:#a6e22e">errors</span>.<span style="color:#a6e22e">New</span>(<span style="color:#e6db74">&#34;Request URL not supported by stub&#34;</span>)
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>The above roundtripper implementation will exhibit the following behavior:</p>
+<ul>
+<li>For an outgoing request to <code>https://github.com</code>, a static response will be sent:
+<ul>
+<li>Response body: &ldquo;This is github.com stub&rdquo;</li>
+<li>Response headers: <code>Content-Type: text/plain</code></li>
+<li>Response status code: <code>http.StatusOK</code></li>
+</ul>
+</li>
+<li>For an outgoing request to <code>https://example.com</code>, the request will be forwarded
+to <code>https://example.com</code> and the response and error value received from the
+<code>http.DefaultTransport.RoundTrip()</code> method will be returned as-is</li>
+<li>For any other request, an error will be returned</li>
+</ul>
+<p>When we configure a HTTP client with the above roundtripper implementation and
+send HTTP GET request to <code>https://github.com</code>, you will get the statically
+configured response as follows:</p>
+<pre tabindex="0"><code>2022/09/20 06:24:03 Sending GET request to: https://github.com
+2022/09/20 06:24:03 This is github.com stub
+</code></pre><p>If we send a HTTP GET request for <code>https://example.com</code>, you will see the response
+that <code>example.com</code> will send back:</p>
+<pre tabindex="0"><code>2022/09/20 06:24:03 Sending GET request to: https://example.com
+2022/09/20 06:24:04 &lt;!doctype html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;title&gt;Example Domain&lt;/title&gt;
+...
+
+&lt;/head&gt;
+
+&lt;body&gt;
+&lt;div&gt;
+    &lt;h1&gt;Example Domain&lt;/h1&gt;
+    &lt;p&gt;This domain is for use in illustrative examples in documents. You may use this
+    domain in literature without prior coordination or asking for permission.&lt;/p&gt;
+    &lt;p&gt;&lt;a href=&#34;https://www.iana.org/domains/example&#34;&gt;More information...&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre><p>If we send a HTTP GET request for any other URL, you will get an error:</p>
+<pre tabindex="0"><code>2022/09/20 06:24:03 Sending GET request to: https://github.com/api
+2022/09/20 06:24:03 Get &#34;https://github.com/api&#34;: Request URL not supported by stub
+</code></pre><p>You can find a runnable example <a href="https://github.com/amitsaha/learning/tree/master/blog-posts-code/go-http-client-middleware/roundtripper_stub_demo">here</a>.</p>
+<p>As you completely control what happens to the outgoing request, your roundtripper implementation
+can implement logic based on the request type - such as GET or POST, send redirect responses back,
+drop requests completely to simulate failure scenarios and such. Now of course, we don&rsquo;t want
+to make our <em>stub</em> too complicated, but it should be <em>just enough</em> for our current requirements.</p>
+<p>It&rsquo;s also worth pointing out that you should make sure you refer to the documentation of
+<code>RoundTripper</code> interface as to what you should or should not do in your implementation:</p>
+<pre tabindex="0"><code>// copied from:https://pkg.go.dev/net/http#RoundTripper
+
+// RoundTrip should not attempt to interpret the response. In
+// particular, RoundTrip must return err == nil if it obtained
+// a response, regardless of the response&#39;s HTTP status code.
+
+// RoundTrip should not attempt to
+// handle higher-level protocol details such as redirects,
+// authentication, or cookies.
+//
+// RoundTrip should not modify the request, except for
+// consuming and closing the Request&#39;s Body. RoundTrip may
+// read fields of the request in a separate goroutine. Callers
+// should not mutate or reuse the request until the Response&#39;s
+// Body has been closed.
+//
+// RoundTrip must always close the body, including on errors,
+// but depending on the implementation may do so in a separate
+// goroutine even after RoundTrip returns. This means that
+// callers wanting to reuse the body for subsequent requests
+// must arrange to wait for the Close call before doing so.
+//
+</code></pre><h2 id="summary">Summary</h2>
+<p>In this post, we saw how we can write HTTP client middleware in Go. We started off writing the
+simplest HTTP client middleware by forwarding the request to the remote server and then focused
+on writing middleware that can be used to implement <em>stubs</em> for remote network services.</p>
+<p>Hope you found the post useful and I will end this post with references to the key standard library
+documentation:</p>
+<ul>
+<li><a href="https://pkg.go.dev/net/http#Client">http.Client</a></li>
+<li><a href="https://pkg.go.dev/net/http#RoundTripper">http.RoundTripper and http.DefaultTransport</a></li>
+<li><a href="https://pkg.go.dev/net/http#Request">http.Request</a></li>
+<li><a href="https://pkg.go.dev/net/http#Response">http.Response</a></li>
+</ul>
+</article>
+<footer id="footer">
+    Post managed in a <a href="https://github.com/amitsaha/echorand.me">git repo</a> | <a href="https://github.com/amitsaha/echorand.me/commit/d9267026f0a2b8cc1d7433684c614913c3a6fcaa">Last Commit on this post </a>
+  | <a href="https://github.com/amitsaha/echorand.me/edit/master/content/posts/go-http-client-middleware.md">Edit post</a>
+    <p>
+    Blog managed via <a href="https://gohugo.io/">Hugo</a> and using a modified version of the <a href="https://themes.gohugo.io/etch/">Etch</a> theme.
+    </p>  
+</footer>
+
+        </main><footer id="footer">
+    
+</footer>
+</body>
+</html>

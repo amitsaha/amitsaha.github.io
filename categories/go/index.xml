@@ -6,9 +6,22 @@
     <description>Recent content in go on Exploring Software</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 21 Nov 2021 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 19 Sep 2022 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://echorand.me/categories/go/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    
+    <item>
+      <title>Writing HTTP client middleware in Go</title>
+      <link>https://echorand.me/posts/go-http-client-middleware/</link>
+      <pubDate>Mon, 19 Sep 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/go-http-client-middleware/</guid>
+      <description>In this post, I am going to share what I have learned about writing HTTP client middleware in Go. Let&amp;rsquo;s get started!
+HTTP client and Transport Writing your own RoundTripper implementation Returning static responses Summary HTTP client and Transport Go&amp;rsquo;s http.Client defines a default value for the Transport field when one is not specified:
+type Client struct { // Transport specifies the mechanism by which individual // HTTP requests are made.</description>
+    </item>
     
     
     
@@ -112,7 +125,7 @@ import ( &amp;#34;bufio&amp;#34; &amp;#34;fmt&amp;#34; &amp;#34;os&amp;#34; &amp
       <guid>https://echorand.me/posts/serialize-deserialize/</guid>
       <description>I always get confused between &amp;ldquo;serialization&amp;rdquo; and &amp;ldquo;deserialization&amp;rdquo;. Perhaps, that is because I am trying to memorize what they are, and then trying to recall from memory. Of course, it&amp;rsquo;s sufficient to remember only one of them correctly.
 So, here&amp;rsquo;s my trick that I am going to use from now on. It is derived from this Wikipedia article on the subject, in the Drawbacks section:
- Serialization breaks the opacity of an abstract data type by potentially exposing private implementation details.</description>
+Serialization breaks the opacity of an abstract data type by potentially exposing private implementation details.</description>
     </item>
     
     
@@ -174,7 +187,7 @@ func myFunc() (int, error) { return 1, errors.New(&amp;#34;An error&amp;#34;) } 
       <guid>https://echorand.me/posts/go-module-check-path/</guid>
       <description>The Go module path enforces certain restrictions as expected on what constitutes a valid path. Try running go mod init https://foo.bar/baz for example.
 Now, what if you as a Go programmer needed to run this check yourself? That&amp;rsquo;s where the golang.org/x/mod/ package comes in. It has a number of functions, one of them being the CheckPath function, which you can use as follows:
-// Using Go 1.16 package main import ( &amp;quot;fmt&amp;quot; &amp;quot;golang.</description>
+// Using Go 1.16 package main import ( &amp;#34;fmt&amp;#34; &amp;#34;golang.</description>
     </item>
     
     
@@ -256,7 +269,7 @@ You can find the article here with the accompanying code repository here.</descr
       
       <guid>https://echorand.me/posts/kubernetes-pod-security-policies/</guid>
       <description>Welcome to this new blog post!
- Introduction Enforcing policies Using kustomize to manage policies Rolling the policy changes out Multiple matching policies Conclusion  Introduction Pod security policies are cluster level resources. The Google cloud docs has some basic human friendly docs. A psp is a way to enforce certain policies that pod needs to comply with before it&amp;rsquo;s allowed to be scheduled to be run on the cluster - create or an update operation (perhaps a restart of the pod?</description>
+Introduction Enforcing policies Using kustomize to manage policies Rolling the policy changes out Multiple matching policies Conclusion Introduction Pod security policies are cluster level resources. The Google cloud docs has some basic human friendly docs. A psp is a way to enforce certain policies that pod needs to comply with before it&amp;rsquo;s allowed to be scheduled to be run on the cluster - create or an update operation (perhaps a restart of the pod?</description>
     </item>
     
     
@@ -316,7 +329,7 @@ Installation and setup Cloud Custodian is a Python 3 application, so you will ne
       
       <guid>https://echorand.me/posts/kubernetes-manifest-management/</guid>
       <description>Introduction There are two broad discussion points in this post:
- Managing the lifecycle of Kubernetes YAML manifests Static guarantees/best practices enforcements around Kubernetes YAML files before they are applied to a cluster  Prior art and background Please read this article to get a more holistic view of this space. What follows is my summary of what I think is the state at this stage and how it fits in with my two gols above.</description>
+Managing the lifecycle of Kubernetes YAML manifests Static guarantees/best practices enforcements around Kubernetes YAML files before they are applied to a cluster Prior art and background Please read this article to get a more holistic view of this space. What follows is my summary of what I think is the state at this stage and how it fits in with my two gols above.</description>
     </item>
     
     
@@ -388,7 +401,7 @@ I shared my experience and some examples in a talk at the combined Go/Women who 
       <guid>https://echorand.me/posts/go-notes/</guid>
       <description>Repeating the same argument to Printf If we wanted to repeat the same argument to a call to fmt.Printf(), we can make use of &amp;ldquo;indexed&amp;rdquo; arguments. That is, instead of writing fmt.Printf(&amp;quot;%s %s&amp;quot;, &amp;quot;Hello&amp;quot;, &amp;quot;Hello&amp;quot;), we can write fmt.Printf(&amp;quot;%[1]s %[1]s&amp;quot;, &amp;quot;Hello&amp;quot;). Learn about it in the docs.
 Multi-line strings Things are hassle free on the multi-line strings front:
-package main import ( &amp;quot;fmt&amp;quot; ) func main() { s := `Multi line strings are easy.</description>
+package main import ( &amp;#34;fmt&amp;#34; ) func main() { s := `Multi line strings are easy.</description>
     </item>
     
     
@@ -414,8 +427,8 @@ Terraform configuration for master This is based on the tutorial from the Terraf
       
       <guid>https://echorand.me/posts/nginx-non-www-www-redirect/</guid>
       <description>Introduction I wanted a Nginx configuration which would satisfy the following requirements:
- Any example.com requests should be redirected to www.example.com The above should happen for http and https http://example.com should redirect directly to https://www.example.com  Solution We will need four server blocks:
- http - example.com (listen on 80) http - www.example.com (listen on 80) https - example.com (listen on 443) https - www.example.com (listen on 443)  I obviously went through a bit of hit and trial, but my main issue was around how I would setup (3) correctly.</description>
+Any example.com requests should be redirected to www.example.com The above should happen for http and https http://example.com should redirect directly to https://www.example.com Solution We will need four server blocks:
+http - example.com (listen on 80) http - www.example.com (listen on 80) https - example.com (listen on 443) https - www.example.com (listen on 443) I obviously went through a bit of hit and trial, but my main issue was around how I would setup (3) correctly.</description>
     </item>
     
     
@@ -427,7 +440,7 @@ Terraform configuration for master This is based on the tutorial from the Terraf
       
       <guid>https://echorand.me/posts/linux_shell_autocompletion/</guid>
       <description>Welcome to this new blog post!
- Introduction Setting up DIY bash completion Data provided to completion handlers Single &amp;lt;TAB&amp;gt; and double &amp;lt;TAB&amp;gt;&amp;lt;TAB&amp;gt; Getting good old BASH completion back Magic of bash-completion package compgen built-in command Learning more Bash completion for applications  cobra (Golang), click (Python) and clap (Rust) complete (Golang) and shell_completion (Rust)   Conclusion  Introduction What happens when you press &amp;lt;command&amp;gt; &amp;lt;TAB&amp;gt; or &amp;lt;command&amp;gt; &amp;lt;TAB&amp;gt;&amp;lt;TAB&amp;gt;? You get a bunch of suggestions with one of them just the one you had in mind you were going to type.</description>
+Introduction Setting up DIY bash completion Data provided to completion handlers Single &amp;lt;TAB&amp;gt; and double &amp;lt;TAB&amp;gt;&amp;lt;TAB&amp;gt; Getting good old BASH completion back Magic of bash-completion package compgen built-in command Learning more Bash completion for applications cobra (Golang), click (Python) and clap (Rust) complete (Golang) and shell_completion (Rust) Conclusion Introduction What happens when you press &amp;lt;command&amp;gt; &amp;lt;TAB&amp;gt; or &amp;lt;command&amp;gt; &amp;lt;TAB&amp;gt;&amp;lt;TAB&amp;gt;? You get a bunch of suggestions with one of them just the one you had in mind you were going to type.</description>
     </item>
     
     
@@ -480,8 +493,8 @@ Once I had installed the module, the hard part for me was how to get the data I 
       
       <guid>https://echorand.me/posts/terraform_from_toml/</guid>
       <description>In this post, we will see how we can use Golang to generate Terraform configuration from a TOML specification. That is, given a TOML file, like:
-subnet_name = &amp;quot;SubnetA&amp;quot; rules = [ {rule_no=101, egress = false, protocol = &amp;quot;tcp&amp;quot;, rule_action = &amp;quot;allow&amp;quot;, cidr_block = &amp;quot;127.0.0.1/32&amp;quot;, from_port = 22, to_port = 30}, ] We will generate:
-# This is a generated file, do not hand edit. See README at the # root of the repository resource &amp;quot;aws_network_acl_rule&amp;quot; &amp;quot;rule_SubnetA_ingress_101&amp;quot; { network_acl_id = &amp;quot;${lookup(local.</description>
+subnet_name = &amp;#34;SubnetA&amp;#34; rules = [ {rule_no=101, egress = false, protocol = &amp;#34;tcp&amp;#34;, rule_action = &amp;#34;allow&amp;#34;, cidr_block = &amp;#34;127.0.0.1/32&amp;#34;, from_port = 22, to_port = 30}, ] We will generate:
+# This is a generated file, do not hand edit. See README at the # root of the repository resource &amp;#34;aws_network_acl_rule&amp;#34; &amp;#34;rule_SubnetA_ingress_101&amp;#34; { network_acl_id = &amp;#34;${lookup(local.</description>
     </item>
     
     
@@ -494,7 +507,7 @@ subnet_name = &amp;quot;SubnetA&amp;quot; rules = [ {rule_no=101, egress = false
       <guid>https://echorand.me/posts/docker_logs_variable/</guid>
       <description>docker logs by default shows the container&amp;rsquo;s stdout and stderr logs. However, what I discovered was that the stderr logs from the container are output to the host system&amp;rsquo;s stderr as well. I was expecting everything from the container to be on the host&amp;rsquo;s stdout.
 Let&amp;rsquo;s see a demo. Consider the Dockerfile:
-FROM alpine:3.7 CMD echo &amp;quot;I echoed to stdout&amp;quot; &amp;amp;&amp;amp; &amp;gt;&amp;amp;2 echo &amp;quot;I echoed to stderr&amp;quot; Let&amp;rsquo;s build it and run it:</description>
+FROM alpine:3.7 CMD echo &amp;#34;I echoed to stdout&amp;#34; &amp;amp;&amp;amp; &amp;gt;&amp;amp;2 echo &amp;#34;I echoed to stderr&amp;#34; Let&amp;rsquo;s build it and run it:</description>
     </item>
     
     
@@ -519,7 +532,7 @@ Background We run ASP.NET compilation on our code base as part of every build in
       <guid>https://echorand.me/posts/traefik-aspnet/</guid>
       <description>Recently, I wrote two articles about using traefik as a reverse proxy. The first article discussed deploying a ASP.NET framework application and the second discussed deploying ASP.NET core applications.
 In both cases, I demonstrated the following:
- Docker native integration In-built support for LetsEncrypt SSL certificates  One of the things I didn&amp;rsquo;t discuss was how we could setup an architecture which allowed us to do zero-downtime deployments without any external help.</description>
+Docker native integration In-built support for LetsEncrypt SSL certificates One of the things I didn&amp;rsquo;t discuss was how we could setup an architecture which allowed us to do zero-downtime deployments without any external help. By external help I mean taking the application instance out of the DNS pool, having another healthchecking process automatically taking it out of a load balancing pool or something like that.</description>
     </item>
     
     
@@ -531,7 +544,7 @@ In both cases, I demonstrated the following:
       
       <guid>https://echorand.me/posts/scheduled-task-docker-prune/</guid>
       <description>Windows docker images can be bulky and on a server that you are deploying your application as docker images, the free disk space becomes a metric to watch out for. The following script will setup a Scheduled tasks to be run at a 7.0 PM UTC which will prune all unused images:
-# Scheduled tasks if (-Not (Test-Path &amp;quot;C:\ScheduledScripts&amp;quot;)) { mkdir C:\ScheduledScripts } $command=&amp;quot;docker image prune --all -f&amp;quot; $command | Out-File -encoding ASCII C:\ScheduledScripts\DockerImagePrune.</description>
+# Scheduled tasks if (-Not (Test-Path &amp;#34;C:\ScheduledScripts&amp;#34;)) { mkdir C:\ScheduledScripts } $command=&amp;#34;docker image prune --all -f&amp;#34; $command | Out-File -encoding ASCII C:\ScheduledScripts\DockerImagePrune.</description>
     </item>
     
     
@@ -579,7 +592,7 @@ Our setup Let&amp;rsquo;s create a file and write a line into it:</description>
       
       <guid>https://echorand.me/posts/manual-letsencrypt-dns-challenge/</guid>
       <description>I wanted to create a new SSL certificate for IIS hosted ASP.NET framework application. The key data that may make this post relevant to you are:
- Let&amp;rsquo;s Encrypt Challenge mode: DNS TXT record DNS provider: GoDaddy Target web server: IIS Target operating system: Windows Local operating environment/system: Linux (including Windows Subsystem for Linux).  Why I chose certbot? I decided to use certbot since it allowed me do create the DNS TXT entries manually.</description>
+Let&amp;rsquo;s Encrypt Challenge mode: DNS TXT record DNS provider: GoDaddy Target web server: IIS Target operating system: Windows Local operating environment/system: Linux (including Windows Subsystem for Linux). Why I chose certbot? I decided to use certbot since it allowed me do create the DNS TXT entries manually.</description>
     </item>
     
     
@@ -615,7 +628,7 @@ Key details The key details that are important to my story are:</description>
       
       <guid>https://echorand.me/posts/aws-vpc-internet-connectivity-subnets/</guid>
       <description>Welcome to this new blog post!
- Public subnet - Public IP  Ingress Egress   Public subnet - No Public IP Private subnet - Public IP  Ingress   Egress Private subnet - No Public IP Ingress Egress Learn more  We can have two kinds of subnets inside a AWS VPC - private and public. A public subnet is one which is attached to an Internet Gateway.</description>
+Public subnet - Public IP Ingress Egress Public subnet - No Public IP Private subnet - Public IP Ingress Egress Private subnet - No Public IP Ingress Egress Learn more We can have two kinds of subnets inside a AWS VPC - private and public. A public subnet is one which is attached to an Internet Gateway. This essentially adds a routing table entry to the subnet&amp;rsquo;s routing table sending all Internet traffic to an Internet Gateway.</description>
     </item>
     
     
@@ -640,7 +653,7 @@ V1__foo.sql V2__foo_new.sql. V3__bar.sql You basically want to say - flyway, ign
       
       <guid>https://echorand.me/posts/git-only-stage-partial-changes/</guid>
       <description>Let&amp;rsquo;s say you have made a few changes to a file and only want to stage only some of those changes for commit. You may want to do so either to create a nice commit history or may be you just want to discard some of the changes. Either way, git add -p is our friend. Let&amp;rsquo;s see an example:
-$ git add -p file1 ... index b82819b..a281865 100644 --- file1 +++ file2 @@ -139,8 +139,14 @@ else docker run \ -e ConnectionStrings__Db=&amp;quot;Data Source=\&amp;quot;tcp:$SQL_SERVER_IP\&amp;quot;;Persist Security Info=True;Initial Catalog=$DB_NAME;User ID=$APPLICATION_USER_NAME;Password=$DB_APPLICATION_PASSWORD&amp;quot; \ - -e App__RedisCS=&amp;quot;$REDIS_IP&amp;quot; \ + -e &amp;quot;${APPLICATION_NAME}_Web__CI__ConnectionStrings__Db&amp;quot;=&amp;quot;Data Source=\&amp;quot;tcp:$SQL_SERVER_IP\&amp;quot;;Persist Security Info=True;Initial Catalog=$DB_NAME;User ID=$APPLICATION_USER_NAME;Password=$DB_APPLICATION_PASSWORD&amp;quot; \ --sysctl net.</description>
+$ git add -p file1 ... index b82819b..a281865 100644 --- file1 +++ file2 @@ -139,8 +139,14 @@ else docker run \ -e ConnectionStrings__Db=&amp;#34;Data Source=\&amp;#34;tcp:$SQL_SERVER_IP\&amp;#34;;Persist Security Info=True;Initial Catalog=$DB_NAME;User ID=$APPLICATION_USER_NAME;Password=$DB_APPLICATION_PASSWORD&amp;#34; \ - -e App__RedisCS=&amp;#34;$REDIS_IP&amp;#34; \ + -e &amp;#34;${APPLICATION_NAME}_Web__CI__ConnectionStrings__Db&amp;#34;=&amp;#34;Data Source=\&amp;#34;tcp:$SQL_SERVER_IP\&amp;#34;;Persist Security Info=True;Initial Catalog=$DB_NAME;User ID=$APPLICATION_USER_NAME;Password=$DB_APPLICATION_PASSWORD&amp;#34; \ --sysctl net.</description>
     </item>
     
     
@@ -677,7 +690,7 @@ Okay, let&amp;rsquo;s try cleaning it - a destructive process potentially, but t
       <guid>https://echorand.me/posts/golang-templates/</guid>
       <description>While working on creating a template file for a Go project, I wanted to better understand how to work with data in Go templates as available via the html/template package. In this post, I discuss a few use cases that may arise.
 Accessing a variable Let&amp;rsquo;s consider our first program:
-package main import ( &amp;quot;html/template&amp;quot; &amp;quot;log&amp;quot; &amp;quot;os&amp;quot; ) func main() { var names = []string{&amp;quot;Tabby&amp;quot;, &amp;quot;Jill&amp;quot;} tmpl := template.New(&amp;quot;test&amp;quot;) tmpl, err := tmpl.</description>
+package main import ( &amp;#34;html/template&amp;#34; &amp;#34;log&amp;#34; &amp;#34;os&amp;#34; ) func main() { var names = []string{&amp;#34;Tabby&amp;#34;, &amp;#34;Jill&amp;#34;} tmpl := template.New(&amp;#34;test&amp;#34;) tmpl, err := tmpl.</description>
     </item>
     
     
@@ -689,7 +702,7 @@ package main import ( &amp;quot;html/template&amp;quot; &amp;quot;log&amp;quot; 
       
       <guid>https://echorand.me/posts/curl-download-redirect/</guid>
       <description>I wanted to download the prometheus binary using curl. My first attempt:
-$ curl https://github.com/prometheus/prometheus/releases/download/v2.4.0/prometheus-2.4.0.linux-amd64.tar.gz &amp;lt;html&amp;gt;&amp;lt;body&amp;gt; You are being &amp;lt;a href=&amp;quot;https://github-production-release-asset-2e65be.s3.amazonaws.com/6838921/5c87dc00-b5d1-11e8-8a3a-fd29b54e0c60?X-Amz-Algorithm=AWS4-HMAC-SHA256&amp;amp;amp;X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20180914%2Fus-east-1%2Fs3%2Faws4_request&amp;amp;amp;X-Amz-Date=20180914T004135Z&amp;amp;amp;X-Amz-Expires=300&amp;amp;amp;X-Amz-Signature=5a4887918cf75526c045d236dd5a8b22dace657900a1d131a7ffa947be66fc81&amp;amp;amp;X-Amz-SignedHeaders=host&amp;amp;amp;actor_id=0&amp;amp;amp;response-content-disposition=attachment%3B%20filename%3Dprometheus-2.4.0.linux-amd64.tar.gz&amp;amp;amp;response-content-type=application%2Foctet-stream&amp;quot;&amp;gt;redirected&amp;lt;/a&amp;gt;. Sure, that&amp;rsquo;s a redirect, let&amp;rsquo;s try:
+$ curl https://github.com/prometheus/prometheus/releases/download/v2.4.0/prometheus-2.4.0.linux-amd64.tar.gz &amp;lt;html&amp;gt;&amp;lt;body&amp;gt; You are being &amp;lt;a href=&amp;#34;https://github-production-release-asset-2e65be.s3.amazonaws.com/6838921/5c87dc00-b5d1-11e8-8a3a-fd29b54e0c60?X-Amz-Algorithm=AWS4-HMAC-SHA256&amp;amp;amp;X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20180914%2Fus-east-1%2Fs3%2Faws4_request&amp;amp;amp;X-Amz-Date=20180914T004135Z&amp;amp;amp;X-Amz-Expires=300&amp;amp;amp;X-Amz-Signature=5a4887918cf75526c045d236dd5a8b22dace657900a1d131a7ffa947be66fc81&amp;amp;amp;X-Amz-SignedHeaders=host&amp;amp;amp;actor_id=0&amp;amp;amp;response-content-disposition=attachment%3B%20filename%3Dprometheus-2.4.0.linux-amd64.tar.gz&amp;amp;amp;response-content-type=application%2Foctet-stream&amp;#34;&amp;gt;redirected&amp;lt;/a&amp;gt;. Sure, that&amp;rsquo;s a redirect, let&amp;rsquo;s try:
 $ curl --location https://github.com/prometheus/prometheus/releases/download/v2.4.0/prometheus-2.4.0.linux-amd64.tar.gz curl: (23) Failed writing body (0 != 16360) What does that mean? I frantically then google, &amp;ldquo;download prometheus using curl&amp;rdquo; and hit upon this link.
 So, the -O option will help:
 $ curl --remote-name --location https://github.com/prometheus/prometheus/releases/download/v2.4.0/prometheus-2.4.0.linux-amd64.tar.gz &amp;lt;file downloaded&amp;gt; The -O option is equivalent to --remote-name which basically says two things:</description>
@@ -705,7 +718,7 @@ $ curl --remote-name --location https://github.com/prometheus/prometheus/release
       <guid>https://echorand.me/posts/docker-user-namespacing-remap-system-user/</guid>
       <description>In this post, we learn how we can make use of docker&amp;rsquo;s user namespacing feature on Linux in a CI/build environment to avoid running into permission issues. Using user namespacing also keeping things a bit sane without adopting sub-optimal alternatives.
 Introduction Let&amp;rsquo;s consider that we are leveraging docker in a continuous integration (CI)/build environment and the usage scenario looks as follows:
- CI agent/slave runs as an unpriviliged user agent on the host agent clones the repository during a build on the host The build happens in a docker container spawned by scripts running as agent with the repository volume mounted  On a new build, the agent doesn&amp;rsquo;t do a fresh clone if a clone already exists, but instead does a git clean followed by git fetch of the commit.</description>
+CI agent/slave runs as an unpriviliged user agent on the host agent clones the repository during a build on the host The build happens in a docker container spawned by scripts running as agent with the repository volume mounted On a new build, the agent doesn&amp;rsquo;t do a fresh clone if a clone already exists, but instead does a git clean followed by git fetch of the commit.</description>
     </item>
     
     
@@ -764,7 +777,7 @@ For starters, we need an IAM profile to be defined with appropriate policies all
       <guid>https://echorand.me/posts/measuring-seconds-elapsed-powershell/</guid>
       <description>I have been working with PowerShell for three months now, and my approach to using it has been pretty much google and trial - copying things, modifying things till they work and learning new things on the way. This post talks about a discovery which I made today.
 I had a script like this:
-while ($health -ne &#39;healthy&#39;) { $elapsedTime = $(get-date) - $StartTime Write-Output &amp;quot;--- Waiting for service to become ready - $($elapsedTime.</description>
+while ($health -ne &amp;#39;healthy&amp;#39;) { $elapsedTime = $(get-date) - $StartTime Write-Output &amp;#34;--- Waiting for service to become ready - $($elapsedTime.</description>
     </item>
     
     
@@ -788,7 +801,7 @@ The accompanying git repository is here. Please file an issue if you have troubl
       
       <guid>https://echorand.me/posts/fedora-29-scientific-rawhide-vagrant-box/</guid>
       <description>I am very excited to share that sometime back the Fedora project gave the go ahead on my idea of making Fedora Scientific available as Vagrant boxes starting with Fedora 29. This basically means (I think) that using Fedora Scientific in a virtual machine is even easier. Instead of downloading the ISO and then going through the installation process, you can now basically do:
- Download Fedora Scientific Vagrant box Initialize VM vagrant up  Trying it out before Fedora 29 release As of a few days back, Fedora 29 rawhide vagrant boxes for Fedora Scientific are now being published.</description>
+Download Fedora Scientific Vagrant box Initialize VM vagrant up Trying it out before Fedora 29 release As of a few days back, Fedora 29 rawhide vagrant boxes for Fedora Scientific are now being published.</description>
     </item>
     
     
@@ -863,7 +876,7 @@ $ ping 127.0.0.1 -c 1 -4 PING 127.0.0.1 (127.0.0.1) 56(84) bytes of data. 64 byt
       <guid>https://echorand.me/posts/cloudflare-dns-over-https/</guid>
       <description>Introduction I recently learned about Cloudflare&amp;rsquo;s 1.1.1.1 DNS service. Let&amp;rsquo;s explore.
 Exploration One of the more interesting things that caught my attention there was DNS over HTTPS. That is, we can do this:
-22:27 $ http &#39;https://cloudflare-dns.com/dns-query?ct=application/dns-json&amp;amp;name=echorand. me&#39; HTTP/1.1 200 OK CF-RAY: 409535ca3b3765bd-SYD Connection: keep-alive Content-Length: 281 Content-Type: application/dns-json Date: Tue, 10 Apr 2018 12:27:53 GMT Server: cloudflare-nginx Set-Cookie: __cfduid=dfb12106907c3b55c52b27b8ea99e185a1523363273; expires=Wed, 10-Apr-19 12:27:53 GMT; path=/; domain=.cloudflare-dns.com; HttpOnly; Secure cache-control: max-age=285 { &amp;quot;AD&amp;quot;: false, &amp;quot;Answer&amp;quot;: [ { &amp;quot;TTL&amp;quot;: 285, &amp;quot;data&amp;quot;: &amp;quot;192.</description>
+22:27 $ http &amp;#39;https://cloudflare-dns.com/dns-query?ct=application/dns-json&amp;amp;name=echorand. me&amp;#39; HTTP/1.1 200 OK CF-RAY: 409535ca3b3765bd-SYD Connection: keep-alive Content-Length: 281 Content-Type: application/dns-json Date: Tue, 10 Apr 2018 12:27:53 GMT Server: cloudflare-nginx Set-Cookie: __cfduid=dfb12106907c3b55c52b27b8ea99e185a1523363273; expires=Wed, 10-Apr-19 12:27:53 GMT; path=/; domain=.cloudflare-dns.com; HttpOnly; Secure cache-control: max-age=285 { &amp;#34;AD&amp;#34;: false, &amp;#34;Answer&amp;#34;: [ { &amp;#34;TTL&amp;#34;: 285, &amp;#34;data&amp;#34;: &amp;#34;192.</description>
     </item>
     
     
@@ -876,7 +889,7 @@ Exploration One of the more interesting things that caught my attention there wa
       <guid>https://echorand.me/posts/fedora-scientific-28-beta/</guid>
       <description>Fedora 28 beta was announced recently and I am happy to say Fedora Scientific is back.
 One note though, the following applications/libraries are not part of the release:
- networkx scilab sagemath rkward  You can install them on your installation using:
+networkx scilab sagemath rkward You can install them on your installation using:
 $ sudo dnf install python*-networkx scilab sagemath rkward The reason for the above software to be not installed was some failures to install the packages which is why I commented those out so that we can have a release.</description>
     </item>
     
@@ -900,7 +913,7 @@ $ sudo dnf install python*-networkx scilab sagemath rkward The reason for the ab
       
       <guid>https://echorand.me/posts/automate-deb-package-packagecloud/</guid>
       <description>In my earlier post, Quick and dirty debian packages for your Go application I shared a recipe building DEB packages for Go applications. We are going to see the following things in this post building upon our recipe in that post:
- Building the DEB packages in Travis CI Publishing the DEB package to packagecloud.io  The primary assumption in my first post was using dep for dependency management. That still holds here.</description>
+Building the DEB packages in Travis CI Publishing the DEB package to packagecloud.io The primary assumption in my first post was using dep for dependency management. That still holds here.</description>
     </item>
     
     
@@ -924,7 +937,7 @@ Then, I came across this post, where I learned about unicode bidirectional class
       
       <guid>https://echorand.me/posts/redis-sorted-sets/</guid>
       <description>In this post, we will see a demo of sorted sets in redis. I just learned about them and I think they are really cool! This post shows how we can play with sorted sets first via the redis-cli, then from Python and Golang.
- ┌────────────┐ .───────────────. │ │ .─────────────. ( Redis CLI ) ───▶ │ Redis │ ◀───── ( Golang ) `───────────────&#39; │ │ `─────────────&#39; └────────────┘ ▲ │ │ .</description>
+┌────────────┐ .───────────────. │ │ .─────────────. ( Redis CLI ) ───▶ │ Redis │ ◀───── ( Golang ) `───────────────&amp;#39; │ │ `─────────────&amp;#39; └────────────┘ ▲ │ │ .─────────────. ( Python ) `─────────────&amp;#39; We will first need a local redis server running.</description>
     </item>
     
     
@@ -937,7 +950,7 @@ Then, I came across this post, where I learned about unicode bidirectional class
       <guid>https://echorand.me/posts/python-using-specific-git-commits-of-packages/</guid>
       <description>After a fair number of furious impatient attempts to try and use specific git commits of third party packages in my Python software, I finally have been able to make it work. I went back to the drawing board - basically reading setup-vs-requirement.
 Applications This is what I did:
- If you have a setup.py, add the library name to setup.py (abstract dependency) Add the git URL in a requirements.txt file (concrete dependency) When you create your deployment artifact, do pip install -r requirements.</description>
+If you have a setup.py, add the library name to setup.py (abstract dependency) Add the git URL in a requirements.txt file (concrete dependency) When you create your deployment artifact, do pip install -r requirements.</description>
     </item>
     
     
@@ -982,7 +995,7 @@ Applications This is what I did:
       
       <guid>https://echorand.me/posts/data-in-c-cpython/</guid>
       <description>In the last two articles (Data in CPython and Data in C), as it turned out, I discussed two fundamental points in each language:
-What happens in an assignment operation (such as a=2)? Are separate copies of data created or references passed to the original when they are sent as function parameters?  In this article, I will summarize the findings by presenting a comparative analysis.
+What happens in an assignment operation (such as a=2)? Are separate copies of data created or references passed to the original when they are sent as function parameters? In this article, I will summarize the findings by presenting a comparative analysis.
 Assignment The simplest way to explain the difference between an assignment operation in C and that in CPython is as follows.</description>
     </item>
     
@@ -1054,7 +1067,7 @@ Which Python? When I refer to Python, I am referring to CPython 2 (2.7 to be exa
       <guid>https://echorand.me/posts/systemd-supervisord/</guid>
       <description>If you are running your server applications via supervisord on a Linux distro running systemd, you may find this post useful.
 Problem Scenario An example scenario to help us establish the utility for this post is as follows:
- systemd starts the shutdown process systemd stops supervisord supervisord stops your processes You see in-flight requests being dropped  Solution What we want to do is prevent in-flight requests being dropped when a system is shutting down as part of a power off cycle (AWS instance termination, for example).</description>
+systemd starts the shutdown process systemd stops supervisord supervisord stops your processes You see in-flight requests being dropped Solution What we want to do is prevent in-flight requests being dropped when a system is shutting down as part of a power off cycle (AWS instance termination, for example).</description>
     </item>
     
     
@@ -1090,7 +1103,7 @@ $ cat /etc/systemd/system/openvpn@.service [Unit] Description=OpenVPN service fo
       
       <guid>https://echorand.me/posts/vim-notes/</guid>
       <description>I use vim as my occasional text editor, especially when I am working on small projects or just editing a text document. Here&amp;rsquo;s some notes for myself, mostly created by searching the web and pointing to or copying other people&amp;rsquo;s answers.
- Modes Files Opening commands Cursor movement Line search Replacing a word in a block Changing a word at n positions Recording and playing macros Swap two characters Switch case Replace character Move block of text Delete Search Folds  Movements   Powerless verbs Miscellaneous movements/Scrolling External Resources  Modes  Insert Normal mode: In insert mode, press Ctrl-o to quickly execute a command and come back to insert mode  Files  Save current buffer as file.</description>
+Modes Files Opening commands Cursor movement Line search Replacing a word in a block Changing a word at n positions Recording and playing macros Swap two characters Switch case Replace character Move block of text Delete Search Folds Movements Powerless verbs Miscellaneous movements/Scrolling External Resources Modes Insert Normal mode: In insert mode, press Ctrl-o to quickly execute a command and come back to insert mode Files Save current buffer as file.</description>
     </item>
     
     
@@ -1102,7 +1115,7 @@ $ cat /etc/systemd/system/openvpn@.service [Unit] Description=OpenVPN service fo
       
       <guid>https://echorand.me/posts/tip-terraform-security-group-existing/</guid>
       <description>When using Terraform&amp;rsquo;s aws_security_group_rule with EC2 classic, you may get an error saying that the source security group doesn&amp;rsquo;t exist, even though it does. That&amp;rsquo;s probably because you (like me and others) used the source security group ID and not the security group name, like so:
-resource &amp;quot;aws_security_group_rule&amp;quot; &amp;quot;my_sg_rule&amp;quot; { type = &amp;quot;ingress&amp;quot; from_port = 11123 to_port = 11123 protocol = &amp;quot;tcp&amp;quot; security_group_id = &amp;quot;${aws_security_group.sg1.id}&amp;quot; source_security_group_id = &amp;quot;${aws_security_group.sg2.id}&amp;quot; } You should actually do this instead:</description>
+resource &amp;#34;aws_security_group_rule&amp;#34; &amp;#34;my_sg_rule&amp;#34; { type = &amp;#34;ingress&amp;#34; from_port = 11123 to_port = 11123 protocol = &amp;#34;tcp&amp;#34; security_group_id = &amp;#34;${aws_security_group.sg1.id}&amp;#34; source_security_group_id = &amp;#34;${aws_security_group.sg2.id}&amp;#34; } You should actually do this instead:</description>
     </item>
     
     
@@ -1115,7 +1128,7 @@ resource &amp;quot;aws_security_group_rule&amp;quot; &amp;quot;my_sg_rule&amp;qu
       <guid>https://echorand.me/posts/mysql-too-many-connection/</guid>
       <description>If you are getting the &amp;ldquo;Too many connections&amp;rdquo; error, couple of things worth checking on the MySQL server:
 mysql&amp;gt; show processlist; .. The above will show the currently open connections. The second is:
-mysql&amp;gt; show variables like &amp;quot;max_connections&amp;quot;; .. The above will show the configured max_connections allowed. When you get this error, this value is less than or equal to the number of rows returned by show processlist.</description>
+mysql&amp;gt; show variables like &amp;#34;max_connections&amp;#34;; .. The above will show the configured max_connections allowed. When you get this error, this value is less than or equal to the number of rows returned by show processlist.</description>
     </item>
     
     
@@ -1142,8 +1155,8 @@ Blog repository setup I use pelican as my blog engine.</description>
       
       <guid>https://echorand.me/posts/python-grpc/</guid>
       <description>My article on getting started with gRPC in Python is up on the codeship blog:
- Using gRPC in Python  I build upon it in the next article:
- Exploring Security, Metrics, and Error-handling with gRPC in Python  The demos can be found in the python-grpc-demo repository.</description>
+Using gRPC in Python I build upon it in the next article:
+Exploring Security, Metrics, and Error-handling with gRPC in Python The demos can be found in the python-grpc-demo repository.</description>
     </item>
     
     
@@ -1182,7 +1195,7 @@ Use case #1: Dedicated service instances based on requests Let&amp;rsquo;s say o
 Let&amp;rsquo;s say a program in a container should be able to resolve a custom hostname.
 Solution
 When using docker run:
-$ sudo docker run --add-host myhost.name:127.0.0.1 -ti python bash Unable to find image &#39;python:latest&#39; locally latest: Pulling from library/python Digest: sha256:eb20fd0c13d2c57fb602572f27f05f7f1e87f606045175c108a7da1af967313e Status: Downloaded newer image for python:latest ... This will show up as an additional entry in the container&amp;rsquo;s /etc/hosts file:
+$ sudo docker run --add-host myhost.name:127.0.0.1 -ti python bash Unable to find image &amp;#39;python:latest&amp;#39; locally latest: Pulling from library/python Digest: sha256:eb20fd0c13d2c57fb602572f27f05f7f1e87f606045175c108a7da1af967313e Status: Downloaded newer image for python:latest ... This will show up as an additional entry in the container&amp;rsquo;s /etc/hosts file:
 root@fee9aeccbc4b:/# cat /etc/hosts ... 127.0.0.1	myhost.name With docker compose, we can use the extra_hosts key:</description>
     </item>
     
@@ -1195,7 +1208,7 @@ root@fee9aeccbc4b:/# cat /etc/hosts ... 127.0.0.1	myhost.name With docker compos
       
       <guid>https://echorand.me/posts/python-prometheus/</guid>
       <description>I recently wrote two articles on Python application monitoring with Prometheus:
- Monitoring Your Synchronous Python Web Applications Using Prometheus Monitoring Your Asynchronous Python Web Applications Using Prometheus  The demos can be found in the python-prometheus-demo repository.
+Monitoring Your Synchronous Python Web Applications Using Prometheus Monitoring Your Asynchronous Python Web Applications Using Prometheus The demos can be found in the python-prometheus-demo repository.
 Also checkout aiohttp-prometheus.</description>
     </item>
     
@@ -1223,7 +1236,7 @@ $ sudo docker network create --driver bridge webapp1 The first container which w
       
       <guid>https://echorand.me/posts/golang-dissecting-listen-and-serve/</guid>
       <description>Welcome to this blog post!
- Introduction What is DefaultServeMux? Registering handlers  The HandleFunc() type   Using your own Handler with ListenAndServe() Writing Middleware Rewrapping http.ResponseWriter References  Introduction My aim in this post is to discuss three &amp;ldquo;concepts&amp;rdquo; in Go that I come across while writing HTTP servers. Through this post, my aim to get rid of my own lack of understanding (at least to a certain degree) about these.</description>
+Introduction What is DefaultServeMux? Registering handlers The HandleFunc() type Using your own Handler with ListenAndServe() Writing Middleware Rewrapping http.ResponseWriter References Introduction My aim in this post is to discuss three &amp;ldquo;concepts&amp;rdquo; in Go that I come across while writing HTTP servers. Through this post, my aim to get rid of my own lack of understanding (at least to a certain degree) about these. Hopefully, it will be of use to others too.</description>
     </item>
     
     
@@ -1234,8 +1247,8 @@ $ sudo docker network create --driver bridge webapp1 The first container which w
       <pubDate>Thu, 06 Apr 2017 00:00:00 +0000</pubDate>
       
       <guid>https://echorand.me/posts/doing-math-humble-bundle/</guid>
-      <description>Slug:humble-bundle  Summary:Humble bundle    No Starch Press has launched a &amp;quot;Pay what you want&amp;quot; Python Humble Bundle running from April 5th - April 19th! Your purchases will help support the Python Software Foundation and I am excited to announce that Doing Math with Python is part of it.
- For 1+ USD you can get three books including &amp;quot;Doing Math with Python&amp;quot;! For 15+ USD you get nine excellent Python books!</description>
+      <description>Slug:humble-bundle Summary:Humble bundle No Starch Press has launched a &amp;quot;Pay what you want&amp;quot; Python Humble Bundle running from April 5th - April 19th! Your purchases will help support the Python Software Foundation and I am excited to announce that Doing Math with Python is part of it.
+For 1+ USD you can get three books including &amp;quot;Doing Math with Python&amp;quot;! For 15+ USD you get nine excellent Python books!</description>
     </item>
     
     
@@ -1283,7 +1296,7 @@ QueueHandler however sets exc_info attribute of a LogRecord to None since it is 
       
       <guid>https://echorand.me/posts/golang-setup-1.8/</guid>
       <description>This guide will be how I usually setup and get started with Go development environment on Linux. By the end of this document, we will have seen how to:
-Install the Go 1.8 compiler and other tools (gofmt, for eaxmple), collectively referred to as go tools Install gb and the vendor plugin Vendoring third party packages  Installing Go tools We can follow the official install guide to get the latest stable version of the Go tools:</description>
+Install the Go 1.8 compiler and other tools (gofmt, for eaxmple), collectively referred to as go tools Install gb and the vendor plugin Vendoring third party packages Installing Go tools We can follow the official install guide to get the latest stable version of the Go tools:</description>
     </item>
     
     
@@ -1295,7 +1308,7 @@ Install the Go 1.8 compiler and other tools (gofmt, for eaxmple), collectively r
       
       <guid>https://echorand.me/posts/golang-setup/</guid>
       <description>This guide will be how I usually setup and get started with Go development environment on Linux. By the end of this document, we will have seen how to:
-Install the Go compiler and other tools (gofmt, for eaxmple), collectively referred to as go tools Setup Go workspace Working with Go programs using third-party packages  Installing Go tools The first option to install the Go compiler and other tools from your distro&#39;s package manager.</description>
+Install the Go compiler and other tools (gofmt, for eaxmple), collectively referred to as go tools Setup Go workspace Working with Go programs using third-party packages Installing Go tools The first option to install the Go compiler and other tools from your distro&#39;s package manager.</description>
     </item>
     
     
@@ -1331,8 +1344,8 @@ When I first set out to learning Rust, I really liked how the Rust programming l
       
       <guid>https://echorand.me/posts/libcontainer-runc-fedora-24/</guid>
       <description>In this post, I will post my notes on how I got runC and then using libcontainer on Fedora. The first step is to install golang:
-$ sudo dnf -y install golang $ go version go version go1.6 linux/amd64  We will set GOPATH=~/golang/ and then do the following:
-$ mkdir -p ~/golang/github.com/opencontainers $ cd ~/golang/github.com/opencontainers $ git clone https://github.com/opencontainers/runc.git $ cd runc $ sudo dnf -y install libseccomp-devel $ make $ sudo make install  At this stage, runc should be installed and ready to use:</description>
+$ sudo dnf -y install golang $ go version go version go1.6 linux/amd64 We will set GOPATH=~/golang/ and then do the following:
+$ mkdir -p ~/golang/github.com/opencontainers $ cd ~/golang/github.com/opencontainers $ git clone https://github.com/opencontainers/runc.git $ cd runc $ sudo dnf -y install libseccomp-devel $ make $ sudo make install At this stage, runc should be installed and ready to use:</description>
     </item>
     
     
@@ -1369,7 +1382,7 @@ But I think there is a better way - make a program do it regularly. First, the p
       
       <guid>https://echorand.me/posts/mocking_s3_with_moto_in_python/</guid>
       <description>Let&#39;s say you have some Python application code which connects to Amazon S3 which retrieves the keys in a bucket. Very likely, the application would be using boto and the code would like this:
-import boto def get_s3_conn(): return boto.connect_s3(&#39;&amp;lt;aws-access-key&#39;, &#39;&amp;lt;aws-secret-key&amp;gt;&#39;) def list_keys(): s3_conn = get_s3_conn() b = s3_conn.get_bucket(&#39;bucket_name&#39;) keys = b.list() return keys  The corresponding test would presumably use some mocks and patching. Here is one way to write a test for the above code:</description>
+import boto def get_s3_conn(): return boto.connect_s3(&#39;&amp;lt;aws-access-key&#39;, &#39;&amp;lt;aws-secret-key&amp;gt;&#39;) def list_keys(): s3_conn = get_s3_conn() b = s3_conn.get_bucket(&#39;bucket_name&#39;) keys = b.list() return keys The corresponding test would presumably use some mocks and patching. Here is one way to write a test for the above code:</description>
     </item>
     
     
@@ -1395,7 +1408,7 @@ You just want a file object (pointing to an empty file) which has a filename ass
       <guid>https://echorand.me/posts/mock_and_attribute_error/</guid>
       <description>Updated: Fixed typo in the last paragraph.
 Today, I was curious to see this behavior of Mock() objects when using mock:
-&amp;gt;&amp;gt;&amp;gt; from mock import Mock &amp;gt;&amp;gt;&amp;gt; m = Mock() &amp;gt;&amp;gt;&amp;gt; m.i_dont_exist &amp;lt;Mock name=&#39;mock.i_dont_exist&#39; id=&#39;139841609578768&#39;&amp;gt; &amp;gt;&amp;gt;&amp;gt; m.i_dont_exist() &amp;lt;Mock name=&#39;mock.i_dont_exist()&#39; id=&#39;139841609106896&#39;&amp;gt;  The above is expected, since I have not declared a spec when creating the Mock() object, so even when you call a non-existent method or get/set a non-existent attribute, you will not get a AttributeError.</description>
+&amp;gt;&amp;gt;&amp;gt; from mock import Mock &amp;gt;&amp;gt;&amp;gt; m = Mock() &amp;gt;&amp;gt;&amp;gt; m.i_dont_exist &amp;lt;Mock name=&#39;mock.i_dont_exist&#39; id=&#39;139841609578768&#39;&amp;gt; &amp;gt;&amp;gt;&amp;gt; m.i_dont_exist() &amp;lt;Mock name=&#39;mock.i_dont_exist()&#39; id=&#39;139841609106896&#39;&amp;gt; The above is expected, since I have not declared a spec when creating the Mock() object, so even when you call a non-existent method or get/set a non-existent attribute, you will not get a AttributeError.</description>
     </item>
     
     
@@ -1419,7 +1432,7 @@ Why do we need a persistent data volume? We will experiment with the jenkins ima
       
       <guid>https://echorand.me/posts/virtualenv-first-python/</guid>
       <description>I have until the last few months (of my ~4 years of working with Python) always worked without virtualenv for all my Python projects. Why? I think I found the whole idea of having to do the following two steps before I work on something cumbersome:
-Remember the exact virtualenv name, and then Activate it  That said, I was very much aware that it was certainly a good thing to do and would cause me less headaches someday.</description>
+Remember the exact virtualenv name, and then Activate it That said, I was very much aware that it was certainly a good thing to do and would cause me less headaches someday.</description>
     </item>
     
     
@@ -1443,7 +1456,7 @@ The input to the urllib.</description>
       
       <guid>https://echorand.me/posts/docker-volume-mount-selinux/</guid>
       <description>My workflow with docker usually involves volume mounting a host directory so that I can read and write to the host directory from my container as a non-root user. On a Fedora 23 host with SELinux enabled, this is what I have to do differently:
-Use: -v /var/dir1:var/dir1:Z  Note the extra Z above? You can learn more about it this Project Atomic blog post</description>
+Use: -v /var/dir1:var/dir1:Z Note the extra Z above? You can learn more about it this Project Atomic blog post</description>
     </item>
     
     
@@ -1454,7 +1467,7 @@ Use: -v /var/dir1:var/dir1:Z  Note the extra Z above? You can learn more about i
       <pubDate>Thu, 01 Oct 2015 00:00:00 +0000</pubDate>
       
       <guid>https://echorand.me/posts/puppet-on-fedora-23/</guid>
-      <description>My goal in this post is to show how to setup puppet in standalone mode on a Fedora 23 system. This setup will allow writing puppet modules and then you can apply them on your local system and check manually and via serverspec tests that they are doing what you intend them to be doing. Obviously, a VM would be the best test environment for this, or even a container. Let&#39;s get started.</description>
+      <description>My goal in this post is to show how to setup puppet in standalone mode on a Fedora 23 system. This setup will allow writing puppet modules and then you can apply them on your local system and check manually and via serverspec tests that they are doing what you intend them to be doing. Obviously, a VM would be the best test environment for this, or even a container.</description>
     </item>
     
     
@@ -1466,7 +1479,7 @@ Use: -v /var/dir1:var/dir1:Z  Note the extra Z above? You can learn more about i
       
       <guid>https://echorand.me/posts/fedora-22-scientific/</guid>
       <description>Fedora 22 was released recently which also means we have a new Fedora Scientific release. Fedora Scientific is now part of Fedora labs.
- As you can see, the new home for Fedora Scientific looks amazing. The &amp;quot;Featured Applications&amp;quot; section features the most important and useful tools in Fedora Scientific. I think that is a great idea. Everyone associated with it, thank you very much.
+As you can see, the new home for Fedora Scientific looks amazing. The &amp;quot;Featured Applications&amp;quot; section features the most important and useful tools in Fedora Scientific. I think that is a great idea. Everyone associated with it, thank you very much.
 I have also updated the Fedora Scientific Guide to reflect the changes.</description>
     </item>
     

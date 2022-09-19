@@ -42,7 +42,7 @@ IAM role doesn&rsquo;t have access to otherwise via the <a href="https://aws.ama
 <code>dev</code>. If you have a profile or want to use a different AWS profile, you can change it in the <code>aws.tf</code> file
 of the configuration you are applying. If you are like me, you may have trouble setting up the profile
 correctly, so here&rsquo;s my two config files:</p>
-<pre><code># ~/.aws/config
+<pre tabindex="0"><code># ~/.aws/config
 
 [profile dev]
 region=ap-southeast-2
@@ -59,7 +59,7 @@ I first used it.</p>
 <h1 id="problem-scenario">Problem Scenario</h1>
 <p>Consider the following scenario for 3 services running on their own AWS EC2 instances in
 a production setup:</p>
-<pre><code>                       ┌───────────────────────────┐
+<pre tabindex="0"><code>                       ┌───────────────────────────┐
                        │   Production AWS Setup    │
                        └───────────────────────────┘
 
@@ -68,7 +68,7 @@ a production setup:</p>
 
  .───────────────────.      .───────────────────.    .───────────────────.
 (      S3Bucket1      )    (      S3Bucket2      )  (      S3Bucket3      )
- `───────────────────'      `───────────────────'    `───────────────────'
+ `───────────────────&#39;      `───────────────────&#39;    `───────────────────&#39;
             ▲                         ▲                        ▲
       ┌ ─ ─ ┴ ─ ─ ┐             ┌ ─ ─ ┴ ─ ─ ┐            ┌ ─ ─ ┴ ─ ─ ┐
        IAM Role 1                IAM Role 2               IAM Role 3
@@ -83,7 +83,7 @@ a production setup:</p>
 </code></pre><p>Each service running on their own EC2 instance has their own AWS IAM profile which via
 their role and role policy gives them access to the corresponding S3 bucket.</p>
 <p>Now, consider the setup below for a developer environment for the above services:</p>
-<pre><code>
+<pre tabindex="0"><code>
                        ┌───────────────────────────┐
                        │   Development AWS Setup   │
                        └───────────────────────────┘
@@ -93,7 +93,7 @@ their role and role policy gives them access to the corresponding S3 bucket.</p>
 
  .───────────────────.      .───────────────────.    .───────────────────.
 (      S3Bucket1      )    (      S3Bucket2      )  (      S3Bucket3      )
- `───────────────────'      `───────────────────'    `───────────────────'
+ `───────────────────&#39;      `───────────────────&#39;    `───────────────────&#39;
               ▲                      ▲                       ▲
               │                      │                       │
       ┌ ─ ─ ─ ┴ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─│─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─│─
@@ -116,7 +116,6 @@ their role and role policy gives them access to the corresponding S3 bucket.</p>
 
 
                               AWS EC2 Instance
-
 </code></pre><p>Instead of each service running on their own development EC2 instance, we run all the services
 on a single EC2 instance.</p>
 <p>As I note in the diagram above, the individual services will get an access denied error since
@@ -135,11 +134,11 @@ The EC2 instance we will be running our experiment is setup to use <code>role1</
 to the S3 bucket.</p>
 <p>The <a href="https://terraform.io">terraform</a> configuration for setting up the above infrastructure can be found
 <a href="https://github.com/amitsaha/aws-assume-role-demo/tree/master/terraform_configuration/problem_demo">here</a>.</p>
-<pre><code>$ cd terraform_configuration/problem_demo
+<pre tabindex="0"><code>$ cd terraform_configuration/problem_demo
 $ terraform init
 $ terraform apply
 </code></pre><p>If we now try to access the S3 bucket from the EC2 instance via the AWS CLI, we will get:</p>
-<pre><code>$ ssh ec2-user@&lt;Public-IP&gt;
+<pre tabindex="0"><code>$ ssh ec2-user@&lt;Public-IP&gt;
 ..
 
 $ aws s3 ls s3://github-amitsaha-bucket/*
@@ -162,39 +161,39 @@ assume role operation to succeed. If an IAM role, <code>role1</code> wants to as
 <li><code>role2</code> should allow <code>role1</code> to assume itself</li>
 </ul>
 <p>The corresponding IAM configuration earlier will be updated as follows:</p>
-<pre><code>data &quot;aws_iam_policy_document&quot; &quot;assume_role2_policy&quot; {
+<pre tabindex="0"><code>data &#34;aws_iam_policy_document&#34; &#34;assume_role2_policy&#34; {
   statement {
     actions = [
-      &quot;sts:AssumeRole&quot;,
+      &#34;sts:AssumeRole&#34;,
     ]
     resources = [
-      &quot;${aws_iam_role.role2.arn}&quot;,
+      &#34;${aws_iam_role.role2.arn}&#34;,
     ]
   }
 }
 
-resource &quot;aws_iam_role_policy&quot; &quot;role1_assume_role2&quot; {
-  name   = &quot;AssumeRole2&quot;
-  role = &quot;${aws_iam_role.role1.name}&quot;
-  policy = &quot;${data.aws_iam_policy_document.assume_role2_policy.json}&quot;
+resource &#34;aws_iam_role_policy&#34; &#34;role1_assume_role2&#34; {
+  name   = &#34;AssumeRole2&#34;
+  role = &#34;${aws_iam_role.role1.name}&#34;
+  policy = &#34;${data.aws_iam_policy_document.assume_role2_policy.json}&#34;
 }
 
-resource &quot;aws_iam_role&quot; &quot;role2&quot; {
-  name = &quot;test_profile2_role&quot;
-  path = &quot;/&quot;
+resource &#34;aws_iam_role&#34; &#34;role2&#34; {
+  name = &#34;test_profile2_role&#34;
+  path = &#34;/&#34;
 
   assume_role_policy = &lt;&lt;EOF
 {
-    &quot;Version&quot;: &quot;2012-10-17&quot;,
-    &quot;Statement&quot;: [
+    &#34;Version&#34;: &#34;2012-10-17&#34;,
+    &#34;Statement&#34;: [
         {
-            &quot;Action&quot;: &quot;sts:AssumeRole&quot;,
-            &quot;Principal&quot;: {
-               &quot;Service&quot;: &quot;ec2.amazonaws.com&quot;,
-               &quot;AWS&quot;: &quot;${aws_iam_role.role1.arn}&quot;
+            &#34;Action&#34;: &#34;sts:AssumeRole&#34;,
+            &#34;Principal&#34;: {
+               &#34;Service&#34;: &#34;ec2.amazonaws.com&#34;,
+               &#34;AWS&#34;: &#34;${aws_iam_role.role1.arn}&#34;
             },
-            &quot;Effect&quot;: &quot;Allow&quot;,
-            &quot;Sid&quot;: &quot;&quot;
+            &#34;Effect&#34;: &#34;Allow&#34;,
+            &#34;Sid&#34;: &#34;&#34;
         }
     ]
 }
@@ -202,31 +201,29 @@ EOF
 }
 </code></pre><p>The updated terraform configuration can be found <a href="https://github.com/amitsaha/aws-assume-role-demo/tree/master/terraform_configuration/solution_demo">here</a>.
 Let&rsquo;s create the new infrastructure:</p>
-<pre><code>$ cd terraform_configuration/solution_demo
+<pre tabindex="0"><code>$ cd terraform_configuration/solution_demo
 $ terraform init
 $ terraform apply
-
 </code></pre><p>Now, if we <code>ssh</code> into the instance and try the same operation, we will get the same error:</p>
-<pre><code>[ec2-user@ip-172-31-6-239 ~]$ aws s3 ls s3://github-amitsaha-bucket/*
+<pre tabindex="0"><code>[ec2-user@ip-172-31-6-239 ~]$ aws s3 ls s3://github-amitsaha-bucket/*
 An error occurred (AccessDenied) when calling the ListObjects operation: Access Denied
 </code></pre><p>However, since the infrastructure is now setup to allow us to perform assume role, we can make use
 of that.</p>
 <h1 id="solution-perform-assumerole-operation">Solution: Perform AssumeRole operation</h1>
 <p>The AWS CLI is already installed in the EC2 instance we spun up, so let&rsquo;s see how we can perform <code>assume role</code> operation:</p>
-<pre><code>[ec2-user@ip-172-31-6-239 ~]$ aws sts assume-role --role-arn arn:aws:iam::033145145979:role/test_profile2_role --role-session-name s3-example
+<pre tabindex="0"><code>[ec2-user@ip-172-31-6-239 ~]$ aws sts assume-role --role-arn arn:aws:iam::033145145979:role/test_profile2_role --role-session-name s3-example
 {
-    &quot;AssumedRoleUser&quot;: {
-        &quot;AssumedRoleId&quot;: &quot;AROAJ3CMHLQFMYPPWQLSQ:s3-example&quot;, 
-        &quot;Arn&quot;: &quot;arn:aws:sts::033145145979:assumed-role/test_profile2_role/s3-example&quot;
+    &#34;AssumedRoleUser&#34;: {
+        &#34;AssumedRoleId&#34;: &#34;AROAJ3CMHLQFMYPPWQLSQ:s3-example&#34;, 
+        &#34;Arn&#34;: &#34;arn:aws:sts::033145145979:assumed-role/test_profile2_role/s3-example&#34;
     }, 
-    &quot;Credentials&quot;: {
-        &quot;SecretAccessKey&quot;: &quot;PzFA0bJxxeB+i4kWjowpM6VTQTQfIiejbRxXkZdo&quot;, 
-        &quot;SessionToken&quot;: &quot;FQoDYXdzEI7//////////wEaDDqRJAWz11tovnatwSLuAUf1CIjLW0OI5dTCAh610HW7f3fBxglofbntqxCSJVyei1DafEjriLIskDzKoCdz6Y7F5Z/uyv/Ue7dCCCvXFpVYExwt82hE7yTGrYJB/oQl+bkMIzPhlHyegDa3/+vxdFu2kbcve8a1VlNhZE8fnpaRLGMoEr9/Ll+NQLjtRyysQ7DuN0GuMVIDiUzqOZHVDFDt4/c5LBHd2VZNfZ2t/rfPTkIwfkI9JQUVON+lcrk5W+FH16Onp1vuZXX4cmraMWQ1ROGf2x4fHGPIcMqaw674sgOnMSllyCUONLIaSPOeJLfOSDIrM/Xfv0PvslgotNrK1AU=&quot;, 
-        &quot;Expiration&quot;: &quot;2018-02-25T13:33:56Z&quot;, 
-    &quot;AccessKeyId&quot;: &quot;ASIAI7JVCNUGFT6XGMAQ&quot;
+    &#34;Credentials&#34;: {
+        &#34;SecretAccessKey&#34;: &#34;PzFA0bJxxeB+i4kWjowpM6VTQTQfIiejbRxXkZdo&#34;, 
+        &#34;SessionToken&#34;: &#34;FQoDYXdzEI7//////////wEaDDqRJAWz11tovnatwSLuAUf1CIjLW0OI5dTCAh610HW7f3fBxglofbntqxCSJVyei1DafEjriLIskDzKoCdz6Y7F5Z/uyv/Ue7dCCCvXFpVYExwt82hE7yTGrYJB/oQl+bkMIzPhlHyegDa3/+vxdFu2kbcve8a1VlNhZE8fnpaRLGMoEr9/Ll+NQLjtRyysQ7DuN0GuMVIDiUzqOZHVDFDt4/c5LBHd2VZNfZ2t/rfPTkIwfkI9JQUVON+lcrk5W+FH16Onp1vuZXX4cmraMWQ1ROGf2x4fHGPIcMqaw674sgOnMSllyCUONLIaSPOeJLfOSDIrM/Xfv0PvslgotNrK1AU=&#34;, 
+        &#34;Expiration&#34;: &#34;2018-02-25T13:33:56Z&#34;, 
+    &#34;AccessKeyId&#34;: &#34;ASIAI7JVCNUGFT6XGMAQ&#34;
     }
 }
-
 </code></pre><p>The <code>--role-arn</code> option specifies the ARN of the IAM profile we want to assume, give it a name via the <code>--role-session-name</code> and we get back three key pieces
 of data back in the <code>Credentials</code> object:</p>
 <ul>
@@ -235,17 +232,17 @@ of data back in the <code>Credentials</code> object:</p>
 <li>AccessKeyId</li>
 </ul>
 <p>We then pass these as environment variables to the AWS CLI and try to perform the above operation on the S3 bucket:</p>
-<pre><code>$ AWS_SESSION_TOKEN=&quot;&lt;session-token-above&gt;&quot; \
+<pre tabindex="0"><code>$ AWS_SESSION_TOKEN=&#34;&lt;session-token-above&gt;&#34; \
   AWS_ACCESS_KEY_ID=&lt;key id above&gt; \
   AWS_SECRET_ACCESS_KEY=&lt;secret key above&gt; aws s3 ls s3://github-amitsaha-bucket/
 </code></pre><p>And it works!</p>
 <p>We can create an object as well:</p>
-<pre><code>$ touch hello
-$ AWS_SESSION_TOKEN=&quot;&lt;session-token-above&gt;&quot; \
+<pre tabindex="0"><code>$ touch hello
+$ AWS_SESSION_TOKEN=&#34;&lt;session-token-above&gt;&#34; \
   AWS_ACCESS_KEY_ID=&lt;key id above&gt; \
   AWS_SECRET_ACCESS_KEY=&lt;secret key above&gt; aws s3 cp hello  s3://github-amitsaha-bucket/
 upload: ./hello to s3://github-amitsaha-bucket/hello             
-$ AWS_SESSION_TOKEN=&quot;&lt;session-token-above&gt;&quot; \
+$ AWS_SESSION_TOKEN=&#34;&lt;session-token-above&gt;&#34; \
   AWS_ACCESS_KEY_ID=&lt;key id above&gt; \
   AWS_SECRET_ACCESS_KEY=&lt;secret key above&gt; aws s3 ls s3://github-amitsaha-bucket/
 2018-02-25 12:38:32         12 hello
@@ -260,10 +257,10 @@ it introduces perhaps an unnecessary dependency on <code>role1</code>. Since <co
 of the service which is only reliant on <code>role2</code>, it may be a good idea to remove this explicit dependency. Hence, we may
 be better off allowing <em>any</em> role in the current AWS account to assume <code>role2</code>. To implement this, we change the IAM configuration
 as follows:</p>
-<pre><code>60c60
-&lt;                &quot;AWS&quot;: &quot;${aws_iam_role.role1.arn}&quot;
+<pre tabindex="0"><code>60c60
+&lt;                &#34;AWS&#34;: &#34;${aws_iam_role.role1.arn}&#34;
 ---
-&gt;                &quot;AWS&quot;: &quot;arn:aws::iam::${data.aws_caller_identity.current.account_id}:root&quot;
+&gt;                &#34;AWS&#34;: &#34;arn:aws::iam::${data.aws_caller_identity.current.account_id}:root&#34;
 </code></pre><p>You can find the entire configuration in the
 <a href="https://github.com/amitsaha/aws-assume-role-demo/tree/master/terraform_configuration/solution_demo_root_user">solution_demo_root_user</a>.</p>
 <h1 id="assumerole-in-your-applications">AssumeRole in your applications</h1>

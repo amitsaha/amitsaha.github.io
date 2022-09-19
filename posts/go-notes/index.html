@@ -39,35 +39,33 @@ That is, instead of writing <code>fmt.Printf(&quot;%s %s&quot;, &quot;Hello&quot
 Learn about it in the <a href="https://golang.org/pkg/fmt/">docs</a>.</p>
 <h2 id="multi-line-strings">Multi-line strings</h2>
 <p>Things are hassle free on the multi-line strings front:</p>
-<pre><code>package main
+<pre tabindex="0"><code>package main
 
 import (
-	&quot;fmt&quot;
+	&#34;fmt&#34;
 )
 
 func main() {
 
 	s := `Multi line strings
-are easy. So are strings with &quot;double quotes&quot;
-and 'single quotes'`
+are easy. So are strings with &#34;double quotes&#34;
+and &#39;single quotes&#39;`
 	fmt.Print(s)
 
 }
-
 </code></pre><h2 id="maps-with-values-as-maps">Maps with values as maps</h2>
 <p>First, we define the map:</p>
-<pre><code>var clusters = make(map[int]map[string]int)
+<pre tabindex="0"><code>var clusters = make(map[int]map[string]int)
 </code></pre><p>Then, we assign a value which is another map, that we create:</p>
-<pre><code>clusters[clusterNum] = map[string]int{
-				&quot;a&quot;: 1,
-				&quot;b&quot;: 1,
+<pre tabindex="0"><code>clusters[clusterNum] = map[string]int{
+				&#34;a&#34;: 1,
+				&#34;b&#34;: 1,
 }
-
 </code></pre><p>We can then modify the map defined as the value, like so:</p>
-<pre><code>clusters[1][&quot;a&quot;] = 5
+<pre tabindex="0"><code>clusters[1][&#34;a&#34;] = 5
 </code></pre><h2 id="check-if-a-key-is-present-in-a-map">Check if a key is present in a map</h2>
 <p>Here we can make use of the multiple return value from the map query statement:</p>
-<pre><code>// The ok variable will be true if key present
+<pre tabindex="0"><code>// The ok variable will be true if key present
 // else false
 if _, ok := flatMap[tblName]; !ok {
      // not present
@@ -76,9 +74,9 @@ if _, ok := flatMap[tblName]; !ok {
 }
 </code></pre><h2 id="reading-data-from-a-database-into-structs">Reading data from a database into structs</h2>
 <p>The following snippet can be used to read the rows of a table from a SQL db into structure variables:</p>
-<pre><code>package main
+<pre tabindex="0"><code>package main
 
-import &quot;fmt&quot;
+import &#34;fmt&#34;
 
 type Node struct {
 	data1 string
@@ -93,7 +91,7 @@ func main() {
 	var results []Node
 
 	if err != nil {
-		fmt.Printf(&quot;Error querying: %v\n&quot;, err.Error())
+		fmt.Printf(&#34;Error querying: %v\n&#34;, err.Error())
 	} else {
 		defer rows.Close()
 
@@ -101,29 +99,28 @@ func main() {
 			var n Node
 			err = rows.Scan(&amp;n.data1, &amp;n.data2)
 			if err != nil {
-				fmt.Printf(&quot;Error serializing data into variable: %v\n&quot;, err)
+				fmt.Printf(&#34;Error serializing data into variable: %v\n&#34;, err)
 			}
 			results = append(results, n)
 		}
 	}
 }
-
 </code></pre><h2 id="check-if-a-string-starts-with-another-string">Check if a string starts with another string</h2>
-<pre><code>// Does the value in `variable` start with &quot;prefix&quot;
-strings.HasPrefix(variable, &quot;prefix&quot;)
+<pre tabindex="0"><code>// Does the value in `variable` start with &#34;prefix&#34;
+strings.HasPrefix(variable, &#34;prefix&#34;)
 </code></pre><h2 id="genearate-a-random-integer-in-0n">Genearate a random integer in [0,n)</h2>
-<pre><code>fmt.Printf(&quot;Random integer between 0-100: %v\n&quot;, rand.Intn(100))
+<pre tabindex="0"><code>fmt.Printf(&#34;Random integer between 0-100: %v\n&#34;, rand.Intn(100))
 </code></pre><h2 id="quotient-and-modulus">Quotient and Modulus</h2>
-<pre><code>fmt.Printf(&quot;1/2 - Modulus: %v Quotient: %v&quot;, 1%2, 1/2)
+<pre tabindex="0"><code>fmt.Printf(&#34;1/2 - Modulus: %v Quotient: %v&#34;, 1%2, 1/2)
 </code></pre><h2 id="walking-a-directory-tree">Walking a directory tree</h2>
 <p>Let&rsquo;s say we want to walk a directory tree and only list/perform operation on files of a certain extension:</p>
-<pre><code>package main
+<pre tabindex="0"><code>package main
 
 import (
-	&quot;fmt&quot;
-	&quot;os&quot;
-	&quot;path/filepath&quot;
-	&quot;strings&quot;
+	&#34;fmt&#34;
+	&#34;os&#34;
+	&#34;path/filepath&#34;
+	&#34;strings&#34;
 )
 
 func main() {
@@ -136,11 +133,11 @@ func main() {
 		if info.IsDir() {
 			return nil
 		}
-		if filepath.Ext(path) == &quot;.go&quot; {
-			// Extract just the &quot;filename&quot; part of &quot;filename.go&quot;
+		if filepath.Ext(path) == &#34;.go&#34; {
+			// Extract just the &#34;filename&#34; part of &#34;filename.go&#34;
 			fName := filepath.Base(path)
 			filename := strings.TrimSuffix(fName, filepath.Ext(path))
-			fmt.Printf(&quot;path: %s filename: %s\n&quot;, path, filename)
+			fmt.Printf(&#34;path: %s filename: %s\n&#34;, path, filename)
 
 		}
 		return nil
@@ -150,25 +147,24 @@ func main() {
 	}
 
 }
-
 </code></pre><h2 id="reading-structure-tags">Reading structure tags</h2>
-<pre><code>package main
+<pre tabindex="0"><code>package main
 
 import (
-	&quot;fmt&quot;
-	&quot;reflect&quot;
+	&#34;fmt&#34;
+	&#34;reflect&#34;
 )
 
 type node struct {
-	Rule string `metadata1:&quot;value1&quot; metadata2:&quot;value2&quot;`
-	Name string `metadata2:&quot;value3&quot;`
+	Rule string `metadata1:&#34;value1&#34; metadata2:&#34;value2&#34;`
+	Name string `metadata2:&#34;value3&#34;`
 }
 
 func main() {
 
 	n := node{
-		Rule: &quot;A rule&quot;,
-		Name: &quot;A name&quot;,
+		Rule: &#34;A rule&#34;,
+		Name: &#34;A name&#34;,
 	}
 	// Reflect example  code from
 	// https://gist.github.com/drewolson/4771479
@@ -177,14 +173,13 @@ func main() {
 		valueField := val.Field(i)
 		typeField := val.Type().Field(i)
 		tag := typeField.Tag
-		metadataOneAttribute := tag.Get(&quot;metadata1&quot;)
-		metadataTwoAttribute := tag.Get(&quot;metadata2&quot;)
+		metadataOneAttribute := tag.Get(&#34;metadata1&#34;)
+		metadataTwoAttribute := tag.Get(&#34;metadata2&#34;)
 
-		fmt.Printf(&quot;%v (metadata1: %v metadata2: %v)\n&quot;, valueField.Interface(), metadataOneAttribute, metadataTwoAttribute)
+		fmt.Printf(&#34;%v (metadata1: %v metadata2: %v)\n&#34;, valueField.Interface(), metadataOneAttribute, metadataTwoAttribute)
 
 	}
 }
-
 </code></pre><h2 id="dot-imports-in-go">Dot imports in Go</h2>
 <p>When you import a package as <code>import . &quot;path/to/pkg&quot;</code>, you don&rsquo;t have to use
 <code>pkg.ExportedSymbol</code> to refer to the <code>ExportedSymbol</code> in <code>pkg</code> any more. You

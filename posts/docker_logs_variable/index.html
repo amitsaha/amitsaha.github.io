@@ -38,11 +38,11 @@
 are output to the host system&rsquo;s <code>stderr</code> as well. I was expecting everything from the container
 to be on the host&rsquo;s <code>stdout</code>.</p>
 <p>Let&rsquo;s see a demo. Consider the <code>Dockerfile</code>:</p>
-<pre><code>FROM alpine:3.7
+<pre tabindex="0"><code>FROM alpine:3.7
 
-CMD echo &quot;I echoed to stdout&quot; &amp;&amp; &gt;&amp;2 echo &quot;I echoed to stderr&quot;
+CMD echo &#34;I echoed to stdout&#34; &amp;&amp; &gt;&amp;2 echo &#34;I echoed to stderr&#34;
 </code></pre><p>Let&rsquo;s build it and run it:</p>
-<pre><code>$ docker build -t amit/test .
+<pre tabindex="0"><code>$ docker build -t amit/test .
 
 $ sudo docker run --name test amit/test
 I echoed to stdout
@@ -60,7 +60,7 @@ the stderr to <code>/dev/null</code> on the host.</p>
 <h1 id="assigning-the-output-of-docker-logs">Assigning the output of docker logs</h1>
 <p>Coming back to the primary use case which triggered this post, if we wanted just the standard output of the
 container to be assigned to a variable in bash, here&rsquo;s what we should do:</p>
-<pre><code>data=&quot;$(sudo docker logs test 2&gt; /dev/null)&quot;
+<pre tabindex="0"><code>data=&#34;$(sudo docker logs test 2&gt; /dev/null)&#34;
 </code></pre><p>If we don&rsquo;t do the above <code>stderr</code> redirection, we will still see that container&rsquo;s <code>stderr</code> output on the host system.
 That may leave you scratching your head, as it did to me, since we think we are assigning all the output of <code>docker logs</code>
 to a variable.</p>

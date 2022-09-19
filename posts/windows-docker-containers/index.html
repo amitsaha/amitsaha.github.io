@@ -54,32 +54,32 @@ version of docker. Once you install it, and run <code>docker version</code>, you
 <p>On Windows server, we have to use the docker enterprise version which can be installed as per <a href="https://docs.docker.com/install/windows/docker-ee/">this page</a>. When we run <code>docker version</code> on a Windows server host, you will
 see the version stated as <code>18.03.1-ee-2</code> or simiar.</p>
 <p>The following <code>PowerShell</code> snippet will install docker engine and <code>docker-compose</code> on Windows server:</p>
-<pre><code># docker engine and docker compose
+<pre tabindex="0"><code># docker engine and docker compose
 Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
 Install-Module -Name DockerMsftProvider -Repository PSGallery -Force
 Install-Package -Name docker -ProviderName DockerMsftProvider -Force
 choco install docker-compose # this needs chocolatey installed
 </code></pre><h1 id="container-isolation">Container Isolation</h1>
 <p>On Windows 10, <code>docker</code> uses <code>hyperv</code> isolation:</p>
-<pre><code>&gt; docker info -f '{{ .Isolation }}'
+<pre tabindex="0"><code>&gt; docker info -f &#39;{{ .Isolation }}&#39;
 hyperv
 </code></pre><p>On Windows server, it uses <code>process</code> isolation:</p>
-<pre><code>&gt; docker info -f '{{ .Isolation }}'
+<pre tabindex="0"><code>&gt; docker info -f &#39;{{ .Isolation }}&#39;
 process
 </code></pre><p>(Please note, use <code>powershell</code> for the above command, not <code>cmd</code> <a href="https://github.com/moby/moby/issues/33959">issue</a>)</p>
 <p>This basically means that on Windows 10, a container is running within a tiny VM. I suspect this is a major reason for
 the slow container startup and image build times on Windows 10. To learn more, see <a href="https://docs.microsoft.com/en-us/virtualization/windowscontainers/manage-containers/hyperv-container">here</a> and a relevant <a href="https://github.com/docker/for-win/issues/1822">issue</a>.</p>
 <h1 id="docker-commit">Docker commit</h1>
 <p><code>docker commit</code> allows us to create a image from a running container. However, on Windows we cannot do that:</p>
-<pre><code>&gt; docker commit hopeful_clarke myimage
+<pre tabindex="0"><code>&gt; docker commit hopeful_clarke myimage
 Error response from daemon: windows does not support commit of a running container
 </code></pre><p>We will have to stop the container and then commit it.</p>
-<pre><code>$ docker stop hopeful_clarke
+<pre tabindex="0"><code>$ docker stop hopeful_clarke
 $ docker commit hopeful_clarke myimage
 </code></pre><h1 id="user-defined-networks">User-defined networks</h1>
 <p>On Windows 10, multiple <code>nat</code> networks are supported, but on Windows Server with 17.06 EE docker engine, only
 one <code>nat</code> network is supported. Hence, when using <code>docker-compose</code>, we must specify the following:</p>
-<pre><code>networks:
+<pre tabindex="0"><code>networks:
   default:
     external:
       name: nat
@@ -97,7 +97,7 @@ command.</p>
 <p>I got this error only a couple of times in all my testing over 2 months. It is filed <a href="https://github.com/docker/libnetwork/issues/1950">here</a>.</p>
 <h1 id="hcsshimpreparelayer-failed-in-win32"><code>hcsshim::PrepareLayer failed in Win32</code></h1>
 <p>While building images and running containers, an error as follows appeared with varying frequency:</p>
-<pre><code>hcsshim::PrepareLayer failed in Win32: This operation returned because the timeout period expired. (0x5b4) layerId=ae8414f34fb31faea64b7bee078b295023db93c8505c67da686750843c853629 flavour=1
+<pre tabindex="0"><code>hcsshim::PrepareLayer failed in Win32: This operation returned because the timeout period expired. (0x5b4) layerId=ae8414f34fb31faea64b7bee078b295023db93c8505c67da686750843c853629 flavour=1
 </code></pre><p>On Windows 10, it was very frequent. On Windows server, the frequency is almost never. A situation in which it
 can happen as discussed in this <a href="https://github.com/moby/moby/issues/27588">issue</a> is when
 an attempt is made to run a number of containers simulataneously. In my case, when I got the issue on Windows server,
@@ -106,7 +106,7 @@ images.</p>
 <p>A retry of the operation usually fixed it. Relevant project - <a href="https://github.com/Microsoft/hcsshim">hccshim</a>.</p>
 <h1 id="docker-compose-and-volume-mounting">Docker compose and volume mounting</h1>
 <p>I needed the following voume mount to work:</p>
-<pre><code> db_setup:
+<pre tabindex="0"><code> db_setup:
     image: &lt;image&gt;
     volumes:
       - type: bind
@@ -117,17 +117,17 @@ images.</p>
 <p>One of the first things I had to tackle while writing a <code>Dockerfile</code> was that of which slash to use in Path names.
 Basically, for Dockerfile instructions such as <code>ADD</code>, <code>WORKDIR</code>, <code>COPY</code>, continue using the &ldquo;Linux&rdquo; style, &ldquo;/&rdquo;.
 For example:</p>
-<pre><code>ADD . C:/app
+<pre tabindex="0"><code>ADD . C:/app
 WORKDIR C:/app
 </code></pre><p>For <code>RUN</code> instruction, you must specify any path using &ldquo;:&quot;, like so:</p>
-<pre><code>RUN Expand-Archive -Path c:\mysql.zip -DestinationPath C:\
+<pre tabindex="0"><code>RUN Expand-Archive -Path c:\mysql.zip -DestinationPath C:\
 ..
 </code></pre><p>When writing multi-line instructions in a <code>Dockerfile</code>, you may be tempted to use &ldquo;&quot;, but, that can cause problems, since
 &ldquo;&quot; is also a path separator in Windows, so declare a <code>escape</code> character as explained
 <a href="https://docs.microsoft.com/en-us/virtualization/windowscontainers/manage-docker/manage-windows-dockerfile#escape-character">here</a>.</p>
 <p>However, I seemed to have success without it - the following snippet works just fine to build a mysql server Windows
 container:</p>
-<pre><code>FROM microsoft/nanoserver
+<pre tabindex="0"><code>FROM microsoft/nanoserver
 ..
 RUN powershell -command \
     Expand-Archive -Path c:\mysql.zip -DestinationPath C:\ ; \
@@ -149,11 +149,11 @@ volume mounted from host wouldn&rsquo;t work. The issue is described <a href="ht
 <h1 id="karma-test-runner-with-phantomjs-inside-a-windows-container">Karma test runner with PhantomJS inside a Windows container</h1>
 <p>I couldn&rsquo;t get <a href="https://www.npmjs.com/package/phantomjs-prebuilt">phantomjs-prebuilt</a> to work inside a Windows container
 for some reason. I decided to give a systemwide installation a try and it worked. The following <code>Dockerfile</code> worked for me:</p>
-<pre><code># escape=`
+<pre tabindex="0"><code># escape=`
 FROM microsoft/windowsservercore
 
-SHELL [&quot;powershell&quot;, &quot;-Command&quot;, &quot;$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';&quot;]
-RUN Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+SHELL [&#34;powershell&#34;, &#34;-Command&#34;, &#34;$ErrorActionPreference = &#39;Stop&#39;; $ProgressPreference = &#39;SilentlyContinue&#39;;&#34;]
+RUN Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString(&#39;https://chocolatey.org/install.ps1&#39;))
 RUN choco install -y phantomjs git nodejs yarn
 
 ADD . C:/app
@@ -166,14 +166,14 @@ CMD powershell -File .\RunTests.ps1
 configured in IIS. Coming from a Linux/Nginx/Python/Golang background, I found it quite challenging to find instructions
 for manually configuring a IIS website without using GUI tools. Visual Studio&rsquo;s Dockerfile worked but I didn&rsquo;t succeed in work for my use-case. I think it will make more sense now. Anyway, thanks to a <a href="https://blog.alexellis.io/run-iis-asp-net-on-windows-10-with-docker/">particular blog post</a> and other posts by the same author, things
 finally clicked. The following is a snippet of a script that I used:</p>
-<pre><code>Write-Output &quot;--- Setting up IIS websites&quot;
+<pre tabindex="0"><code>Write-Output &#34;--- Setting up IIS websites&#34;
 
 # Copy built artifacts 
 cp -r site1 C:\inetpub\wwwroot\
 cp -r site2 C:\inetpub\wwwroot\
 
-New-IISSite -Name 'site1' -PhysicalPath c:\inetpub\wwwroot\site1 -BindingInformation &quot;*:8080:&quot;
-New-IISSite -Name 'site2' -PhysicalPath c:\inetpub\wwwroot\site2 -BindingInformation &quot;*:8081:&quot;
+New-IISSite -Name &#39;site1&#39; -PhysicalPath c:\inetpub\wwwroot\site1 -BindingInformation &#34;*:8080:&#34;
+New-IISSite -Name &#39;site2&#39; -PhysicalPath c:\inetpub\wwwroot\site2 -BindingInformation &#34;*:8081:&#34;
 
 Set-Location C:\inetpub\wwwroot\site1
 C:\WebConfigTransformRunner.1.0.0.1\Tools\WebConfigTransformRunner.exe .\Configs\AppSetting.config .\Configs\AppSetting.Docker.config .\Configs\AppSetting.config
@@ -190,7 +190,7 @@ to <a href="https://anthonychu.ca/post/aspnet-web-config-transforms-windows-cont
 i found <a href="https://anthonychu.ca/post/overriding-web-config-settings-environment-variables-containerized-aspnet-apps/">this post</a>
 by the same author useful too.</p>
 <p>The above script was an entrypoint to the following <code>Dockerfile</code> snippet:</p>
-<pre><code>FROM microsoft/dotnet-framework:4.7.2-sdk
+<pre tabindex="0"><code>FROM microsoft/dotnet-framework:4.7.2-sdk
 RUN Add-WindowsFeature Web-Server; `
     Add-WindowsFeature NET-Framework-45-ASPNET; `
     Add-WindowsFeature Web-Asp-Net45; `
@@ -200,8 +200,8 @@ RUN Add-WindowsFeature Web-Server; `
 # Open issue: https://github.com/Microsoft/aspnet-docker/issues/109
 WORKDIR /install
 ADD https://download.microsoft.com/download/C/9/E/C9E8180D-4E51-40A6-A9BF-776990D8BCA9/rewrite_amd64.msi rewrite_amd64.msi
-RUN Write-Host 'Installing URL Rewrite' ; `
-    Start-Process msiexec.exe -ArgumentList '/i', 'rewrite_amd64.msi', '/quiet', '/norestart' -NoNewWindow -Wait
+RUN Write-Host &#39;Installing URL Rewrite&#39; ; `
+    Start-Process msiexec.exe -ArgumentList &#39;/i&#39;, &#39;rewrite_amd64.msi&#39;, &#39;/quiet&#39;, &#39;/norestart&#39; -NoNewWindow -Wait
 
 WORKDIR C:\
 RUN nuget.exe install WebConfigTransformRunner -Version 1.0.0.1
@@ -211,7 +211,7 @@ EXPOSE 51033 51034 51035
 WORKDIR /app
 HEALTHCHECK --interval=30s --timeout=10s --retries=20 CMD powershell -Command Invoke-WebRequest -UseBasicParsing http://localhost:8080;Invoke-WebRequest -UseBasicParsing http://localhost:8081
 ...
-ENTRYPOINT [&quot;.\StartApp.ps1&quot;]
+ENTRYPOINT [&#34;.\StartApp.ps1&#34;]
 </code></pre><p>The reason I use dotnet framework image above is so that I can share the same base image for a different docker image
 used to build the dotnet framework solution as well.</p>
 <h1 id="summary">Summary</h1>

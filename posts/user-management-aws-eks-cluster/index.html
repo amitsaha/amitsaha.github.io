@@ -44,7 +44,7 @@ and join the cluster. One of the first things to do when you are setting up an E
 ConfigMap - aws-auth in the kube-system namespace and add the IAM role ARNs to it. This allows the nodes to
 call home to the master and allow them to be part of the cluster. To make things concrete, here’s how the
 config map looks like:</p>
-<pre><code>apiVersion: v1
+<pre tabindex="0"><code>apiVersion: v1
 data:
   mapRoles: |
     - rolearn: arn:aws:iam::AWS-ACCOUN-ID:role/myrole
@@ -56,7 +56,6 @@ kind: ConfigMap
 metadata:
   name: aws-auth
   namespace: kube-system
-
 </code></pre><p>The <code>mapRoles</code> array lists all the IAM roles that we want to allow to authenticate
 successfully to the cluster. We add the role to the kubernetes groups <code>system:bootstrappers</code>
 and <code>system:nodes</code>. We have to add all the IAM roles of the nodes in our cluster to this
@@ -65,7 +64,7 @@ ConfigMap. Once we apply this manifest, you should see the nodes are ready when 
 <h1 id="allowing-other-admins">Allowing other admins</h1>
 <p>The cluster creator gets admin privileges by default. To add other admin users, we will
 have to update the above ConfigMap as follows:</p>
-<pre><code>apiVersion: v1
+<pre tabindex="0"><code>apiVersion: v1
 data:
   mapRoles: |
     - rolearn: arn:aws:iam::AWS-ACCOUN-ID:role/myrole
@@ -95,7 +94,7 @@ we define the perimeter and granularity of our permissions. Let&rsquo;s assume:<
 groups in Kubernetes and then regulate access based on their group and Kubernetes role bindings.
 This is how it might look like.</p>
 <p>First, we update the <code>ConfigMap</code> to add new entry per user in the <code>mapUsers</code> section as follows:</p>
-<pre><code>apiVersion: v1
+<pre tabindex="0"><code>apiVersion: v1
 data:
   ...
   mapUsers: |
@@ -117,7 +116,7 @@ and added them to two other projectA specific groups.</p>
 <p>The above <code>ConfigMap</code> update coupled with the &ldquo;right&rdquo; <code>kubeconfig</code> and AWS CLI configuration
 will allow users, <code>username1</code> and <code>username2</code> to authenticate to the EKS cluster successfully.
 For completeness, a working kubeconfig will look as follows:</p>
-<pre><code>apiVersion: v1
+<pre tabindex="0"><code>apiVersion: v1
 current-context: k8s-cluster
 clusters:
 - cluster:
@@ -144,13 +143,13 @@ users:
 </code></pre><p>However, to allow them to access project A specific resource, we will first create a <code>Role</code> and
 then a <code>RoleBinding</code> to associate the <code>projectA:qa</code> group above with the role.</p>
 <p>The manifest for the <code>Role</code> looks as follows:</p>
-<pre><code>kind: Role
+<pre tabindex="0"><code>kind: Role
 metadata:
   name: projectA-qa-human-users
   namespace: projectA-qa
 rules:
 - apiGroups:
-  - &quot;&quot;
+  - &#34;&#34;
   resources:
   - services
   verbs:
@@ -170,27 +169,26 @@ rules:
   verbs:
   - get
 - apiGroups:
-  - &quot;&quot;
+  - &#34;&#34;
   resources:
   - pods
   verbs:
   - get
   - list
 - apiGroups:
-  - &quot;&quot;
+  - &#34;&#34;
   resources:
   - pods/exec
   verbs:
   - create
 - apiGroups:
-  - &quot;&quot;
+  - &#34;&#34;
   resources:
   - pods/log
   verbs:
   - get
-
 </code></pre><p>The <code>RoleBinding</code> is as follows:</p>
-<pre><code>apiVersion: rbac.authorization.k8s.io/v1
+<pre tabindex="0"><code>apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:  
   name:  projectA-qa-human-users
@@ -208,23 +206,23 @@ subjects:
 </code></pre><p>The key bit of information that ties in an AWS user with a certain set of permissions in the cluster
 is the assignment to a group in the <code>ConfigMap</code> and the <code>group</code> assigment in the above role binding.</p>
 <p>So:</p>
-<pre><code>                                                                    Role with certain permissions
+<pre tabindex="0"><code>                                                                    Role with certain permissions
                                                                               / \
                                                                                |
 AWS user/IAM role -&gt; Assigned to a cluster group via ConfigMap -&gt; Role binding associates a role to the group
 </code></pre><p>With the above setup, you have successfully granted <code>username1</code> access to your cluster and they
 are confined to the <code>projectA-qa</code> namespace where they can only <code>exec</code> into pods and view the
-pods' logs. If you wanted to allow <code>username1</code> access to other projectA&rsquo;s environments or other
-projects' environments, you would do the following:</p>
+pods&rsquo; logs. If you wanted to allow <code>username1</code> access to other projectA&rsquo;s environments or other
+projects&rsquo; environments, you would do the following:</p>
 <ul>
 <li>Update <code>ConfigMap</code> to assign <code>username1</code> to the different groups</li>
-<li>Create <code>Role</code>s in your cluster corresponding to your different projects' namespaces</li>
+<li>Create <code>Role</code>s in your cluster corresponding to your different projects&rsquo; namespaces</li>
 <li>Create <code>RoleBinding</code>s in your cluster corresponding the different groups and roles</li>
 </ul>
 <p>For adding new users such as other team members on the same project or different project
 members, you would essentially repeat the process - add new user and assign them to groups.</p>
 <p>For example:</p>
-<pre><code>apiVersion: v1
+<pre tabindex="0"><code>apiVersion: v1
 data:
   ...
   mapUsers: |
@@ -257,7 +255,7 @@ data:
 ..
 </code></pre><p>An alternative to adding each individual user to the <code>ConfigMap</code> is to use IAM roles per project
 environment. So, to replicate the above using IAM roles, we would do the following:</p>
-<pre><code>apiVersion: v1
+<pre tabindex="0"><code>apiVersion: v1
 data:
   mapRoles: |
     - rolearn: arn:aws:iam::AWS-ACCOUN-ID:role/projectA-qa-humans
@@ -271,11 +269,10 @@ data:
       - system:basic-user
       - projectB:qa
 ...
-
 </code></pre><p>We don&rsquo;t add the individual user accounts any more. So, how do the individual users authenticate themselves
 to the cluster and then access relevant resources? We use the <code>AssumeRole</code> functionality to do so. An example
 kubeconfig will now look like:</p>
-<pre><code>apiVersion: v1
+<pre tabindex="0"><code>apiVersion: v1
 current-context: k8s-cluster
 clusters:
 - cluster:
@@ -301,31 +298,30 @@ users:
       - k8s-cluster
       - -r
       - arn:aws:iam::AWS-ACCOUN-ID:role/projectA-qa-humans
-
 </code></pre><p>If we compare it to the previous kubeconfig, the change is additional two arguments to <code>aws-iam-authenticator</code>
 to the end. <code>-r</code> says that we want to assume a role when fetching the token that we use to authenticate
 to the cluster. The role we want to assume here is the role which we have added to the <code>ConfigMap</code> above
 instead of individual users. To allow users to assume this role, we will need to do a couple of things.</p>
 <p>Allow the IAM role <code>projectA-qa-humans</code> to be assumed by everyone in the AWS account:</p>
-<pre><code>{
-  &quot;Version&quot;: &quot;2012-10-17&quot;,
-  &quot;Statement&quot;: [
+<pre tabindex="0"><code>{
+  &#34;Version&#34;: &#34;2012-10-17&#34;,
+  &#34;Statement&#34;: [
     {
-      &quot;Effect&quot;: &quot;Allow&quot;,
-      &quot;Principal&quot;: {
-        &quot;AWS&quot;: &quot;arn:aws:iam::&lt;AWS-ACCOUNT-ID&gt;:root&quot;
+      &#34;Effect&#34;: &#34;Allow&#34;,
+      &#34;Principal&#34;: {
+        &#34;AWS&#34;: &#34;arn:aws:iam::&lt;AWS-ACCOUNT-ID&gt;:root&#34;
       },
-      &quot;Action&quot;: &quot;sts:AssumeRole&quot;
+      &#34;Action&#34;: &#34;sts:AssumeRole&#34;
     }
   ]
 }
 </code></pre><p>And then allow user&rsquo;s accounts to assume this role via this policy:</p>
-<pre><code>{
-  &quot;Version&quot;: &quot;2012-10-17&quot;,
-  &quot;Statement&quot;: {
-    &quot;Effect&quot;: &quot;Allow&quot;,
-    &quot;Action&quot;: &quot;sts:AssumeRole&quot;,
-    &quot;Resource&quot;: &quot;arn:aws:iam::&lt;AWS-ACCOUNT-ID&gt;:role/projectA-humans&quot;
+<pre tabindex="0"><code>{
+  &#34;Version&#34;: &#34;2012-10-17&#34;,
+  &#34;Statement&#34;: {
+    &#34;Effect&#34;: &#34;Allow&#34;,
+    &#34;Action&#34;: &#34;sts:AssumeRole&#34;,
+    &#34;Resource&#34;: &#34;arn:aws:iam::&lt;AWS-ACCOUNT-ID&gt;:role/projectA-humans&#34;
   }
 }
 </code></pre><h2 id="which-aws-user-performed-this-api-operation">Which AWS user performed this API operation</h2>
@@ -337,45 +333,45 @@ doesn&rsquo;t support this. However, we can write our own solution by reading Ku
 AWS CloudTrail.</p>
 <h3 id="api-server-audit-logs">API server audit logs</h3>
 <p>The specific EKS log stream we are interested in is <code>kube-apiserver-audit</code>. Entires in this log stream are similar to:</p>
-<pre><code>{
-    &quot;kind&quot;: &quot;Event&quot;,
-    &quot;apiVersion&quot;: &quot;audit.k8s.io/v1beta1&quot;,
-    &quot;metadata&quot;: {
-        &quot;creationTimestamp&quot;: &quot;2019-08-22T00:13:15Z&quot;
+<pre tabindex="0"><code>{
+    &#34;kind&#34;: &#34;Event&#34;,
+    &#34;apiVersion&#34;: &#34;audit.k8s.io/v1beta1&#34;,
+    &#34;metadata&#34;: {
+        &#34;creationTimestamp&#34;: &#34;2019-08-22T00:13:15Z&#34;
     },
-    &quot;level&quot;: &quot;Request&quot;,
-    &quot;timestamp&quot;: &quot;2019-08-22T00:13:15Z&quot;,
-    &quot;auditID&quot;: &quot;b7140a45-50bf-4dc3-ad64-e64d211e4e6e&quot;,
-    &quot;stage&quot;: &quot;ResponseComplete&quot;,
-    &quot;requestURI&quot;: &quot;/api/v1/namespaces/projectA-qa/pods?limit=500&quot;,
-    &quot;verb&quot;: &quot;list&quot;,
-    &quot;user&quot;: {
-        &quot;username&quot;: &quot;projectA-qa-1566432791140199108&quot;,
-        &quot;uid&quot;: &quot;heptio-authenticator-aws:&lt;AWS-ACCOUNT-ID&gt;:AROAUBGCRZPAQIISY7KAL&quot;,
-        &quot;groups&quot;: [
-            &quot;system:basic-user&quot;,
-            &quot;projectA:qa&quot;,
-            &quot;system:authenticated&quot;
+    &#34;level&#34;: &#34;Request&#34;,
+    &#34;timestamp&#34;: &#34;2019-08-22T00:13:15Z&#34;,
+    &#34;auditID&#34;: &#34;b7140a45-50bf-4dc3-ad64-e64d211e4e6e&#34;,
+    &#34;stage&#34;: &#34;ResponseComplete&#34;,
+    &#34;requestURI&#34;: &#34;/api/v1/namespaces/projectA-qa/pods?limit=500&#34;,
+    &#34;verb&#34;: &#34;list&#34;,
+    &#34;user&#34;: {
+        &#34;username&#34;: &#34;projectA-qa-1566432791140199108&#34;,
+        &#34;uid&#34;: &#34;heptio-authenticator-aws:&lt;AWS-ACCOUNT-ID&gt;:AROAUBGCRZPAQIISY7KAL&#34;,
+        &#34;groups&#34;: [
+            &#34;system:basic-user&#34;,
+            &#34;projectA:qa&#34;,
+            &#34;system:authenticated&#34;
         ]
     },
-    &quot;sourceIPs&quot;: [
-        &quot;10.0.57.37&quot;
+    &#34;sourceIPs&#34;: [
+        &#34;10.0.57.37&#34;
     ],
-    &quot;userAgent&quot;: &quot;kubectl/v1.12.7 (linux/amd64) kubernetes/6f48297&quot;,
-    &quot;objectRef&quot;: {
-        &quot;resource&quot;: &quot;pods&quot;,
-        &quot;namespace&quot;: &quot;projectA-qa&quot;,
-        &quot;apiVersion&quot;: &quot;v1&quot;
+    &#34;userAgent&#34;: &#34;kubectl/v1.12.7 (linux/amd64) kubernetes/6f48297&#34;,
+    &#34;objectRef&#34;: {
+        &#34;resource&#34;: &#34;pods&#34;,
+        &#34;namespace&#34;: &#34;projectA-qa&#34;,
+        &#34;apiVersion&#34;: &#34;v1&#34;
     },
-    &quot;responseStatus&quot;: {
-        &quot;metadata&quot;: {},
-        &quot;code&quot;: 200
+    &#34;responseStatus&#34;: {
+        &#34;metadata&#34;: {},
+        &#34;code&#34;: 200
     },
-    &quot;requestReceivedTimestamp&quot;: &quot;2019-08-22T00:13:15.584533Z&quot;,
-    &quot;stageTimestamp&quot;: &quot;2019-08-22T00:13:15.589325Z&quot;,
-    &quot;annotations&quot;: {
-        &quot;authorization.k8s.io/decision&quot;: &quot;allow&quot;,
-        &quot;authorization.k8s.io/reason&quot;: &quot;RBAC: allowed by RoleBinding \&quot;projectA-qa-human-users/projectA-qa\&quot; of Role \&quot;projectA-qa-human-users\&quot; to Group \&quot;projectA:qa\&quot;&quot;
+    &#34;requestReceivedTimestamp&#34;: &#34;2019-08-22T00:13:15.584533Z&#34;,
+    &#34;stageTimestamp&#34;: &#34;2019-08-22T00:13:15.589325Z&#34;,
+    &#34;annotations&#34;: {
+        &#34;authorization.k8s.io/decision&#34;: &#34;allow&#34;,
+        &#34;authorization.k8s.io/reason&#34;: &#34;RBAC: allowed by RoleBinding \&#34;projectA-qa-human-users/projectA-qa\&#34; of Role \&#34;projectA-qa-human-users\&#34; to Group \&#34;projectA:qa\&#34;&#34;
     }
 }
 </code></pre><p>Our main interest in the above log is the <code>user</code> object and it&rsquo;s fields - <code>uid</code> and <code>username</code>. The <code>username</code> is composed
@@ -384,36 +380,36 @@ of two parts - a hardcoded <code>projectA-qa</code> and a generated session name
 The two key bits of data here that we will use to query CloudTrial are the strings <code>AROAUBGCRZPAQIISY7KAL</code> and <code>1566432791140199108</code>.</p>
 <h3 id="cloudtrail">CloudTrail</h3>
 <p>A CloudTrail event whose <code>EventName</code> is <code>AssumeRole</code> has the following structure:</p>
-<pre><code>{
-  AccessKeyId: &quot;AKKKLKLJLJLJLLHLHLHL&quot;,
-  CloudTrailEvent: &quot;...&quot;,
-  EventName: &quot;AssumeRole&quot;,
-  EventSource: &quot;sts.amazonaws.com&quot;,
+<pre tabindex="0"><code>{
+  AccessKeyId: &#34;AKKKLKLJLJLJLLHLHLHL&#34;,
+  CloudTrailEvent: &#34;...&#34;,
+  EventName: &#34;AssumeRole&#34;,
+  EventSource: &#34;sts.amazonaws.com&#34;,
   EventTime: 2019-08-22 00:13:12 +0000 UTC,
-  ReadOnly: &quot;true&quot;,
+  ReadOnly: &#34;true&#34;,
   Resources: [
     {
-      ResourceName: &quot;AKHKHKLJLHLJLLHHLHLHL&quot;,
-      ResourceType: &quot;AWS::IAM::AccessKey&quot;
+      ResourceName: &#34;AKHKHKLJLHLJLLHHLHLHL&#34;,
+      ResourceType: &#34;AWS::IAM::AccessKey&#34;
     },
     {
-      ResourceName: &quot;1566432791140199108&quot;,
-      ResourceType: &quot;AWS::STS::AssumedRole&quot;
+      ResourceName: &#34;1566432791140199108&#34;,
+      ResourceType: &#34;AWS::STS::AssumedRole&#34;
     },
     {
-      ResourceName: &quot;AROAUBGCRZPAQIISY7KAL:1566432791140199108&quot;,
-      ResourceType: &quot;AWS::STS::AssumedRole&quot;
+      ResourceName: &#34;AROAUBGCRZPAQIISY7KAL:1566432791140199108&#34;,
+      ResourceType: &#34;AWS::STS::AssumedRole&#34;
     },
     {
-      ResourceName: &quot;arn:aws:sts::AWS-ACCOUNT-ID:assumed-role/projectA-qa-humans/1566432791140199108&quot;,
-      ResourceType: &quot;AWS::STS::AssumedRole&quot;
+      ResourceName: &#34;arn:aws:sts::AWS-ACCOUNT-ID:assumed-role/projectA-qa-humans/1566432791140199108&#34;,
+      ResourceType: &#34;AWS::STS::AssumedRole&#34;
     },
     {
-      ResourceName: &quot;arn:aws:iam::AWS-ACCOUNT-ID:role/projectA-qa-humans&quot;,
-      ResourceType: &quot;AWS::IAM::Role&quot;
+      ResourceName: &#34;arn:aws:iam::AWS-ACCOUNT-ID:role/projectA-qa-humans&#34;,
+      ResourceType: &#34;AWS::IAM::Role&#34;
     }
   ],
-  Username: &quot;username1&quot;
+  Username: &#34;username1&#34;
 }
 </code></pre><p>In the above event, if you see the third entry in the <code>Resources</code> array, you can see that the <code>ResourceName</code> is
 basically composed of our two strings of interest from the kubeserver audit logs. Thus, if we search for CloudTrail
@@ -421,7 +417,7 @@ AssumeRole events for this ResourceName, we will have our actual AWS user who pe
 in the <code>Username</code> field.</p>
 <p>You can write your own script for this. I implemented this in my hobby AWS CLI project <a href="https://github.com/amitsaha/yawsi">yawsi</a>.</p>
 <p>The interface looks like:</p>
-<pre><code>$ yawsi eks whois --uid heptio-authenticator-aws:&lt;user-id&gt;:AROAUBGCRZPAQIISY7KAL --username projectA-qa-1566432791140199108 --lookback 6
+<pre tabindex="0"><code>$ yawsi eks whois --uid heptio-authenticator-aws:&lt;user-id&gt;:AROAUBGCRZPAQIISY7KAL --username projectA-qa-1566432791140199108 --lookback 6
 </code></pre><p>The <code>--lookback</code> parameter specifies the number of hours of CloudTrail events to look back to.</p>
 <h2 id="automating-kubeconfig-management-for-human-users">Automating kubeconfig management for human users</h2>
 <p>To allow human users to access the kubernetes cluster in a setup where we use a IAM role per project
@@ -447,50 +443,50 @@ To generate the project environment specific kubeconfig contexts, we need to loo
 that we want to assume while authenticating ourselves to the cluster. The conventions that I am currently
 following which I have referred to previously is that the IAM role which users assume are named as:
 <code>&lt;project name&gt;-&lt;environment&gt;-humans</code>. The following IAM policy gives all these permissions:</p>
-<pre><code>{
-  &quot;Version&quot;: &quot;2012-10-17&quot;,
-  &quot;Statement&quot;: [
+<pre tabindex="0"><code>{
+  &#34;Version&#34;: &#34;2012-10-17&#34;,
+  &#34;Statement&#34;: [
     {
-      &quot;Sid&quot;: &quot;NI1&quot;,
-      &quot;Effect&quot;: &quot;Allow&quot;,
-      &quot;Action&quot;: &quot;ec2:DescribeNetworkInterfaces&quot;,
-      &quot;Resource&quot;: &quot;*&quot;
+      &#34;Sid&#34;: &#34;NI1&#34;,
+      &#34;Effect&#34;: &#34;Allow&#34;,
+      &#34;Action&#34;: &#34;ec2:DescribeNetworkInterfaces&#34;,
+      &#34;Resource&#34;: &#34;*&#34;
     },
     {
-      &quot;Sid&quot;: &quot;EKS1&quot;,
-      &quot;Effect&quot;: &quot;Allow&quot;,
-      &quot;Action&quot;: [
-        &quot;eks:ListUpdates&quot;,
-        &quot;eks:DescribeUpdate&quot;,
-        &quot;eks:DescribeCluster&quot;,
-        &quot;eks:ListClusters&quot;
+      &#34;Sid&#34;: &#34;EKS1&#34;,
+      &#34;Effect&#34;: &#34;Allow&#34;,
+      &#34;Action&#34;: [
+        &#34;eks:ListUpdates&#34;,
+        &#34;eks:DescribeUpdate&#34;,
+        &#34;eks:DescribeCluster&#34;,
+        &#34;eks:ListClusters&#34;
       ],
-      &quot;Resource&quot;: &quot;*&quot;
+      &#34;Resource&#34;: &#34;*&#34;
     },
     {
-      &quot;Sid&quot;: &quot;IAM1&quot;,
-      &quot;Effect&quot;: &quot;Allow&quot;,
-      &quot;Action&quot;: [
-        &quot;iam:GetRole&quot;
+      &#34;Sid&#34;: &#34;IAM1&#34;,
+      &#34;Effect&#34;: &#34;Allow&#34;,
+      &#34;Action&#34;: [
+        &#34;iam:GetRole&#34;
       ],
-      &quot;Resource&quot;: &quot;arn:aws:iam::AWS-ACCOUNT-ID:role/*-humans&quot;
+      &#34;Resource&#34;: &#34;arn:aws:iam::AWS-ACCOUNT-ID:role/*-humans&#34;
     }
   ]
 }
 </code></pre><p>And ofcourse, we need to allow the user to assume the project environment specific role:</p>
-<pre><code>{
-  &quot;Version&quot;: &quot;2012-10-17&quot;,
-  &quot;Statement&quot;: {
-    &quot;Effect&quot;: &quot;Allow&quot;,
-    &quot;Action&quot;: &quot;sts:AssumeRole&quot;,
-    &quot;Resource&quot;: &quot;arn:aws:iam::AWS-ACCOUNT-ID:role/projectA-qa-humans&quot;
+<pre tabindex="0"><code>{
+  &#34;Version&#34;: &#34;2012-10-17&#34;,
+  &#34;Statement&#34;: {
+    &#34;Effect&#34;: &#34;Allow&#34;,
+    &#34;Action&#34;: &#34;sts:AssumeRole&#34;,
+    &#34;Resource&#34;: &#34;arn:aws:iam::AWS-ACCOUNT-ID:role/projectA-qa-humans&#34;
   }
 }
 </code></pre><p>(Instead of managing these permissions for individual users, I am using AWS user groups
 and assigning users to relevant groups and managing policies at the group level).</p>
 <p>I have implemented this in the <code>yawsi</code> project. To create a kubeconfig context if you want to access the
 EKS cluster as a individual AWS user:</p>
-<pre><code>$ yawsi eks create-kube-config --cluster-name &lt;your-cluster-name&gt;
+<pre tabindex="0"><code>$ yawsi eks create-kube-config --cluster-name &lt;your-cluster-name&gt;
 Kubeconfig written
 
 --------------------------/etc/hosts/ file entry ---------------------
@@ -498,7 +494,7 @@ Kubeconfig written
 &lt;ip&gt; &lt;EKS cluster endpoint&gt;
 </code></pre><p>To create a kubeconfig context if you want to access the EKS cluster by assuming another role
 which follows the specified convention above:</p>
-<pre><code>$ yawsi eks create-kube-config --cluster-name &lt;your-cluster-name&gt; --project projectA --environment qa
+<pre tabindex="0"><code>$ yawsi eks create-kube-config --cluster-name &lt;your-cluster-name&gt; --project projectA --environment qa
 Kubeconfig written
 
 --------------------------/etc/hosts/ file entry ---------------------
@@ -520,7 +516,7 @@ environment and then use the corresponding credentials when performing operation
 A service account will only have permissions to perform operations in a specific namespace.</p>
 <p>Let&rsquo;s see an example of creating a service account, creating a role with permissions to perform operations
 one would usually need to perform deployments, and then creating a role binding with this service acccount:</p>
-<pre><code>apiVersion: v1
+<pre tabindex="0"><code>apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: jenkins-projectA
@@ -533,34 +529,34 @@ metadata:
   namespace: projectA-qa
 rules:
 - apiGroups:
-  - &quot;&quot;
+  - &#34;&#34;
   resources:
   - services
   verbs:
-  - '*'
+  - &#39;*&#39;
 - apiGroups:
   - extensions
   - apps
   resources:
   - deployments
   verbs:
-  - '*'
+  - &#39;*&#39;
 - apiGroups:
   - batch
   resources:
   - cronjobs
   - jobs
   verbs:
-  - '*'
+  - &#39;*&#39;
 - apiGroups:
-  - &quot;&quot;
+  - &#34;&#34;
   resources:
   - pods
   verbs:
   - get
   - list
 - apiGroups:
-  - &quot;&quot;
+  - &#34;&#34;
   resources:
   - pods/log
   verbs:
@@ -582,7 +578,7 @@ subjects:
 </code></pre><p>Once the above service account is created, we can then get the token corresponding to the service account
 and then use that when performing operations on the cluster for a project via <code>kubectl --token &lt;token&gt;</code>.</p>
 <p>For completeness, the <code>ConfigMap</code> entry would like this:</p>
-<pre><code>apiVersion: v1
+<pre tabindex="0"><code>apiVersion: v1
 data:
   mapRoles: |
     - rolearn: arn:aws:iam::AWS-ACCOUNT-ID:role/Jenkins
@@ -594,7 +590,7 @@ data:
 <p>Let&rsquo;s consider a scenario where you want to run some software outside the cluster which will need to make API
 calls to the cluster to read various information - example, for monitoring. In this case, we can use an approach
 similar to we do for human non-admin users:</p>
-<pre><code>apiVersion: v1
+<pre tabindex="0"><code>apiVersion: v1
 data:
   mapRoles: |
   - rolearn: arn:aws:iam::AWS-ACCOUNT-ID:role/Monitoring
@@ -602,7 +598,7 @@ data:
       groups:
       - monitoring
 </code></pre><p>We augment this with a <code>ClusterRole</code> and <code>ClusterRoleBinding</code> as follows:</p>
-<pre><code># Role defined here
+<pre tabindex="0"><code># Role defined here
 ....
 
 apiVersion: rbac.authorization.k8s.io/v1

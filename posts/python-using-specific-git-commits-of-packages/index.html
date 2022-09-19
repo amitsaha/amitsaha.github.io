@@ -45,54 +45,51 @@ I went back to the drawing board - basically reading
 <li>When you create your deployment artifact, do <code>pip install -r requirements.txt</code>.</li>
 </ul>
 <p>An example requirements.txt file would look like:</p>
-<pre><code>git+https://&lt;git repo&gt;@master
+<pre tabindex="0"><code>git+https://&lt;git repo&gt;@master
 ..
-
 </code></pre><p>You can replace the <code>master</code> by a specific commit/git tag.</p>
 <h1 id="librariesend-user-focused-tools">Libraries/End-user focused tools</h1>
 <p>Now, let&rsquo;s say you are publishing a package to PyPI and this package has a dependency on
 a version of a package which is not in PyPi or in a git repo. This is what we do:</p>
 <p>In our <code>setup.py</code>, we add the package name in <code>install_requires</code> and add <code>dependency_links</code>
 as follows:</p>
-<pre><code> dependency_links=['git+https://&lt;git-repo&gt;@4ed6231457c244b8459037ee2224b0ef430cf766#egg=&lt;package-name&gt;-0'],
+<pre tabindex="0"><code> dependency_links=[&#39;git+https://&lt;git-repo&gt;@4ed6231457c244b8459037ee2224b0ef430cf766#egg=&lt;package-name&gt;-0&#39;],
 </code></pre><p>However if the third party package is already in <code>pypi</code>, we have a problem. So, we fool <code>pip</code> like, so:</p>
-<pre><code># I fool `pip` by specifying the version number which
+<pre tabindex="0"><code># I fool `pip` by specifying the version number which
 # is greater than the one released in PyPi and force
 # it to look at the dependency_links where i wrongly specify
 # that i have a version which is greater than 0.1.2
-install_requires='fire&gt;0.1.2',
+install_requires=&#39;fire&gt;0.1.2&#39;,
 dependency_links=[
-    'git+https://github.com/google/python-fire.git@9bff9d01ce16589201f57ffef27ea84744951c11#egg=fire-0.1.2.1',
+    &#39;git+https://github.com/google/python-fire.git@9bff9d01ce16589201f57ffef27ea84744951c11#egg=fire-0.1.2.1&#39;,
 ],
-
 </code></pre><p>See an <a href="https://github.com/amitsaha/python-git-dependency-demo/tree/master/application">example project</a></p>
 <p>Now, if we install <code>pip install . --process-dependency-links</code>, we will see:</p>
-<pre><code>Could not find a tag or branch '9bff9d01ce16589201f57ffef27ea84744951c11', assuming commit.
+<pre tabindex="0"><code>Could not find a tag or branch &#39;9bff9d01ce16589201f57ffef27ea84744951c11&#39;, assuming commit.
   Requested fire&gt;0.1.2 from git+https://github.com/google/python-fire.git@9bff9d01ce16589201f57ffef27ea84744951c11#egg=fire-0.1.2.1 (from my-awesome-cli==0.1), but installing version None
 </code></pre><p>To then distribute this to  PyPI, we need to make sure that we distribute this as a source tarball, <a href="https://github.com/pypa/pip/issues/3172">not a wheel</a>:</p>
-<pre><code> $ python setup.py sdist
- $ TWINE_REPOSITORY_URL=https://test.pypi.org/legacy/ TWINE_USERNAME=echorand TWINE_PASSWORD=&quot;secret&quot; twine upload dist/*
+<pre tabindex="0"><code> $ python setup.py sdist
+ $ TWINE_REPOSITORY_URL=https://test.pypi.org/legacy/ TWINE_USERNAME=echorand TWINE_PASSWORD=&#34;secret&#34; twine upload dist/*
 </code></pre><p>Once we have done that, we can install it, like so:</p>
-<pre><code>$ pip install my-awesome-cli==0.2 --process-dependency-links -i https://test.pypi.org/simple/
+<pre tabindex="0"><code>$ pip install my-awesome-cli==0.2 --process-dependency-links -i https://test.pypi.org/simple/
 ...
 DEPRECATION: Dependency Links processing has been deprecated and will be removed in a future release.
 Collecting fire&gt;0.1.2 (from my-awesome-cli==0.2)
   Cloning https://github.com/google/python-fire.git (to 9bff9d01ce16589201f57ffef27ea84744951c11) to /tmp/pip-build-SykxjY/fire
-  Could not find a tag or branch '9bff9d01ce16589201f57ffef27ea84744951c11', assuming commit.
+  Could not find a tag or branch &#39;9bff9d01ce16589201f57ffef27ea84744951c11&#39;, assuming commit.
   Requested fire&gt;0.1.2 from git+https://github.com/google/python-fire.git@9bff9d01ce16589201f57ffef27ea84744951c11#egg=fire-0.1.2.1 (from my-awesome-cli==0.2), but installing version None
 Collecting six (from fire&gt;0.1.2-&gt;my-awesome-cli==0.2)
 ...
 
 Successfully installed fire-0.1.2 my-awesome-cli-0.2 six-1.10.0
 </code></pre><p>We can then run our application:</p>
-<pre><code>$ my-awesome-cli
+<pre tabindex="0"><code>$ my-awesome-cli
 Type:        Calculator
 String form: &lt;my_awesome_cli.main.Calculator object at 0x7feecae69850&gt;
 Docstring:   A simple calculator class.
 
 Usage:       my-awesome-cli
              my-awesome-cli double
-
 </code></pre><h1 id="helpful-links">Helpful links</h1>
 <ul>
 <li><a href="https://caremad.io/posts/2013/07/setup-vs-requirement/">setup-vs-requirement</a></li>

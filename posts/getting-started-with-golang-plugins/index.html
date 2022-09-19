@@ -40,16 +40,15 @@ are present in both of them. The driver program will feed an integer into the fi
 on it. The result of the first plugin is fed into the second plugin and finally the driver program will print the result.</p>
 <h1 id="setup">Setup</h1>
 <p>Golang plugins are only supported on FreeBSD,Linux and Mac. I am using Golang 1.14 on Linux:</p>
-<pre><code>go version go1.14.1 linux/amd64
-
+<pre tabindex="0"><code>go version go1.14.1 linux/amd64
 </code></pre><p>Create a new directory for our first plugin and <code>chdir</code> into it:</p>
-<pre><code>$ mkdir golang-plugin-demo
+<pre tabindex="0"><code>$ mkdir golang-plugin-demo
 $ cd $_
 </code></pre><h1 id="writing-a-shared-package">Writing a shared package</h1>
-<pre><code>$ mkdir types
+<pre tabindex="0"><code>$ mkdir types
 $ cd types/
 </code></pre><p>Create a new file <code>type.go</code> with the following contents:</p>
-<pre><code>package types
+<pre tabindex="0"><code>package types
 
 type InData struct {
         V int
@@ -58,23 +57,21 @@ type InData struct {
 type OutData struct {
         V int
 }
-
 </code></pre><h1 id="writing-the-plugins">Writing the plugins</h1>
 <p>Navigate one level up in the directory tree and create a &ldquo;plugin1&rdquo; directory:</p>
-<pre><code>$ mkdir plugin1
+<pre tabindex="0"><code>$ mkdir plugin1
 $ cd plugin
-
 </code></pre><p>Create a new file <code>plugin.go</code> with the following contents:</p>
-<pre><code>package main
+<pre tabindex="0"><code>package main
 
-import &quot;../types&quot;
+import &#34;../types&#34;
 
 var Input types.InData
 var Output types.OutData
 var Name string
 
 func init() {
-        Name = &quot;plugin1&quot;
+        Name = &#34;plugin1&#34;
 }
 
 func process() types.OutData {
@@ -85,22 +82,21 @@ func F() {
         Output = process()
 }
 </code></pre><p>Build the plugin using:</p>
-<pre><code>$ go build -buildmode=plugin
+<pre tabindex="0"><code>$ go build -buildmode=plugin
 </code></pre><p>Navigate one level up in the directory tree and create a &ldquo;plugin2&rdquo; directory:</p>
-<pre><code>$ mkdir plugin2
+<pre tabindex="0"><code>$ mkdir plugin2
 $ cd plugin
-
 </code></pre><p>Create a new file <code>plugin.go</code> with the following contents:</p>
-<pre><code>package main
+<pre tabindex="0"><code>package main
 
-import &quot;../types&quot;
+import &#34;../types&#34;
 
 var Input types.InData
 var Output types.OutData
 var Name string
 
 func init() {
-        Name = &quot;plugin2&quot;
+        Name = &#34;plugin2&#34;
 }
 func process() types.OutData {
         o := types.OutData{V: Input.V * 20}
@@ -109,40 +105,39 @@ func process() types.OutData {
 func F() {
         Output = process()
 }
-
-</code></pre><pre><code>$ go build -buildmode=plugin
+</code></pre><pre tabindex="0"><code>$ go build -buildmode=plugin
 </code></pre><h1 id="writing-the-driver-program">Writing the driver program</h1>
 <p>Now, create a new file <code>main.go</code> at the top-level of the directory we created with the following contents:</p>
-<pre><code>package main
+<pre tabindex="0"><code>package main
 
 import (
-        &quot;log&quot;
-        &quot;plugin&quot;
+        &#34;log&#34;
+        &#34;plugin&#34;
 
-        &quot;./types&quot;
+        &#34;./types&#34;
 )
 
 func LoadPlugins(plugins []string) {
 
         d := types.InData{V: 1}
-        log.Printf(&quot;Invoking pipeline with data: %#v\n&quot;, d)
+        log.Printf(&#34;Invoking pipeline with data: %#v\n&#34;, d)
         o := types.OutData{}
         for _, p := range plugins {
                 p, err := plugin.Open(p)
                 if err != nil {
                         log.Fatal(err)
                 }
-                pName, err := p.Lookup(&quot;Name&quot;)
+                pName, err := p.Lookup(&#34;Name&#34;)
                 if err != nil {
                         panic(err)
                 }
-                log.Printf(&quot;Invoking plugin: %s\n&quot;, *pName.(*string))
+                log.Printf(&#34;Invoking plugin: %s\n&#34;, *pName.(*string))
 
-                input, err := p.Lookup(&quot;Input&quot;)
+                input, err := p.Lookup(&#34;Input&#34;)
                 if err != nil {
                         panic(err)
                 }
-                f, err := p.Lookup(&quot;F&quot;)
+                f, err := p.Lookup(&#34;F&#34;)
                 if err != nil {
                         panic(err)
                 }
@@ -150,26 +145,25 @@ func LoadPlugins(plugins []string) {
                 *input.(*types.InData) = d
                 f.(func())()
 
-                output, err := p.Lookup(&quot;Output&quot;)
+                output, err := p.Lookup(&#34;Output&#34;)
                 if err != nil {
                         panic(err)
                 }
-                // Feed the output to the next plugin's input
+                // Feed the output to the next plugin&#39;s input
                 d = types.InData{V: output.(*types.OutData).V}
                 *input.(*types.InData) = d
 
                 o = *output.(*types.OutData)
         }
-        log.Printf(&quot;Final result: %#v\n&quot;, o)
+        log.Printf(&#34;Final result: %#v\n&#34;, o)
 }
 
 func main() {
-        plugins := []string{&quot;plugin1/plugin1.so&quot;, &quot;plugin2/plugin2.so&quot;}
+        plugins := []string{&#34;plugin1/plugin1.so&#34;, &#34;plugin2/plugin2.so&#34;}
         LoadPlugins(plugins)
 }
-
 </code></pre><p>At this stage, our directory tree will look like this:</p>
-<pre><code>.
+<pre tabindex="0"><code>.
 ├── main.go
 ├── plugin1
 │   ├── plugin1.so
@@ -179,15 +173,13 @@ func main() {
 │   └── plugin.go
 └── types
     └── type.go
-
 </code></pre><p>Let&rsquo;s now build and run our driver program:</p>
-<pre><code>$ go build
+<pre tabindex="0"><code>$ go build
 $ ./golang-plugin-demo 
 2020/05/26 15:49:48 Invoking pipeline with data: types.InData{V:1}
 2020/05/26 15:49:48 Invoking plugin: plugin1
 2020/05/26 15:49:48 Invoking plugin: plugin2
 2020/05/26 15:49:48 Final result: types.OutData{V:40}
-
 </code></pre><h1 id="debrief">Debrief</h1>
 <p>The idea of plugins in Golang using the <code>plugin</code> package seems to quite simple. Write your plugin, export
 certain symbols - functions and variables only and then use them in your driver program. A plugin must be

@@ -46,16 +46,16 @@ seconds.</p>
 </ul>
 <h1 id="observations-on-build-host">Observations on build host</h1>
 <p>I built the image on build host, and ran it in a docker container, like so:</p>
-<pre><code>$ docker run -d test/image
+<pre tabindex="0"><code>$ docker run -d test/image
 </code></pre><p>My web application is configured to run on port 51034. From the host, I find out the container IP using <code>docker inspect</code>
 and make a GET request using PowerShell&rsquo;s <code>curl</code> (whic is basically aliased to <code>Invoke-WebRequest</code>):</p>
-<pre><code>$ curl -UseBasicParsing http://ip:51034
+<pre tabindex="0"><code>$ curl -UseBasicParsing http://ip:51034
 </code></pre><p>I get back errors saying there was a error in connecting to the external services. This is expected, since
 <strong>host1</strong> doesn&rsquo;t have connectivity to these services.</p>
 <p>Great, so I push the docker image to AWS ECR.</p>
 <h1 id="observations-on-deployment-host">Observations on deployment host</h1>
 <p>I pull the image from ECR, and run it, as above. Then I try to make the same request as above:</p>
-<pre><code>&gt; curl IP:51034
+<pre tabindex="0"><code>&gt; curl IP:51034
 curl : Unable to connect to the remote server
 At line:1 char:1
 + curl 172.29.170.207:51034
@@ -82,17 +82,17 @@ outside the container - done in the application. If only, my client would be tel
 <h1 id="on-sane-defaults">On Sane defaults</h1>
 <p>So, let&rsquo;s talk about what could have helped me debug this in seconds. When I replace the &ldquo;fake&rdquo; curl by the <a href="https://curl.haxx.se/windows/">real
 curl</a>:</p>
-<pre><code>PS C:\Users\Administrator\work\curl&gt; .\curl-7.61.1-win64-mingw\bin\curl.exe  172.29.170.207:51034
+<pre tabindex="0"><code>PS C:\Users\Administrator\work\curl&gt; .\curl-7.61.1-win64-mingw\bin\curl.exe  172.29.170.207:51034
 &lt;html&gt;&lt;head&gt;&lt;title&gt;Object moved&lt;/title&gt;&lt;/head&gt;&lt;body&gt;
-&lt;h2&gt;Object moved to &lt;a href=&quot;https://localhost:51034/&quot;&gt;here&lt;/a&gt;.&lt;/h2&gt;
+&lt;h2&gt;Object moved to &lt;a href=&#34;https://localhost:51034/&#34;&gt;here&lt;/a&gt;.&lt;/h2&gt;
 &lt;/body&gt;&lt;/html&gt;
 </code></pre><p>See what I see above? I see that there is a redirect being issued to <code>https://</code>. That&rsquo;s a sane default I am talking about.
-Dont' redirect me automatically, tell me  I am being redirected. That would have been sufficient for me to investigate
+Dont&rsquo; redirect me automatically, tell me  I am being redirected. That would have been sufficient for me to investigate
 into the issue I was having.</p>
 <p>(Ignore the &ldquo;localhost&rdquo; above, that was my fault in the configuration - that doesn&rsquo;t change the error I get from
 &ldquo;fake&rdquo; curl)</p>
 <p>It turns out &ldquo;fake&rdquo; curl has a <code>MaximumRedirection</code> parameter which when set to 0 gives me the same behavior as real curl:</p>
-<pre><code>PS C:\Users\Administrator\work\curl&gt; curl -UseBasicParsing 172.29.170.207:51034 -Verbose -MaximumRedirection 0
+<pre tabindex="0"><code>PS C:\Users\Administrator\work\curl&gt; curl -UseBasicParsing 172.29.170.207:51034 -Verbose -MaximumRedirection 0
 VERBOSE: GET http://172.29.170.207:51034/ with 0-byte payload
 VERBOSE: received 141-byte response of content type text/html; charset=utf-8
 
@@ -100,7 +100,7 @@ VERBOSE: received 141-byte response of content type text/html; charset=utf-8
 StatusCode        : 301
 StatusDescription : Moved Permanently
 Content           : &lt;html&gt;&lt;head&gt;&lt;title&gt;Object moved&lt;/title&gt;&lt;/head&gt;&lt;body&gt;
-                    &lt;h2&gt;Object moved to &lt;a href=&quot;https://localhost:51034/&quot;&gt;here&lt;/a&gt;.&lt;/h2&gt;
+                    &lt;h2&gt;Object moved to &lt;a href=&#34;https://localhost:51034/&#34;&gt;here&lt;/a&gt;.&lt;/h2&gt;
                     &lt;/body&gt;&lt;/html&gt;
 
 RawContent        : HTTP/1.1 301 Moved Permanently
@@ -114,7 +114,7 @@ Forms             :
 Headers           : {[X-Content-Type-Options, nosniff], [X-UA-Compatible, IE=Edge,chrome=1], [Content-Length, 141], [Content-Type, text/html; charset=utf-8]...}
 Images            : {}
 InputFields       : {}
-Links             : {@{outerHTML=&lt;a href=&quot;https://localhost:51034/&quot;&gt;here&lt;/a&gt;; tagName=A; href=https://localhost:51034/}}
+Links             : {@{outerHTML=&lt;a href=&#34;https://localhost:51034/&#34;&gt;here&lt;/a&gt;; tagName=A; href=https://localhost:51034/}}
 ParsedHtml        :
 RawContentLength  : 141
 

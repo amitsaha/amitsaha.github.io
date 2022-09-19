@@ -68,62 +68,62 @@ with <code>traefik</code> as a reverse proxy and using native docker integration
 </ol>
 <h1 id="example">Example</h1>
 <p>An example <code>docker-compose</code> file that you can use to experiment with the above idea is:</p>
-<pre><code>version: '3'
+<pre tabindex="0"><code>version: &#39;3&#39;
 
 services:
   reverse-proxy:
     image: traefik # The official Traefik docker image
     command: --api --docker # Enables the web UI and tells Traefik to listen to docker
     ports:
-      - &quot;80:80&quot;     # The HTTP port
-      - &quot;8080:8080&quot; # The Web UI (enabled by --api)
+      - &#34;80:80&#34;     # The HTTP port
+      - &#34;8080:8080&#34; # The Web UI (enabled by --api)
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock # So that Traefik can listen to the Docker events
   whoami:
     image: containous/whoami # A container that exposes an API to show its IP address
     labels:
-      - &quot;traefik.frontend.rule=Host:whoami.docker.localhost&quot;
-      - &quot;traefik.backend=backend1&quot;
+      - &#34;traefik.frontend.rule=Host:whoami.docker.localhost&#34;
+      - &#34;traefik.backend=backend1&#34;
 
   whoami-again:
     image: containous/whoami # A container that exposes an API to show its IP address
     labels:
-      - &quot;traefik.frontend.rule=Host:whoami.docker.localhost&quot;
-      - &quot;traefik.site1.backend=backendsite1&quot;
+      - &#34;traefik.frontend.rule=Host:whoami.docker.localhost&#34;
+      - &#34;traefik.site1.backend=backendsite1&#34;
 </code></pre><p>Run <code>docker-compose up</code> and go to <code>http://localhost:8080/api/providers/docker/backends</code>, we will get the three
 backends that&rsquo;s configured:</p>
-<pre><code>{
-  &quot;backend-backend1&quot;: {
-    &quot;servers&quot;: {
-      &quot;server-traefik-demo-whoami-1-86460ec963c2-f0078ecb386e282a8fc546f06636ff94&quot;: {
-        &quot;url&quot;: &quot;http:\/\/172.18.0.3:80&quot;,
-        &quot;weight&quot;: 1
+<pre tabindex="0"><code>{
+  &#34;backend-backend1&#34;: {
+    &#34;servers&#34;: {
+      &#34;server-traefik-demo-whoami-1-86460ec963c2-f0078ecb386e282a8fc546f06636ff94&#34;: {
+        &#34;url&#34;: &#34;http:\/\/172.18.0.3:80&#34;,
+        &#34;weight&#34;: 1
       }
     },
-    &quot;loadBalancer&quot;: {
-      &quot;method&quot;: &quot;wrr&quot;
+    &#34;loadBalancer&#34;: {
+      &#34;method&#34;: &#34;wrr&#34;
     }
   },
-  &quot;backend-reverse-proxy-traefik-demo&quot;: {
-    &quot;servers&quot;: {
-      &quot;server-traefik-demo-reverse-proxy-1-807284c2bf53-a4b9e1129a86189ee88fc1a031f0c65d&quot;: {
-        &quot;url&quot;: &quot;http:\/\/172.18.0.4:80&quot;,
-        &quot;weight&quot;: 1
+  &#34;backend-reverse-proxy-traefik-demo&#34;: {
+    &#34;servers&#34;: {
+      &#34;server-traefik-demo-reverse-proxy-1-807284c2bf53-a4b9e1129a86189ee88fc1a031f0c65d&#34;: {
+        &#34;url&#34;: &#34;http:\/\/172.18.0.4:80&#34;,
+        &#34;weight&#34;: 1
       }
     },
-    &quot;loadBalancer&quot;: {
-      &quot;method&quot;: &quot;wrr&quot;
+    &#34;loadBalancer&#34;: {
+      &#34;method&#34;: &#34;wrr&#34;
     }
   },
-  &quot;backend-whoami-again-traefik-demo-backendsite1&quot;: {
-    &quot;servers&quot;: {
-      &quot;server-traefik-demo-whoami-again-1-36490b790acf-780f230448df16d66397c0c29cebc062&quot;: {
-        &quot;url&quot;: &quot;http:\/\/172.18.0.2:80&quot;,
-        &quot;weight&quot;: 1
+  &#34;backend-whoami-again-traefik-demo-backendsite1&#34;: {
+    &#34;servers&#34;: {
+      &#34;server-traefik-demo-whoami-again-1-36490b790acf-780f230448df16d66397c0c29cebc062&#34;: {
+        &#34;url&#34;: &#34;http:\/\/172.18.0.2:80&#34;,
+        &#34;weight&#34;: 1
       }
     },
-    &quot;loadBalancer&quot;: {
-      &quot;method&quot;: &quot;wrr&quot;
+    &#34;loadBalancer&#34;: {
+      &#34;method&#34;: &#34;wrr&#34;
     }
   }
 }
@@ -141,10 +141,10 @@ in more concrete terms, this is how we can check if a new server container has b
 to learn more. Basically, the backend name is not fixed, it will need to be derived at runtime.</p>
 <h2 id="getting-the-relevant-containers-ip-address">Getting the relevant container&rsquo;s IP address</h2>
 <p>How do you get the new container&rsquo;s IP address that you want to check if it&rsquo;s been registered? I used something like this:</p>
-<pre><code>NewContainer=docker ps --filter &quot;health=healthy&quot; --filter &quot;label=app=${Image}&quot; --filter &quot;label=version=${GitHash}&quot; --format '{{.Names}}'
+<pre tabindex="0"><code>NewContainer=docker ps --filter &#34;health=healthy&#34; --filter &#34;label=app=${Image}&#34; --filter &#34;label=version=${GitHash}&#34; --format &#39;{{.Names}}&#39;
 </code></pre><p>My new container would have a label, <code>version</code> with the version of the application I am deploying so I use that to query it.</p>
 <p>How do I get the old container&rsquo;s IP address? I use this appraoch:</p>
-<pre><code>$OldContainers=docker ps --filter &quot;label=app=${Image}&quot; --filter before=$NewContainer --format '{{.ID}}'
+<pre tabindex="0"><code>$OldContainers=docker ps --filter &#34;label=app=${Image}&#34; --filter before=$NewContainer --format &#39;{{.ID}}&#39;
 </code></pre><p>Basically, I check the container of the same application which was created before the new container. A more fool proof
 approach would be to store the previous version that was deployed and use that.</p>
 <h1 id="conclusion">Conclusion</h1>

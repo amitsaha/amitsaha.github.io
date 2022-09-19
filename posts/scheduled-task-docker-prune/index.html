@@ -36,19 +36,19 @@
         <h1>Scheduled task to prune docker images on Windows server</h1><time>January 21, 2019</time></header><p>Windows docker images can be bulky and on a server that you are deploying your application as docker images, the free disk space
 becomes a metric to watch out for. The following script will setup a Scheduled tasks to be run at a 7.0 PM UTC which will prune
 all unused images:</p>
-<pre><code># Scheduled tasks
-if (-Not (Test-Path &quot;C:\ScheduledScripts&quot;))
+<pre tabindex="0"><code># Scheduled tasks
+if (-Not (Test-Path &#34;C:\ScheduledScripts&#34;))
 {
     mkdir C:\ScheduledScripts
 }
 
-$command=&quot;docker image prune --all -f&quot;
+$command=&#34;docker image prune --all -f&#34;
 $command | Out-File -encoding ASCII C:\ScheduledScripts\DockerImagePrune.ps1
 
-$action = New-ScheduledTaskAction -Execute 'powershell.exe' -Argument '-command C:\ScheduledScripts\DockerImagePrune.ps1'
+$action = New-ScheduledTaskAction -Execute &#39;powershell.exe&#39; -Argument &#39;-command C:\ScheduledScripts\DockerImagePrune.ps1&#39;
 $trigger = New-ScheduledTaskTrigger -Daily -At 07:00pm #UTC
-$prncipal = New-ScheduledTaskPrincipal -GroupId &quot;BUILTIN\Administrators&quot; -RunLevel Highest
-Register-ScheduledTask -Action $action -Trigger $trigger -Principal $prncipal -TaskName &quot;\PowerShell\PruneUnusedDockerImages&quot; -Description &quot;Prune unused docker images&quot;
+$prncipal = New-ScheduledTaskPrincipal -GroupId &#34;BUILTIN\Administrators&#34; -RunLevel Highest
+Register-ScheduledTask -Action $action -Trigger $trigger -Principal $prncipal -TaskName &#34;\PowerShell\PruneUnusedDockerImages&#34; -Description &#34;Prune unused docker images&#34;
 </code></pre><p>That&rsquo;s it.</p>
 </article>
 <footer id="footer">

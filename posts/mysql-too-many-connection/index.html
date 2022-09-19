@@ -34,10 +34,10 @@
 <article>
     <header id="post-header">
         <h1>Tip MySQL - Too many connections</h1><time>January 4, 2018</time></header><p>If you are getting the &ldquo;Too many connections&rdquo; error, couple of things worth checking on the MySQL server:</p>
-<pre><code>mysql&gt; show processlist;
+<pre tabindex="0"><code>mysql&gt; show processlist;
 ..
 </code></pre><p>The above will show the currently open connections. The second is:</p>
-<pre><code>mysql&gt; show variables like &quot;max_connections&quot;;
+<pre tabindex="0"><code>mysql&gt; show variables like &#34;max_connections&#34;;
 ..
 </code></pre><p>The above will show the configured <code>max_connections</code> allowed. When you get this error, this value is less than or equal to the
 number of rows returned by <code>show processlist</code>.</p>

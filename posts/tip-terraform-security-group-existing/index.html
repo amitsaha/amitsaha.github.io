@@ -37,24 +37,24 @@
 saying that the source security group doesn&rsquo;t exist, even though it does. That&rsquo;s probably
 because you (like me and <a href="https://github.com/hashicorp/terraform/issues/5532">others</a>)
 used the source security group ID and not the security group name, like so:</p>
-<pre><code>resource &quot;aws_security_group_rule&quot; &quot;my_sg_rule&quot; {
-  type      = &quot;ingress&quot;
+<pre tabindex="0"><code>resource &#34;aws_security_group_rule&#34; &#34;my_sg_rule&#34; {
+  type      = &#34;ingress&#34;
   from_port = 11123
   to_port   = 11123
-  protocol  = &quot;tcp&quot;
+  protocol  = &#34;tcp&#34;
 
-  security_group_id        = &quot;${aws_security_group.sg1.id}&quot;
-  source_security_group_id = &quot;${aws_security_group.sg2.id}&quot;
+  security_group_id        = &#34;${aws_security_group.sg1.id}&#34;
+  source_security_group_id = &#34;${aws_security_group.sg2.id}&#34;
 }
 </code></pre><p>You should actually do this instead:</p>
-<pre><code>resource &quot;aws_security_group_rule&quot; &quot;my_sg_rule&quot; {
-  type      = &quot;ingress&quot;
+<pre tabindex="0"><code>resource &#34;aws_security_group_rule&#34; &#34;my_sg_rule&#34; {
+  type      = &#34;ingress&#34;
   from_port = 11123
   to_port   = 11123
-  protocol  = &quot;tcp&quot;
+  protocol  = &#34;tcp&#34;
 
-  security_group_id        = &quot;${aws_security_group.sg1.id}&quot;
-  source_security_group_id = &quot;${aws_security_group.sg2.name}&quot;
+  security_group_id        = &#34;${aws_security_group.sg1.id}&#34;
+  source_security_group_id = &#34;${aws_security_group.sg2.name}&#34;
 }
 </code></pre></article>
 <footer id="footer">

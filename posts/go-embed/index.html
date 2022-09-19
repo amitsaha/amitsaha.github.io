@@ -43,44 +43,43 @@ in the form of a standard library package is great news.</p>
 <h2 id="demo---embedding-a-template">Demo - Embedding a template</h2>
 <p>As an example of a file that we want to embed, let&rsquo;s consider a Go template
 which generates Go source code:</p>
-<pre><code># We want to embed this
+<pre tabindex="0"><code># We want to embed this
 package main
 
-import &quot;fmt&quot;
+import &#34;fmt&#34;
 
 func main() {
-    fmt.Printf(&quot;Hello World - Welcome to {{.Name}}'s World&quot;)
+    fmt.Printf(&#34;Hello World - Welcome to {{.Name}}&#39;s World&#34;)
 }
 </code></pre><p>The file above is stored in the directory <code>templates</code> as a file <code>main.go.tmpl</code>.
 To embed the above file contents, we would write the following code using the
 <code>embed</code> package:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
-
-<span style="color:#f92672">import</span> <span style="color:#a6e22e">_</span> <span style="color:#e6db74">&#34;embed&#34;</span>
-
-<span style="color:#75715e">//go:embed templates/main.go.tmpl
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">tmplMainGo</span> []<span style="color:#66d9ef">byte</span>
-</code></pre></div><p>The key here is of course:</p>
-<pre><code>//go:embed templates/main.go.tmpl
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> <span style="color:#a6e22e">_</span> <span style="color:#e6db74">&#34;embed&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">//go:embed templates/main.go.tmpl
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">tmplMainGo</span> []<span style="color:#66d9ef">byte</span>
+</span></span></code></pre></div><p>The key here is of course:</p>
+<pre tabindex="0"><code>//go:embed templates/main.go.tmpl
 var tmplMainGo []byte
 </code></pre><p>This makes the contents of the above template available as a slice of bytes in
 the <code>tmplMainGo</code> variable.</p>
 <p>We can then access the template as follows:</p>
-<pre><code>tmpl, err := tmpl.Parse(string(tmplMainGo))
+<pre tabindex="0"><code>tmpl, err := tmpl.Parse(string(tmplMainGo))
 ...
 </code></pre><p>You can see the working demo <a href="https://github.com/amitsaha/go-embed">here</a>. Clone the repository and run the following steps:</p>
-<pre><code>
+<pre tabindex="0"><code>
 $ go build
 
 $ ./go-embed 
 package main
 
-import &quot;fmt&quot;
+import &#34;fmt&#34;
 
 func main() {
-    fmt.Printf(&quot;Hello World - Welcome to Jane's World&quot;)
+    fmt.Printf(&#34;Hello World - Welcome to Jane&#39;s World&#34;)
 }
-
 </code></pre><h2 id="notes">Notes</h2>
 <p>The <code>embed</code> package also currently supports embedding an file system tree via the <code>embed.FS</code> type. See the package docs for the
 <a href="https://golang.org/pkg/embed/">details</a>.</p>

@@ -37,19 +37,19 @@
 <h2 id="non-named-return-values">Non-named return values</h2>
 <p>Until today, I had been exclusively using the following style of what i am going
 to refer to as &ldquo;Non-named return values&rdquo;:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">myFunc</span>() (<span style="color:#66d9ef">int</span>, <span style="color:#66d9ef">error</span>) {
-        <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">1</span>, <span style="color:#a6e22e">errors</span>.<span style="color:#a6e22e">New</span>(<span style="color:#e6db74">&#34;An error&#34;</span>)
-}
-</code></pre></div><p>You declare in the function signature that you will be returning an <code>int</code> and and an <code>error</code>.
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">myFunc</span>() (<span style="color:#66d9ef">int</span>, <span style="color:#66d9ef">error</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">1</span>, <span style="color:#a6e22e">errors</span>.<span style="color:#a6e22e">New</span>(<span style="color:#e6db74">&#34;An error&#34;</span>)
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>You declare in the function signature that you will be returning an <code>int</code> and and an <code>error</code>.
 Then in your code, you return those values.</p>
 <h2 id="named-return-values">Named return values</h2>
 <p>Using the &ldquo;named return values&rdquo; approach, the above function would be written as:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">myFunc</span>() (<span style="color:#a6e22e">i</span> <span style="color:#66d9ef">int</span>, <span style="color:#a6e22e">e</span> <span style="color:#66d9ef">error</span>) {
-        <span style="color:#a6e22e">i</span> = <span style="color:#ae81ff">1</span>
-        <span style="color:#a6e22e">e</span> = <span style="color:#a6e22e">errors</span>.<span style="color:#a6e22e">New</span>(<span style="color:#e6db74">&#34;An error&#34;</span>)
-        <span style="color:#66d9ef">return</span>
-}
-</code></pre></div><p>The updated function signature essentially does two things:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">myFunc</span>() (<span style="color:#a6e22e">i</span> <span style="color:#66d9ef">int</span>, <span style="color:#a6e22e">e</span> <span style="color:#66d9ef">error</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">i</span> = <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">e</span> = <span style="color:#a6e22e">errors</span>.<span style="color:#a6e22e">New</span>(<span style="color:#e6db74">&#34;An error&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>The updated function signature essentially does two things:</p>
 <ol>
 <li>It says that the function will return an <code>int</code> and an <code>error</code></li>
 <li>Declares two variables - <code>i</code> of type <code>int</code> and <code>e</code> of type <code>error</code></li>
@@ -79,56 +79,56 @@ in a deferred function call. I came across the usefulness of named return values
 <p>This technique is well described in the <a href="https://blog.golang.org/defer-panic-and-recover">Defer, Panic, and Recover</a> blog
 post as - &ldquo;Deferred functions may read and assign to the returning function&rsquo;s named return values.&rdquo;</p>
 <p>Let&rsquo;s consider an updated <code>myFunc()</code>:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go">
-<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">myFunc</span>(<span style="color:#a6e22e">msg</span> <span style="color:#66d9ef">string</span>) (<span style="color:#a6e22e">i</span> <span style="color:#66d9ef">int</span>, <span style="color:#a6e22e">e</span> <span style="color:#66d9ef">error</span>) {
-	<span style="color:#a6e22e">i</span> = <span style="color:#ae81ff">1</span>
-	<span style="color:#66d9ef">defer</span> <span style="color:#66d9ef">func</span>() {
-		<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">r</span> <span style="color:#f92672">:=</span> recover(); <span style="color:#a6e22e">r</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
-			<span style="color:#a6e22e">e</span> = <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Errorf</span>(<span style="color:#e6db74">&#34;Error recovered: %v&#34;</span>, <span style="color:#a6e22e">r</span>)
-		}
-
-	}()
-	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">msg</span> <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;panic&#34;</span> {
-		panic(<span style="color:#e6db74">&#34;Panicked!&#34;</span>)
-	}
-	<span style="color:#a6e22e">i</span> = <span style="color:#ae81ff">2</span>
-	<span style="color:#66d9ef">return</span>
-}
-</code></pre></div><p>We setup a deferred function call where in we call <code>recover()</code> and set the error value, <code>e</code>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">myFunc</span>(<span style="color:#a6e22e">msg</span> <span style="color:#66d9ef">string</span>) (<span style="color:#a6e22e">i</span> <span style="color:#66d9ef">int</span>, <span style="color:#a6e22e">e</span> <span style="color:#66d9ef">error</span>) {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">i</span> = <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">defer</span> <span style="color:#66d9ef">func</span>() {
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">r</span> <span style="color:#f92672">:=</span> recover(); <span style="color:#a6e22e">r</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+</span></span><span style="display:flex;"><span>			<span style="color:#a6e22e">e</span> = <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Errorf</span>(<span style="color:#e6db74">&#34;Error recovered: %v&#34;</span>, <span style="color:#a6e22e">r</span>)
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	}()
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">msg</span> <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;panic&#34;</span> {
+</span></span><span style="display:flex;"><span>		panic(<span style="color:#e6db74">&#34;Panicked!&#34;</span>)
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">i</span> = <span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>We setup a deferred function call where in we call <code>recover()</code> and set the error value, <code>e</code>
 to the recovered error.</p>
 <p>If the string argument, <code>msg</code> is equal to <code>panic</code>, we call the <code>panic()</code> function.</p>
 <p>Else, we set the value of <code>i</code> to 2 and call <code>return</code>.</p>
 <p>(<a href="https://play.golang.org/p/D4g877Ft2_i">Go playground link</a>)</p>
 <p>Now, if we call the function as <code>i, e := myFunc(&quot;don't panic&quot;)</code>, the output will be:</p>
-<pre><code>I: 2 
+<pre tabindex="0"><code>I: 2 
 Err: &lt;nil&gt;
 </code></pre><p>If we call the function as <code>i, e = myFunc(&quot;panic&quot;)</code>, the output will be:</p>
-<pre><code>I: 1 
+<pre tabindex="0"><code>I: 1 
 Err: Error recovered: Panicked!
 </code></pre><p>We need to use named return values technique here, because of one primary reason:
 <em>return</em> values from a <code>defer</code>-red function call are discarded. If you update
 <code>myFunc()</code> to be as follows: (<a href="https://play.golang.org/p/vTTZzuvzVgw">Playground link</a>)</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go">
-<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">myFunc</span>(<span style="color:#a6e22e">msg</span> <span style="color:#66d9ef">string</span>) (<span style="color:#66d9ef">int</span>, <span style="color:#66d9ef">error</span>) {
-	<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">i</span> <span style="color:#66d9ef">int</span>
-	<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">e</span> <span style="color:#66d9ef">error</span>
-	<span style="color:#a6e22e">i</span> = <span style="color:#ae81ff">1</span>
-	<span style="color:#66d9ef">defer</span> <span style="color:#66d9ef">func</span>() (<span style="color:#66d9ef">int</span>, <span style="color:#66d9ef">error</span>) {
-		<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">r</span> <span style="color:#f92672">:=</span> recover(); <span style="color:#a6e22e">r</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
-			<span style="color:#a6e22e">e</span> = <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Errorf</span>(<span style="color:#e6db74">&#34;Error recovered: %v&#34;</span>, <span style="color:#a6e22e">r</span>)
-			<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">i</span>, <span style="color:#a6e22e">e</span>
-		}
-		<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">i</span>, <span style="color:#a6e22e">e</span>
-
-	}()
-	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">msg</span> <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;panic&#34;</span> {
-		panic(<span style="color:#e6db74">&#34;Panicked!&#34;</span>)
-	}
-	<span style="color:#a6e22e">i</span> = <span style="color:#ae81ff">2</span>
-	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">i</span>, <span style="color:#a6e22e">e</span>
-}
-</code></pre></div><p>The output of the same two function calls will be:</p>
-<pre><code>I: 2 
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">myFunc</span>(<span style="color:#a6e22e">msg</span> <span style="color:#66d9ef">string</span>) (<span style="color:#66d9ef">int</span>, <span style="color:#66d9ef">error</span>) {
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">i</span> <span style="color:#66d9ef">int</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">e</span> <span style="color:#66d9ef">error</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">i</span> = <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">defer</span> <span style="color:#66d9ef">func</span>() (<span style="color:#66d9ef">int</span>, <span style="color:#66d9ef">error</span>) {
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">r</span> <span style="color:#f92672">:=</span> recover(); <span style="color:#a6e22e">r</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+</span></span><span style="display:flex;"><span>			<span style="color:#a6e22e">e</span> = <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Errorf</span>(<span style="color:#e6db74">&#34;Error recovered: %v&#34;</span>, <span style="color:#a6e22e">r</span>)
+</span></span><span style="display:flex;"><span>			<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">i</span>, <span style="color:#a6e22e">e</span>
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">i</span>, <span style="color:#a6e22e">e</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	}()
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">msg</span> <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;panic&#34;</span> {
+</span></span><span style="display:flex;"><span>		panic(<span style="color:#e6db74">&#34;Panicked!&#34;</span>)
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">i</span> = <span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">i</span>, <span style="color:#a6e22e">e</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>The output of the same two function calls will be:</p>
+<pre tabindex="0"><code>I: 2 
 Err: &lt;nil&gt;
 
 I: 0 

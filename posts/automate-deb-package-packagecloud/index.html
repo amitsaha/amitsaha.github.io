@@ -45,7 +45,7 @@ That still holds here.</p>
 <h1 id="building-the-deb-packages-in-travis-ci">Building the DEB packages in Travis CI</h1>
 <p>To let Travis build the DEB package, we add a <code>.travis.yml</code> file to our <a href="https://github.com/amitsaha/golang-packaging-demo">git repository</a>
 with the following contents:</p>
-<pre><code># This gives us full control over what we intend to do
+<pre tabindex="0"><code># This gives us full control over what we intend to do
 # in the job
 language: minimal
 sudo: required
@@ -56,29 +56,28 @@ addons:
     packages:
       - docker-ce
 script:
-  - make build-deb DEB_PACKAGE_DESCRIPTION=&quot;Logrus Demo&quot; DEB_PACKAGE_NAME=demo BINARY_NAME=demo
-
+  - make build-deb DEB_PACKAGE_DESCRIPTION=&#34;Logrus Demo&#34; DEB_PACKAGE_NAME=demo BINARY_NAME=demo
 </code></pre><p>The recipe I shared in my earlier post used a script, <code>build-deb-docker.sh</code> to build the DEB package. We invoked
 it via the <code>Makefile</code> targte, <code>build-deb</code>. We do the same here in the <code>.travis.yml</code> file&rsquo;s script section. However,
 as opposed to the first post where I was using two separate dockerfiles, I switched to using docker&rsquo;s
 <a href="https://docs.docker.com/develop/develop-images/multistage-build/">multi stage builds</a> feature and hence used
 a single Dockerfile. To use this docker feature, I update the <code>docker</code> engine to the latest release via the following
 above:</p>
-<pre><code>addons:
+<pre tabindex="0"><code>addons:
   apt:
     ...
 </code></pre><p>The above creates the DEB package and places it in the <code>artifacts</code> directory.</p>
 <h1 id="publishing-deb-package-to-packagecloudio">Publishing DEB package to packagecloud.io</h1>
 <p>We have built our package now and we are going to push it to a repository created on <a href="https://packagecloud.io">pacakagecloud.io</a>. The first step is to create a repostiory by logging in - let&rsquo;s call it <code>logrus-demo</code>'
 and update our <code>.travis.yml</code> as follows:</p>
-<pre><code>deploy:
+<pre tabindex="0"><code>deploy:
   provider: packagecloud
   repository: logrus-demo 
   username: amitsaha
-  token: &quot;${PACKAGECLOUD_TOKEN}&quot;
-  dist: &quot;ubuntu/xenial&quot;   
-  local-dir: &quot;./artifacts&quot;
-  package_glob: &quot;*.deb&quot;
+  token: &#34;${PACKAGECLOUD_TOKEN}&#34;
+  dist: &#34;ubuntu/xenial&#34;   
+  local-dir: &#34;./artifacts&#34;
+  package_glob: &#34;*.deb&#34;
   skip_cleanup: true
   on:
     branch: master
@@ -98,7 +97,7 @@ packagecloud.io repository. You should see your package in your repo similar to 
 are provided on how you can add the repository to your distribution:</p>
 <p><img src="%7Bfilename%7D/images/package_cloud1.png" alt="Repository setup" title="Repository setup instructions"></p>
 <p>Let&rsquo;s try the manual step:</p>
-<pre><code>root@c9b3de968621:/# curl -s https://packagecloud.io/install/repositories/amitsaha/logrus-demo/script.deb.sh | bash
+<pre tabindex="0"><code>root@c9b3de968621:/# curl -s https://packagecloud.io/install/repositories/amitsaha/logrus-demo/script.deb.sh | bash
 Detected operating system as Ubuntu/xenial.
 Checking for curl...
 Detected curl...
@@ -112,7 +111,7 @@ Running apt-get update... done.
 
 The repository is setup! You can now install packages.
 </code></pre><p>Our package is called <code>demo</code>, so let&rsquo;s install it:</p>
-<pre><code>root@c9b3de968621:/# apt install demo
+<pre tabindex="0"><code>root@c9b3de968621:/# apt install demo
 Reading package lists... Done
 Building dependency tree
 Reading state information... Done
@@ -129,11 +128,9 @@ Selecting previously unselected package demo.
 Preparing to unpack .../demo_0.1-e7b1650_amd64.deb ...
 Unpacking demo (0.1-e7b1650) ...
 Setting up demo (0.1-e7b1650) ...
-
 </code></pre><p>And let&rsquo;s run it now:</p>
-<pre><code>$ demo
+<pre tabindex="0"><code>$ demo
 INFO[0000] I love logrus!
-
 </code></pre><h1 id="references">References</h1>
 <ul>
 <li><a href="https://docs.travis-ci.com/user/getting-started">Get started with Travis CI</a></li>

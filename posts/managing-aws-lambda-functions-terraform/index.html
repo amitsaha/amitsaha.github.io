@@ -55,7 +55,7 @@ your global infrastructure as code repository.</p>
 I wrote this for a recent <a href="https://blog.codeship.com/cloudwatch-event-notifications-using-aws-lambda/">article</a>. The <code>src</code> directory
 has the source of the lambda function which is written in Python. To create the lambda function (for the first time) and to
 deploy new versions of the code, the following BASH script (there is a PowerShell script too) is run:</p>
-<pre><code>!/usr/bin/env bash
+<pre tabindex="0"><code>!/usr/bin/env bash
 set -ex
 
 # Create a .zip of src
@@ -65,7 +65,7 @@ popd
 
 aws s3 cp src.zip s3://aws-health-notif-demo-lambda-artifacts/ec2-state-change/src.zip
 version=$(aws s3api head-object --bucket aws-health-notif-demo-lambda-artifacts --key ec2-state-change/src.zip)
-version=$(echo $version | python -c 'import json,sys; obj=json.load(sys.stdin); print(obj[&quot;VersionId&quot;])')
+version=$(echo $version | python -c &#39;import json,sys; obj=json.load(sys.stdin); print(obj[&#34;VersionId&#34;])&#39;)
 
 # Deploy to demo environment
 pushd ../../terraform/environments/demo
@@ -79,7 +79,6 @@ terraform apply \
     -target=module.ec2_state_change_handler.module.ec2_state_change_handler.aws_iam_role_policy.lambda_cloudwatch_logging \
     -target=module.ec2_state_change_handler.module.ec2_state_change_handler.aws_lambda_permission.cloudwatch_lambda_execution
 popd
-
 </code></pre><p>The above script does the following main things:</p>
 <ul>
 <li>First, it creates a ZIP of the <code>src</code> sub-directory</li>
@@ -110,109 +109,108 @@ be defined in my &ldquo;real&rdquo; code. In terraform, the <code>resource</code
 in the code you plan to &ldquo;execute&rdquo;.</p>
 <p>Using the <code>cloudwatch_event_handlers</code> module, I define another module to implement the lambda function that would handle
 EC2 state change events as follows:</p>
-<pre><code>variable &quot;lambda_artifacts_bucket_name&quot; {
-    type = &quot;string&quot;
+<pre tabindex="0"><code>variable &#34;lambda_artifacts_bucket_name&#34; {
+    type = &#34;string&#34;
 }
 
-variable &quot;ec2_state_change_handler_version&quot; {
-    type = &quot;string&quot;
+variable &#34;ec2_state_change_handler_version&#34; {
+    type = &#34;string&#34;
 }
 
-module &quot;ec2_state_change_handler&quot; {
+module &#34;ec2_state_change_handler&#34; {
 
-    source = &quot;../cloudwatch_event_handlers&quot;
+    source = &#34;../cloudwatch_event_handlers&#34;
 
-    cloudwatch_event_rule_name = &quot;ec2-state-change-event&quot;
-    cloudwatch_event_rule_description = &quot;Notify when there is a state change in EC2 instances&quot;
+    cloudwatch_event_rule_name = &#34;ec2-state-change-event&#34;
+    cloudwatch_event_rule_description = &#34;Notify when there is a state change in EC2 instances&#34;
     cloudwatch_event_rule_pattern = &lt;&lt;PATTERN
 {
-  &quot;source&quot;: [ &quot;aws.ec2&quot; ],
-  &quot;detail-type&quot;: [ &quot;EC2 Instance State-change Notification&quot; ]
+  &#34;source&#34;: [ &#34;aws.ec2&#34; ],
+  &#34;detail-type&#34;: [ &#34;EC2 Instance State-change Notification&#34; ]
 }
 PATTERN
-     lambda_iam_role_name = &quot;ec2_state_change_lambda_iam&quot;
-     lambda_function_name = &quot;ec2_state_change&quot;
-     lambda_handler = &quot;main.handler&quot;
-     lambda_runtime = &quot;python3.6&quot;
+     lambda_iam_role_name = &#34;ec2_state_change_lambda_iam&#34;
+     lambda_function_name = &#34;ec2_state_change&#34;
+     lambda_handler = &#34;main.handler&#34;
+     lambda_runtime = &#34;python3.6&#34;
      
-     lambda_artifacts_bucket_name = &quot;${var.lambda_artifacts_bucket_name}&quot;
-     lambda_artifacts_bucket_key = &quot;ec2-state-change/src.zip&quot;
-     lambda_version = &quot;${var.ec2_state_change_handler_version}&quot;
+     lambda_artifacts_bucket_name = &#34;${var.lambda_artifacts_bucket_name}&#34;
+     lambda_artifacts_bucket_key = &#34;ec2-state-change/src.zip&#34;
+     lambda_version = &#34;${var.ec2_state_change_handler_version}&#34;
 }
-
 </code></pre><p>Similarly, the <code>health_event_handler</code> module is defined as:</p>
-<pre><code>variable &quot;lambda_artifacts_bucket_name&quot; {
-    type = &quot;string&quot;
+<pre tabindex="0"><code>variable &#34;lambda_artifacts_bucket_name&#34; {
+    type = &#34;string&#34;
 }
 
-variable &quot;health_event_handler_version&quot; {
-    type = &quot;string&quot;
+variable &#34;health_event_handler_version&#34; {
+    type = &#34;string&#34;
 }
 
-variable &quot;health_event_handler_environment&quot; {
-  type = &quot;map&quot;
+variable &#34;health_event_handler_environment&#34; {
+  type = &#34;map&#34;
 }
 
 
-module &quot;health_event_handler&quot; {
+module &#34;health_event_handler&#34; {
 
-    source = &quot;../cloudwatch_event_handlers&quot;
+    source = &#34;../cloudwatch_event_handlers&#34;
 
-    cloudwatch_event_rule_name = &quot;health-event&quot;
-    cloudwatch_event_rule_description = &quot;Invoke a lambda function when there is a scheduled health event&quot;
+    cloudwatch_event_rule_name = &#34;health-event&#34;
+    cloudwatch_event_rule_description = &#34;Invoke a lambda function when there is a scheduled health event&#34;
     cloudwatch_event_rule_pattern = &lt;&lt;PATTERN
 {
-  &quot;source&quot;: [ &quot;aws.health&quot; ],
-  &quot;detail-type&quot;: [ &quot;AWS Health Event&quot; ]
+  &#34;source&#34;: [ &#34;aws.health&#34; ],
+  &#34;detail-type&#34;: [ &#34;AWS Health Event&#34; ]
 }
 PATTERN
 
-    lambda_iam_role_name = &quot;health_event_lambda&quot;
-    lambda_function_name = &quot;health_event&quot;
-    lambda_handler = &quot;main.handler&quot;
-    lambda_runtime = &quot;python3.6&quot;
+    lambda_iam_role_name = &#34;health_event_lambda&#34;
+    lambda_function_name = &#34;health_event&#34;
+    lambda_handler = &#34;main.handler&#34;
+    lambda_runtime = &#34;python3.6&#34;
 
-    lambda_artifacts_bucket_name = &quot;${var.lambda_artifacts_bucket_name}&quot;
-    lambda_artifacts_bucket_key = &quot;health-event/src.zip&quot;
-    lambda_version = &quot;${var.health_event_handler_version}&quot;
+    lambda_artifacts_bucket_name = &#34;${var.lambda_artifacts_bucket_name}&#34;
+    lambda_artifacts_bucket_key = &#34;health-event/src.zip&#34;
+    lambda_version = &#34;${var.health_event_handler_version}&#34;
 
-    lambda_environment = &quot;${var.health_event_handler_environment}&quot;
+    lambda_environment = &#34;${var.health_event_handler_environment}&#34;
 }
 </code></pre><p>Note how the implementations code here says it&rsquo;s <code>module</code>! Anyway, another thing I learned here is that the inputs to a module
-are it&rsquo;s variables. Thats' it. I found it hard to wrap my head around it, but I think i have got it now.</p>
+are it&rsquo;s variables. Thats&rsquo; it. I found it hard to wrap my head around it, but I think i have got it now.</p>
 <p>Okay, now that we defined our &ldquo;source&rdquo; configuration, we next define <code>environments</code> for our infrastructure.</p>
 <p>Currently, the repository <a href="https://github.com/amitsaha/cloudwatch-event-lambda/">here</a> has a <code>demo</code> environment defined under
 the <code>environments</code> sub-directory. The idea is to have one sub-directory per environment. Inside this <code>demo</code> environment,
 we have the bootstrap configuration where we create the bucket and dynamodb table for storing our terraform state remotely.
 We then define the <code>backend</code> created in <code>backend.tf</code>. With the setup done, we then bring in the modules we created above
 in the <code>main.tf</code> file:</p>
-<pre><code>provider &quot;aws&quot; {
-  region = &quot;${var.aws_region}&quot;
+<pre tabindex="0"><code>provider &#34;aws&#34; {
+  region = &#34;${var.aws_region}&#34;
 }
 
-module &quot;lambda_artifacts&quot; {
-  source = &quot;../../modules/deployment_artifacts&quot;
-  artifacts_bucket_name = &quot;${var.lambda_artifacts_bucket_name}&quot;  
+module &#34;lambda_artifacts&#34; {
+  source = &#34;../../modules/deployment_artifacts&#34;
+  artifacts_bucket_name = &#34;${var.lambda_artifacts_bucket_name}&#34;  
 }
 
-module &quot;ec2_state_change_handler&quot; {
-  source = &quot;../../modules/ec2_state_change_handler&quot;
-  lambda_artifacts_bucket_name = &quot;${var.lambda_artifacts_bucket_name}&quot;
-  ec2_state_change_handler_version = &quot;${var.ec2_state_change_handler_lambda_version}&quot;
+module &#34;ec2_state_change_handler&#34; {
+  source = &#34;../../modules/ec2_state_change_handler&#34;
+  lambda_artifacts_bucket_name = &#34;${var.lambda_artifacts_bucket_name}&#34;
+  ec2_state_change_handler_version = &#34;${var.ec2_state_change_handler_lambda_version}&#34;
   
 }
 
-module &quot;health_event_handler&quot; {
-  source = &quot;../../modules/health_event_handler&quot;
-  lambda_artifacts_bucket_name = &quot;${var.lambda_artifacts_bucket_name}&quot;
-  health_event_handler_version = &quot;${var.aws_health_event_handler_lambda_version}&quot;
-  health_event_handler_environment = &quot;${var.health_event_handler_lambda_environment}&quot;
+module &#34;health_event_handler&#34; {
+  source = &#34;../../modules/health_event_handler&#34;
+  lambda_artifacts_bucket_name = &#34;${var.lambda_artifacts_bucket_name}&#34;
+  health_event_handler_version = &#34;${var.aws_health_event_handler_lambda_version}&#34;
+  health_event_handler_environment = &#34;${var.health_event_handler_lambda_environment}&#34;
 }
 </code></pre><p>Once again, we have another set of child modules. Here we only specify the environment specific variables which we
 then populate via <code>terraform.tfvars</code> and during application (in the scripts above).</p>
 <p>Coming back to our script I shared at the beginning, here&rsquo;s the key terraform specific bits reproduced which should
 make more sense now:</p>
-<pre><code># Deploy to demo environment
+<pre tabindex="0"><code># Deploy to demo environment
 pushd ../../terraform/environments/demo
 terraform init
 terraform apply \

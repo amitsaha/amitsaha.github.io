@@ -37,19 +37,19 @@
 <p>Let&rsquo;s say a program in a container should be able to resolve a custom hostname.</p>
 <p><strong>Solution</strong></p>
 <p>When using <code>docker run</code>:</p>
-<pre><code>$ sudo docker run --add-host myhost.name:127.0.0.1 -ti python bash
-Unable to find image 'python:latest' locally
+<pre tabindex="0"><code>$ sudo docker run --add-host myhost.name:127.0.0.1 -ti python bash
+Unable to find image &#39;python:latest&#39; locally
 latest: Pulling from library/python
 Digest: sha256:eb20fd0c13d2c57fb602572f27f05f7f1e87f606045175c108a7da1af967313e
 Status: Downloaded newer image for python:latest
 ...
 </code></pre><p>This will show up as an additional entry in the container&rsquo;s <code>/etc/hosts</code> file:</p>
-<pre><code>root@fee9aeccbc4b:/# cat /etc/hosts
+<pre tabindex="0"><code>root@fee9aeccbc4b:/# cat /etc/hosts
 ...
 127.0.0.1	myhost.name
 </code></pre><p>With <code>docker compose</code>, we can use the <code>extra_hosts</code> key:</p>
-<pre><code>extra_hosts:
-    - &quot;myhost.name:127.0.0.1&quot;
+<pre tabindex="0"><code>extra_hosts:
+    - &#34;myhost.name:127.0.0.1&#34;
 </code></pre></article>
 <footer id="footer">
     Post managed in a <a href="https://github.com/amitsaha/echorand.me">git repo</a> | <a href="https://github.com/amitsaha/echorand.me/commit/1b90ad51465b24203cfc8dc4f0cbc29d52efda78">Last Commit on this post </a>

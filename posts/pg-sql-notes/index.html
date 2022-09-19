@@ -44,32 +44,31 @@ Learn more about it in the <a href="https://www.postgresql.org/docs/8.1/ddl-sche
 <h1 id="user-creation">User creation</h1>
 <p>The first thing you need to be sure of is that you are connected to the right database before you do this.
 To find out the current database:</p>
-<pre><code>SELECT current_database();
+<pre tabindex="0"><code>SELECT current_database();
 </code></pre><p>If the above database is not the one, you want to create the user and their grants for, reconnect
 to the right database.</p>
 <p>Then, we can create the user:</p>
-<pre><code>
---create user &quot;readonlyuser&quot; and allow them to connect to the database &quot;dbname&quot;
-CREATE USER readonlyuser WITH PASSWORD 'plaintextpassword';
+<pre tabindex="0"><code>
+--create user &#34;readonlyuser&#34; and allow them to connect to the database &#34;dbname&#34;
+CREATE USER readonlyuser WITH PASSWORD &#39;plaintextpassword&#39;;
 GRANT CONNECT ON DATABASE dbname TO readonlyuser
 
 
---allow select on all current and future tables in the &quot;public&quot; schema
+--allow select on all current and future tables in the &#34;public&#34; schema
 GRANT SELECT ON ALL TABLES IN SCHEMA public TO readonlyuser;
 GRANT USAGE ON SCHEMA public TO readonlyuser;
 ALTER DEFAULT PRIVILEGES IN SCHEMA public  GRANT SELECT ON TABLES TO readonlyuser;
-
 </code></pre><h1 id="user-deletion">User deletion</h1>
 <p>First, revoke privileges:</p>
-<pre><code>ALTER DEFAULT PRIVILEGES IN SCHEMA public REVOKE SELECT ON TABLES FROM readonlyuser;
+<pre tabindex="0"><code>ALTER DEFAULT PRIVILEGES IN SCHEMA public REVOKE SELECT ON TABLES FROM readonlyuser;
 REVOKE USAGE ON SCHEMA public FROM readonlyuser;
 REVOKE SELECT ON ALL TABLES IN SCHEMA public FROM readonlyuser;
 REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA public FROM readonlyuser;
 REVOKE CONNECT ON DATABASE dbname FROM readonlyuser;
 </code></pre><p>Now, drop the user:</p>
-<pre><code>drop user readonlyuser;
+<pre tabindex="0"><code>drop user readonlyuser;
 </code></pre><h1 id="list-all-rolesusers">List all roles/users</h1>
-<pre><code>SELECT
+<pre tabindex="0"><code>SELECT
       r.rolname,
       r.rolsuper,
       r.rolinherit,

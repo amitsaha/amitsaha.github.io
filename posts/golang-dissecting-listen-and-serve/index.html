@@ -55,21 +55,21 @@ in this <a href="https://www.digitalflapjack.com/blog/2018/4/10/better-testing-f
 The code references are from <a href="https://golang.org/src/net/http/server.go">src/net/http/server.go</a>.</p>
 <p>The <a href="https://golang.org/pkg/net/http/#ListenAndServe%3E">http.ListenAndServe(..)</a> function is the most straightforward
 approach to start a HTTP 1.1 server. The following code does just that:</p>
-<pre><code>   package main
+<pre tabindex="0"><code>   package main
    
    import (
-   	&quot;log&quot;
-   	&quot;net/http&quot;
+   	&#34;log&#34;
+   	&#34;net/http&#34;
    )
    
    func main() {
-   	log.Fatal(http.ListenAndServe(&quot;:8080&quot;, nil))
+   	log.Fatal(http.ListenAndServe(&#34;:8080&#34;, nil))
    }
 </code></pre><p>What is the <code>nil</code> second argument above? The documentation states that the second argument to the function should be a
 &ldquo;handler&rdquo; and if it is specified as <code>nil</code>, it defaults to <code>DefaultServeMux</code>.</p>
 <h1 id="what-is-defaultservemux">What is <code>DefaultServeMux</code>?</h1>
 <p>If we run our server above via <code>go run server1.go</code>, and send a couple of HTTP GET requests, we will see the following:</p>
-<pre><code>   
+<pre tabindex="0"><code>   
    $ curl localhost:8080
    404 page not found
    
@@ -80,7 +80,7 @@ requests to GET the &ldquo;/status/&rdquo; resource - our second request. Before
 <em>how</em> the error message &ldquo;404 page not found&rdquo; is generated.</p>
 <p>The error message is generated from the function below in <code>src/net/http/server.go</code> specifically the <code>NotFoundHandler()</code>
 &ldquo;handler&rdquo; function:</p>
-<pre><code>
+<pre tabindex="0"><code>
    // handler is the main implementation of Handler.
    // The path is known to be in canonical form, except for CONNECT methods.
    func (mux *ServeMux) handler(host, path string) (h Handler, pattern string) {
@@ -95,14 +95,14 @@ requests to GET the &ldquo;/status/&rdquo; resource - our second request. Before
    		h, pattern = mux.match(path)
    	}
    	if h == nil {
-   		h, pattern = NotFoundHandler(), &quot;&quot;
+   		h, pattern = NotFoundHandler(), &#34;&#34;
    	}
    	return
    }
    
 </code></pre><p>Now, let&rsquo;s roughly see how our GET request above reaches the above function.</p>
 <p>Let us consider the function signature of the above handler function: <code>func (mux *ServeMux) handler(host, path string) (h Handler, pattern string)</code>. This function is a method belonging to the type <code>ServeMux</code>:</p>
-<pre><code>
+<pre tabindex="0"><code>
    // ServeMux also takes care of sanitizing the URL request path,
    // redirecting any request containing . or .. elements or repeated slashes
    // to an equivalent, cleaner URL.
@@ -128,25 +128,25 @@ requests to GET the &ldquo;/status/&rdquo; resource - our second request. Before
     
 </code></pre><p>So, how does <code>DefaultServeMux</code> get set when the second argument to <code>ListenAndServe()</code> is <code>nil</code>? The following code
 snippet has the answer:</p>
-<pre><code>
+<pre tabindex="0"><code>
    func (sh serverHandler) ServeHTTP(rw ResponseWriter, req *Request) {
    	handler := sh.srv.Handler
    	if handler == nil {
    		handler = DefaultServeMux
    	}
-   	if req.RequestURI == &quot;*&quot; &amp;&amp; req.Method == &quot;OPTIONS&quot; {
+   	if req.RequestURI == &#34;*&#34; &amp;&amp; req.Method == &#34;OPTIONS&#34; {
    		handler = globalOptionsHandler{}
    	}
    	handler.ServeHTTP(rw, req)
    }
 </code></pre><p>The above call to <code>ServeHTTP()</code> calls the following implementation of <code>ServeHTTP()</code>:</p>
-<pre><code>
+<pre tabindex="0"><code>
    // ServeHTTP dispatches the request to the handler whose
    // pattern most closely matches the request URL.
    func (mux *ServeMux) ServeHTTP(w ResponseWriter, r *Request) {
-   	if r.RequestURI == &quot;*&quot; {
+   	if r.RequestURI == &#34;*&#34; {
    		if r.ProtoAtLeast(1, 1) {
-   			w.Header().Set(&quot;Connection&quot;, &quot;close&quot;)
+   			w.Header().Set(&#34;Connection&#34;, &#34;close&#34;)
    		}
    		w.WriteHeader(StatusBadRequest)
    		return
@@ -155,11 +155,11 @@ snippet has the answer:</p>
    	h.ServeHTTP(w, r)
    }
 </code></pre><p>The call to <code>Handler()</code> function then calls the following implementation:</p>
-<pre><code>
+<pre tabindex="0"><code>
    // If there is no registered handler that applies to the request,
-   // Handler returns a ``page not found'' handler and an empty pattern.
+   // Handler returns a ``page not found&#39;&#39; handler and an empty pattern.
    func (mux *ServeMux) Handler(r *Request) (h Handler, pattern string) {
-   	if r.Method != &quot;CONNECT&quot; {
+   	if r.Method != &#34;CONNECT&#34; {
    		if p := cleanPath(r.URL.Path); p != r.URL.Path {
    			_, pattern = mux.handler(r.Host, p)
    			url := *r.URL
@@ -185,7 +185,7 @@ snippet has the answer:</p>
    		h, pattern = mux.match(path)
    	}
    	if h == nil {
-   		h, pattern = NotFoundHandler(), &quot;&quot;
+   		h, pattern = NotFoundHandler(), &#34;&#34;
    	}
    	return
    }
@@ -193,51 +193,51 @@ snippet has the answer:</p>
 </code></pre><p>Now, when we make a request to &ldquo;/&rdquo; or &ldquo;/status/&rdquo;, no match is found by the <code>mux.match()</code> call above and hence the
 handler returned is the <code>NotFoundHandler</code> whose <code>ServeHTTP()</code> function is then called to return the &ldquo;404 page not found&rdquo;
 error message:</p>
-<pre><code>
+<pre tabindex="0"><code>
    // NotFound replies to the request with an HTTP 404 not found error.
-   func NotFound(w ResponseWriter, r *Request) { Error(w, &quot;404 page not found&quot;, StatusNotFound) }
+   func NotFound(w ResponseWriter, r *Request) { Error(w, &#34;404 page not found&#34;, StatusNotFound) }
    
    // NotFoundHandler returns a simple request handler
-   // that replies to each request with a ``404 page not found'' reply.
+   // that replies to each request with a ``404 page not found&#39;&#39; reply.
    func NotFoundHandler() Handler { return HandlerFunc(NotFound) }
 </code></pre><p>We will discuss how this &ldquo;magic&rdquo; happens in the next section.</p>
 <h1 id="registering-handlers">Registering handlers</h1>
-<p>Let&rsquo;s now update our server code to handle &ldquo;/&rdquo; and &ldquo;/status/&quot;:</p>
-<pre><code>
+<p>Let&rsquo;s now update our server code to handle &ldquo;/&rdquo; and &ldquo;/status/&rdquo;:</p>
+<pre tabindex="0"><code>
    package main
    
-   import &quot;net/http&quot;
-   import &quot;fmt&quot;
+   import &#34;net/http&#34;
+   import &#34;fmt&#34;
    
    type mytype struct{}
    
    func (t *mytype) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-   	fmt.Fprintf(w, &quot;Hello there from mytype&quot;)
+   	fmt.Fprintf(w, &#34;Hello there from mytype&#34;)
    }
    
    
    func StatusHandler(w http.ResponseWriter, r *http.Request) {
-   	fmt.Fprintf(w, &quot;OK&quot;)
+   	fmt.Fprintf(w, &#34;OK&#34;)
    }
    
    func main() {
    
    	t := new(mytype)
-   	http.Handle(&quot;/&quot;, t)
+   	http.Handle(&#34;/&#34;, t)
    	
-   	http.HandleFunc(&quot;/status/&quot;, StatusHandler)
+   	http.HandleFunc(&#34;/status/&#34;, StatusHandler)
            
-   	http.ListenAndServe(&quot;:8080&quot;, nil)
+   	http.ListenAndServe(&#34;:8080&#34;, nil)
    }
 </code></pre><p>If we run the server and send the two requests above, we will see the following responses:</p>
-<pre><code>
+<pre tabindex="0"><code>
    $ curl localhost:8080
    Hello there from mytype 
 
    $ curl localhost:8080/status/
    OK
 </code></pre><p>Let&rsquo;s now revisit how the right handler function gets called. In a code snippet above, we saw a call to the <code>match()</code> function which given a path returns the most appropriate registered handler for the path:</p>
-<pre><code>
+<pre tabindex="0"><code>
    // Find a handler on a handler map given a path string
    // Most-specific (longest) pattern wins
    func (mux *ServeMux) match(path string) (h Handler, pattern string) {
@@ -258,24 +258,23 @@ error message:</p>
 <h2 id="the-handlefunc-type">The HandleFunc() type</h2>
 <p>Let&rsquo;s go back to the idea of &ldquo;converting&rdquo; any function with the signature <code>func aFunction(w http.ResponseWriter, r *http.Request)</code> to the type &ldquo;HandlerFunc&rdquo;.</p>
 <p>Any type which has a ServeHTTP() method is said to implement the <code>Handler</code> interface:</p>
-<pre><code>
+<pre tabindex="0"><code>
     type HandlerFunc func(ResponseWriter, *Request)
 
     // ServeHTTP calls f(w, req).
     func (f HandlerFunc) ServeHTTP(w ResponseWriter, req *Request) {
         f(w, req)
     }
-
 </code></pre><p>Going back to the previous version of our server, we see how we do that:</p>
-<pre><code>
+<pre tabindex="0"><code>
     type mytype struct{}
 
     func (t *mytype) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-        fmt.Fprintf(w, &quot;Hello there from mytype&quot;)
+        fmt.Fprintf(w, &#34;Hello there from mytype&#34;)
     }
 </code></pre><p>The <code>ServeHTTP()</code> method of a Handler is invoked when it has been registered as handling a particular path.</p>
 <p>Let&rsquo;s look at what the call to <code>Handle()</code> function does:</p>
-<pre><code>
+<pre tabindex="0"><code>
    
    // Handle registers the handler for the given pattern
    // in the DefaultServeMux.
@@ -288,14 +287,14 @@ error message:</p>
    	mux.mu.Lock()
    	defer mux.mu.Unlock()
    
-   	if pattern == &quot;&quot; {
-   		panic(&quot;http: invalid pattern &quot; + pattern)
+   	if pattern == &#34;&#34; {
+   		panic(&#34;http: invalid pattern &#34; + pattern)
    	}
    	if handler == nil {
-   		panic(&quot;http: nil handler&quot;)
+   		panic(&#34;http: nil handler&#34;)
    	}
    	if mux.m[pattern].explicit {
-   		panic(&quot;http: multiple registrations for &quot; + pattern)
+   		panic(&#34;http: multiple registrations for &#34; + pattern)
    	}
    
    	if mux.m == nil {
@@ -303,7 +302,7 @@ error message:</p>
    	}
    	mux.m[pattern] = muxEntry{explicit: true, h: handler, pattern: pattern}
    
-   	if pattern[0] != '/' {
+   	if pattern[0] != &#39;/&#39; {
    		mux.hosts = true
    	}
    
@@ -311,14 +310,14 @@ error message:</p>
    	// If pattern is /tree/, insert an implicit permanent redirect for /tree.
    	// It can be overridden by an explicit registration.
    	n := len(pattern)
-   	if n &gt; 0 &amp;&amp; pattern[n-1] == '/' &amp;&amp; !mux.m[pattern[0:n-1]].explicit {
+   	if n &gt; 0 &amp;&amp; pattern[n-1] == &#39;/&#39; &amp;&amp; !mux.m[pattern[0:n-1]].explicit {
    		// If pattern contains a host name, strip it and use remaining
    		// path for redirect.
    		path := pattern
-   		if pattern[0] != '/' {
-   			// In pattern, at least the last character is a '/', so
-   			// strings.Index can't be -1.
-   			path = pattern[strings.Index(pattern, &quot;/&quot;):]
+   		if pattern[0] != &#39;/&#39; {
+   			// In pattern, at least the last character is a &#39;/&#39;, so
+   			// strings.Index can&#39;t be -1.
+   			path = pattern[strings.Index(pattern, &#34;/&#34;):]
    		}
    		url := &amp;url.URL{Path: path}
    		mux.m[pattern[0:n-1]] = muxEntry{h: RedirectHandler(url.String(), StatusMovedPermanently), pattern: pattern}
@@ -326,9 +325,9 @@ error message:</p>
    }
     
 </code></pre><p>It can feel cumbersome to define a type implementing the <code>Handler</code> interface for every path we want to register a handler for. Hence, a convenience function, <code>HandleFunc()</code> is provided to register any function which has a specified signature as a Handler function. For example:</p>
-<pre><code>    http.HandleFunc(&quot;/status/&quot;, StatusHandler)
+<pre tabindex="0"><code>    http.HandleFunc(&#34;/status/&#34;, StatusHandler)
 </code></pre><p>Now, let&rsquo;s look at what the call to <code>HandleFunc()</code> function does:</p>
-<pre><code>   
+<pre tabindex="0"><code>   
    // HandleFunc registers the handler function for the given pattern
    // in the DefaultServeMux.
    // The documentation for ServeMux explains how patterns are matched.
@@ -358,20 +357,20 @@ this <a href="http://jordanorelli.com/post/42369331748/function-types-in-go-gola
 <p>Earlier in this post, we saw how passsing <code>nil</code> to <code>ListenAndServe()</code> function sets the handler to
 <code>DefaultServeMux</code>. The handlers we register via <code>Handle()</code> and <code>HandleFunc()</code> are then added to this
 object. Hence, we could without changing any functionality rewrite our server as follows:</p>
-<pre><code>
+<pre tabindex="0"><code>
    package main
    
-   import &quot;net/http&quot;
-   import &quot;fmt&quot;
+   import &#34;net/http&#34;
+   import &#34;fmt&#34;
    
    type mytype struct{}
    
    func (t *mytype) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-   	fmt.Fprintf(w, &quot;Hello there from mytype&quot;)
+   	fmt.Fprintf(w, &#34;Hello there from mytype&#34;)
    }
    
    func StatusHandler(w http.ResponseWriter, r *http.Request) {
-   	fmt.Fprintf(w, &quot;OK&quot;)
+   	fmt.Fprintf(w, &#34;OK&#34;)
    }
    
    func main() {
@@ -379,10 +378,10 @@ object. Hence, we could without changing any functionality rewrite our server as
    	mux := http.NewServeMux()
    
    	t := new(mytype)
-   	mux.Handle(&quot;/&quot;, t)
-   	mux.HandleFunc(&quot;/status/&quot;, StatusHandler)
+   	mux.Handle(&#34;/&#34;, t)
+   	mux.HandleFunc(&#34;/status/&#34;, StatusHandler)
    
-   	http.ListenAndServe(&quot;:8080&quot;, mux)
+   	http.ListenAndServe(&#34;:8080&#34;, mux)
    }
 </code></pre><p>We create an object of type <code>ServeMux</code> via <code>mux := http.NewServeMux()</code>, register our handlers calling the same two functions, but those that are defined for the <code>ServeMux</code> object we created.</p>
 <p>The reason we may want to use our own Handler with <code>ListenAndServe()</code> is demonstrated in the next section.</p>
@@ -396,34 +395,34 @@ object. Hence, we could without changing any functionality rewrite our server as
 <li>Return the response to the client</li>
 </ol>
 <p>Either of steps 2 or 4 or both may occur and this is where &ldquo;middleware&rdquo; comes in. Our next version of the server demonstrates how we may implement this:</p>
-<pre><code>
+<pre tabindex="0"><code>
    package main
    
-   import &quot;net/http&quot;
-   import &quot;fmt&quot;
-   import &quot;log&quot;
+   import &#34;net/http&#34;
+   import &#34;fmt&#34;
+   import &#34;log&#34;
    
    type mytype struct{}
    
    func (t *mytype) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-   	fmt.Fprintf(w, &quot;Hello there from mytype&quot;)
+   	fmt.Fprintf(w, &#34;Hello there from mytype&#34;)
    }
    
    func StatusHandler(w http.ResponseWriter, r *http.Request) {
-   	fmt.Fprintf(w, &quot;OK&quot;)
+   	fmt.Fprintf(w, &#34;OK&#34;)
    }
    
    func RunSomeCode(handler http.Handler) http.Handler {
    	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-   		log.Printf(&quot;Got a %s request for: %v&quot;, r.Method, r.URL)
+   		log.Printf(&#34;Got a %s request for: %v&#34;, r.Method, r.URL)
    		handler.ServeHTTP(w, r)
-   		// At this stage, our handler has &quot;handled&quot; the request
+   		// At this stage, our handler has &#34;handled&#34; the request
    		// but we can still write to the client there
-   		// but we won't do that
+   		// but we won&#39;t do that
    		// XXX: We have the HTTP status here, but we cannot access
    		// it directly here
    		// See next example (server5.go)
-   		log.Println(&quot;Handler finished processing request&quot;)
+   		log.Println(&#34;Handler finished processing request&#34;)
    	})
    }
    
@@ -432,14 +431,14 @@ object. Hence, we could without changing any functionality rewrite our server as
    	mux := http.NewServeMux()
    
    	t := new(mytype)
-   	mux.Handle(&quot;/&quot;, t)
-   	mux.HandleFunc(&quot;/status/&quot;, StatusHandler)
+   	mux.Handle(&#34;/&#34;, t)
+   	mux.HandleFunc(&#34;/status/&#34;, StatusHandler)
    
    	WrappedMux := RunSomeCode(mux)
-   	http.ListenAndServe(&quot;:8080&quot;, WrappedMux)
+   	http.ListenAndServe(&#34;:8080&#34;, WrappedMux)
    }
 </code></pre><p>When we run the server and send it a couple of requests as above, we will see:</p>
-<pre><code>
+<pre tabindex="0"><code>
     2017/04/24 17:53:03 Got a GET request for: /
     2017/04/24 17:53:03 Handler finished processing request
     2017/04/24 17:53:05 Got a GET request for: /status
@@ -450,12 +449,12 @@ handler, <code>mux</code>. Once it returns from there, we are then printing anot
 <h1 id="rewrapping-httpresponsewriter">Rewrapping <code>http.ResponseWriter</code></h1>
 <p>It took me a while to write the next version of the server, and after reading through some mailing list postings and example code,
 i have a version which achieves what I wanted to be able to do via my middleware:</p>
-<pre><code>
+<pre tabindex="0"><code>
    package main
    
-   import &quot;net/http&quot;
-   import &quot;fmt&quot;
-   import &quot;log&quot;
+   import &#34;net/http&#34;
+   import &#34;fmt&#34;
+   import &#34;log&#34;
    
    type MyResponseWriter struct {
    	http.ResponseWriter
@@ -472,20 +471,20 @@ i have a version which achieves what I wanted to be able to do via my middleware
    
    func (t *mytype) ServeHTTP(w http.ResponseWriter, r *http.Request) {
    	w.WriteHeader(http.StatusOK)
-   	fmt.Fprintf(w, &quot;Hello there from mytype&quot;)
+   	fmt.Fprintf(w, &#34;Hello there from mytype&#34;)
    }
    
    func StatusHandler(w http.ResponseWriter, r *http.Request) {
    	w.WriteHeader(http.StatusOK)
-   	fmt.Fprintf(w, &quot;OK&quot;)
+   	fmt.Fprintf(w, &#34;OK&#34;)
    }
    
    func RunSomeCode(handler http.Handler) http.Handler {
    	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-   		log.Printf(&quot;Got a %s request for: %v&quot;, r.Method, r.URL)
+   		log.Printf(&#34;Got a %s request for: %v&#34;, r.Method, r.URL)
    		myrw := &amp;MyResponseWriter{ResponseWriter: w, code: -1}
    		handler.ServeHTTP(myrw, r)
-   		log.Println(&quot;Response status: &quot;, myrw.code)
+   		log.Println(&#34;Response status: &#34;, myrw.code)
    	})
    }
    
@@ -494,22 +493,22 @@ i have a version which achieves what I wanted to be able to do via my middleware
    	mux := http.NewServeMux()
    
    	t := new(mytype)
-   	mux.Handle(&quot;/&quot;, t)
-   	mux.HandleFunc(&quot;/status/&quot;, StatusHandler)
+   	mux.Handle(&#34;/&#34;, t)
+   	mux.HandleFunc(&#34;/status/&#34;, StatusHandler)
    
    	WrappedMux := RunSomeCode(mux)
-   	log.Fatal(http.ListenAndServe(&quot;:8080&quot;, WrappedMux))
+   	log.Fatal(http.ListenAndServe(&#34;:8080&#34;, WrappedMux))
    }
     
 </code></pre><p>In the example above, I define a new type <code>MyResponseWriter</code> which wraps the <code>http.ResponseWriter</code> type and adds
 a new field, <code>code</code> to store the HTTP status code and implements a <code>WriteHeader()</code> method. Then, in <code>RunSomeCode()</code>,
 instead of using the standard <code>http.ResponseWriter()</code> object that it was passed, I wrap it in a <code>MyResponseWriter</code> type as
 follows:</p>
-<pre><code>    
+<pre tabindex="0"><code>    
     myrw := &amp;MyResponseWriter{ResponseWriter: w, code: -1}
     handler.ServeHTTP(myrw, r)
 </code></pre><p>Now, if we run the server, we will see log messages on the server as follows when we send it HTTP get requests:</p>
-<pre><code>
+<pre tabindex="0"><code>
     2017/04/25 17:33:06 Got a GET request for: /status/
     2017/04/25 17:33:06 Response status:  200
     2017/04/25 17:33:07 Got a GET request for: /status

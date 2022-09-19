@@ -37,29 +37,28 @@
 three months now, and my approach to using it has been pretty much google and trial - copying things, modifying things
 till they work and learning new things on the way. This post talks about a discovery which I made today.</p>
 <p>I had a script like this:</p>
-<pre><code>while ($health -ne 'healthy') {    
+<pre tabindex="0"><code>while ($health -ne &#39;healthy&#39;) {    
     $elapsedTime = $(get-date) - $StartTime
-    Write-Output &quot;--- Waiting for service to become ready - $($elapsedTime.Seconds) seconds&quot;
+    Write-Output &#34;--- Waiting for service to become ready - $($elapsedTime.Seconds) seconds&#34;
 
     if ($elapsedTime.Seconds -lt 120)
     {
         Start-Sleep -s 30
-        $health = docker inspect --format '{{ .State.Health.Status }}' service
+        $health = docker inspect --format &#39;{{ .State.Health.Status }}&#39; service
     } else
     {        
-        Write-Output '--- Recreating service'
+        Write-Output &#39;--- Recreating service&#39;
         docker-compose up -d --no-deps --force-recreate service
         $StartTime = $(get-date)
     }
 }
-
 </code></pre><p>To my horror, I found that <code>$elapsedTime.Seconds</code> was going back to 0 after the second sleep interval i.e. 60 seconds. Hence,
 the recreation service step was never being executed.</p>
 <p>What&rsquo;s going on? Let&rsquo;s write a test script:</p>
-<pre><code>$StartTime = $(get-date)
+<pre tabindex="0"><code>$StartTime = $(get-date)
 $StartTime
-$health = 'unhealthy'
-while ($health -ne 'healthy') {
+$health = &#39;unhealthy&#39;
+while ($health -ne &#39;healthy&#39;) {
 
     $CurrentTime = $(get-date)
     $elapsedTime = $CurrentTime - $StartTime
@@ -67,9 +66,8 @@ while ($health -ne 'healthy') {
     $elapsedTime.Seconds
     Start-Sleep -s 5    
 }
-
 </code></pre><p>When you run the above script, a key part of the output which tells us the story is:</p>
-<pre><code>...
+<pre tabindex="0"><code>...
 
 50
 
@@ -100,7 +98,6 @@ TotalMinutes      : 1.00298208666667
 TotalSeconds      : 60.1789252
 
 ..
-
 </code></pre><p>Notice how the <code>Seconds</code> property rolls back to 0 after the first 60 seconds? That&rsquo;s because, the <code>Minutes</code> property is now 1.</p>
 <p>So, always use <code>TotalSeconds</code> instead of <code>Seconds</code>. Similarly, <code>TotalMinutes</code>, <code>TotalHours</code> and <code>TotalDays</code>.</p>
 </article>

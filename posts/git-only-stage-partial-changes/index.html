@@ -36,30 +36,29 @@
         <h1>Git Staging partial changes in a file</h1><time>October 11, 2018</time></header><p>Let&rsquo;s say you have made a few changes to a file and only want to stage only some of those changes for commit.
 You may want to do so either to create a nice commit history or may be you just want to discard some of the changes.
 Either way, <code>git add -p</code> is our friend. Let&rsquo;s see an example:</p>
-<pre><code>$ git add -p file1
+<pre tabindex="0"><code>$ git add -p file1
 ...
 index b82819b..a281865 100644
 --- file1
 +++ file2
 @@ -139,8 +139,14 @@ else
      docker run \
-       -e ConnectionStrings__Db=&quot;Data Source=\&quot;tcp:$SQL_SERVER_IP\&quot;;Persist Security Info=True;Initial Catalog=$DB_NAME;User ID=$APPLICATION_USER_NAME;Password=$DB_APPLICATION_PASSWORD&quot; \
--      -e App__RedisCS=&quot;$REDIS_IP&quot; \
-+      -e &quot;${APPLICATION_NAME}_Web__CI__ConnectionStrings__Db&quot;=&quot;Data Source=\&quot;tcp:$SQL_SERVER_IP\&quot;;Persist Security Info=True;Initial Catalog=$DB_NAME;User ID=$APPLICATION_USER_NAME;Password=$DB_APPLICATION_PASSWORD&quot; \
-       --sysctl net.ipv4.ip_local_port_range=&quot;49152 65535&quot; -v &quot;$(pwd)&quot;:/app -w &quot;/app/$WORK_DIR&quot; -ti --rm microsoft/dotnet:2.1-sdk ./run-tests.bash &quot;$project&quot;
+       -e ConnectionStrings__Db=&#34;Data Source=\&#34;tcp:$SQL_SERVER_IP\&#34;;Persist Security Info=True;Initial Catalog=$DB_NAME;User ID=$APPLICATION_USER_NAME;Password=$DB_APPLICATION_PASSWORD&#34; \
+-      -e App__RedisCS=&#34;$REDIS_IP&#34; \
++      -e &#34;${APPLICATION_NAME}_Web__CI__ConnectionStrings__Db&#34;=&#34;Data Source=\&#34;tcp:$SQL_SERVER_IP\&#34;;Persist Security Info=True;Initial Catalog=$DB_NAME;User ID=$APPLICATION_USER_NAME;Password=$DB_APPLICATION_PASSWORD&#34; \
+       --sysctl net.ipv4.ip_local_port_range=&#34;49152 65535&#34; -v &#34;$(pwd)&#34;:/app -w &#34;/app/$WORK_DIR&#34; -ti --rm microsoft/dotnet:2.1-sdk ./run-tests.bash &#34;$project&#34;
      retVal=$?
 Stage this hunk [y,n,q,a,d,/,j,J,g,e,?]? y
-
-</code></pre><p>For each hunk, git will ask you if you want to stage it or not. If you want to, press, &lsquo;y&rsquo;, else &lsquo;n&rsquo;:
+</code></pre><p>For each hunk, git will ask you if you want to stage it or not. If you want to, press, &lsquo;y&rsquo;, else &rsquo;n&rsquo;:
 ..</p>
-<pre><code>@@ -185,7 +196,7 @@ else
+<pre tabindex="0"><code>@@ -185,7 +196,7 @@ else
    ..
-   mkdir &quot;$workdir/$SERVICE_DEPLOYABLE&quot;
--  cp -a &quot;$WORK_DIR/$SERVICE_DEPLOYABLE/bin/Release/netcoreapp2.1/$dotnet_env/publish/.&quot; &quot;$workdir/$SERVICE_DEPLOYABLE/&quot;
-+  cp -a &quot;$SERVICE_DEPLOYABLE/bin/Release/netcoreapp2.1/$dotnet_env/publish/.&quot; &quot;$workdir/$SERVICE_DEPLOYABLE/&quot;
+   mkdir &#34;$workdir/$SERVICE_DEPLOYABLE&#34;
+-  cp -a &#34;$WORK_DIR/$SERVICE_DEPLOYABLE/bin/Release/netcoreapp2.1/$dotnet_env/publish/.&#34; &#34;$workdir/$SERVICE_DEPLOYABLE/&#34;
++  cp -a &#34;$SERVICE_DEPLOYABLE/bin/Release/netcoreapp2.1/$dotnet_env/publish/.&#34; &#34;$workdir/$SERVICE_DEPLOYABLE/&#34;
  fi
 
- if [ -z &quot;$WORKER_DEPLOYABLE&quot; ]
+ if [ -z &#34;$WORKER_DEPLOYABLE&#34; ]
 Stage this hunk [y,n,q,a,d,/,K,j,J,g,e,?]? n
 </code></pre><p>What about the other letters above - like <code>a, </code>d` and others? Learn more <a href="https://git-scm.com/book/en/v2/Git-Tools-Interactive-Staging">here</a>.</p>
 </article>

@@ -40,14 +40,14 @@ However, I end up getting confused between the two, specifically the differences
 my post on the topic with the hope that I will stop getting confused ever again.</p>
 <h1 id="our-setup">Our setup</h1>
 <p>Let&rsquo;s create a file and write a line into it:</p>
-<pre><code>$ echo &quot;Hello, I am file1&quot; &gt; file1
+<pre tabindex="0"><code>$ echo &#34;Hello, I am file1&#34; &gt; file1
 </code></pre><p>Next, we create a <code>hard</code> link using the <code>ln</code> command:</p>
-<pre><code>$ ln file1 file1-hlink
+<pre tabindex="0"><code>$ ln file1 file1-hlink
 </code></pre><p>Now, let&rsquo;s create a soft link using <code>ln -s</code>:</p>
-<pre><code>$ ln -s file1 file1-slink
+<pre tabindex="0"><code>$ ln -s file1 file1-slink
 </code></pre><p>At this stage, if we use the <code>cat</code> command to display the contents of each of the above, we
 will see the same line of text:</p>
-<pre><code>$ cat file1
+<pre tabindex="0"><code>$ cat file1
 Hello, I am file1
 
 $ cat file1-hlink
@@ -59,7 +59,7 @@ Hello, I am file1
 <p>One of the key differences between soft links and hard links is with respect to how they are represented
 in the filesystem. If we run <code>ls</code> with the <code>i</code> switch, it will show the <a href="https://en.wikipedia.org/wiki/Inode">inode</a>
 number of each of the above files:</p>
-<pre><code>$ ls -il
+<pre tabindex="0"><code>$ ls -il
 
 15481123719144131 -rw-rw-rw- 2 asaha asaha 18 Nov  9 13:52 file1
 15481123719144131 -rw-rw-rw- 2 asaha asaha 18 Nov  9 13:52 file1-hlink
@@ -73,18 +73,18 @@ number of each of the above files:</p>
 <p>When we create a soft link, it is equivalent to creating a new file with its own filename. In the filesystem,
 it is a separate file, with the special property that its contents is the <code>path</code> to the real file <code>file1</code>.</p>
 <p>Graphically:</p>
-<pre><code>            Soft link -&gt;   FILE CONTENTS -&gt; Path of original file -&gt; FILE CONTENTS -&gt; &quot;Hello, I am file1&quot;
+<pre tabindex="0"><code>            Soft link -&gt;   FILE CONTENTS -&gt; Path of original file -&gt; FILE CONTENTS -&gt; &#34;Hello, I am file1&#34;
 </code></pre><p>A hard link on the other hand is a reference to the original file. It exists on the filesystem, but only as another
 reference or a link. Let&rsquo;s explore a bit into what it means. If we execute <code>ls</code> with the <code>-l</code> (small <code>L</code>) switch, the
 second column gives the number of <code>link</code> counts of a file:</p>
-<pre><code>$ ls -l file1
+<pre tabindex="0"><code>$ ls -l file1
 -rw-rw-rw- 2 asaha asaha 18 Nov  9 13:52 file1
 </code></pre><p>We have created a hard link above, so, the link count now is 2. If we create another hard link, the link count will be 3:</p>
-<pre><code>$ ln file1 file1-hlink-2
+<pre tabindex="0"><code>$ ln file1 file1-hlink-2
 $ ls -l file1
 -rw-rw-rw- 3 asaha asaha 18 Nov  9 13:52 file1
 </code></pre><p>Graphically:</p>
-<pre><code>file1-hlink  -----&gt; FILE CONTENTS (&quot;Hello, I am file1&quot;) &lt;------ file1
+<pre tabindex="0"><code>file1-hlink  -----&gt; FILE CONTENTS (&#34;Hello, I am file1&#34;) &lt;------ file1
                          /|\ 
                           |
                      file1-hlink-2
@@ -92,7 +92,7 @@ $ ls -l file1
 soft links.</p>
 <h1 id="investigation-size-of-hard-links-and-soft-links">Investigation: Size of hard links and soft links</h1>
 <p>Let&rsquo;s go back to one of the previous output of <code>ls -l</code>:</p>
-<pre><code>$ ls -il
+<pre tabindex="0"><code>$ ls -il
 
 15481123719144131 -rw-rw-rw- 2 asaha asaha 18 Nov  9 13:52 file1
 15481123719144131 -rw-rw-rw- 2 asaha asaha 18 Nov  9 13:52 file1-hlink
@@ -102,7 +102,7 @@ of the original file, <code>file1</code> and the hardlink, <code>file1-hlink</co
 and a new line character. This doesn&rsquo;t mean that each hard link takes up 18 bytes on the disk. Each link is effectively
 a <a href="https://ext4.wiki.kernel.org/index.php/Ext4_Disk_Layout#Directory_Entries">directory entry</a>.</p>
 <p>What are the five bytes in <code>file1-slink</code>? The <code>readlink</code> command will help us:</p>
-<pre><code>$ readlink file1-slink
+<pre tabindex="0"><code>$ readlink file1-slink
 file1
 </code></pre><p>It is the &ldquo;relative&rdquo; path to the original file. Contrary to a hard link, a soft link actually takes up some space of it&rsquo;s
 own.</p>
@@ -111,7 +111,7 @@ own.</p>
 link will basically be a &ldquo;dangling&rdquo; link and hence, we will lose access to the file contents. In the case of hard link, the contents will still continue to be accessible, since all we are doing is deleting one of the links.
 Even though it is the original file, it doesn&rsquo;t matter. Other links continue to exist and point to the data.</p>
 <p>Let&rsquo;s validate our theory:</p>
-<pre><code>$ rm file1
+<pre tabindex="0"><code>$ rm file1
 
 $ ls -lrt
 total 0
@@ -121,14 +121,14 @@ lrwxrwxrwx 1 asaha asaha  5 Nov  9 13:54 file1-slink -&gt; file1
 </code></pre><p>We delete the original file above. Now the link count of <code>file1-hlink</code> and <code>file-hlink-2</code> has decreased by 1 and
 is now 2.</p>
 <p>If we try to display the contents of a hard link:</p>
-<pre><code>$ cat file1-hlink
+<pre tabindex="0"><code>$ cat file1-hlink
 Hello, I am file1
 </code></pre><p>For the soft link though:</p>
-<pre><code>$ cat file1-slink
+<pre tabindex="0"><code>$ cat file1-slink
 cat: file1-slink: No such file or directory
 </code></pre><p>What the above error really says is I am trying to look for a file, <code>file1</code>, but it doesn&rsquo;t exist. This also means that
 we can essentially do:</p>
-<pre><code>$ echo &quot;Hello, I am a different file1&quot; &gt; file1
+<pre tabindex="0"><code>$ echo &#34;Hello, I am a different file1&#34; &gt; file1
 $ cat file1-slink
 Hello, I am a different file1
 </code></pre><p>I wonder what kind of security risk this may post - may be we need symbolic links with checksums?</p>
@@ -137,7 +137,7 @@ Hello, I am a different file1
 <h1 id="investigation-directories-and-links">Investigation: Directories and Links</h1>
 <p>We cannot create hardlinks to directories. This <a href="https://askubuntu.com/questions/210741/why-are-hard-links-not-allowed-for-directories">link</a> is a good resource to learn why. Soft links doesn&rsquo;t have such a limitation.</p>
 <p>Mildly related to this topic is the number of &ldquo;default&rdquo; links for a directory on Linux:</p>
-<pre><code>$ ls -lrta
+<pre tabindex="0"><code>$ ls -lrta
 total 12
 drwxr-xr-x 6 ubuntu ubuntu 4096 Nov  9 05:38 ..
 drwxrwxr-x 2 ubuntu ubuntu 4096 Nov  9 05:41 dir2

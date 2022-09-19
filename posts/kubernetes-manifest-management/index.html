@@ -97,7 +97,7 @@ generate-able object. A service may have:</p>
 <li>Doesn&rsquo;t allow resource limit setting</li>
 </ul>
 <p>As of now, the CLI interface looks as follows:</p>
-<pre><code>Error: accepts 1 arg(s), received 0
+<pre tabindex="0"><code>Error: accepts 1 arg(s), received 0
 Usage:
   mycli service generate-k8s [flags]
 
@@ -125,7 +125,6 @@ Global Flags:
       --log int   Set log level (default 3)
 
 accepts 1 arg(s), received 0
-
 </code></pre><p>Out of scope at this stage:</p>
 <ul>
 <li>Cluster admin will be the exclusive manifest applier</li>
@@ -135,9 +134,9 @@ accepts 1 arg(s), received 0
 <h3 id="examples">Examples</h3>
 <p><strong>Correct user input</strong></p>
 <p>The following command will generate YAML files to deploy a container image:</p>
-<pre><code>$ mycli service generate-k8s hello-world  \
+<pre tabindex="0"><code>$ mycli service generate-k8s hello-world  \
   --container-image=amitsaha/webapp-demo:golang-tls \
-  --environ LISTEN_ADDRESS=&quot;:8443&quot;  \
+  --environ LISTEN_ADDRESS=&#34;:8443&#34;  \
   --deploy-environment=qa  \
   --type internal \
   --port 8443  \
@@ -157,14 +156,13 @@ accepts 1 arg(s), received 0
 <li>Create a service account for the deployment and use that for the deployment</li>
 </ul>
 <p><strong>Bad user input - invalid service name</strong></p>
-<pre><code>$ mycli service generate-k8s hello_world  --container-image=amitsaha/webapp-demo:golang-tls --environ LISTEN_ADDRESS=&quot;:8443&quot;  --deploy-environment=qa  --type in
+<pre tabindex="0"><code>$ mycli service generate-k8s hello_world  --container-image=amitsaha/webapp-demo:golang-tls --environ LISTEN_ADDRESS=&#34;:8443&#34;  --deploy-environment=qa  --type in
 ternal --port 8443  --role=web --project demo  --replicas 1 --node-group demo   
 
-&amp;validator.fieldError{v:(*validator.Validate)(0xc0000de420), tag:&quot;Host&quot;, actualTag:&quot;Host&quot;, ns:&quot;ServiceData.ServiceHost&quot;, structNs:&quot;ServiceData.Host&quot;, fieldLen:0xb, structfie
-ldLen:0x4, value:&quot;&quot;, param:&quot;&quot;, kind:0x18, typ:(*reflect.rtype)(0x18fce60)}
+&amp;validator.fieldError{v:(*validator.Validate)(0xc0000de420), tag:&#34;Host&#34;, actualTag:&#34;Host&#34;, ns:&#34;ServiceData.ServiceHost&#34;, structNs:&#34;ServiceData.Host&#34;, fieldLen:0xb, structfie
+ldLen:0x4, value:&#34;&#34;, param:&#34;&#34;, kind:0x18, typ:(*reflect.rtype)(0x18fce60)}
 
 2019/12/10 15:56:18 Validations failed
-
 </code></pre><p><strong>Bad user input - 1 replica for stateless applications</strong></p>
 <p>TODO</p>
 <p>To summarize, the following resources are created:</p>
@@ -195,7 +193,7 @@ on user input.</p>
 <p>For custom services, using the command line parameters, create a specification for your application. Then using this specification,
 generate manifests for each environment. This will solve 1, 2 and 3 above. If we want to change something across
 all or a specific environments, we will change the specification. Let&rsquo;s consider example specifications:</p>
-<pre><code># For an external PHP service with a
+<pre tabindex="0"><code># For an external PHP service with a
 # Web, Worker, DB migration jobs and a Cron job
 
 Kind: PHPService
@@ -207,7 +205,7 @@ Container:
   Image: 121211.aws.ecr.io/hello-world-api:&lt;githash&gt;
 DBMigration: true
 CIServiceAccount: true
-CronSchedule: &quot;* * * * *&quot;
+CronSchedule: &#34;* * * * *&#34;
 Environments:
   qa:
     Namespace: hello-world-qa
@@ -235,7 +233,7 @@ PersistentVolumeClaims:
   - name: data
     mountPath: /storage
     size:5
-</code></pre><pre><code># For an external Python service with a
+</code></pre><pre tabindex="0"><code># For an external Python service with a
 # Web, Worker, DB migration jobs and a Cron job
 
 Kind: PythonService
@@ -247,7 +245,7 @@ Container:
   Image: 121211.aws.ecr.io/hello-world-api:&lt;githash&gt;
 DBMigration: true
 CIServiceAccount: true
-CronSchedule: &quot;* * * * *&quot;
+CronSchedule: &#34;* * * * *&#34;
 Environments:
   qa:
     Namespace: hello-world-qa
@@ -275,11 +273,10 @@ PersistentVolumeClaims:
   - name: data
     mountPath: /storage
     size:5
-
 </code></pre><p>For deploying standard services which will be deployed in multiple environments across multiple
 applications, the following specification will be generated using in-built custom parameters, thus
 minimizing the number of user inputs:</p>
-<pre><code>Kind: Redis
+<pre tabindex="0"><code>Kind: Redis
 Project: hello-world
 Type: Internal
 Port: 6379

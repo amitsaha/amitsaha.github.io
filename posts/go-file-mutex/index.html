@@ -51,9 +51,9 @@ when you just want to run a single copy of your application.</p>
 </ul>
 <h2 id="our-data-structure">Our data structure</h2>
 <p>Let&rsquo;s consider the following <code>struct</code> type:</p>
-<pre><code>type fileStore struct {
+<pre tabindex="0"><code>type fileStore struct {
 	Mu    sync.Mutex
-	Store map[string]string `json:&quot;store&quot;`
+	Store map[string]string `json:&#34;store&#34;`
 }
 </code></pre><p>Our data store here is the <code>Store</code> map object. This is what we will read from the file and write to the file.
 At any point of time our application is running, the <code>Store</code> object must be strongly consistent with what&rsquo;s inside
@@ -70,7 +70,7 @@ Of course, you could choose any other object type to persist, any other encoding
 a combination of the two. The implementation will vary then, but hopefully the ideas are transferable.</p>
 <h2 id="a-reference-implementation">A reference implementation</h2>
 <p>We will create a new package to encapsulate all the file operations:</p>
-<pre><code>package filestore
+<pre tabindex="0"><code>package filestore
 
 // imports
 
@@ -79,7 +79,7 @@ a combination of the two. The implementation will vary then, but hopefully the i
 // a Mutex object
 type fileStore struct {
 	Mu    sync.Mutex
-	Store map[string]string `json:&quot;store&quot;`
+	Store map[string]string `json:&#34;store&#34;`
 }
 
 // FileStoreConfig encapsulates the DataFileName and
@@ -91,7 +91,7 @@ var FileStoreConfig struct {
 </code></pre><p>Having defined the above types, we can write an <code>Init()</code> function which will take the file
 path as a parameter, create the file if it doesn&rsquo;t exist and returns a <code>FileStoreConfig</code> object
 which the rest of the application can use:</p>
-<pre><code>// Init creates the file if it doesn't exist and initializes the  FileStoreConfig
+<pre tabindex="0"><code>// Init creates the file if it doesn&#39;t exist and initializes the  FileStoreConfig
 // to be used in the rest of the application
 func Init(dataFileName string) error {
 	_, err := os.Stat(dataFileName)
@@ -106,7 +106,6 @@ func Init(dataFileName string) error {
 	FileStoreConfig.DataFileName = dataFileName
 	return nil
 }
-
 </code></pre><p>The <code>Init()</code> function is called at application startup.</p>
 <p>Once that&rsquo;s done, the rest of the application then interacts with two methods implemented for
 the <code>fileStore</code> object:</p>
@@ -115,7 +114,7 @@ the <code>fileStore</code> object:</p>
 <li>Read()</li>
 </ul>
 <p>For the purpose of this reference implementation, we will consider another struct type:</p>
-<pre><code>type myDataType struct {
+<pre tabindex="0"><code>type myDataType struct {
     Key string
     Value string
 }
@@ -123,7 +122,7 @@ the <code>fileStore</code> object:</p>
 <h3 id="writing-to-the-file">Writing to the file</h3>
 <p>The <code>Write()</code> function is called with an object of <code>myDataType</code> which contains
 both the key and value to store in the map and looks like this:</p>
-<pre><code>func (j *fileStore) Write(data myDataType) error {
+<pre tabindex="0"><code>func (j *fileStore) Write(data myDataType) error {
 	j.Mu.Lock()
 	defer j.Mu.Unlock()
 
@@ -136,7 +135,7 @@ both the key and value to store in the map and looks like this:</p>
 }
 </code></pre><p>The <code>Write()</code> function updates the <code>Store</code> map object and then uses a helper function, <code>writeToFile()</code>
 which looks like this:</p>
-<pre><code>func (j *fileStore) WriteToFile() error {
+<pre tabindex="0"><code>func (j *fileStore) WriteToFile() error {
 	var f *os.File
 	jsonData, err := json.Marshal(j.Store)
 	if err != nil {
@@ -150,7 +149,6 @@ which looks like this:</p>
 	_, err = f.Write(jsonData)
 	return err
 }
-
 </code></pre><p>The <code>WriteToFile()</code> function essentially writes the <code>Store</code> object to disk. It&rsquo;s worth
 noting here that the <code>os.Create()</code> function will truncate the file if it exists. This
 is exactly what we want here as we are writing the complete <code>Store</code> object every time.</p>
@@ -164,13 +162,13 @@ till the previous goroutine has released the lock.</p>
 <h3 id="reading-from-file">Reading from file</h3>
 <p>The <code>Read()</code> function accepts a key, <code>id</code> whose value we are interested in. Recall that our key object here
 is a <code>map[string]string</code></p>
-<pre><code>func (j *fileStore) Read(id string) (string, error) {
+<pre tabindex="0"><code>func (j *fileStore) Read(id string) (string, error) {
 	j.Mu.Lock()
 	defer j.Mu.Unlock()
 
 	err := j.ReadFromFile()
 	if err != nil {
-		return &quot;&quot;, err
+		return &#34;&#34;, err
 	}
 
 	data := j.Store[id]
@@ -181,7 +179,7 @@ is a <code>map[string]string</code></p>
 }
 </code></pre><p>The helper function, <code>ReadFromFile()</code>, like its counterpart, <code>WriteToFile()</code> reads the complete file
 and overwrites the current <code>Store</code> object in memory:</p>
-<pre><code>func (j *fileStore) ReadFromFile() error {
+<pre tabindex="0"><code>func (j *fileStore) ReadFromFile() error {
 
 	f, err := os.Open(FileStoreConfig.DataFileName)
 	if err != nil {

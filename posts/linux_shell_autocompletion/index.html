@@ -62,25 +62,24 @@ it worked.</p>
 <p>Let&rsquo;s learn more about the minions that gets to work when we press <code>&lt;TAB&gt;</code> or <code>&lt;TAB&gt;&lt;TAB&gt;</code> on a popular Linux shell, <code>bash</code>.</p>
 <h1 id="setting-up">Setting up</h1>
 <p>Let&rsquo;s get a fresh Fedora 30 VM in a Vagrant box and set it up:</p>
-<pre><code>$ vagrant box add https://download.fedoraproject.org/pub/fedora/linux/releases/30/Cloud/x86_64/images/Fedora-Cloud-Base-Vagrant-30-1.2.x86_64.vagrant-virtualbox.box --name Fedora-30
+<pre tabindex="0"><code>$ vagrant box add https://download.fedoraproject.org/pub/fedora/linux/releases/30/Cloud/x86_64/images/Fedora-Cloud-Base-Vagrant-30-1.2.x86_64.vagrant-virtualbox.box --name Fedora-30
 </code></pre><p>Create a <code>Vagrantfile</code> with the following contents:</p>
-<pre><code># -*- mode: ruby -*-
+<pre tabindex="0"><code># -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-Vagrant.configure(&quot;2&quot;) do |config|
-  config.vm.box = &quot;Fedora-30&quot;
+Vagrant.configure(&#34;2&#34;) do |config|
+  config.vm.box = &#34;Fedora-30&#34;
 
-  config.vm.provider &quot;virtualbox&quot; do |vb|
-    vb.memory = &quot;2048&quot;
+  config.vm.provider &#34;virtualbox&#34; do |vb|
+    vb.memory = &#34;2048&#34;
    end
 end
-
 </code></pre><p>Then, let&rsquo;s bring up the VM:</p>
-<pre><code>$ vagrant up
+<pre tabindex="0"><code>$ vagrant up
 </code></pre><p>Once the VM is up, let&rsquo;s SSH into it:</p>
-<pre><code>$ vagrant ssh
+<pre tabindex="0"><code>$ vagrant ssh
 </code></pre><p>Once we are in the VM:</p>
-<pre><code> $ sudo dnf remove bash-completion
+<pre tabindex="0"><code> $ sudo dnf remove bash-completion
  $ sudo dnf install bpftrace
  $ curl https://raw.githubusercontent.com/iovisor/bpftrace/master/tools/execsnoop.bt -o execsnoop.bt
  $ curl https://raw.githubusercontent.com/iovisor/bpftrace/master/tools/statsnoop.bt -o statsnoop.bt
@@ -94,36 +93,35 @@ now.</p>
 and <code>checkout</code>. Let&rsquo;s aim to achieve that.</p>
 <p>First, create a file, <code>/tmp/git_suggestions</code>, put in the following snippet and make it executeable
 (<code>chmod +x /tmp/git_suggestions</code>):</p>
-<pre><code>
+<pre tabindex="0"><code>
 #!/bin/bash
 
-echo &quot;status&quot;
-echo &quot;checkout&quot;
-echo &quot;clone&quot;
-echo &quot;branch&quot;
+echo &#34;status&#34;
+echo &#34;checkout&#34;
+echo &#34;clone&#34;
+echo &#34;branch&#34;
 </code></pre><p>This script prints four git subcommands - one on each line. Now, execute the command from Terminal 1:</p>
-<pre><code>$  complete -C &quot;/tmp/git_suggestions&quot; git
+<pre tabindex="0"><code>$  complete -C &#34;/tmp/git_suggestions&#34; git
 </code></pre><p>The <code>complete</code> bash built-in is a way to tell bash what we want it to do when we ask for completing a command.
 The <code>-C</code> option asks it to call a specified external program. There are various other options some of which we
 will learn later on in this post.</p>
 <p>Next, type in <code>git &lt;TAB&gt;&lt;TAB&gt;</code>, you will see that you are now suggested four options for your next command/option:</p>
-<pre><code>[vagrant@ip-10-0-2-15 temp]$ git &lt;TAB&gt;&lt;TAB&gt;
+<pre tabindex="0"><code>[vagrant@ip-10-0-2-15 temp]$ git &lt;TAB&gt;&lt;TAB&gt;
 branch    checkout  clone     status    
-
 </code></pre><p>Note that each of the suggestion is a line printed by the above script. Let&rsquo;s delve further into this.</p>
 <p>Open a new terminal (Terminal 2) and execute the following:</p>
-<pre><code>$ sudo bpftrace ./execnsoop.bt
+<pre tabindex="0"><code>$ sudo bpftrace ./execnsoop.bt
 </code></pre><p>Now, go back to Terminal 1, and type <code>$git &lt;TAB&gt;&lt;TAB&gt;</code>.</p>
 <p>On Terminal 2, you will see something like:</p>
-<pre><code>49916      15949 /tmp/git_suggestions git
+<pre tabindex="0"><code>49916      15949 /tmp/git_suggestions git
 </code></pre><p>The first column is how long the external program executed for in milliseconds (the number seem weird to me, but that&rsquo;s
 a different problem). The second column gives us the process ID and the third column shows us the external program
 along with the arguments it was executed it. We can see that the script <code>/tmp/git_suggestions</code> is executed and the
 command for which the auto-completion suggestions are being shown is provided as the first argument.</p>
 <p>Now, go back to Terminal 1, and type:</p>
-<pre><code>$ git chec&lt;TAB&gt;
+<pre tabindex="0"><code>$ git chec&lt;TAB&gt;
 </code></pre><p>On Terminal 2, we will see:</p>
-<pre><code>189064     16701/tmp/git_suggestions git chec git
+<pre tabindex="0"><code>189064     16701/tmp/git_suggestions git chec git
 </code></pre><p>We see that the script <code>/tmp/git_suggestions</code> is now being called with three arguments:</p>
 <ul>
 <li><code>git</code>: The command we are trying to ask BASH to suggest auto-completions for</li>
@@ -137,23 +135,22 @@ line in the output is suggested as possible candidates for the auto-completion.<
 <p>Let&rsquo;s discuss more about the data provided to completion handlers.</p>
 <h1 id="data-provided-to-completion-handlers">Data provided to completion handlers</h1>
 <p>We will update our <code>/tmp/git_suggestions</code> script to be as follows:</p>
-<pre><code>#!/bin/bash
+<pre tabindex="0"><code>#!/bin/bash
 
-echo &quot;status&quot;
-echo &quot;checkout&quot;
-echo &quot;clone&quot;
-echo &quot;branch&quot;
+echo &#34;status&#34;
+echo &#34;checkout&#34;
+echo &#34;clone&#34;
+echo &#34;branch&#34;
 
 # Print the envrionment variables relevant to bash autocompletion
 env | grep COMP &gt; /tmp/log
 </code></pre><p>We add a line at the end to print all environment variables having COMP in them and log it to
 a file. Now, if we go back to Terminal 1, and type <code>$git checkout &lt;TAB&gt;&lt;TAB&gt;</code>, we will again see:</p>
-<pre><code>
+<pre tabindex="0"><code>
 $ git checkout &lt;TAB&gt;&lt;TAB&gt;
 branch                   clone                    checkout                 status 
-
 </code></pre><p>Let&rsquo;s display the contents of <code>/tmp/log</code> on Terminal 2:</p>
-<pre><code>$ cat /tmp/log 
+<pre tabindex="0"><code>$ cat /tmp/log 
 COMP_POINT=4
 COMP_LINE=git 
 COMP_TYPE=63
@@ -174,18 +171,17 @@ back the suggestions is different when the handler is a shell function.</p>
 auto-completions in most cases. Let&rsquo;s look into that. A single <code>&lt;TAB&gt;</code> will aim to complete (not list) the current command
 with the largest common prefix among all the suggestions. If there is no common prefix, it will not do anything.</p>
 <p>Let&rsquo;s verify that by changing the <code>/tmp/git_suggestions</code> script to be as follows:</p>
-<pre><code>#!/bin/bash
+<pre tabindex="0"><code>#!/bin/bash
 
-echo &quot;status&quot;
+echo &#34;status&#34;
 # Print the envrionment variables relevant to bash autocompletion
 env | grep COMP &gt; /tmp/log
-
 </code></pre><p>Since the script will now print only one value as the suggestion for auto-completion, it will complete
 the <code>git</code> command by inserting <code>status</code>.</p>
 <p>Now, if we go to Terminal 1, we will see the following when we press <code>$ git &lt;TAB&gt;</code>:</p>
-<pre><code>$ git status
+<pre tabindex="0"><code>$ git status
 </code></pre><p>Now, let&rsquo;s go back to Terminal 2, and do:</p>
-<pre><code>$ cat /tmp/log
+<pre tabindex="0"><code>$ cat /tmp/log
 
 COMP_POINT=4
 COMP_LINE=git 
@@ -199,55 +195,52 @@ COMP_KEY=9
 the Bash manual refers to this as &ldquo;normal&rdquo; completion.</li>
 </ul>
 <p>Update the <code>/tmp/git_suggestions</code> script to be as follows:</p>
-<pre><code>#!/bin/bash
+<pre tabindex="0"><code>#!/bin/bash
 
-echo &quot;checkout&quot;
-echo &quot;check&quot;
+echo &#34;checkout&#34;
+echo &#34;check&#34;
 
 # Print the envrionment variables relevant to bash autocompletion
 env | grep COMP &gt; /tmp/log
 </code></pre><p>Now, let&rsquo;s go back to Terminal 1, and type in: <code>$ git &lt;TAB&gt;</code>, we will now see this:</p>
-<pre><code>$ git check
+<pre tabindex="0"><code>$ git check
 </code></pre><p><code>checkout</code> and <code>check</code> share the common prefix, <code>check</code> and hence is inserted at the cursor upon
 pressing a single <code>&lt;TAB&gt;</code>.</p>
 <p>Let&rsquo;s now update the <code>/tmp/git_suggestions</code> script as follows:</p>
-<pre><code>#!/bin/bash
+<pre tabindex="0"><code>#!/bin/bash
 
-echo &quot;checkout&quot;
-echo &quot;branch&quot;
+echo &#34;checkout&#34;
+echo &#34;branch&#34;
 
 # Print the envrionment variables relevant to bash autocompletion
 env | grep COMP &gt; /tmp/log
-
 </code></pre><p>Now, if we go back to Terminal 1 and type in <code>$git &lt;TAB&gt;</code>, we will not see any completion since
 there is no common prefix between the two words &ldquo;checkout&rdquo; and &ldquo;branch&rdquo;.</p>
 <p>If you have your terminal bell turned on and your computer&rsquo;s speaker switched on, you should hear a bell
 when this happens.</p>
 <h1 id="getting-good-old-bash-completion-back">Getting good old BASH completion back</h1>
 <p>Now, on Terminal 2, let&rsquo;s install the <code>bash-completion</code> package:</p>
-<pre><code>$ sudo dnf install bash-completion
+<pre tabindex="0"><code>$ sudo dnf install bash-completion
 </code></pre><p>Then <code>exec bash</code> to get a new shell. On Terminal 2, run:</p>
-<pre><code>$ sudo bpftrace execnsnoop.bt
-
+<pre tabindex="0"><code>$ sudo bpftrace execnsnoop.bt
 </code></pre><p>On Terminal 1, type, in <code>$ git &lt;TAB&gt;</code>, we will not see any auto-completion being performed.</p>
 <p>On Terminal 2, now we will see something like:</p>
-<pre><code>95607      1470  git --list-cmds=list-mainporcelain,others,nohelpers,alias,list-complete,config
+<pre tabindex="0"><code>95607      1470  git --list-cmds=list-mainporcelain,others,nohelpers,alias,list-complete,config
 </code></pre><p>While trying to make auto-completion suggestions, the above command is being executed. However, it
 seems like the suggestions do not have any common prefix, hence no completion is being performed. Let&rsquo;s
 verify that.</p>
 <p><code>commonprefix.py</code> is a Python program, which we will use to verify this:</p>
-<pre><code># thanks to https://stackoverflow.com/a/6718435
+<pre tabindex="0"><code># thanks to https://stackoverflow.com/a/6718435
 import fileinput
 import os
 
 suggestions = []
 for line in fileinput.input():
-    suggestions.append(line.rstrip('\n'))
+    suggestions.append(line.rstrip(&#39;\n&#39;))
 
 print(os.path.commonprefix(suggestions))
-
 </code></pre><p>Now, let&rsquo;s see if the suggestions had a common prefix:</p>
-<pre><code>$ git --list-cmds=list-mainporcelain,others,nohelpers,alias,list-complete,config | python3 commonprefix.py
+<pre tabindex="0"><code>$ git --list-cmds=list-mainporcelain,others,nohelpers,alias,list-complete,config | python3 commonprefix.py
 </code></pre><p>This verifies that there were no common prefix among all the suggestions and hence <TAB> didn&rsquo;t
 bring up any suggestion.</p>
 <p>Let&rsquo;s now ask the question - how did installing the <code>bash-completion</code> package magically bring our
@@ -255,7 +248,7 @@ auto-completion machinery into motion? The short answer is a bunch of bash magic
 see what the long answer is.</p>
 <h1 id="magic-of-bash-completion-package">Magic of <code>bash-completion</code> package</h1>
 <p>Let&rsquo;s start by listing all the files that this package creates on our system:</p>
-<pre><code>$ sudo dnf download bash-completion
+<pre tabindex="0"><code>$ sudo dnf download bash-completion
 $ rpm -qlp bash-completion-2.8-6.fc30.noarch.rpm 
 /etc/bash_completion.d
 ..
@@ -279,41 +272,41 @@ we see a whole bunch of things happening.</p>
 <p>As we start reading the file from the top, we see completions for various commands being setup. Let&rsquo;s
 look at a few.</p>
 <p>As a first example:</p>
-<pre><code># user commands see only users
+<pre tabindex="0"><code># user commands see only users
 complete -u groups slay w sux
 </code></pre><p>The <code>-u</code> switch  of the <code>complete</code> command is a shortcut to specify that the auto-completion suggestions
 for the commands, <code>groups</code>, <code>slay</code> and <code>sux</code> should be the user names on the system.</p>
 <p>The second example we will look at is:</p>
-<pre><code># type and which complete on commands
+<pre tabindex="0"><code># type and which complete on commands
 complete -c command type which
 </code></pre><p>Here we are specifying via the <code>-c</code> switch that the suggested completions for the <code>command</code>, <code>type</code> and <code>which</code> commands should be
 all possible command names on the system.</p>
 <p>Both the above are examples of pre-defined list of auto-completions that a program author can take advantage of.</p>
 <p>Earlier in this post, we saw how we can invoke external programs for auto-completion suggestions. We can also define
 shell functions. Here&rsquo;s an example from the above file:</p>
-<pre><code>complete -F _service service
+<pre tabindex="0"><code>complete -F _service service
 </code></pre><p><code>_service</code> is a function defined in the same file which uses various other helpers and external commands
 to come up with the list of services on the system.</p>
 <p>An interesting completion that is setup in this file is a &ldquo;dynamic&rdquo; completion handler:</p>
-<pre><code>complete -D -F _completion_loader
+<pre tabindex="0"><code>complete -D -F _completion_loader
 </code></pre><p>The <code>-D</code> switch setups a default completion handler for any command for which a compspec is not found. The default
 handler is set to the bash function, <code>_completion_loader</code> which is:</p>
-<pre><code>_completion_loader () 
+<pre tabindex="0"><code>_completion_loader () 
 { 
-    local cmd=&quot;${1:-_EmptycmD_}&quot;;
-    __load_completion &quot;$cmd&quot; &amp;&amp; return 124;
-    complete -F _minimal -- &quot;$cmd&quot; &amp;&amp; return 124
+    local cmd=&#34;${1:-_EmptycmD_}&#34;;
+    __load_completion &#34;$cmd&#34; &amp;&amp; return 124;
+    complete -F _minimal -- &#34;$cmd&#34; &amp;&amp; return 124
 }
 </code></pre><p>The <code>__load_completion</code> function essentially looks for a bash script named as, <code>command-name</code>, <code>command-name.bash</code>
 and <code>_command-name</code> in the following locations (preferring whichever it finds first):</p>
-<pre><code>/home/&lt;user-name&gt;/.local/share/bash-completion/completions/
+<pre tabindex="0"><code>/home/&lt;user-name&gt;/.local/share/bash-completion/completions/
 /usr/local/share/bash-completion/completions/
 /usr/share/bash-completion/completions/
 </code></pre><p>If it finds one, it sources it. Let&rsquo;s see it in action. On Terminal 2:</p>
-<pre><code>$ sudo bpftrace ./statsoop.bt
+<pre tabindex="0"><code>$ sudo bpftrace ./statsoop.bt
 </code></pre><p>On Terminal 1, <code>exec bash</code> to start a new bash shell and type in <code>git &lt;TAB&gt;</code>. On Terminal 2, we will
 see something like:</p>
-<pre><code>577    bash               2 /home/vagrant/.local/share/bash-completion/completions/git
+<pre tabindex="0"><code>577    bash               2 /home/vagrant/.local/share/bash-completion/completions/git
 577    bash               2 /home/vagrant/.local/share/bash-completion/completions/git.bash
 577    bash               2 /home/vagrant/.local/share/bash-completion/completions/_git
 577    bash               2 /usr/local/share/bash-completion/completions/git
@@ -322,16 +315,16 @@ see something like:</p>
 577    bash               0 /usr/share/bash-completion/completions/git
 </code></pre><p>The third column in the above output is the return code of the <code>stat</code> system call. A non-zero
 number there means the file doesn&rsquo;t exist. If we now create a file:</p>
-<pre><code>$ cat ~/.local/share/bash-completion/completions/git
+<pre tabindex="0"><code>$ cat ~/.local/share/bash-completion/completions/git
 
 _my_git_completion()
 {
-	COMPREPLY=&quot;checkout&quot;
+	COMPREPLY=&#34;checkout&#34;
 }
 complete -F _my_git_completion git
 </code></pre><p>Now, if we <code>exec bash</code> and type in <code>git &lt;TAB&gt;</code>, we will see that <code>checkout</code> is inserted and on Terminal 2,
 we will see:</p>
-<pre><code>577    bash               0 /home/vagrant/.local/share/bash-completion/completions/git
+<pre tabindex="0"><code>577    bash               0 /home/vagrant/.local/share/bash-completion/completions/git
 </code></pre><p>We use the special variable <code>COMPREPLY</code> to send back the auto-completion suggestions to the
 shell.</p>
 <p>In this section, we looked at how <code>bash-completion</code> enables auto-completion from a very high-level
@@ -391,85 +384,84 @@ driver remains Bash scripts. Two projects that aim to provide alternatives are <
 and <a href="https://github.com/joshmcguigan/shell_completion">shell_completion</a>(Rust). These projects aim to provide completion
 primitives such as those provided by <code>compgen</code> in Golang and Rust respectively.</p>
 <p>An example of using <code>complete</code> is the following golang program for auto-completing a fictional command line program, <code>myops</code>:</p>
-<pre><code># main.go
+<pre tabindex="0"><code># main.go
 package main
 
-import &quot;github.com/posener/complete&quot;
+import &#34;github.com/posener/complete&#34;
 
 func main() {
 
-	logLevelOptions := []string{&quot;1&quot;, &quot;2&quot;, &quot;3&quot;}
+	logLevelOptions := []string{&#34;1&#34;, &#34;2&#34;, &#34;3&#34;}
 
 	run := complete.Command{
 		Sub: complete.Commands{
-			&quot;grafana&quot;: complete.Command{
+			&#34;grafana&#34;: complete.Command{
 				Flags: complete.Flags{
-					&quot;--grafana.url&quot;: complete.PredictAnything,
+					&#34;--grafana.url&#34;: complete.PredictAnything,
 				},
 			},
-			&quot;kibana&quot;: complete.Command{
+			&#34;kibana&#34;: complete.Command{
 				Flags: complete.Flags{
-					&quot;--elkUrl&quot;: complete.PredictAnything,
+					&#34;--elkUrl&#34;: complete.PredictAnything,
 				},
 			},
 		},
 
-		// define flags of the 'run' main command
+		// define flags of the &#39;run&#39; main command
 		Flags: complete.Flags{
 			// a flag -o, which expects a file ending with .out after
 			// it, the tab completion will auto complete for files matching
 			// the given pattern.
-			&quot;-h&quot;: complete.PredictAnything,
+			&#34;-h&#34;: complete.PredictAnything,
 		},
 
 		GlobalFlags: complete.Flags{
-			&quot;--log&quot;: complete.PredictSet(logLevelOptions...),
+			&#34;--log&#34;: complete.PredictSet(logLevelOptions...),
 		},
 	}
 
-	complete.New(&quot;myops&quot;, run).Run()
+	complete.New(&#34;myops&#34;, run).Run()
 }
-
 </code></pre><p>Build and register the binary with Bash so that it is invoked during auto-completion for the
 <code>myops</code> command:</p>
-<pre><code>$ go build -o shell_completion main.go
+<pre tabindex="0"><code>$ go build -o shell_completion main.go
 $ ./shell_autocompletion --help
 Usage of ./shell_autocompletion:
   -install
     	Install completion for myops command
   -uninstall
     	Uninstall completion for myops command
-  -y	Don't prompt user for typing 'yes' when installing completion
+  -y	Don&#39;t prompt user for typing &#39;yes&#39; when installing completion
 
 $ ./shell_autocompletion -install
 Install completion for myops? y
 Installing...
 Done!
 </code></pre><p>When we run <code>-install</code>, it inserts the following line in the user&rsquo;s <code>~/.bashrc</code>:</p>
-<pre><code>complete -C /home/amit/work/bitbucket.org/myops/shell_autocompletion/shell_autocompletion myops
+<pre tabindex="0"><code>complete -C /home/amit/work/bitbucket.org/myops/shell_autocompletion/shell_autocompletion myops
 </code></pre><p>Now, we will start getting suggestions as configured above:</p>
-<pre><code>$ myops grafana --log 
+<pre tabindex="0"><code>$ myops grafana --log 
 1  2  3  
 </code></pre><h1 id="conclusion">Conclusion</h1>
 <p>We will end this post by peeking at where the auto-completion machinery is set to motion. Bash uses the <code>readline</code> library
 for all the command line editing, history and auto-completion support. In the bash source code, we have this line in
 the file <code>bashline.c</code>:</p>
-<pre><code># bashline.c
+<pre tabindex="0"><code># bashline.c
 rl_attempted_completion_function = attempt_shell_completion;
 </code></pre><p>If we compile Bash from source, run it under <code>gdb</code> after placing a breakpoint at this function,
 we can see a backtrace showing the invocation of this function when we press <code>TAB</code>:</p>
-<pre><code>$ &lt;compile bash&gt;
+<pre tabindex="0"><code>$ &lt;compile bash&gt;
 $ gdb ./bash
 gdb) b attempt_shell_completion
 Breakpoint 1 at 0x479d00: file bashline.c, line 1434.
 $ run
 $  &lt;TAB&gt;
-Breakpoint 1, attempt_shell_completion (text=0x6dd8f8 &quot;&quot;, start=0, end=0) at bashline.c:1434
+Breakpoint 1, attempt_shell_completion (text=0x6dd8f8 &#34;&#34;, start=0, end=0) at bashline.c:1434
 1434	  rl_ignore_some_completions_function = filename_completion_ignore;
 Missing separate debuginfos, use: dnf debuginfo-install sssd-client-2.1.0-2.fc30.x86_64
 (gdb) bt
-#0  attempt_shell_completion (text=0x6dd8f8 &quot;&quot;, start=0, end=0) at bashline.c:1434
-#1  0x00000000004b24b9 in gen_completion_matches (text=0x6dd8f8 &quot;&quot;, start=&lt;optimized out&gt;, end=&lt;optimized out&gt;, our_func=0x4b0000 &lt;rl_filename_completion_function&gt;, found_quote=&lt;optimized out&gt;, quote_char=&lt;optimized out&gt;)
+#0  attempt_shell_completion (text=0x6dd8f8 &#34;&#34;, start=0, end=0) at bashline.c:1434
+#1  0x00000000004b24b9 in gen_completion_matches (text=0x6dd8f8 &#34;&#34;, start=&lt;optimized out&gt;, end=&lt;optimized out&gt;, our_func=0x4b0000 &lt;rl_filename_completion_function&gt;, found_quote=&lt;optimized out&gt;, quote_char=&lt;optimized out&gt;)
     at complete.c:1209
 #2  0x00000000004b2673 in rl_complete_internal (what_to_do=9) at complete.c:2013
 #3  0x00000000004a8bf3 in _rl_dispatch_subseq (key=9, map=0x514a20 &lt;emacs_standard_keymap&gt;, got_subseq=0) at readline.c:852

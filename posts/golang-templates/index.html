@@ -38,34 +38,33 @@ with data in Go templates as available via the <code>html/template</code> packag
 a few use cases that may arise.</p>
 <h1 id="accessing-a-variable">Accessing a variable</h1>
 <p>Let&rsquo;s consider our first program:</p>
-<pre><code>package main
+<pre tabindex="0"><code>package main
 
 import (
-	&quot;html/template&quot;
-	&quot;log&quot;
-	&quot;os&quot;
+	&#34;html/template&#34;
+	&#34;log&#34;
+	&#34;os&#34;
 )
 
 func main() {
 
-	var names = []string{&quot;Tabby&quot;, &quot;Jill&quot;}
+	var names = []string{&#34;Tabby&#34;, &#34;Jill&#34;}
 
-	tmpl := template.New(&quot;test&quot;)
+	tmpl := template.New(&#34;test&#34;)
 
-	tmpl, err := tmpl.Parse(&quot;Array contents: {{.}}&quot;)
+	tmpl, err := tmpl.Parse(&#34;Array contents: {{.}}&#34;)
 	if err != nil {
-		log.Fatal(&quot;Error Parsing template: &quot;, err)
+		log.Fatal(&#34;Error Parsing template: &#34;, err)
 		return
 	}
 	err1 := tmpl.Execute(os.Stdout, names)
 	if err1 != nil {
-		log.Fatal(&quot;Error executing template: &quot;, err1)
+		log.Fatal(&#34;Error executing template: &#34;, err1)
 
 	}
 }
-
 </code></pre><p>When we run the above program <a href="https://play.golang.org/p/St0g-6_G8_1">Go playground link</a>, the output we get is:</p>
-<pre><code>Array contents: [Tabby Jill]
+<pre tabindex="0"><code>Array contents: [Tabby Jill]
 </code></pre><p>There are three main stages to working with templates in general that we see in the program above:</p>
 <ul>
 <li>Create a new <code>Template</code> object: <code>tmpl := template.New(&quot;test&quot;)</code></li>
@@ -78,7 +77,7 @@ with it.</p>
 <p>The <code>.</code> (dot) refers to the data that is passed in. In the above example, the
 entire array contents of <code>names</code> is the value of <code>.</code>. Hence, the output has the entire array including the surrounding
 <code>[]</code>. This also means that <code>names</code> could have been of another type - a struct for <a href="https://play.golang.org/p/vAmNzNFg8LR">example</a> like so:</p>
-<pre><code>..
+<pre tabindex="0"><code>..
 
 type Test struct {
 	name string
@@ -89,25 +88,24 @@ func main() {
 	..
 
 	//parse some content and generate a template
-	tmpl, err := tmpl.Parse(&quot;Variable contents: {{.}}&quot;)
+	tmpl, err := tmpl.Parse(&#34;Variable contents: {{.}}&#34;)
 	if err != nil {
-		log.Fatal(&quot;Error Parsing template: &quot;, err)
+		log.Fatal(&#34;Error Parsing template: &#34;, err)
 		return
 	}
 	..
 }
-
 </code></pre><p>The output now would be:</p>
-<pre><code>Variable contents: {Tabby}
+<pre tabindex="0"><code>Variable contents: {Tabby}
 </code></pre><h1 id="accessing-structure-members">Accessing structure members</h1>
 <p>Now, let&rsquo;s consider that our structure has multiple members and we want to access the individual members in our
 template. Here&rsquo;s how we can do so (Golang playground)[https://play.golang.org/p/8BSiYJ_7Mfd]:</p>
-<pre><code>package main
+<pre tabindex="0"><code>package main
 
 import (
-	&quot;html/template&quot;
-	&quot;log&quot;
-	&quot;os&quot;
+	&#34;html/template&#34;
+	&#34;log&#34;
+	&#34;os&#34;
 )
 
 type Person struct {
@@ -117,52 +115,51 @@ type Person struct {
 
 func main() {
 
-	p := Person{Name: &quot;Tabby&quot;, Age: 21}
+	p := Person{Name: &#34;Tabby&#34;, Age: 21}
 
-	tmpl := template.New(&quot;test&quot;)
+	tmpl := template.New(&#34;test&#34;)
 
 	//parse some content and generate a template
-	tmpl, err := tmpl.Parse(&quot;{{.Name}} is {{.Age}} years old&quot;)
+	tmpl, err := tmpl.Parse(&#34;{{.Name}} is {{.Age}} years old&#34;)
 	if err != nil {
-		log.Fatal(&quot;Error Parsing template: &quot;, err)
+		log.Fatal(&#34;Error Parsing template: &#34;, err)
 		return
 	}
 	err1 := tmpl.Execute(os.Stdout, p)
 	if err1 != nil {
-		log.Fatal(&quot;Error executing template: &quot;, err1)
+		log.Fatal(&#34;Error executing template: &#34;, err1)
 
 	}
 }
 </code></pre><p>The <code>dot</code> operator referes to the structure object, <code>p</code> and then inside the template, we just specify the
 field name, like so, <code>.&lt;Field&gt;</code>. The output will be:</p>
-<pre><code>Tabby is 21 years old
+<pre tabindex="0"><code>Tabby is 21 years old
 </code></pre><h1 id="do-something-with-array-elements">Do something with array elements</h1>
 <p>Going back to our first example, how do we access the individual array elements? Let&rsquo;s see how we can do so.</p>
 <p>The complete example can be found <a href="https://play.golang.org/p/v2qP49qaJp5">here</a>, but the only change is in the template
 string:</p>
-<pre><code>tmpl, err := tmpl.Parse(&quot;{{range .}}Hello {{.}}\n{{end}} &quot;)
+<pre tabindex="0"><code>tmpl, err := tmpl.Parse(&#34;{{range .}}Hello {{.}}\n{{end}} &#34;)
 </code></pre><p>I find it easy when I read the above template string as:</p>
-<pre><code>for _, item := range names {       // corresponding to {{range .}}
-    fmt.Printf(&quot;Hello %s\n&quot;, item) // corresponding to Hello {{.}}\n
+<pre tabindex="0"><code>for _, item := range names {       // corresponding to {{range .}}
+    fmt.Printf(&#34;Hello %s\n&#34;, item) // corresponding to Hello {{.}}\n
 }                                 // corresponding to {{end}}
 </code></pre><p><code>range</code> can be used to iterate over arrays, slice, map or a channel.</p>
 <h1 id="arrays-of-structure-objects">Arrays of structure objects</h1>
 <p>Combining the two previous examples, we can access array elements which are structure objects, like so:</p>
-<pre><code>...
+<pre tabindex="0"><code>...
 var names = []Person{
-		Person{Name: &quot;Tabby&quot;, Age: 21},
-		Person{Name: &quot;Jill&quot;, Age: 19},
+		Person{Name: &#34;Tabby&#34;, Age: 21},
+		Person{Name: &#34;Jill&#34;, Age: 19},
 }
 
-tmpl := template.New(&quot;test&quot;)
+tmpl := template.New(&#34;test&#34;)
 
-tmpl, err := tmpl.Parse(&quot;{{range .}}{{.Name}} is {{.Age}} years old\n{{end}} &quot;)
+tmpl, err := tmpl.Parse(&#34;{{range .}}{{.Name}} is {{.Age}} years old\n{{end}} &#34;)
 err1 := tmpl.Execute(os.Stdout, names)
 ...
 </code></pre><p>The complete program is <a href="https://play.golang.org/p/NseTCXCyjF7">here</a> and the output from this program is:</p>
-<pre><code>Tabby is 21 years old
+<pre tabindex="0"><code>Tabby is 21 years old
 Jill is 19 years old
-
 </code></pre><h1 id="calling-user-defined-functions-and-chaining">Calling user defined functions and Chaining</h1>
 <p>Our next example demonstrates two new things:</p>
 <ul>
@@ -170,49 +167,49 @@ Jill is 19 years old
 <li>Chaining</li>
 </ul>
 <p>The complete example is available <a href="https://play.golang.org/p/cksPYVt3RUg">here</a> and the output is:</p>
-<pre><code>Tabby has an odd name 
+<pre tabindex="0"><code>Tabby has an odd name 
 Jill has an even name 
 </code></pre><p>The two main changes from our previous program are:</p>
 <h2 id="adding-a-funcmap">Adding a <code>FuncMap</code></h2>
-<pre><code>funcMap := template.FuncMap{  
-    &quot;oddOrEven&quot;: oddOrEven,
+<pre tabindex="0"><code>funcMap := template.FuncMap{  
+    &#34;oddOrEven&#34;: oddOrEven,
 }
 
-tmpl := template.New(&quot;test&quot;).Funcs(funcMap)
+tmpl := template.New(&#34;test&#34;).Funcs(funcMap)
 </code></pre><p>A <code>FuncMap</code> is how we add our functions to a template&rsquo;s &ldquo;context&rdquo; and then invoke them. There are few
 rules around the semantics of functions we can add which you can learn <a href="https://golang.org/pkg/text/template/#FuncMap">here</a>.
 My favorite is if I return a non-nil error, the template execution will halt without me having to do any
 extra checks.</p>
 <h2 id="chaining">Chaining</h2>
 <p>Chaining is how we perform an action and feed it&rsquo;s output to another action via the <code>|</code> (pipe) operator:</p>
-<pre><code>tmpl, err := tmpl.Parse(&quot;{{range .}}{{.Name}} has an {{len .Name | oddOrEven}} name \n{{end}}&quot;)
+<pre tabindex="0"><code>tmpl, err := tmpl.Parse(&#34;{{range .}}{{.Name}} has an {{len .Name | oddOrEven}} name \n{{end}}&#34;)
 </code></pre><p>Here, we invoke the in-built <code>len</code> function to calculate the length of <code>Name</code> and then call the <code>oddOrEven</code> function.</p>
 <h1 id="controlling-output-using-template-strings">Controlling output using template strings</h1>
 <p>My first encounter with Go templates was when working with <a href="https://docs.docker.com/config/formatting/">docker</a> output
 formatting which allowed controlling what I get as output. Let&rsquo;s see how we can implement something like that
 for our program. The entire program is <a href="https://github.com/amitsaha/golang-templates-demo/blob/master/format-output/test.go">here</a>.</p>
 <p>When we run it without passing any arguments:</p>
-<pre><code>$ go run test.go
+<pre tabindex="0"><code>$ go run test.go
 Tabby 21 odd
 Jill 19 even
 </code></pre><p>If however we pass it a format string as the first command line argument, we can control the output:</p>
-<pre><code>$ go run test.go &quot;{{ .Age }} {{ OddOrEven .Name}}&quot;
+<pre tabindex="0"><code>$ go run test.go &#34;{{ .Age }} {{ OddOrEven .Name}}&#34;
 21 odd
 19 even
 </code></pre><p>The two main changes are:</p>
-<pre><code>func OddOrEven(s string) string {
+<pre tabindex="0"><code>func OddOrEven(s string) string {
 
         if len(s)%2 == 0 {
-                return &quot;even&quot;
+                return &#34;even&#34;
         } else {
-                return &quot;odd&quot;
+                return &#34;odd&#34;
         }
 
 }
 </code></pre><p>The format string is now obtained via a function call:</p>
-<pre><code>func getFormatString() string {
-        placeHolderFormat := &quot;{{range .}}%s\n{{end}}&quot;
-        defaultFormatString := &quot;{{.Name}} {{.Age}} {{ OddOrEven .Name}}&quot;
+<pre tabindex="0"><code>func getFormatString() string {
+        placeHolderFormat := &#34;{{range .}}%s\n{{end}}&#34;
+        defaultFormatString := &#34;{{.Name}} {{.Age}} {{ OddOrEven .Name}}&#34;
         if len(os.Args) == 2 {
                 return fmt.Sprintf(placeHolderFormat, os.Args[1])
         } else {
@@ -222,21 +219,21 @@ Jill 19 even
 </code></pre><p>We can of course define any arbitrary functions and make them available to be invoked in the context of our templates.</p>
 <h1 id="rendering-an-arbitrary-template-file-using-arbitrary-values">Rendering an arbitrary template file using arbitrary values</h1>
 <p>Our next program will take a template string in a file, like so:</p>
-<pre><code>$ cat cluster.tmpl
+<pre tabindex="0"><code>$ cat cluster.tmpl
 Cluster Name: {{.clusterName}}
 Max Nodes: {{.maxNodes}}
 Nodes: {{range .nodeNames}}
 - {{.}}
 {{- end}}
 </code></pre><p>The data will be provided as an YAML file, like so:</p>
-<pre><code>$ cat values.yml
-clusterName: &quot;test.local&quot;
+<pre tabindex="0"><code>$ cat values.yml
+clusterName: &#34;test.local&#34;
 maxNodes: 10
 nodeNames:
 - Node 1
 - Node 2
 </code></pre><p>And our program will print:</p>
-<pre><code>Cluster Name: test.local
+<pre tabindex="0"><code>Cluster Name: test.local
 Max Nodes: 10
 Nodes:
 - Node 1
@@ -245,7 +242,7 @@ Nodes:
 file and the complete program is <a href="https://github.com/amitsaha/golang-templates-demo/blob/master/render-arbitrary-template/main.go">here</a>.</p>
 <p>The key bit in the program was to create a map of type <code>[string]interface</code> from the provided YAML file. We will run
 the program as:</p>
-<pre><code>$ go run main.go cluster.tmpl values.yml
+<pre tabindex="0"><code>$ go run main.go cluster.tmpl values.yml
 Cluster Name: test.local
 Max Nodes: 10
 Nodes:

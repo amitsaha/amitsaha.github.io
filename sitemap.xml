@@ -1,704 +1,427 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
-  
   <url>
     <loc>https://echorand.me/categories/</loc>
-    <lastmod>2022-09-08T06:18:58+10:00</lastmod>
-  </url>
-  
-  <url>
+    <lastmod>2022-09-20T08:08:31+10:00</lastmod>
+  </url><url>
     <loc>https://echorand.me/</loc>
-    <lastmod>2022-09-08T06:18:58+10:00</lastmod>
-  </url>
-  
-  <url>
+    <lastmod>2022-09-20T08:08:31+10:00</lastmod>
+  </url><url>
+    <loc>https://echorand.me/categories/go/</loc>
+    <lastmod>2022-09-20T08:08:31+10:00</lastmod>
+  </url><url>
+    <loc>https://echorand.me/posts/</loc>
+    <lastmod>2022-09-20T08:08:31+10:00</lastmod>
+  </url><url>
+    <loc>https://echorand.me/posts/go-http-client-middleware/</loc>
+    <lastmod>2022-09-20T08:08:31+10:00</lastmod>
+  </url><url>
     <loc>https://echorand.me/posts/shared-functionality-using-middleware-ii/</loc>
     <lastmod>2022-09-08T06:18:58+10:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://echorand.me/posts/</loc>
-    <lastmod>2022-09-08T06:18:58+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/categories/python/</loc>
     <lastmod>2022-09-08T06:18:58+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/shared-functionality-using-middleware/</loc>
     <lastmod>2022-06-01T08:19:34+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/py-script-monkey-patch-requests/</loc>
     <lastmod>2022-05-08T20:19:36-06:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/hard-to-not-be-a-computer-user/</loc>
     <lastmod>2022-02-07T14:42:29+11:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/categories/software/</loc>
     <lastmod>2022-02-07T14:42:29+11:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/on-my-learning-style/</loc>
     <lastmod>2021-12-12T12:06:05+11:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://echorand.me/categories/go/</loc>
-    <lastmod>2021-12-22T15:56:02+11:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/go-values-references-etc/</loc>
     <lastmod>2021-12-22T15:56:02+11:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/go-flag-option-append/</loc>
     <lastmod>2021-11-17T06:44:59+11:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/go-test-stdin/</loc>
     <lastmod>2021-11-06T12:15:46+11:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/serialize-deserialize/</loc>
     <lastmod>2021-09-18T13:42:22+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/computing-transparency/</loc>
     <lastmod>2021-09-15T11:40:19+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/categories/infrastructure/</loc>
     <lastmod>2021-12-21T08:36:46+11:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/chaos-engineering-talk/</loc>
     <lastmod>2021-09-13T14:31:24+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/go-contexts/</loc>
     <lastmod>2021-08-17T02:26:43+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/go-named-return-values/</loc>
     <lastmod>2021-10-22T10:27:31+11:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/go-module-check-path/</loc>
     <lastmod>2021-04-16T00:02:41+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/go-file-mutex/</loc>
     <lastmod>2021-12-21T08:36:46+11:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/go-embed/</loc>
     <lastmod>2021-04-11T00:49:35+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/micros-auth-kubernetes/</loc>
     <lastmod>2020-12-13T15:11:32+11:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/policy-enforcement-kubernetes/</loc>
     <lastmod>2020-08-06T13:51:39+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/gatekeeper-kubernetes/</loc>
     <lastmod>2020-06-03T17:03:18+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/getting-started-with-golang-plugins/</loc>
     <lastmod>2021-04-19T13:55:45+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/kubernetes-pod-security-policies/</loc>
     <lastmod>2021-12-21T08:36:46+11:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/fluentbit-kubernetes/</loc>
     <lastmod>2020-05-07T11:07:41+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/hugo-reverse-sort-modified/</loc>
     <lastmod>2020-05-05T15:47:15+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/cloud-custodian-aws/</loc>
     <lastmod>2020-04-30T16:22:58+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/python-restrict-attributes/</loc>
     <lastmod>2020-01-02T21:48:09+11:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/kubernetes-manifest-management/</loc>
     <lastmod>2020-03-06T16:38:19+11:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/correlated-error-logging/</loc>
     <lastmod>2020-10-10T10:03:44+11:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/golang-ops-automation/</loc>
     <lastmod>2021-08-17T02:26:43+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/jenkins-docker-workflow-inside/</loc>
     <lastmod>2021-04-19T13:54:41+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/bash-functions-exit/</loc>
     <lastmod>2019-10-18T15:57:16+11:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/ssh-with-private-key/</loc>
     <lastmod>2019-09-05T10:01:41+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/user-management-aws-eks-cluster/</loc>
     <lastmod>2019-08-23T18:24:25+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/go-notes/</loc>
     <lastmod>2020-12-12T14:06:00+11:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/kubernetes-notes/</loc>
     <lastmod>2021-11-30T10:18:00+11:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/nginx-non-www-www-redirect/</loc>
     <lastmod>2019-07-21T19:28:36+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/linux_shell_autocompletion/</loc>
     <lastmod>2021-12-21T08:36:46+11:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/pg-sql-notes/</loc>
     <lastmod>2019-07-11T16:52:00+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/strace-nginx/</loc>
     <lastmod>2019-07-19T10:11:04+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/about/</loc>
-    <lastmod>2022-05-24T07:00:14+10:00</lastmod>
-  </url>
-  
-  <url>
+    <lastmod>2022-09-20T07:16:16+10:00</lastmod>
+  </url><url>
     <loc>https://echorand.me/after-you-have-merged-your-pr/</loc>
     <lastmod>2019-07-21T17:14:27+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/nginx-geoip2-mmdblookup/</loc>
     <lastmod>2019-07-11T17:16:36+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/terraform_from_toml/</loc>
     <lastmod>2019-07-11T16:52:00+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/docker_logs_variable/</loc>
     <lastmod>2019-07-11T16:52:00+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/aspnet_compiler_node_modules/</loc>
     <lastmod>2019-07-11T16:52:00+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/traefik-aspnet/</loc>
     <lastmod>2019-07-11T16:52:00+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/scheduled-task-docker-prune/</loc>
     <lastmod>2019-07-24T11:46:20+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/docker-build-and-ephemeral-port-issues/</loc>
     <lastmod>2020-08-19T13:40:05+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/aws-codedeploy-autoscaling-group/</loc>
     <lastmod>2019-06-17T14:58:57+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/hard-links-soft-links-linux/</loc>
     <lastmod>2020-01-09T13:57:20+11:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/manual-letsencrypt-dns-challenge/</loc>
     <lastmod>2019-07-11T16:52:00+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/categories/fedora/</loc>
     <lastmod>2019-07-11T16:52:00+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/fedora-29-scientific-vagrant-boxes/</loc>
     <lastmod>2019-06-17T14:58:57+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/on-sane-defaults/</loc>
     <lastmod>2019-07-11T16:52:00+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/aws-vpc-internet-connectivity-subnets/</loc>
     <lastmod>2021-12-21T08:36:46+11:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/flyway-baseline-migration/</loc>
     <lastmod>2019-06-17T14:58:57+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/git-only-stage-partial-changes/</loc>
     <lastmod>2019-06-17T14:58:57+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/building-fedora-vagrant-boxes-for-virtualbox-with-packer/</loc>
     <lastmod>2019-06-17T14:58:57+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/sql-server-flyway-non-empty-schema/</loc>
     <lastmod>2019-06-17T14:58:57+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/golang-templates/</loc>
     <lastmod>2021-08-17T02:26:43+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/curl-download-redirect/</loc>
     <lastmod>2019-07-11T16:52:00+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/docker-user-namespacing-remap-system-user/</loc>
     <lastmod>2019-07-11T16:52:00+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/aws-vpc-private-dns/</loc>
     <lastmod>2019-06-17T14:58:57+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/aws-network-acl-docker/</loc>
     <lastmod>2020-08-19T13:40:05+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/managing-aws-lambda-functions-terraform/</loc>
     <lastmod>2019-07-11T16:52:00+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/windows-docker-containers/</loc>
     <lastmod>2019-07-11T16:52:00+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/measuring-seconds-elapsed-powershell/</loc>
     <lastmod>2019-06-17T14:58:57+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/terraform-remote-state-consul/</loc>
     <lastmod>2019-06-17T14:58:57+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/fedora-29-scientific-rawhide-vagrant-box/</loc>
     <lastmod>2019-07-11T16:52:00+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/py-ast-straightplugin-nox/</loc>
     <lastmod>2019-07-11T16:52:00+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/video-counter-gauge-oh-my/</loc>
     <lastmod>2021-09-13T11:07:25+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/pycon-counter-gauge-oh-my/</loc>
     <lastmod>2019-06-17T14:58:57+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/fedora-scientific-28/</loc>
     <lastmod>2019-06-17T14:58:57+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/my-own-ping/</loc>
     <lastmod>2019-07-11T16:52:00+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/cloudflare-dns-over-https/</loc>
     <lastmod>2019-07-26T15:58:55+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/fedora-scientific-28-beta/</loc>
     <lastmod>2019-06-17T14:58:57+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/aws-assume-iam-role-from-another/</loc>
     <lastmod>2019-07-11T16:52:00+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/automate-deb-package-packagecloud/</loc>
     <lastmod>2021-08-17T02:26:43+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/python-rlo/</loc>
     <lastmod>2019-06-17T14:58:57+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/redis-sorted-sets/</loc>
     <lastmod>2019-07-11T16:52:00+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/python-using-specific-git-commits-of-packages/</loc>
     <lastmod>2019-07-11T16:52:00+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/rest-or-rpc-for-microservices/</loc>
     <lastmod>2019-06-17T14:58:57+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/categories/c/</loc>
     <lastmod>2019-06-17T14:58:57+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/c_cplus_scientific_programming/</loc>
     <lastmod>2019-06-17T14:58:57+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/data-in-c/</loc>
     <lastmod>2019-06-17T14:58:57+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/data-in-c-cpython/</loc>
     <lastmod>2019-06-17T14:58:57+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/data-in-cpython/</loc>
     <lastmod>2019-06-17T14:58:57+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/clean_up_variable_attribute/</loc>
     <lastmod>2019-06-17T14:58:57+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/building-golang-deb-packages/</loc>
     <lastmod>2021-04-19T13:55:05+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/python-prometheus-monitoring-options/</loc>
     <lastmod>2021-01-22T14:24:42+11:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/linux-system-mining/</loc>
     <lastmod>2019-06-17T14:58:57+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/systemd-supervisord/</loc>
     <lastmod>2019-07-11T16:52:00+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/fedora-openvpn-systemd/</loc>
     <lastmod>2019-07-11T16:52:00+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/compilation-interpretation-c-python/</loc>
     <lastmod>2019-06-17T14:58:57+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/vim-notes/</loc>
     <lastmod>2021-12-26T10:06:48+11:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/tip-terraform-security-group-existing/</loc>
     <lastmod>2019-06-17T14:58:57+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/categories/mysql/</loc>
     <lastmod>2019-06-17T14:58:57+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/mysql-too-many-connection/</loc>
     <lastmod>2019-06-17T14:58:57+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/github-pages-custom-domain-travis-ci/</loc>
     <lastmod>2019-07-11T16:52:00+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/python-grpc/</loc>
     <lastmod>2019-06-17T14:58:57+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/imovie-rotate-video/</loc>
     <lastmod>2019-06-17T14:58:57+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/consul-tags/</loc>
     <lastmod>2019-07-11T16:52:00+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/docker-extra-hosts/</loc>
     <lastmod>2019-06-17T14:58:57+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/python-prometheus/</loc>
     <lastmod>2019-06-17T14:58:57+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/docker-user-defined-networks/</loc>
     <lastmod>2019-06-17T14:58:57+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/golang-dissecting-listen-and-serve/</loc>
     <lastmod>2021-12-21T08:36:46+11:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/doing-math-humble-bundle/</loc>
     <lastmod>2019-06-17T14:58:57+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/python-zipkin/</loc>
     <lastmod>2019-06-17T14:58:57+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/golang-notes-gitbackup/</loc>
     <lastmod>2021-04-19T13:59:42+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/queue-logger-python-json-logging/</loc>
     <lastmod>2019-06-17T14:58:57+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/golang-setup-1.8/</loc>
     <lastmod>2021-08-17T02:26:43+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/golang-setup/</loc>
     <lastmod>2021-08-17T02:26:43+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/slides-jupyter-notebook/</loc>
     <lastmod>2019-06-17T14:58:57+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/tee-in-rust/</loc>
     <lastmod>2019-06-17T14:58:57+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/categories/rust/</loc>
     <lastmod>2019-06-17T14:58:57+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/libcontainer-runc-fedora-24/</loc>
     <lastmod>2021-08-17T02:30:25+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/go_image_cropping/</loc>
     <lastmod>2021-08-17T02:26:43+00:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/fedora_koji_livecd_builds/</loc>
     <lastmod>2019-06-17T14:58:57+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/mocking_s3_with_moto_in_python/</loc>
     <lastmod>2019-06-17T14:58:57+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/named_temporary_file/</loc>
     <lastmod>2019-06-17T14:58:57+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/mock_and_attribute_error/</loc>
     <lastmod>2019-06-17T14:58:57+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/data-containers-in-docker/</loc>
     <lastmod>2019-06-17T14:58:57+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/virtualenv-first-python/</loc>
     <lastmod>2019-06-17T14:58:57+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/python-hashseed/</loc>
     <lastmod>2019-06-17T14:58:57+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/docker-volume-mount-selinux/</loc>
     <lastmod>2019-06-17T14:58:57+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/puppet-on-fedora-23/</loc>
     <lastmod>2019-06-17T14:58:57+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/fedora-22-scientific/</loc>
     <lastmod>2019-06-17T14:58:57+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/posts/hello/</loc>
     <lastmod>2019-06-17T14:58:57+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/categories/updates/</loc>
     <lastmod>2019-06-17T14:58:57+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/jenkins-secrets/</loc>
     <priority>0</priority>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/admin/</loc>
     <lastmod>2021-09-16T09:50:46+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/tags/</loc>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/talks/</loc>
     <lastmod>2022-09-07T17:45:42+10:00</lastmod>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://echorand.me/writings-trainings/</loc>
     <lastmod>2022-02-03T09:18:44+11:00</lastmod>
   </url>
-  
 </urlset>

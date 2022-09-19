@@ -37,157 +37,156 @@
 just started to do some planned work. Then, slack tells me that new deployment had just been pushed out successfully, but
 the service was actually down. Now, we had HTTP healthchecks which was hitting a specific endpoint but apparently
 that was successful, but functionally the service was down. So I check the service logs, which shows something like this:</p>
-<pre><code>Oct 14 00:03:35 ip-192-168-6-113.eu-central-1.compute.internal docker[20833]: The environment file is invalid!
+<pre tabindex="0"><code>Oct 14 00:03:35 ip-192-168-6-113.eu-central-1.compute.internal docker[20833]: The environment file is invalid!
 Oct 14 00:03:35 ip-192-168-6-113.eu-central-1.compute.internal docker[20833]: Failed to parse dotenv file due to an unexpected escape sequence..
 </code></pre><p>This was a PHP service which was using <a href="https://github.com/vlucas/phpdotenv">phpdotenv</a> to load the environment variables
 from a file. Okay, so we have found the issue which we can now fix.</p>
 <p>However, I think why didn&rsquo;t the whole startup script just abort when it got this error? This is how our startup script
 looked like at this stage:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e">#!/usr/bin/env bash
-</span><span style="color:#75715e"></span>
-CHOWN_BIN<span style="color:#f92672">=</span>/usr/bin/chown
-GREP_BIN<span style="color:#f92672">=</span>/usr/bin/grep
-
-
-<span style="color:#66d9ef">function</span> _check_migrations<span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
-  php$PHP_VERSION $APPLICATION_ROOT/artisan migrate:status | $GREP_BIN -c <span style="color:#e6db74">&#39;No&#39;</span>
-<span style="color:#f92672">}</span>
-
-FAILED_MIGRATIONS_COUNT<span style="color:#f92672">=</span><span style="color:#66d9ef">$(</span>_check_migrations<span style="color:#66d9ef">)</span>
-<span style="color:#66d9ef">if</span> <span style="color:#f92672">[</span> $FAILED_MIGRATIONS_COUNT !<span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;0&#34;</span> <span style="color:#f92672">]</span>
-<span style="color:#66d9ef">then</span>
-  echo <span style="color:#e6db74">&#34;ERROR: Cannot start while there are </span>$FAILED_MIGRATIONS_COUNT<span style="color:#e6db74"> unapplied migrations!!!&#34;</span>
-  exit <span style="color:#ae81ff">1</span>
-<span style="color:#66d9ef">fi</span>
-
-
-$CHOWN_BIN -R $PHP_FPM_USER:$PHP_FPM_GROUP $APPLICATION_ROOT
-$PHP_FPM_BIN -y $PHP_FPM_CONF --nodaemonize &amp;
-
-CHILD_PID<span style="color:#f92672">=</span>$!
-wait $CHILD_PID
-
-</code></pre></div><p>The error above was happening when the <code>_check_migrations</code> function was being called. Since we didn&rsquo;t have a
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e">#!/usr/bin/env bash
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>CHOWN_BIN<span style="color:#f92672">=</span>/usr/bin/chown
+</span></span><span style="display:flex;"><span>GREP_BIN<span style="color:#f92672">=</span>/usr/bin/grep
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> _check_migrations<span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>  php$PHP_VERSION $APPLICATION_ROOT/artisan migrate:status | $GREP_BIN -c <span style="color:#e6db74">&#39;No&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>FAILED_MIGRATIONS_COUNT<span style="color:#f92672">=</span><span style="color:#66d9ef">$(</span>_check_migrations<span style="color:#66d9ef">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> <span style="color:#f92672">[</span> $FAILED_MIGRATIONS_COUNT !<span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;0&#34;</span> <span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">then</span>
+</span></span><span style="display:flex;"><span>  echo <span style="color:#e6db74">&#34;ERROR: Cannot start while there are </span>$FAILED_MIGRATIONS_COUNT<span style="color:#e6db74"> unapplied migrations!!!&#34;</span>
+</span></span><span style="display:flex;"><span>  exit <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fi</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$CHOWN_BIN -R $PHP_FPM_USER:$PHP_FPM_GROUP $APPLICATION_ROOT
+</span></span><span style="display:flex;"><span>$PHP_FPM_BIN -y $PHP_FPM_CONF --nodaemonize &amp;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>CHILD_PID<span style="color:#f92672">=</span>$!
+</span></span><span style="display:flex;"><span>wait $CHILD_PID
+</span></span></code></pre></div><p>The error above was happening when the <code>_check_migrations</code> function was being called. Since we didn&rsquo;t have a
 <code>-e</code> in the Bash script, the script continued executing (hence starting the <code>php-fpm</code> workers) even though the <code>php artisan</code>
 command had failed to execute successfully.</p>
 <p>So I thought ok, i will just add a <code>set -e</code> to the script above:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-diff" data-lang="diff">diff --git a/scripts/app.sh b/scripts/app.sh
-index 6df3af8..3553eff 100755
-<span style="color:#f92672">--- a/scripts/app.sh
-</span><span style="color:#f92672"></span><span style="color:#a6e22e">+++ b/scripts/app.sh
-</span><span style="color:#a6e22e"></span><span style="color:#75715e">@@ -1,4 +1,5 @@
-</span><span style="color:#75715e"></span> #!/usr/bin/env bash
-<span style="color:#a6e22e">+set -e
-</span><span style="color:#a6e22e"></span> 
- CHOWN_BIN=/usr/bin/chown
- GREP_BIN=/usr/bin/grep
-</code></pre></div><p>So, I tried the above and what happened? The script will error out if the <code>php</code> command above runs successfully and
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-diff" data-lang="diff"><span style="display:flex;"><span>diff --git a/scripts/app.sh b/scripts/app.sh
+</span></span><span style="display:flex;"><span>index 6df3af8..3553eff 100755
+</span></span><span style="display:flex;"><span><span style="color:#f92672">--- a/scripts/app.sh
+</span></span></span><span style="display:flex;"><span><span style="color:#f92672"></span><span style="color:#a6e22e">+++ b/scripts/app.sh
+</span></span></span><span style="display:flex;"><span><span style="color:#a6e22e"></span><span style="color:#75715e">@@ -1,4 +1,5 @@
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span> #!/usr/bin/env bash
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">+set -e
+</span></span></span><span style="display:flex;"><span><span style="color:#a6e22e"></span> 
+</span></span><span style="display:flex;"><span> CHOWN_BIN=/usr/bin/chown
+</span></span><span style="display:flex;"><span> GREP_BIN=/usr/bin/grep
+</span></span></code></pre></div><p>So, I tried the above and what happened? The script will error out if the <code>php</code> command above runs successfully and
 if the output doensn&rsquo;t have the word <code>No</code> (i.e. no migrations need to be applied). Why? That&rsquo;s how <code>grep</code> works. If it
 doesn&rsquo;t find a match, the exit code is non-zero. Frantic googling later, I next have another fix:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-diff" data-lang="diff">index 3553eff..64d0f60 100755
-<span style="color:#f92672">--- a/scripts/app.sh
-</span><span style="color:#f92672"></span><span style="color:#a6e22e">+++ b/scripts/app.sh
-</span><span style="color:#a6e22e"></span><span style="color:#75715e">@@ -11,7 +11,9 @@ function _term() {
-</span><span style="color:#75715e"></span> }
- 
- function _check_migrations() {
-<span style="color:#f92672">-  php$PHP_VERSION $APPLICATION_ROOT/artisan migrate:status | $GREP_BIN -c &#39;No&#39;
-</span><span style="color:#f92672"></span><span style="color:#a6e22e">+  # we have the last | cat so that the overall exit code is that of cat in case
-</span><span style="color:#a6e22e">+  # of the first two commands executing successfully
-</span><span style="color:#a6e22e">+  php$PHP_VERSION $APPLICATION_ROOT/artisan migrate:status | $GREP_BIN -c &#39;No&#39; | cat
-</span><span style="color:#a6e22e"></span> }
- 
-</code></pre></div><p>This fails again, since <code>grep</code> was the problem, but obviously I was in a hurry to think. Then I think i know of this
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-diff" data-lang="diff"><span style="display:flex;"><span>index 3553eff..64d0f60 100755
+</span></span><span style="display:flex;"><span><span style="color:#f92672">--- a/scripts/app.sh
+</span></span></span><span style="display:flex;"><span><span style="color:#f92672"></span><span style="color:#a6e22e">+++ b/scripts/app.sh
+</span></span></span><span style="display:flex;"><span><span style="color:#a6e22e"></span><span style="color:#75715e">@@ -11,7 +11,9 @@ function _term() {
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span> }
+</span></span><span style="display:flex;"><span> 
+</span></span><span style="display:flex;"><span> function _check_migrations() {
+</span></span><span style="display:flex;"><span><span style="color:#f92672">-  php$PHP_VERSION $APPLICATION_ROOT/artisan migrate:status | $GREP_BIN -c &#39;No&#39;
+</span></span></span><span style="display:flex;"><span><span style="color:#f92672"></span><span style="color:#a6e22e">+  # we have the last | cat so that the overall exit code is that of cat in case
+</span></span></span><span style="display:flex;"><span><span style="color:#a6e22e">+  # of the first two commands executing successfully
+</span></span></span><span style="display:flex;"><span><span style="color:#a6e22e">+  php$PHP_VERSION $APPLICATION_ROOT/artisan migrate:status | $GREP_BIN -c &#39;No&#39; | cat
+</span></span></span><span style="display:flex;"><span><span style="color:#a6e22e"></span> }
+</span></span><span style="display:flex;"><span> 
+</span></span></code></pre></div><p>This fails again, since <code>grep</code> was the problem, but obviously I was in a hurry to think. Then I think i know of this
 thing called, <code>-o pipefail</code>, let me try that:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-diff" data-lang="diff">index 64d0f60..150fd76 100755
-<span style="color:#f92672">--- a/scripts/app.sh
-</span><span style="color:#f92672"></span><span style="color:#a6e22e">+++ b/scripts/app.sh
-</span><span style="color:#a6e22e"></span><span style="color:#75715e">@@ -1,5 +1,5 @@
-</span><span style="color:#75715e"></span> #!/usr/bin/env bash
-<span style="color:#f92672">-set -e
-</span><span style="color:#f92672"></span><span style="color:#a6e22e">+set -eo pipefail
-</span><span style="color:#a6e22e"></span> 
- CHOWN_BIN=/usr/bin/chown
- GREP_BIN=/usr/bin/grep
-</code></pre></div><p>But that doesn&rsquo;t work either since <code>grep</code> is the problem! So, I decide to lose the conciseness and do this:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-diff" data-lang="diff">index 150fd76..6a9457a 100755
-<span style="color:#f92672">--- a/scripts/app.sh
-</span><span style="color:#f92672"></span><span style="color:#a6e22e">+++ b/scripts/app.sh
-</span><span style="color:#a6e22e"></span><span style="color:#75715e">@@ -1,5 +1,4 @@
-</span><span style="color:#75715e"></span> #!/usr/bin/env bash
-<span style="color:#f92672">-set -eo pipefail
-</span><span style="color:#f92672"></span> 
- CHOWN_BIN=/usr/bin/chown
- GREP_BIN=/usr/bin/grep
-<span style="color:#75715e">@@ -13,7 +12,12 @@ function _term() {
-</span><span style="color:#75715e"></span> function _check_migrations() {
-   # we have the last | cat so that the overall exit code is that of cat in case
-   # of the first two commands executing successfully
-<span style="color:#f92672">-  php$PHP_VERSION $APPLICATION_ROOT/artisan migrate:status | $GREP_BIN -c &#39;No&#39; | cat
-</span><span style="color:#f92672"></span><span style="color:#a6e22e">+  status=`php$PHP_VERSION $APPLICATION_ROOT/artisan migrate:status`
-</span><span style="color:#a6e22e">+  exit_status=$?
-</span><span style="color:#a6e22e">+  if [ $exit_status -ne 0 ]; then
-</span><span style="color:#a6e22e">+    exit $exit_status
-</span><span style="color:#a6e22e">+  fi
-</span><span style="color:#a6e22e">+  echo $status | $GREP_BIN -c &#39;No&#39;
-</span><span style="color:#a6e22e"></span> }
-</code></pre></div><p>This works as in it will exit the script if there is an error running the <code>php</code> command which is what we want, else proceed
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-diff" data-lang="diff"><span style="display:flex;"><span>index 64d0f60..150fd76 100755
+</span></span><span style="display:flex;"><span><span style="color:#f92672">--- a/scripts/app.sh
+</span></span></span><span style="display:flex;"><span><span style="color:#f92672"></span><span style="color:#a6e22e">+++ b/scripts/app.sh
+</span></span></span><span style="display:flex;"><span><span style="color:#a6e22e"></span><span style="color:#75715e">@@ -1,5 +1,5 @@
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span> #!/usr/bin/env bash
+</span></span><span style="display:flex;"><span><span style="color:#f92672">-set -e
+</span></span></span><span style="display:flex;"><span><span style="color:#f92672"></span><span style="color:#a6e22e">+set -eo pipefail
+</span></span></span><span style="display:flex;"><span><span style="color:#a6e22e"></span> 
+</span></span><span style="display:flex;"><span> CHOWN_BIN=/usr/bin/chown
+</span></span><span style="display:flex;"><span> GREP_BIN=/usr/bin/grep
+</span></span></code></pre></div><p>But that doesn&rsquo;t work either since <code>grep</code> is the problem! So, I decide to lose the conciseness and do this:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-diff" data-lang="diff"><span style="display:flex;"><span>index 150fd76..6a9457a 100755
+</span></span><span style="display:flex;"><span><span style="color:#f92672">--- a/scripts/app.sh
+</span></span></span><span style="display:flex;"><span><span style="color:#f92672"></span><span style="color:#a6e22e">+++ b/scripts/app.sh
+</span></span></span><span style="display:flex;"><span><span style="color:#a6e22e"></span><span style="color:#75715e">@@ -1,5 +1,4 @@
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span> #!/usr/bin/env bash
+</span></span><span style="display:flex;"><span><span style="color:#f92672">-set -eo pipefail
+</span></span></span><span style="display:flex;"><span><span style="color:#f92672"></span> 
+</span></span><span style="display:flex;"><span> CHOWN_BIN=/usr/bin/chown
+</span></span><span style="display:flex;"><span> GREP_BIN=/usr/bin/grep
+</span></span><span style="display:flex;"><span><span style="color:#75715e">@@ -13,7 +12,12 @@ function _term() {
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span> function _check_migrations() {
+</span></span><span style="display:flex;"><span>   # we have the last | cat so that the overall exit code is that of cat in case
+</span></span><span style="display:flex;"><span>   # of the first two commands executing successfully
+</span></span><span style="display:flex;"><span><span style="color:#f92672">-  php$PHP_VERSION $APPLICATION_ROOT/artisan migrate:status | $GREP_BIN -c &#39;No&#39; | cat
+</span></span></span><span style="display:flex;"><span><span style="color:#f92672"></span><span style="color:#a6e22e">+  status=`php$PHP_VERSION $APPLICATION_ROOT/artisan migrate:status`
+</span></span></span><span style="display:flex;"><span><span style="color:#a6e22e">+  exit_status=$?
+</span></span></span><span style="display:flex;"><span><span style="color:#a6e22e">+  if [ $exit_status -ne 0 ]; then
+</span></span></span><span style="display:flex;"><span><span style="color:#a6e22e">+    exit $exit_status
+</span></span></span><span style="display:flex;"><span><span style="color:#a6e22e">+  fi
+</span></span></span><span style="display:flex;"><span><span style="color:#a6e22e">+  echo $status | $GREP_BIN -c &#39;No&#39;
+</span></span></span><span style="display:flex;"><span><span style="color:#a6e22e"></span> }
+</span></span></code></pre></div><p>This works as in it will exit the script if there is an error running the <code>php</code> command which is what we want, else proceed
 as earlier. Or so I thougt.</p>
 <p>It turns out when you cal a Bash function using the syntax <code>$()</code> you are actually invoking a subshell (duh!) which means
 exiting in the Bash function, only exits from that shell - which makes sense but I didn&rsquo;t know that. That means,
 the original issue I sought out to fix wouldn&rsquo;t actually be fixed. Anyway, here&rsquo;s the fixed version:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e">#!/usr/bin/env bash
-</span><span style="color:#75715e"></span>
-CHOWN_BIN<span style="color:#f92672">=</span>/usr/bin/chown
-GREP_BIN<span style="color:#f92672">=</span>/usr/bin/grep
-
-<span style="color:#75715e"># Helper functions</span>
-<span style="color:#66d9ef">function</span> _term<span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
- echo <span style="color:#e6db74">&#39;Caught SIGTERM signal!&#39;</span>
- kill -15 $CHILD_PID
-<span style="color:#f92672">}</span>
-
-php$PHP_VERSION $APPLICATION_ROOT/artisan migrate:status
-exit_status<span style="color:#f92672">=</span>$?
-<span style="color:#66d9ef">if</span> <span style="color:#f92672">[[</span> $exit_status -ne <span style="color:#ae81ff">0</span> <span style="color:#f92672">]]</span>; <span style="color:#66d9ef">then</span>
- exit $exit_status
-<span style="color:#66d9ef">fi</span>
-FAILED_MIGRATION_COUNT<span style="color:#f92672">=</span><span style="color:#e6db74">`</span>php$PHP_VERSION $APPLICATION_ROOT/artisan migrate:status | $GREP_BIN -c <span style="color:#e6db74">&#39;No&#39;</span><span style="color:#e6db74">`</span>
-<span style="color:#66d9ef">if</span> <span style="color:#f92672">[</span> $FAILED_MIGRATION_COUNT !<span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;0&#34;</span> <span style="color:#f92672">]</span>; <span style="color:#66d9ef">then</span>
- echo <span style="color:#e6db74">&#34;ERROR: Cannot start while there are </span>$FAILED_MIGRATIONS_COUNT<span style="color:#e6db74"> unapplied migrations!!!&#34;</span>
- exit <span style="color:#ae81ff">1</span>
-<span style="color:#66d9ef">fi</span>
-
-trap _term SIGTERM
-
-$CHOWN_BIN -R $PHP_FPM_USER:$PHP_FPM_GROUP $APPLICATION_ROOT
-$PHP_FPM_BIN -y $PHP_FPM_CONF --nodaemonize &amp;
-
-CHILD_PID<span style="color:#f92672">=</span>$!
-
-wait $CHILD_PID
-</code></pre></div><p>Essentially, i have now running <code>php artisan migrate:status</code> twice. First to check if the <code>.env</code> file can be read
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e">#!/usr/bin/env bash
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>CHOWN_BIN<span style="color:#f92672">=</span>/usr/bin/chown
+</span></span><span style="display:flex;"><span>GREP_BIN<span style="color:#f92672">=</span>/usr/bin/grep
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Helper functions</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> _term<span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span> echo <span style="color:#e6db74">&#39;Caught SIGTERM signal!&#39;</span>
+</span></span><span style="display:flex;"><span> kill -15 $CHILD_PID
+</span></span><span style="display:flex;"><span><span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>php$PHP_VERSION $APPLICATION_ROOT/artisan migrate:status
+</span></span><span style="display:flex;"><span>exit_status<span style="color:#f92672">=</span>$?
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> <span style="color:#f92672">[[</span> $exit_status -ne <span style="color:#ae81ff">0</span> <span style="color:#f92672">]]</span>; <span style="color:#66d9ef">then</span>
+</span></span><span style="display:flex;"><span> exit $exit_status
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fi</span>
+</span></span><span style="display:flex;"><span>FAILED_MIGRATION_COUNT<span style="color:#f92672">=</span><span style="color:#e6db74">`</span>php$PHP_VERSION $APPLICATION_ROOT/artisan migrate:status | $GREP_BIN -c <span style="color:#e6db74">&#39;No&#39;</span><span style="color:#e6db74">`</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> <span style="color:#f92672">[</span> $FAILED_MIGRATION_COUNT !<span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;0&#34;</span> <span style="color:#f92672">]</span>; <span style="color:#66d9ef">then</span>
+</span></span><span style="display:flex;"><span> echo <span style="color:#e6db74">&#34;ERROR: Cannot start while there are </span>$FAILED_MIGRATIONS_COUNT<span style="color:#e6db74"> unapplied migrations!!!&#34;</span>
+</span></span><span style="display:flex;"><span> exit <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">fi</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>trap _term SIGTERM
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$CHOWN_BIN -R $PHP_FPM_USER:$PHP_FPM_GROUP $APPLICATION_ROOT
+</span></span><span style="display:flex;"><span>$PHP_FPM_BIN -y $PHP_FPM_CONF --nodaemonize &amp;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>CHILD_PID<span style="color:#f92672">=</span>$!
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>wait $CHILD_PID
+</span></span></code></pre></div><p>Essentially, i have now running <code>php artisan migrate:status</code> twice. First to check if the <code>.env</code> file can be read
 successfully and error out if not. Second, actually check for the migrations. We can make it more concise, but who
 knows what will break?</p>
 <p>If you really want to use a Bash function and also exit early, this <a href="https://stackoverflow.com/a/9894126">link</a> will help.</p>
 <p>Here&rsquo;s some test code:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#66d9ef">function</span> foo<span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
-	echo <span style="color:#e6db74">&#34;in foo, exiting&#34;</span>
-	exit <span style="color:#ae81ff">1</span>
-<span style="color:#f92672">}</span>
-
-<span style="color:#66d9ef">function</span> bar<span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
-	echo <span style="color:#e6db74">&#34;In bar&#34;</span>
-<span style="color:#f92672">}</span>
-
-bar
-<span style="color:#75715e"># this invocation will exit the script</span>
-foo
-<span style="color:#75715e"># this invocation will not exit the script</span>
-f<span style="color:#f92672">=</span><span style="color:#66d9ef">$(</span> foo <span style="color:#66d9ef">)</span>
-echo $f
-echo <span style="color:#e6db74">&#34;hi there&#34;</span>
-</code></pre></div></article>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> foo<span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>	echo <span style="color:#e6db74">&#34;in foo, exiting&#34;</span>
+</span></span><span style="display:flex;"><span>	exit <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> bar<span style="color:#f92672">()</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>	echo <span style="color:#e6db74">&#34;In bar&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>bar
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># this invocation will exit the script</span>
+</span></span><span style="display:flex;"><span>foo
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># this invocation will not exit the script</span>
+</span></span><span style="display:flex;"><span>f<span style="color:#f92672">=</span><span style="color:#66d9ef">$(</span> foo <span style="color:#66d9ef">)</span>
+</span></span><span style="display:flex;"><span>echo $f
+</span></span><span style="display:flex;"><span>echo <span style="color:#e6db74">&#34;hi there&#34;</span>
+</span></span></code></pre></div></article>
 <footer id="footer">
     Post managed in a <a href="https://github.com/amitsaha/echorand.me">git repo</a> | <a href="https://github.com/amitsaha/echorand.me/commit/fef39405a4c2086369d0fa1ab12b3707020784a4">Last Commit on this post </a>
   | <a href="https://github.com/amitsaha/echorand.me/edit/master/content/posts/bash-functions-exit.md">Edit post</a>

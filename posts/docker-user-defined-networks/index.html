@@ -42,25 +42,25 @@ on the same host. The current recommended approach to do so is using a <code>use
 <p>Create an <a href="https://docs.docker.com/engine/userguide/networking/#user-defined-networks">user-defined network</a>
 and run both (or as many you have) the containers in this network:
 (For reference, I am using docker 17.09.0-ce)</p>
-<pre><code>$ sudo docker network create --driver bridge webapp1
+<pre tabindex="0"><code>$ sudo docker network create --driver bridge webapp1
 </code></pre><p>The first container which we will launch in this network is a HTTP server listening
 on port 8000. The <code>Dockerfile</code> is as follows:</p>
 <p>[gist:id=bd31ad432f83bfd178f0cedd7a45d59f,file=webapp.Dockerfile]</p>
 <p>Start the container in the network we created above:</p>
-<pre><code>$ sudo docker run -d -network webapp1 -name webapp amitsaha/webapp
+<pre tabindex="0"><code>$ sudo docker run -d -network webapp1 -name webapp amitsaha/webapp
 94a3f4631eb924f7e4339986b73b1af7fca4c09b2a1a8d3ea106b698eae5c577
 </code></pre><p>Now, we will communicate with the web application from another container:</p>
-<pre><code>$ sudo docker run -network webapp1 -rm appropriate/curl -fsSL webapp:8000
-&lt;!DOCTYPE HTML PUBLIC “-//W3C//DTD HTML 4.01//EN” “http://www.w3.org/TR/html4/strict.dtd&quot;&gt;
+<pre tabindex="0"><code>$ sudo docker run -network webapp1 -rm appropriate/curl -fsSL webapp:8000
+&lt;!DOCTYPE HTML PUBLIC “-//W3C//DTD HTML 4.01//EN” “http://www.w3.org/TR/html4/strict.dtd&#34;&gt;
 &lt;html&gt;
 ...
 </code></pre><p>If we tried to communicate with webapp container from a container on a different network,
 we will get a name resolution error:</p>
-<pre><code>$ sudo docker run --rm appropriate/curl -fsSL webapp:8000
-curl: (6) Couldn't resolve host 'webapp'
+<pre tabindex="0"><code>$ sudo docker run --rm appropriate/curl -fsSL webapp:8000
+curl: (6) Couldn&#39;t resolve host &#39;webapp&#39;
 </code></pre><p><strong>Background information</strong></p>
 <p>When we install docker, by default, we have three networks:</p>
-<pre><code>$ sudo docker network ls
+<pre tabindex="0"><code>$ sudo docker network ls
 NETWORK ID          NAME                DRIVER              SCOPE
 8a6a3da7b5a2        bridge              bridge              local
 31f4f28111f0        host                host                local
@@ -76,7 +76,7 @@ get container name resolution to facilitate inter-container communication. In ad
 we can expose and publish ports for a service to be also accessible from outside the container.
 If you look at the output of <code>docker network ls</code> again, you will see an additional entry
 for the network we created:</p>
-<pre><code>$ sudo docker network ls
+<pre tabindex="0"><code>$ sudo docker network ls
 NETWORK ID          NAME                DRIVER              SCOPE
 e865bd63c762        webapp1             bridge              local
 </code></pre><p><strong>References</strong></p>

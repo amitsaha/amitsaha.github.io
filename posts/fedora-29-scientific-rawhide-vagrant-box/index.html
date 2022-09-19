@@ -47,24 +47,24 @@ the ISO and then going through the installation process, you can now basically d
 engineering for moving this forward.</p>
 <h1 id="mac-os-x-hosts---virtualbox">Mac OS X Hosts - VirtualBox</h1>
 <p>Here&rsquo;s what I did using VirtualBox on an OS X host. First, install <a href="https://www.vagrantup.com/">vagrant</a>. Then, from a terminal:</p>
-<pre><code># Add the box
+<pre tabindex="0"><code># Add the box
 $ vagrant box add https://kojipkgs.fedoraproject.org//packages/Fedora-Scientific-Vagrant/Rawhide/20180613.n.0/images/Fedora-Scientific-Vagrant-Rawhide-20180613.n.0.x86_64.vagrant-virtualbox.box  --name Fedora-Scientific-Rawhide
 ==&gt; box: Box file was not detected as metadata. Adding it directly...
-==&gt; box: Adding box 'Fedora-Scientific-Rawhide' (v0) for provider: 
+==&gt; box: Adding box &#39;Fedora-Scientific-Rawhide&#39; (v0) for provider: 
     box: Downloading: https://kojipkgs.fedoraproject.org//packages/Fedora-Scientific-Vagrant/Rawhide/20180613.n.0/images/Fedora-Scientific-Vagrant-Rawhide-20180613.n.0.x86_64.vagrant-virtualbox.box
 ==&gt; box: Box download is resuming from prior download progress
-==&gt; box: Successfully added box 'Fedora-Scientific-Rawhide' (v0) for 'virtualbox'!
+==&gt; box: Successfully added box &#39;Fedora-Scientific-Rawhide&#39; (v0) for &#39;virtualbox&#39;!
 
 ..
 </code></pre><p>Now that the box has been downloaded, we initialize a new VM:</p>
-<pre><code>$ vagrant init Fedora-Scientific-Rawhide
+<pre tabindex="0"><code>$ vagrant init Fedora-Scientific-Rawhide
 A `Vagrantfile` has been placed in this directory. You are now
 ready to `vagrant up` your first virtual environment! Please read
 the comments in the Vagrantfile as well as documentation on
 `vagrantup.com` for more information on using Vagrant.
 MacBook-Air:Downloads amit$ vagrant up
-Bringing machine 'default' up with 'virtualbox' provider...
-==&gt; default: Importing base box 'Fedora-Scientific-Rawhide'...
+Bringing machine &#39;default&#39; up with &#39;virtualbox&#39; provider...
+==&gt; default: Importing base box &#39;Fedora-Scientific-Rawhide&#39;...
 Progress: 70%
 Progress: 90%
 ..
@@ -73,23 +73,23 @@ Progress: 90%
 ==&gt; default: Machine booted and ready!
 ..
 </code></pre><p>If you see the above message, we are ready to start using Fedora Scientific:</p>
-<pre><code>$ vagrant ssh
+<pre tabindex="0"><code>$ vagrant ssh
 </code></pre><p>The above will drop us into a terminal session on our Fedora Scientific VM. To be able to use graphical programs, we
 will change the above command to (please note I also needed to install <a href="https://www.xquartz.org/">xquartz</a> to be able to see graphical programs from the VM on my host):</p>
-<pre><code>$ vagrant ssh -- -X
+<pre tabindex="0"><code>$ vagrant ssh -- -X
 </code></pre><p>By default, the virtual machine is given 512 MB memory which is not enough for doing anything useful on your system. To change
 that, open the <code>Vagrantfile</code> that was created by the <code>vagrant init</code> step above. In that file, look for the block of code
 starting with <code>config.vm.provider &quot;virtualbox&quot;</code> and change the block to be:</p>
-<pre><code>config.vm.provider &quot;virtualbox&quot; do |vb|
+<pre tabindex="0"><code>config.vm.provider &#34;virtualbox&#34; do |vb|
      # Display the VirtualBox GUI when booting the machine
      #   vb.gui = true
      #
      # Customize the amount of memory on the VM:
-     vb.memory = &quot;1024&quot;
+     vb.memory = &#34;1024&#34;
   end
 </code></pre><p>The key above is <code>vb.memory = &quot;1024&quot;</code> which gives our virtual machine 1024 MB. If you want or can provide more
 RAM, adjust the value accordingly. Once done, do:</p>
-<pre><code>$ vagrant reload
+<pre tabindex="0"><code>$ vagrant reload
 </code></pre><p>This will recreate the virtual machine.</p>
 <h1 id="windows-hosts---virtualbox">Windows hosts - VirtualBox</h1>
 <p>To be done (If you end up doing it, please let me know - see for a link at the bottom of this post).</p>

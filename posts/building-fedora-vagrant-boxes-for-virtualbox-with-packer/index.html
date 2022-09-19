@@ -45,7 +45,7 @@ something else. <a href="https://github.com/chef/bento">chef/bento</a> uses <a h
 and hence this approach looked promising.</p>
 <p>After creating a <a href="https://github.com/amitsaha/bento/blob/f29/fedora/fedora-29-scientific-x86_64.json">config file</a> for
 Fedora 29 and making sure I had my kickstart files right, the following command will build a virtual box vagrant image:</p>
-<pre><code>$ packer build -force -only=virtualbox-iso .\fedora-29-scientific-x86_64.json
+<pre tabindex="0"><code>$ packer build -force -only=virtualbox-iso .\fedora-29-scientific-x86_64.json
 </code></pre><p>Once I had the box build environment ready, it was then a matter of a manual commenting/uncomenting out of package/package
 groups to find out the culprit.</p>
 </article>

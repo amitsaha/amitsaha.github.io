@@ -58,7 +58,7 @@ metric rather worker level. (Aside: this is each worker behaving in <a href="htt
 <p>To work around this problem, you can add a unique <code>worker_id</code> as a label such that each metric as scraped
 by prometheus is unique for one application instance (by virtue of having different value for the
 label, <code>worker_id</code>). Then we can perform aggregation such as:</p>
-<pre><code>sum by (instance, http_status) (sum without (worker_id) (rate(request_count[5m])))
+<pre tabindex="0"><code>sum by (instance, http_status) (sum without (worker_id) (rate(request_count[5m])))
 </code></pre><p>This will perform the aggregation across all <code>worker_id</code> metrics (basically ignoring it)
 and then we can group by the <code>instance</code> and any other label associated to the metric
 of interest.</p>

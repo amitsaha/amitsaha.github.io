@@ -38,26 +38,26 @@ I needed to implement a way to implement an option in my command line applicatio
 The result would be that all the values specified would form a list of the values. To make that concrete, consider that
 you are writing a command line HTTP client application. You want to add one or more headers to an outgoing request, so this is
 the user interface that you want for your application:</p>
-<pre><code>$ my-command-line-app -header key1:value1 -header key2:value2 https://www.example.com
+<pre tabindex="0"><code>$ my-command-line-app -header key1:value1 -header key2:value2 https://www.example.com
 </code></pre><p>Next, I show how you can achieve the above using the Go standard library&rsquo;s <a href="https://pkg.go.dev/flag#Func">flag</a> package.</p>
 <h2 id="the-func-function">The Func() function</h2>
 <p>The <a href="https://pkg.go.dev/flag#Func">Func()</a> function allows you to define a function that will be called everytime
 the flag parsing machinery encounters a specific option. This is how our solution to the above problem
 may look like:</p>
-<pre><code>type httpConfig struct {
+<pre tabindex="0"><code>type httpConfig struct {
 	headers         []string
 }
 
 func myFunc() {
   c := httpConfig{}
-  fs := flag.NewFlagSet(&quot;http&quot;, flag.ContinueOnError)	
+  fs := flag.NewFlagSet(&#34;http&#34;, flag.ContinueOnError)	
   // define your other flags
 	
   headerOptionFunc := func(v string) error {
 		c.headers = append(c.headers, v)
 		return nil
 	}
-	fs.Func(&quot;header&quot;, &quot;Add one or more headers to the outgoing request (key=value)&quot;, headerOptionFunc)
+	fs.Func(&#34;header&#34;, &#34;Add one or more headers to the outgoing request (key=value)&#34;, headerOptionFunc)
   
 # other stuff..
 }

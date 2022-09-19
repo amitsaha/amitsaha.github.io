@@ -53,16 +53,16 @@ pelican specific files, the important files related to publishing are:</p>
 <li><code>.travis.yml</code></li>
 </ul>
 <p>The <code>Dockerfile</code> is used in Travis for building the site and is as follows:</p>
-<pre><code>FROM ubuntu:latest
+<pre tabindex="0"><code>FROM ubuntu:latest
 
 RUN apt-get update &amp;&amp; apt-get -y install python3-pip make bash git
 RUN pip3 install pelican pelican-youtube markdown pelican-gist
 RUN git clone https://github.com/gfidente/pelican-svbhack /tmp/pelican-svbhack
 RUN git clone --recursive https://github.com/getpelican/pelican-plugins /tmp/pelican-plugins
 WORKDIR /site
-ENTRYPOINT [&quot;make&quot;, &quot;build&quot;]
+ENTRYPOINT [&#34;make&#34;, &#34;build&#34;]
 </code></pre><p>The <code>Makefile</code> has a number of targets, but only the <code>build</code> target is currently being used:</p>
-<pre><code>build:
+<pre tabindex="0"><code>build:
 	$(PELICAN) $(INPUTDIR) -o $(OUTPUTDIR) -s $(PUBLISHCONF) $(PELICANOPTS)
 	cp 404.md $(OUTPUTDIR)/
 </code></pre><p>The first command generates the site and places the generated files in the <code>output</code> sub-directory. In addition
@@ -81,33 +81,33 @@ done via Travis CI via the instructions in the <code>.travis.yml</code> file.</p
 commit to the <code>site</code> branch of the repository. Below I reproduce snippets from the file and their
 function.</p>
 <p>The blog source is in the site branch  so we want to only build when a push has been made to that branch:</p>
-<pre><code>branches:
+<pre tabindex="0"><code>branches:
   only:
   - site
 git:
   depth: false
 </code></pre><p>We also don&rsquo;t bother cloning more than the last commit (<a href="https://docs.travis-ci.com/user/customizing-the-build/#Git-Clone-Depth">Learn more</a>).</p>
 <p>Next, we configure the language and specify that we want to use docker:</p>
-<pre><code>language: generic
+<pre tabindex="0"><code>language: generic
 </code></pre><p>The <code>generic</code> language ensures that our <code>.travis.yml</code> completely controls what commands are run
 as part of our build.</p>
 <p>We use <code>docker</code> to carry out the build and generation. To do so, we have to specify the following:</p>
-<pre><code>sudo: required
+<pre tabindex="0"><code>sudo: required
 services:
   - docker
 </code></pre><p>(To learn more about docker in Travis CI, see <a href="https://docs.travis-ci.com/user/docker/">this</a>)</p>
 <p>We then specify the <code>before_install</code> and <code>install</code> steps. The <code>before_install</code> step builds
 the docker image:</p>
-<pre><code>before_install:
+<pre tabindex="0"><code>before_install:
   - docker build -t amitsaha/pelican  .
 </code></pre><p>The <code>install</code> step then creates a container from the image we just built:</p>
-<pre><code>install:
+<pre tabindex="0"><code>install:
   - docker run -v `pwd`:/site -t amitsaha/pelican
 </code></pre><p>The <code>install</code> step runs a container which populates the <code>output</code> sub-directory with the generated
 files.</p>
 <p>The remaining step is to tell Travis CI&rsquo;s <a href="https://docs.travis-ci.com/user/deployment/pages/">GitHub pages</a>
 &ldquo;deployer&rdquo; to deploy the generated output files:</p>
-<pre><code>deploy:
+<pre tabindex="0"><code>deploy:
   provider: pages
   skip_cleanup: true
   github_token: $GITHUB_TOKEN # Set in travis-ci.org dashboard
