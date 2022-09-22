@@ -12,6 +12,19 @@
     
     
     <item>
+      <title>Custom HTTP client with golang.org/x/oauth2 and GitHub Go SDK</title>
+      <link>https://echorand.me/posts/github-oauth/</link>
+      <pubDate>Wed, 21 Sep 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/github-oauth/</guid>
+      <description>In this post, we are going to discuss an implementation detail about how we can use a custom HTTP client to use the Go GitHub SDK and the https://pkg.go.dev/golang.org/x/oauth2 package.
+Introduction Using a custom HTTP client with golang.org/x/oauth2 Using the custom HTTP client with Go Github SDK Summary References Introduction Let&amp;rsquo;s create an example *oauth2.Config for communicating with GitHub.com oauth provider:
+oauthConf = &amp;amp;oauth2.Config{ ClientID: getEnvironValue(&amp;#34;CLIENT_ID&amp;#34;), ClientSecret: getEnvironValue(&amp;#34;CLIENT_SECRET&amp;#34;), Scopes: []string{&amp;#34;repo&amp;#34;, &amp;#34;user&amp;#34;}, // see the project desrciption for understandng why we need full scopes here Endpoint: github.</description>
+    </item>
+    
+    
+    
+    <item>
       <title>Writing HTTP client middleware in Go</title>
       <link>https://echorand.me/posts/go-http-client-middleware/</link>
       <pubDate>Mon, 19 Sep 2022 00:00:00 +0000</pubDate>
