@@ -53,25 +53,25 @@ This PR is now merged.</p>
 <p>The second solution is it to subclass <tt class="docutils literal">logutils.queue.QueueHandler</tt> as follows
 and add pickling support for <tt class="docutils literal">exc_info</tt> via <a class="reference external" href="https://github.com/ionelmc/python-tblib">tblib</a>:</p>
 <pre class="code python literal-block">
-<span class="comment single"># Bring in support for serializing/deserializing tracebacks</span>
-<span class="comment single"># needed by QueueHandler</span>
-<span class="keyword namespace">from</span> <span class="name namespace">tblib</span> <span class="keyword namespace">import</span> <span class="name">pickling_support</span>
-<span class="name">pickling_support</span><span class="operator">.</span><span class="name">install</span><span class="punctuation">()</span>
+<span class="comment single"># Bring in support for serializing/deserializing tracebacks</span><span class="whitespace">
+</span><span class="comment single"># needed by QueueHandler</span><span class="whitespace">
+</span><span class="keyword namespace">from</span> <span class="name namespace">tblib</span> <span class="keyword namespace">import</span> <span class="name">pickling_support</span><span class="whitespace">
+</span><span class="name">pickling_support</span><span class="operator">.</span><span class="name">install</span><span class="punctuation">()</span><span class="whitespace">
 
 
-<span class="keyword">class</span> <span class="name class">QueueHandlerWithTraceback</span><span class="punctuation">(</span><span class="name">logutils</span><span class="operator">.</span><span class="name">queue</span><span class="operator">.</span><span class="name">QueueHandler</span><span class="punctuation">):</span>
-    <span class="literal string doc">&quot;&quot;&quot; QueueHandler with support for pickling/unpickling
+</span><span class="keyword">class</span> <span class="name class">QueueHandlerWithTraceback</span><span class="punctuation">(</span><span class="name">logutils</span><span class="operator">.</span><span class="name">queue</span><span class="operator">.</span><span class="name">QueueHandler</span><span class="punctuation">):</span><span class="whitespace">
+    </span><span class="literal string doc">&quot;&quot;&quot; QueueHandler with support for pickling/unpickling
         Tracebacks via tblib. We only override the prepare()
         method to *not* set `exc_info=None`
-    &quot;&quot;&quot;</span>
-    <span class="keyword">def</span> <span class="name function magic">__init__</span><span class="punctuation">(</span><span class="name builtin pseudo">self</span><span class="punctuation">,</span> <span class="operator">*</span><span class="name">args</span><span class="punctuation">,</span> <span class="operator">**</span><span class="name">kwargs</span><span class="punctuation">):</span>
-        <span class="name">logutils</span><span class="operator">.</span><span class="name">queue</span><span class="operator">.</span><span class="name">QueueHandler</span><span class="operator">.</span><span class="name function magic">__init__</span><span class="punctuation">(</span><span class="name builtin pseudo">self</span><span class="punctuation">,</span> <span class="operator">*</span><span class="name">args</span><span class="punctuation">,</span> <span class="operator">**</span><span class="name">kwargs</span><span class="punctuation">)</span>
+    &quot;&quot;&quot;</span><span class="whitespace">
+</span>    <span class="keyword">def</span> <span class="name function magic">__init__</span><span class="punctuation">(</span><span class="name builtin pseudo">self</span><span class="punctuation">,</span> <span class="operator">*</span><span class="name">args</span><span class="punctuation">,</span> <span class="operator">**</span><span class="name">kwargs</span><span class="punctuation">):</span><span class="whitespace">
+</span>        <span class="name">logutils</span><span class="operator">.</span><span class="name">queue</span><span class="operator">.</span><span class="name">QueueHandler</span><span class="operator">.</span><span class="name function magic">__init__</span><span class="punctuation">(</span><span class="name builtin pseudo">self</span><span class="punctuation">,</span> <span class="operator">*</span><span class="name">args</span><span class="punctuation">,</span> <span class="operator">**</span><span class="name">kwargs</span><span class="punctuation">)</span><span class="whitespace">
 
-    <span class="keyword">def</span> <span class="name function">prepare</span><span class="punctuation">(</span><span class="name builtin pseudo">self</span><span class="punctuation">,</span> <span class="name">record</span><span class="punctuation">):</span>
-        <span class="name builtin pseudo">self</span><span class="operator">.</span><span class="name">format</span><span class="punctuation">(</span><span class="name">record</span><span class="punctuation">)</span>
-        <span class="name">record</span><span class="operator">.</span><span class="name">msg</span> <span class="operator">=</span> <span class="name">record</span><span class="operator">.</span><span class="name">message</span>
-        <span class="name">record</span><span class="operator">.</span><span class="name">args</span> <span class="operator">=</span> <span class="keyword constant">None</span>
-        <span class="keyword">return</span> <span class="name">record</span>
+</span>    <span class="keyword">def</span> <span class="name function">prepare</span><span class="punctuation">(</span><span class="name builtin pseudo">self</span><span class="punctuation">,</span> <span class="name">record</span><span class="punctuation">):</span><span class="whitespace">
+</span>        <span class="name builtin pseudo">self</span><span class="operator">.</span><span class="name">format</span><span class="punctuation">(</span><span class="name">record</span><span class="punctuation">)</span><span class="whitespace">
+</span>        <span class="name">record</span><span class="operator">.</span><span class="name">msg</span> <span class="operator">=</span> <span class="name">record</span><span class="operator">.</span><span class="name">message</span><span class="whitespace">
+</span>        <span class="name">record</span><span class="operator">.</span><span class="name">args</span> <span class="operator">=</span> <span class="keyword constant">None</span><span class="whitespace">
+</span>        <span class="keyword">return</span> <span class="name">record</span>
 </pre>
 <p>Instead of <tt class="docutils literal">logutils.queue.QueueHandler</tt>, we will then use <tt class="docutils literal">QueueHandlerWithTraceback</tt> instead
 above (<a class="reference external" href="https://github.com/amitsaha/python-json-logging/blob/master/multi_processes_queue_logger/multi_process_json_logging_tblib.py">Sample Code</a>).</p>
