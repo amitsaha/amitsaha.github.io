@@ -52,23 +52,26 @@ func myFunc() {
   c := httpConfig{}
   fs := flag.NewFlagSet(&#34;http&#34;, flag.ContinueOnError)	
   // define your other flags
-	
+
+  // define a header option that can be specified multiple
+  // times and the values will be appended 
   headerOptionFunc := func(v string) error {
 		c.headers = append(c.headers, v)
 		return nil
 	}
-	fs.Func(&#34;header&#34;, &#34;Add one or more headers to the outgoing request (key=value)&#34;, headerOptionFunc)
+  fs.Func(&#34;header&#34;, &#34;Add one or more headers to the outgoing request (key=value)&#34;, headerOptionFunc)
   
-# other stuff..
+  # other stuff..
 }
 </code></pre><p><code>headerOptionFunc</code> gets calld everytime the <code>flag.Parse()</code> function encounters <code>-header</code>. Here, we append it to a list <code>headers</code> which
 is a field we have defined in the <code>httpConfig</code> struct.</p>
-<p>This is another of those moments, where I thought - how do i solve this using the standard library? (Yes i hear you, didn&rsquo;t you think of that
-when you wrote the exercise? I may have, or i may not have, who knows).</p>
+<p>This is another of those moments, where I thought - how do i solve this using the standard library?
+(Yes i hear you, didn&rsquo;t you think of that when you wrote the exercise? I may have, or i may not have,
+who knows).</p>
 <p>And the standard library delivered, yet again.</p>
 </article>
 <footer id="footer">
-    Post managed in a <a href="https://github.com/amitsaha/echorand.me">git repo</a> | <a href="https://github.com/amitsaha/echorand.me/commit/0938308aa84403310dcd8378c9e130524d63691d">Last Commit on this post </a>
+    Post managed in a <a href="https://github.com/amitsaha/echorand.me">git repo</a> | <a href="https://github.com/amitsaha/echorand.me/commit/a2845c16a3487c1d5a58b0cdea522d8d8519a5a6">Last Commit on this post </a>
   | <a href="https://github.com/amitsaha/echorand.me/edit/master/content/posts/go-flag-option-append.md">Edit post</a>
     <p>
     Blog managed via <a href="https://gohugo.io/">Hugo</a> and using a modified version of the <a href="https://themes.gohugo.io/etch/">Etch</a> theme.
