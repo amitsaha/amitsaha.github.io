@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="echo $RANDOM. Exploring Software and writing about it.">
+    
+    <link rel="shortcut icon" href="https://echorand.me/favicon.ico">
+    
+    <link rel="stylesheet" href="/css/style.min.css">
+
+    <title>Downloading MIMIC-CXR-JPG data from Google cloud</title>
+</head>
+<body><header id="banner">
+    <h2><a href="https://echorand.me">Exploring Software</a></h2>
+    <nav>
+        <ul>
+            <li>
+                <a href="/about" title="">About</a>
+            </li><li>
+                <a href="/posts" title="">Posts</a>
+            </li><li>
+                <a href="/talks" title="">Talks</a>
+            </li><li>
+                <a href="/writings-trainings" title="">Writings and Trainings</a>
+            </li><li>
+                <a href="/categories" title="">Categories</a>
+            </li><li>
+                <a href="/index.xml" title="">Subscribe (RSS)</a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main id="content">
+<article>
+    <header id="post-header">
+        <h1>Downloading MIMIC-CXR-JPG data from Google cloud</h1><time>July 14, 2024</time></header><p>I recently downloaded <a href="https://physionet.org/content/mimic-cxr-jpg/2.1.0/#files">MIMIC-CXR-JPG</a>, from Google cloud storage.
+The reason I had to eventually use Google cloud storage download was because of the <a href="https://github.com/MIT-LCP/mimic-code/discussions/1725">suggestion</a> that was offered
+for working around the bandwidth constrained physionet.org servers.</p>
+<p>These are some notes that might help someone else.</p>
+<p>Before you get started:</p>
+<ol>
+<li>Right off the bat, the first thing you want to keep in mind is the bucket&rsquo;s configured so that the downloader will bear the
+cost of network transfer. See <a href="https://cloud.google.com/storage/docs/using-requester-pays#using">Requester pays</a> to learn more.
+It will come to about ~ 120 USD. You will need to ensure that you have a Google cloud project created and billing information configured.
+(You may find <a href="https://edu.google.com/intl/ALL_us/programs/credits/research/?modal_active=none">Google&rsquo;s Research Credits program</a> relevant and useful for your use case)</li>
+<li>You will need around ~ 570 GB disk space</li>
+<li>Complete your Physionet credentials and training</li>
+<li>Obtain access to the google cloud storage bucket by following links at <a href="https://physionet.org/projects/mimic-cxr-jpg/2.1.0/request_access/3">physionet</a></li>
+<li>Setup <a href="https://cloud.google.com/sdk/gcloud/">gcloud CLI</a></li>
+</ol>
+<h2 id="downloading-the-data">Downloading the data</h2>
+<p>The data downloading command will be as follows:</p>
+<pre tabindex="0"><code>$ gcloud storage --billing-project phd-work-427010 \ # this is how you specify what Google cloud project the transfer cost will be charged to
+  cp -r   &#34;gs://mimic-cxr-jpg-2.1.0.physionet.org/IMAGE_FILENAMES&#34;   \
+          &#34;gs://mimic-cxr-jpg-2.1.0.physionet.org/LICENSE.txt&#34;   \
+          &#34;gs://mimic-cxr-jpg-2.1.0.physionet.org/README&#34;   \
+          &#34;gs://mimic-cxr-jpg-2.1.0.physionet.org/SHA256SUMS.txt&#34;  \
+          &#34;gs://mimic-cxr-jpg-2.1.0.physionet.org/files&#34;  \
+          &#34;gs://mimic-cxr-jpg-2.1.0.physionet.org/mimic-cxr-2.0.0-chexpert.csv.gz&#34;  \
+          &#34;gs://mimic-cxr-jpg-2.1.0.physionet.org/mimic-cxr-2.0.0-metadata.csv.gz&#34;  \
+          &#34;gs://mimic-cxr-jpg-2.1.0.physionet.org/mimic-cxr-2.0.0-negbio.csv.gz&#34; \
+          &#34;gs://mimic-cxr-jpg-2.1.0.physionet.org/mimic-cxr-2.0.0-split.csv.gz&#34;  \
+          &#34;gs://mimic-cxr-jpg-2.1.0.physionet.org/mimic-cxr-2.1.0-test-set-labeled.csv&#34; . # this will create a directory tree inside the directory where you are executing the command from
+</code></pre><h2 id="finding-missing-images">Finding missing images</h2>
+<p>In the initial download attempt, I had a few images that were not able to be downloaded due to network issues, so I used this script to download the ones that
+were not downloaded:</p>
+<pre tabindex="0"><code># Run this Python script from within the directory where you downloaded the data
+import os
+import subprocess
+
+not_found = 0
+with open(&#39;IMAGE_FILENAMES&#39;) as f:
+    for image in f.readlines():
+        fname = image.rstrip(&#39;\n&#39;)
+        try:
+            os.stat(fname)
+        except FileNotFoundError as e:
+            not_found += 1
+            print(f&#34;{fname} not found. Downloading&#34;)
+            print(subprocess.check_output(
+                [
+                &#34;gcloud&#34;, &#34;storage&#34;, &#34;--billing-project&#34;, &#34;&lt;billing-project-id&gt;&#34;, &#34;cp&#34;,
+                 f&#34;gs://mimic-cxr-jpg-2.1.0.physionet.org/{fname}&#34;, f&#34;{fname}&#34;
+                 ]
+            ))
+</code></pre><h2 id="verifying-the-data">Verifying the data</h2>
+<p>To ensure that the data downloaded is OK, we should verify the SHA256 sum:</p>
+<pre tabindex="0"><code>$ sha256sum -c SHA256SUMS.txt  --quiet
+files/p10/p10375986/s59475126/44685902-a2ada121-02735bc5-bf1bf167-adfd2ae5.jpg: FAILED
+files/p11/p11131026/s59741822/08c22db9-5bef7d06-d904ec15-7bbfe57f-416dbdc1.jpg: FAILED
+files/p11/p11607063/s58298420/235c7af4-ef2ba0dc-7dc251ea-a2571f33-d37c8185.jpg: FAILED
+files/p11/p11785297/s58022353/3b64bf5a-021ff5ae-137c22d1-5529364f-1415c640.jpg: FAILED
+files/p11/p11920643/s55676416/4d70ff33-43ad77af-22ff047c-19f6ceb1-aae49eea.jpg: FAILED
+files/p13/p13283178/s55081421/026de108-3310a177-7c01791c-7eb32cff-b076122f.jpg: FAILED
+files/p13/p13628037/s54872639/f845ad66-716c76dd-da718912-8b0ff596-b30d25cb.jpg: FAILED
+files/p13/p13694166/s55805720/df57d48e-566984d2-fbe39e6e-0c68fc55-380f1217.jpg: FAILED
+files/p14/p14656449/s56499991/67a4e5cd-50d441d3-42294f94-363ac071-17cfc342.jpg: FAILED
+files/p14/p14690121/s50057475/34ad06d4-475863f1-f3712cec-783c3b99-308cf886.jpg: FAILED
+files/p17/p17405329/s55291678/283084bb-0f4994a7-d7622b32-d7f18f75-d8dde41b.jpg: FAILED
+files/p17/p17490145/s55463370/803fcbd8-2e38a5c7-cca96a50-ce5660cb-83ecc3a1.jpg: FAILED
+files/p18/p18459824/s52186356/2eb68b2f-0742cb3d-b8c9db5b-9c9d74f9-69e31cc1.jpg: FAILED
+files/p18/p18690742/s56844948/f4f63777-6a8a6b60-d6cb0718-9256537a-2ca41831.jpg: FAILED
+sha256sum: WARNING: 14 computed checksums did NOT match
+</code></pre><p>As you can see, there were a few mismatches.</p>
+<p>Of course that&rsquo;s not great, so I redownloaded the images once more, however the result was the same.</p>
+<p>Finally, I decided that I will download the above files into a different directory and compare the
+freshly downloaded version with the originally downloaded version. Running the <code>diff</code> command resulted
+in no differences between the two versions.</p>
+<p>I reported the issue on the <a href="https://github.com/MIT-LCP/mimic-code/issues/1763">MIT-LCP/mimic-code</a> repository.</p>
+</article>
+<footer id="footer">
+    Post managed in a <a href="https://github.com/amitsaha/echorand.me">git repo</a> | <a href="https://github.com/amitsaha/echorand.me/commit/de9bb5d5a79e1afa0bb2fc896b6f0476e626df1d">Last Commit on this post </a>
+  | <a href="https://github.com/amitsaha/echorand.me/edit/master/content/posts/downloading-mimic-cxr-jpg.md">Edit post</a>
+    <p>
+    Blog managed via <a href="https://gohugo.io/">Hugo</a> and using a modified version of the <a href="https://themes.gohugo.io/etch/">Etch</a> theme.
+    </p>  
+</footer>
+
+        </main><footer id="footer">
+    
+</footer>
+</body>
+</html>

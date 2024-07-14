@@ -12,6 +12,20 @@
     
     
     <item>
+      <title>Downloading MIMIC-CXR-JPG data from Google cloud</title>
+      <link>https://echorand.me/posts/downloading-mimic-cxr-jpg/</link>
+      <pubDate>Sun, 14 Jul 2024 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/downloading-mimic-cxr-jpg/</guid>
+      <description>I recently downloaded MIMIC-CXR-JPG, from Google cloud storage. The reason I had to eventually use Google cloud storage download was because of the suggestion that was offered for working around the bandwidth constrained physionet.org servers.
+These are some notes that might help someone else.
+Before you get started:
+Right off the bat, the first thing you want to keep in mind is the bucket&amp;rsquo;s configured so that the downloader will bear the cost of network transfer.</description>
+    </item>
+    
+    
+    
+    <item>
       <title>Custom HTTP client with golang.org/x/oauth2 and GitHub Go SDK</title>
       <link>https://echorand.me/posts/github-oauth/</link>
       <pubDate>Wed, 21 Sep 2022 00:00:00 +0000</pubDate>
