@@ -2,6 +2,9 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
+    <loc>https://echorand.me/about/</loc>
+    <lastmod>2024-08-09T12:05:03+10:00</lastmod>
+  </url><url>
     <loc>https://echorand.me/categories/</loc>
     <lastmod>2024-07-14T13:15:12+10:00</lastmod>
   </url><url>
@@ -145,9 +148,6 @@
   </url><url>
     <loc>https://echorand.me/posts/strace-nginx/</loc>
     <lastmod>2019-07-19T10:11:04+10:00</lastmod>
-  </url><url>
-    <loc>https://echorand.me/about/</loc>
-    <lastmod>2023-12-03T17:31:40+11:00</lastmod>
   </url><url>
     <loc>https://echorand.me/after-you-have-merged-your-pr/</loc>
     <lastmod>2019-07-21T17:14:27+10:00</lastmod>

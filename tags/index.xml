@@ -11,6 +11,8 @@
     
     
     
+    
+    
     <item>
       <title>Downloading MIMIC-CXR-JPG data from Google cloud</title>
       <link>https://echorand.me/posts/downloading-mimic-cxr-jpg/</link>
@@ -481,8 +483,6 @@ Schemas and Database The database is the highest level of organization. A databa
       <description>I was debugging a issue where we were getting truncated logs in ElasticSearch in the context of a setup as follows:
 Application Logs -&amp;gt; Fluentd (logging) -&amp;gt; Nginx -&amp;gt; ElasticSearch The original problem turned out to be on the application side, but my first point of investigation was what are we getting on the nginx side? Do we get the entire message that we are expecting and something is going on the ElasticSearch side?</description>
     </item>
-    
-    
     
     
     
