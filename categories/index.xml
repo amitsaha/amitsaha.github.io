@@ -6,9 +6,21 @@
     <description>Recent content in Categories on Exploring Software</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 14 Jul 2024 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 26 Aug 2025 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://echorand.me/categories/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    
+    <item>
+      <title>Slow down, Read API documentation and Tutorials</title>
+      <link>https://echorand.me/posts/slowing-down-read-api-documentation/</link>
+      <pubDate>Tue, 26 Aug 2025 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/slowing-down-read-api-documentation/</guid>
+      <description>I remember the days of reading API documentation, and figuring things out and experiencing a joy having done so. The experience was enriching and that&amp;rsquo;s really what enabled me keep doing it, because of a sense of joy I derive from it. I remember the days, when that was just how things happened.
+Now, my first call is to open my favorite LLM powered tool and ask it to do what I need to be done.</description>
+    </item>
     
     
     

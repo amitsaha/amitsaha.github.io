@@ -2,19 +2,25 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
+    <loc>https://echorand.me/categories/</loc>
+    <lastmod>2025-08-27T07:23:57+10:00</lastmod>
+  </url><url>
+    <loc>https://echorand.me/</loc>
+    <lastmod>2025-08-27T07:23:57+10:00</lastmod>
+  </url><url>
+    <loc>https://echorand.me/posts/</loc>
+    <lastmod>2025-08-27T07:23:57+10:00</lastmod>
+  </url><url>
+    <loc>https://echorand.me/posts/slowing-down-read-api-documentation/</loc>
+    <lastmod>2025-08-27T07:23:57+10:00</lastmod>
+  </url><url>
+    <loc>https://echorand.me/categories/software/</loc>
+    <lastmod>2025-08-27T07:23:57+10:00</lastmod>
+  </url><url>
     <loc>https://echorand.me/about/</loc>
     <lastmod>2024-12-04T18:53:39+11:00</lastmod>
   </url><url>
-    <loc>https://echorand.me/categories/</loc>
-    <lastmod>2024-07-14T13:15:12+10:00</lastmod>
-  </url><url>
     <loc>https://echorand.me/posts/downloading-mimic-cxr-jpg/</loc>
-    <lastmod>2024-07-14T13:15:12+10:00</lastmod>
-  </url><url>
-    <loc>https://echorand.me/</loc>
-    <lastmod>2024-07-14T13:15:12+10:00</lastmod>
-  </url><url>
-    <loc>https://echorand.me/posts/</loc>
     <lastmod>2024-07-14T13:15:12+10:00</lastmod>
   </url><url>
     <loc>https://echorand.me/categories/research/</loc>
@@ -42,9 +48,6 @@
     <lastmod>2022-05-08T20:19:36-06:00</lastmod>
   </url><url>
     <loc>https://echorand.me/posts/hard-to-not-be-a-computer-user/</loc>
-    <lastmod>2022-02-07T14:42:29+11:00</lastmod>
-  </url><url>
-    <loc>https://echorand.me/categories/software/</loc>
     <lastmod>2022-02-07T14:42:29+11:00</lastmod>
   </url><url>
     <loc>https://echorand.me/posts/on-my-learning-style/</loc>
