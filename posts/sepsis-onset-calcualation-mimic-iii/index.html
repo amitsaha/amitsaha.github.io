@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="echo $RANDOM. Exploring Software and writing about it.">
+    
+    <link rel="shortcut icon" href="https://echorand.me/favicon.ico">
+    
+    <link rel="stylesheet" href="/css/style.min.css">
+
+    <title>Sepsis onset calculation from MIMIC-III data using sepsis-3 criteria</title>
+</head>
+<body><header id="banner">
+    <h2><a href="https://echorand.me">Exploring Software</a></h2>
+    <nav>
+        <ul>
+            <li>
+                <a href="/about" title="">About</a>
+            </li><li>
+                <a href="/posts" title="">Posts</a>
+            </li><li>
+                <a href="/talks" title="">Talks</a>
+            </li><li>
+                <a href="/writings-trainings" title="">Writings and Trainings</a>
+            </li><li>
+                <a href="/categories" title="">Categories</a>
+            </li><li>
+                <a href="/index.xml" title="">Subscribe (RSS)</a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main id="content">
+<article>
+    <header id="post-header">
+        <h1>Sepsis onset calculation from MIMIC-III data using sepsis-3 criteria</h1><time>November 10, 2025</time></header><p>In this blog post, I am going to desribe how we can calculate sepsis onset time using
+sepsis-3 criteria for the MIMIC-III patient data.</p>
+<ul>
+<li><a href="#reading-the-relevant-tables">Reading the relevant tables</a></li>
+<li><a href="#sepsis-3-criteria">Sepsis-3 Criteria</a></li>
+<li><a href="#operationalization-in-code">Operationalization in code</a></li>
+<li><a href="#identifying-the-onset-of-suspected-infection">Identifying the onset of suspected infection</a>
+<ul>
+<li><a href="#time-of-drawing-of-the-first-culture">Time of drawing of the first culture</a></li>
+<li><a href="#time-of-administering-of-antibiotics">Time of administering of antibiotics</a></li>
+<li><a href="#identifying-infection-onset">Identifying infection onset</a></li>
+</ul>
+</li>
+<li><a href="#identifying-organ-failuredsyfunction">Identifying organ failure/dsyfunction</a>
+<ul>
+<li><a href="#calculation-of-total-sofa-score">Calculation of total SOFA score</a></li>
+</ul>
+</li>
+<li><a href="#finding-sepsis-onset-time">Finding sepsis onset time</a></li>
+<li><a href="#code">Code</a></li>
+<li><a href="#data-access">Data access</a></li>
+<li><a href="#assumptions">Assumptions</a></li>
+<li><a href="#references">References</a></li>
+</ul>
+<h2 id="reading-the-relevant-tables">Reading the relevant tables</h2>
+<p>We first read the data from the CSV files (corresponding to the relevant tables):</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> pandas <span style="color:#66d9ef">as</span> pd
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> numpy <span style="color:#66d9ef">as</span> np
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>MIMIC_DIR <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;C:</span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">Users</span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">amits</span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">work</span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">datasets</span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">MIMIC-III-v1.4&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>patients <span style="color:#f92672">=</span> pd<span style="color:#f92672">.</span>read_csv(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>MIMIC_DIR<span style="color:#e6db74">}</span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">PATIENTS.csv.gz&#34;</span>)
+</span></span><span style="display:flex;"><span>admissions <span style="color:#f92672">=</span> pd<span style="color:#f92672">.</span>read_csv(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>MIMIC_DIR<span style="color:#e6db74">}</span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">ADMISSIONS.csv.gz&#34;</span>,  parse_dates<span style="color:#f92672">=</span>[<span style="color:#e6db74">&#39;ADMITTIME&#39;</span>])
+</span></span><span style="display:flex;"><span>diagnoses_icd <span style="color:#f92672">=</span> pd<span style="color:#f92672">.</span>read_csv(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>MIMIC_DIR<span style="color:#e6db74">}</span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">DIAGNOSES_ICD.csv.gz&#34;</span>)
+</span></span><span style="display:flex;"><span>icustays <span style="color:#f92672">=</span> pd<span style="color:#f92672">.</span>read_csv(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>MIMIC_DIR<span style="color:#e6db74">}</span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">ICUSTAYS.csv.gz&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>micro <span style="color:#f92672">=</span> pd<span style="color:#f92672">.</span>read_csv(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>MIMIC_DIR<span style="color:#e6db74">}</span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">MICROBIOLOGYEVENTS.csv.gz&#34;</span>, parse_dates<span style="color:#f92672">=</span>[<span style="color:#e6db74">&#39;CHARTDATE&#39;</span>], low_memory<span style="color:#f92672">=</span><span style="color:#66d9ef">False</span>) 
+</span></span><span style="display:flex;"><span>prescriptions <span style="color:#f92672">=</span> pd<span style="color:#f92672">.</span>read_csv(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>MIMIC_DIR<span style="color:#e6db74">}</span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">PRESCRIPTIONS.csv.gz&#34;</span>, parse_dates<span style="color:#f92672">=</span>[<span style="color:#e6db74">&#39;STARTDATE&#39;</span>], low_memory<span style="color:#f92672">=</span><span style="color:#66d9ef">False</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>chartevents <span style="color:#f92672">=</span> pd<span style="color:#f92672">.</span>read_csv(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>MIMIC_DIR<span style="color:#e6db74">}</span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">CHARTEVENTS.csv.gz&#34;</span>, 
+</span></span><span style="display:flex;"><span>                          usecols<span style="color:#f92672">=</span>[<span style="color:#e6db74">&#39;SUBJECT_ID&#39;</span>, <span style="color:#e6db74">&#39;HADM_ID&#39;</span>, <span style="color:#e6db74">&#39;CHARTTIME&#39;</span>, <span style="color:#e6db74">&#39;ITEMID&#39;</span>, <span style="color:#e6db74">&#39;VALUENUM&#39;</span>],
+</span></span><span style="display:flex;"><span>                          chunksize<span style="color:#f92672">=</span><span style="color:#ae81ff">1000000</span>, <span style="color:#75715e"># chartevents is big, so we read one chunk at a time</span>
+</span></span><span style="display:flex;"><span>                          low_memory<span style="color:#f92672">=</span><span style="color:#66d9ef">False</span>, 
+</span></span><span style="display:flex;"><span>                          parse_dates<span style="color:#f92672">=</span>[<span style="color:#e6db74">&#39;CHARTTIME&#39;</span>]
+</span></span><span style="display:flex;"><span>             ) <span style="color:#75715e"># 330712483 rows</span>
+</span></span><span style="display:flex;"><span>labevents <span style="color:#f92672">=</span> pd<span style="color:#f92672">.</span>read_csv(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>MIMIC_DIR<span style="color:#e6db74">}</span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">LABEVENTS.csv.gz&#34;</span>, 
+</span></span><span style="display:flex;"><span>                          usecols<span style="color:#f92672">=</span>[<span style="color:#e6db74">&#39;SUBJECT_ID&#39;</span>, <span style="color:#e6db74">&#39;HADM_ID&#39;</span>, <span style="color:#e6db74">&#39;CHARTTIME&#39;</span>, <span style="color:#e6db74">&#39;ITEMID&#39;</span>, <span style="color:#e6db74">&#39;VALUENUM&#39;</span>],
+</span></span><span style="display:flex;"><span>                          chunksize<span style="color:#f92672">=</span><span style="color:#ae81ff">1000000</span>, 
+</span></span><span style="display:flex;"><span>                          low_memory<span style="color:#f92672">=</span><span style="color:#66d9ef">False</span>, 
+</span></span><span style="display:flex;"><span>                          parse_dates<span style="color:#f92672">=</span>[<span style="color:#e6db74">&#39;CHARTTIME&#39;</span>]
+</span></span><span style="display:flex;"><span>             ) <span style="color:#75715e">#27854055 rows</span>
+</span></span></code></pre></div><h2 id="sepsis-3-criteria">Sepsis-3 Criteria</h2>
+<p>From <a href="https://jamanetwork.com/journals/jama/fullarticle/2492881">The Third International Consensus Definitions for Sepsis and Septic Shock (Sepsis-3)</a>:</p>
+<blockquote>
+<p>Sepsis should be defined as life-threatening organ dysfunction caused by a dysregulated host response to infection</p>
+</blockquote>
+<blockquote>
+<p>For clinical operationalization, organ dysfunction can be represented by an increase in the Sequential [Sepsis-related] Organ Failure Assessment (SOFA) score of 2 points or more, which is associated with an in-hospital mortality greater than 10%.</p>
+</blockquote>
+<p>Another key point that&rsquo;s worth mentioning from the above is:</p>
+<blockquote>
+<p>As described later, even a modest degree of organ dysfunction when infection is first <strong>suspected</strong> is associated with an in-hospital mortality in excess of 10%. Recognition of this condition thus merits a prompt and appropriate response.</p>
+</blockquote>
+<p>We will henceforth refer to infection detection as &ldquo;suspected infection detection&rdquo;.</p>
+<h2 id="operationalization-in-code">Operationalization in code</h2>
+<p>To implement it, we will need to:</p>
+<ol>
+<li>Identify the onset of suspected infection</li>
+<li>Use the SOFA score and its increase magnitude</li>
+</ol>
+<h2 id="identifying-the-onset-of-suspected-infection">Identifying the onset of suspected infection</h2>
+<p>To identify the onset of suspected infection, we will:</p>
+<ol>
+<li>Find the time of drawing of first culture for a particular HADM_ID (which uniquely identifies a patient&rsquo;s specific admission)</li>
+<li>Find the time of administering of antibiotics</li>
+<li>And if they are within 24 hours of each other (irrespective of order), we consider that there is an onset of suspected infection.</li>
+</ol>
+<h3 id="time-of-drawing-of-the-first-culture">Time of drawing of the first culture</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># [&#39;CHARTDATE&#39;].min() computes the minimum (earliest) CHARTDATE for each HADM_ID group</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># since we already prased the CHARTDATE as datetime during reading, the min function</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># works as intended</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>first_culture <span style="color:#f92672">=</span> micro<span style="color:#f92672">.</span>groupby(<span style="color:#e6db74">&#39;HADM_ID&#39;</span>)[<span style="color:#e6db74">&#39;CHARTDATE&#39;</span>]<span style="color:#f92672">.</span>min()<span style="color:#f92672">.</span>reset_index()
+</span></span><span style="display:flex;"><span>first_culture<span style="color:#f92672">.</span>columns <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#39;HADM_ID&#39;</span>, <span style="color:#e6db74">&#39;first_culture_time&#39;</span>]
+</span></span></code></pre></div><h3 id="time-of-administering-of-antibiotics">Time of administering of antibiotics</h3>
+<p>Next, we look through the <code>prescriptions</code> dataframe&rsquo;s <code>DRUG</code> column and filter rows which contain one of the antibiotics
+commonly identified for infection onset:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>antibiotics <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#39;Vancomycin&#39;</span>, <span style="color:#e6db74">&#39;Ceftriaxone&#39;</span>, <span style="color:#e6db74">&#39;Meropenem&#39;</span>, <span style="color:#e6db74">&#39;Piperacillin-Tazobactam&#39;</span>, <span style="color:#e6db74">&#39;Levofloxacin&#39;</span>]
+</span></span><span style="display:flex;"><span>extended_abx <span style="color:#f92672">=</span> [
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;Cefepime&#39;</span>, <span style="color:#e6db74">&#39;Azithromycin&#39;</span>, <span style="color:#e6db74">&#39;Ampicillin&#39;</span>, <span style="color:#e6db74">&#39;Ampicillin-Sulbactam&#39;</span>, 
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;Clindamycin&#39;</span>, <span style="color:#e6db74">&#39;Linezolid&#39;</span>, <span style="color:#e6db74">&#39;Metronidazole&#39;</span>, <span style="color:#e6db74">&#39;Cefuroxime&#39;</span>, <span style="color:#e6db74">&#39;Tobramycin&#39;</span>, 
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;Gentamicin&#39;</span>, <span style="color:#e6db74">&#39;Imipenem&#39;</span>, <span style="color:#e6db74">&#39;Imipenem-Cilastatin&#39;</span>, <span style="color:#e6db74">&#39;Ciprofloxacin&#39;</span>
+</span></span><span style="display:flex;"><span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>all_abx <span style="color:#f92672">=</span> antibiotics <span style="color:#f92672">+</span> extended_abx
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>abx_lc <span style="color:#f92672">=</span> [a<span style="color:#f92672">.</span>lower() <span style="color:#66d9ef">for</span> a <span style="color:#f92672">in</span> all_abx]
+</span></span><span style="display:flex;"><span>drug_lc <span style="color:#f92672">=</span> prescriptions[<span style="color:#e6db74">&#39;DRUG&#39;</span>]<span style="color:#f92672">.</span>fillna(<span style="color:#e6db74">&#39;&#39;</span>)<span style="color:#f92672">.</span>str<span style="color:#f92672">.</span>lower()
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Create a boolean mask: True if any antibiotic name is a substring of the DRUG string</span>
+</span></span><span style="display:flex;"><span>mask <span style="color:#f92672">=</span> drug_lc<span style="color:#f92672">.</span>apply(<span style="color:#66d9ef">lambda</span> s: any(abx <span style="color:#f92672">in</span> s <span style="color:#66d9ef">for</span> abx <span style="color:#f92672">in</span> abx_lc))
+</span></span><span style="display:flex;"><span>abx_given <span style="color:#f92672">=</span> prescriptions[mask]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>first_abx <span style="color:#f92672">=</span> abx_given<span style="color:#f92672">.</span>groupby(<span style="color:#e6db74">&#39;HADM_ID&#39;</span>)[<span style="color:#e6db74">&#39;STARTDATE&#39;</span>]<span style="color:#f92672">.</span>min()<span style="color:#f92672">.</span>reset_index()
+</span></span><span style="display:flex;"><span>first_abx<span style="color:#f92672">.</span>columns <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#39;HADM_ID&#39;</span>, <span style="color:#e6db74">&#39;first_abx_time&#39;</span>]
+</span></span></code></pre></div><h3 id="identifying-infection-onset">Identifying infection onset</h3>
+<p>Now that we have identified the first instance of administering an antibiotic and drawing blood culture, we now join
+the two dataframes based on HADM_ID:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>suspected_infection <span style="color:#f92672">=</span> pd<span style="color:#f92672">.</span>merge(first_abx, first_culture, on<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;HADM_ID&#39;</span>)
+</span></span></code></pre></div><p>Next, we find the delta between the two times and store it as a separate column:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>suspected_infection[<span style="color:#e6db74">&#39;delta&#39;</span>] <span style="color:#f92672">=</span> (
+</span></span><span style="display:flex;"><span>    (suspected_infection[<span style="color:#e6db74">&#39;first_abx_time&#39;</span>] <span style="color:#f92672">-</span> suspected_infection[<span style="color:#e6db74">&#39;first_culture_time&#39;</span>])
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">.</span>dt<span style="color:#f92672">.</span>total_seconds() <span style="color:#f92672">/</span> <span style="color:#ae81ff">3600</span>
+</span></span><span style="display:flex;"><span>)
+</span></span></code></pre></div><p>Finally, we filter the data to store only those for which the absolute value of delta is within 24 hours:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>suspected_infection <span style="color:#f92672">=</span> suspected_infection[suspected_infection[<span style="color:#e6db74">&#39;delta&#39;</span>]<span style="color:#f92672">.</span>abs() <span style="color:#f92672">&lt;=</span> <span style="color:#ae81ff">24</span>]
+</span></span></code></pre></div><p>We add the suspected infection time as a separate column storing the earlier of the two times:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>suspected_infection[<span style="color:#e6db74">&#39;infection_time&#39;</span>] <span style="color:#f92672">=</span> suspected_infection[[<span style="color:#e6db74">&#39;first_abx_time&#39;</span>, <span style="color:#e6db74">&#39;first_culture_time&#39;</span>]]<span style="color:#f92672">.</span>min(axis<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>)
+</span></span></code></pre></div><h2 id="identifying-organ-failuredsyfunction">Identifying organ failure/dsyfunction</h2>
+<p>Next, we want to identify organ failures for calculating the sequential organ failure assessment score (SOFA score). It comprises six subscores corresponding to the condition (See reference 2) of
+the:</p>
+<ol>
+<li>Kidney (renal)</li>
+<li>Coagulation</li>
+<li>Liver</li>
+<li>Central nervous system</li>
+<li>Cardiovascular system</li>
+<li>Respiratory system</li>
+</ol>
+<p>To measure the first three, we will query the <code>labevents</code> table for the following item ids:</p>
+<ol>
+<li>Kidney - creatinine (item id: 50912)</li>
+<li>Coagulation - platelet count (item id: 51265)</li>
+<li>Liver - bilirubin total (itemid: 50885)</li>
+</ol>
+<p>We read one chunk at a time of the table, group the data into one of four bins based on their value
+and then associate a severity label with them (0, 1, 2, 3, 4 - normal to abnormal).</p>
+<p>For example, for renal, we do this:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>creat_itemid <span style="color:#f92672">=</span> <span style="color:#ae81ff">50912</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>renal_rows <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Renal - Creatinine</span>
+</span></span><span style="display:flex;"><span>cr <span style="color:#f92672">=</span> chunk[chunk[<span style="color:#e6db74">&#39;ITEMID&#39;</span>] <span style="color:#f92672">==</span> creat_itemid]<span style="color:#f92672">.</span>copy()
+</span></span><span style="display:flex;"><span>cr[<span style="color:#e6db74">&#39;renal_score&#39;</span>] <span style="color:#f92672">=</span> pd<span style="color:#f92672">.</span>cut(
+</span></span><span style="display:flex;"><span>    cr[<span style="color:#e6db74">&#39;VALUENUM&#39;</span>],
+</span></span><span style="display:flex;"><span>    bins<span style="color:#f92672">=</span>[<span style="color:#f92672">-</span>float(<span style="color:#e6db74">&#39;inf&#39;</span>), <span style="color:#ae81ff">1.2</span>, <span style="color:#ae81ff">1.9</span>, <span style="color:#ae81ff">3.4</span>, <span style="color:#ae81ff">4.9</span>, float(<span style="color:#e6db74">&#39;inf&#39;</span>)], <span style="color:#75715e"># bins for creatinine</span>
+</span></span><span style="display:flex;"><span>    labels<span style="color:#f92672">=</span>[<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">4</span>] <span style="color:#75715e"># assignemnt of severity score</span>
+</span></span><span style="display:flex;"><span>)<span style="color:#f92672">.</span>fillna(<span style="color:#ae81ff">0</span>)<span style="color:#f92672">.</span>astype(int)
+</span></span><span style="display:flex;"><span>renal_rows<span style="color:#f92672">.</span>append(cr[[<span style="color:#e6db74">&#39;HADM_ID&#39;</span>, <span style="color:#e6db74">&#39;CHARTTIME&#39;</span>, <span style="color:#e6db74">&#39;renal_score&#39;</span>]])
+</span></span></code></pre></div><p>Once we have read all the data, stored the data for each chunk as a row in the list, we then
+create dataframe for each of the three measurements:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Concatenate results</span>
+</span></span><span style="display:flex;"><span>renal_scores <span style="color:#f92672">=</span> pd<span style="color:#f92672">.</span>concat(renal_rows)
+</span></span><span style="display:flex;"><span>coag_scores <span style="color:#f92672">=</span> pd<span style="color:#f92672">.</span>concat(coag_rows)
+</span></span><span style="display:flex;"><span>liver_scores <span style="color:#f92672">=</span> pd<span style="color:#f92672">.</span>concat(liver_rows)
+</span></span></code></pre></div><p>We see that for some of the measurement, the <code>HADM_ID</code> is <code>NaN</code>, these are data for outpatients,
+and will be filtered automatically later on.</p>
+<p>Next, we will calculate the remaining three:</p>
+<ol start="4">
+<li>Central nervous system</li>
+<li>Cardiovascular system</li>
+<li>Respiratory system</li>
+</ol>
+<p>For the <strong>central nervous system</strong>, we calculate the Glasgow Coma Scale (GCS) score,
+measuring the following by reading the <code>chartevents</code> table:</p>
+<p>A. Eye response (item id: 223900, 220739)
+B. Verbal response (item id: 223901)
+C. Motor response (item id: 223902)</p>
+<p>We read the data one chunk at a time, and accumulate them in a list:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>gcs_rows <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>gcs_chunk <span style="color:#f92672">=</span> chunk[chunk[<span style="color:#e6db74">&#39;ITEMID&#39;</span>]<span style="color:#f92672">.</span>isin(
+</span></span><span style="display:flex;"><span>    gcs_itemids[<span style="color:#e6db74">&#39;EYE&#39;</span>] <span style="color:#f92672">+</span> gcs_itemids[<span style="color:#e6db74">&#39;VERBAL&#39;</span>] <span style="color:#f92672">+</span> gcs_itemids[<span style="color:#e6db74">&#39;MOTOR&#39;</span>]
+</span></span><span style="display:flex;"><span>)]<span style="color:#f92672">.</span>copy()
+</span></span><span style="display:flex;"><span>gcs_rows<span style="color:#f92672">.</span>append(gcs_chunk)
+</span></span></code></pre></div><p>Then, we create a dataframe, and process the individual scores and calculate the final score that
+will be used for SOFA calculation:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>gcs_all <span style="color:#f92672">=</span> pd<span style="color:#f92672">.</span>concat(gcs_rows)
+</span></span><span style="display:flex;"><span>gcs_all <span style="color:#f92672">=</span> gcs_all<span style="color:#f92672">.</span>dropna(subset<span style="color:#f92672">=</span>[<span style="color:#e6db74">&#39;VALUENUM&#39;</span>])
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Take the maximum when multiple measurements exist for the hour</span>
+</span></span><span style="display:flex;"><span>gcs_all[<span style="color:#e6db74">&#39;CHARTTIME&#39;</span>] <span style="color:#f92672">=</span> pd<span style="color:#f92672">.</span>to_datetime(gcs_all[<span style="color:#e6db74">&#39;CHARTTIME&#39;</span>])<span style="color:#f92672">.</span>dt<span style="color:#f92672">.</span>floor(<span style="color:#e6db74">&#39;h&#39;</span>)
+</span></span><span style="display:flex;"><span>gcs_pivot <span style="color:#f92672">=</span> gcs_all<span style="color:#f92672">.</span>pivot_table(index<span style="color:#f92672">=</span>[<span style="color:#e6db74">&#39;HADM_ID&#39;</span>, <span style="color:#e6db74">&#39;CHARTTIME&#39;</span>], 
+</span></span><span style="display:flex;"><span>                                columns<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;ITEMID&#39;</span>, values<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;VALUENUM&#39;</span>, aggfunc<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;max&#39;</span>)<span style="color:#f92672">.</span>reset_index()
+</span></span><span style="display:flex;"><span>gcs_pivot<span style="color:#f92672">.</span>columns<span style="color:#f92672">.</span>name <span style="color:#f92672">=</span> <span style="color:#66d9ef">None</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Rename columns for clarity</span>
+</span></span><span style="display:flex;"><span>gcs_pivot <span style="color:#f92672">=</span> gcs_pivot<span style="color:#f92672">.</span>rename(columns<span style="color:#f92672">=</span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#ae81ff">223900</span>: <span style="color:#e6db74">&#39;eye&#39;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#ae81ff">220739</span>: <span style="color:#e6db74">&#39;eye_alt&#39;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#ae81ff">223901</span>: <span style="color:#e6db74">&#39;verbal&#39;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#ae81ff">223902</span>: <span style="color:#e6db74">&#39;motor&#39;</span>
+</span></span><span style="display:flex;"><span>})
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Fill missing eye from alternate</span>
+</span></span><span style="display:flex;"><span>gcs_pivot[<span style="color:#e6db74">&#39;eye&#39;</span>] <span style="color:#f92672">=</span> gcs_pivot[<span style="color:#e6db74">&#39;eye&#39;</span>]<span style="color:#f92672">.</span>combine_first(gcs_pivot[<span style="color:#e6db74">&#39;eye_alt&#39;</span>])
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Ensure all three components exist</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> col <span style="color:#f92672">in</span> [<span style="color:#e6db74">&#39;eye&#39;</span>, <span style="color:#e6db74">&#39;verbal&#39;</span>, <span style="color:#e6db74">&#39;motor&#39;</span>]:
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> col <span style="color:#f92672">not</span> <span style="color:#f92672">in</span> gcs_pivot<span style="color:#f92672">.</span>columns:
+</span></span><span style="display:flex;"><span>        gcs_pivot[col] <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>nan
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Total GCS calculation (NaNs allowed)</span>
+</span></span><span style="display:flex;"><span>gcs_pivot[<span style="color:#e6db74">&#39;gcs_total&#39;</span>] <span style="color:#f92672">=</span> gcs_pivot[[<span style="color:#e6db74">&#39;eye&#39;</span>, <span style="color:#e6db74">&#39;verbal&#39;</span>, <span style="color:#e6db74">&#39;motor&#39;</span>]]<span style="color:#f92672">.</span>sum(axis<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>, min_count<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Fill fully missing GCS with 15 (assume alert) </span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># TODO alternative - forward fill</span>
+</span></span><span style="display:flex;"><span>gcs_pivot[<span style="color:#e6db74">&#39;gcs_total&#39;</span>] <span style="color:#f92672">=</span> gcs_pivot[<span style="color:#e6db74">&#39;gcs_total&#39;</span>]<span style="color:#f92672">.</span>fillna(<span style="color:#ae81ff">15</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># CNS SOFA scoring bins and severity allocation</span>
+</span></span><span style="display:flex;"><span>gcs_pivot[<span style="color:#e6db74">&#39;cns_score&#39;</span>] <span style="color:#f92672">=</span> pd<span style="color:#f92672">.</span>cut(
+</span></span><span style="display:flex;"><span>    gcs_pivot[<span style="color:#e6db74">&#39;gcs_total&#39;</span>],
+</span></span><span style="display:flex;"><span>    bins<span style="color:#f92672">=</span>[<span style="color:#f92672">-</span>float(<span style="color:#e6db74">&#39;inf&#39;</span>), <span style="color:#ae81ff">5</span>, <span style="color:#ae81ff">8</span>, <span style="color:#ae81ff">11</span>, <span style="color:#ae81ff">14</span>, <span style="color:#ae81ff">15</span>],
+</span></span><span style="display:flex;"><span>    labels<span style="color:#f92672">=</span>[<span style="color:#ae81ff">4</span>, <span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">0</span>]
+</span></span><span style="display:flex;"><span>)<span style="color:#f92672">.</span>astype(int)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Final GCS score output</span>
+</span></span><span style="display:flex;"><span>cns_scores <span style="color:#f92672">=</span> gcs_pivot[[<span style="color:#e6db74">&#39;HADM_ID&#39;</span>, <span style="color:#e6db74">&#39;CHARTTIME&#39;</span>, <span style="color:#e6db74">&#39;cns_score&#39;</span>]]
+</span></span></code></pre></div><p>For <strong>Cardio vascular system</strong> score, we read the following data from different tables:</p>
+<ol>
+<li>Mean arterial pressure (MAP) from <code>chartevents</code></li>
+<li>Vasopressors from <code>inputevents_mv</code> and <code>inputevents_cv</code>
+<ol>
+<li>Dopamine</li>
+<li>Dobutamine</li>
+<li>Epinephrine</li>
+<li>Norepinephrine</li>
+</ol>
+</li>
+</ol>
+<p>Based on the rate of the vasopressor administration and the MAP, a severity score is assigned.
+See reference [2], Page 7 for the severity score assignment.</p>
+<p>To see the calculation of the cardiovascular score, see the notebook, <a href="https://github.com/amitsaha/mimic-ml/blob/main/mimic-iii/sepsis-onset/Cardiovascular%20Score%20Standalone.ipynb">Cardiovascular Score Standalone.ipynb</a> in the associated GitHub repository for this post.</p>
+<p>For calculating the <strong>respiratory system</strong> score, we calculate the P/F ratio
+(P: PaO2 - Partial pressure of oxygen), (F: Fraction of inspired oxygen),
+by reading the following data:</p>
+<ol>
+<li>Fraction of inspired oxygen (FiO2) from <code>charevents</code> (item id: 223835, 3420)</li>
+<li>Partial pressure of oxygen(PaO2) from <code>labevents</code> (item id: 50821)</li>
+</ol>
+<h3 id="calculation-of-total-sofa-score">Calculation of total SOFA score</h3>
+<p>Once we have the subscores, we calculate the total SOFA score:</p>
+<pre tabindex="0"><code>from functools import reduce
+score_dfs = [
+    renal_scores,    
+    coag_scores,
+    liver_scores,
+    cardio_scores,
+    cns_scores,
+    resp_scores
+]
+
+# Merge all on HADM_ID + CHARTTIME
+sofa_df = reduce(lambda left, right: pd.merge(left, right, how=&#39;outer&#39;, on=[&#39;HADM_ID&#39;, &#39;CHARTTIME&#39;]), score_dfs)
+
+# Fill missing scores with 0
+for col in sofa_df.columns:
+    if &#39;_score&#39; in col:
+        sofa_df[col] = sofa_df[col].fillna(0).astype(int)
+
+# Calculate total SOFA score
+sofa_df[&#39;total_sofa_score&#39;] = sofa_df[[col for col in sofa_df.columns if &#39;_score&#39; in col]].sum(axis=1)
+</code></pre><h2 id="finding-sepsis-onset-time">Finding sepsis onset time</h2>
+<p>Now, we have the suspected infection time and the organ dysfunction data via the SOFA score, we can
+now use the Sepsis-3 criteria to detect the sepsis onset:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># Merge SOFA with infection time</span>
+</span></span><span style="display:flex;"><span>merged <span style="color:#f92672">=</span> pd<span style="color:#f92672">.</span>merge(sofa_df, suspected_infection[[<span style="color:#e6db74">&#39;HADM_ID&#39;</span>, <span style="color:#e6db74">&#39;infection_time&#39;</span>]], on<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;HADM_ID&#39;</span>, how<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;inner&#39;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Time diff in hours for each row</span>
+</span></span><span style="display:flex;"><span>merged[<span style="color:#e6db74">&#39;time_diff_hours&#39;</span>] <span style="color:#f92672">=</span> (merged[<span style="color:#e6db74">&#39;CHARTTIME&#39;</span>] <span style="color:#f92672">-</span> merged[<span style="color:#e6db74">&#39;infection_time&#39;</span>])<span style="color:#f92672">.</span>dt<span style="color:#f92672">.</span>total_seconds() <span style="color:#f92672">/</span> <span style="color:#ae81ff">3600</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Pre- and post-infection windows (24 h before and after)</span>
+</span></span><span style="display:flex;"><span>pre_window <span style="color:#f92672">=</span> merged[(merged[<span style="color:#e6db74">&#39;time_diff_hours&#39;</span>] <span style="color:#f92672">&gt;=</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">24</span>) <span style="color:#f92672">&amp;</span> (merged[<span style="color:#e6db74">&#39;time_diff_hours&#39;</span>] <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span>)]
+</span></span><span style="display:flex;"><span>post_window <span style="color:#f92672">=</span> merged[(merged[<span style="color:#e6db74">&#39;time_diff_hours&#39;</span>] <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">0</span>) <span style="color:#f92672">&amp;</span> (merged[<span style="color:#e6db74">&#39;time_diff_hours&#39;</span>] <span style="color:#f92672">&lt;=</span> <span style="color:#ae81ff">48</span>)]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Get baseline SOFA (lowest in 24h before)</span>
+</span></span><span style="display:flex;"><span>baseline_sofa <span style="color:#f92672">=</span> pre_window<span style="color:#f92672">.</span>groupby(<span style="color:#e6db74">&#39;HADM_ID&#39;</span>)[<span style="color:#e6db74">&#39;total_sofa_score&#39;</span>]<span style="color:#f92672">.</span>min()<span style="color:#f92672">.</span>reset_index()
+</span></span><span style="display:flex;"><span>baseline_sofa<span style="color:#f92672">.</span>columns <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#39;HADM_ID&#39;</span>, <span style="color:#e6db74">&#39;baseline_sofa&#39;</span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Join baseline with post-infection SOFA</span>
+</span></span><span style="display:flex;"><span>post_with_baseline <span style="color:#f92672">=</span> pd<span style="color:#f92672">.</span>merge(post_window, baseline_sofa, on<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;HADM_ID&#39;</span>, how<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;left&#39;</span>)
+</span></span><span style="display:flex;"><span>post_with_baseline[<span style="color:#e6db74">&#39;sofa_delta&#39;</span>] <span style="color:#f92672">=</span> post_with_baseline[<span style="color:#e6db74">&#39;total_sofa_score&#39;</span>] <span style="color:#f92672">-</span> post_with_baseline[<span style="color:#e6db74">&#39;baseline_sofa&#39;</span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># First time SOFA delta ≥ 2 = Sepsis Onset</span>
+</span></span><span style="display:flex;"><span>sepsis_onset <span style="color:#f92672">=</span> (
+</span></span><span style="display:flex;"><span>    post_with_baseline[post_with_baseline[<span style="color:#e6db74">&#39;sofa_delta&#39;</span>] <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">2</span>]
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">.</span>sort_values([<span style="color:#e6db74">&#39;HADM_ID&#39;</span>, <span style="color:#e6db74">&#39;CHARTTIME&#39;</span>])
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">.</span>groupby(<span style="color:#e6db74">&#39;HADM_ID&#39;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">.</span>first() <span style="color:#75715e"># take the earliest charttime for the HADM_ID</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">.</span>reset_index()
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Output: earliest time of sepsis</span>
+</span></span><span style="display:flex;"><span>sepsis_onset <span style="color:#f92672">=</span> sepsis_onset[[<span style="color:#e6db74">&#39;HADM_ID&#39;</span>, <span style="color:#e6db74">&#39;CHARTTIME&#39;</span>]]<span style="color:#f92672">.</span>rename(columns<span style="color:#f92672">=</span>{<span style="color:#e6db74">&#39;CHARTTIME&#39;</span>: <span style="color:#e6db74">&#39;sepsis_onset_time&#39;</span>})
+</span></span></code></pre></div><p>With MIMIC-III data, the sepsis onset dataframe should have the shape:</p>
+<pre tabindex="0"><code>sepsis_onset.shape
+(1731, 2)
+</code></pre><h2 id="code">Code</h2>
+<p>You can find jupyter notebooks <a href="https://github.com/amitsaha/mimic-ml/tree/main/mimic-iii/sepsis-onset">here</a>:</p>
+<ol>
+<li><a href="https://github.com/amitsaha/mimic-ml/blob/main/mimic-iii/sepsis-onset/Updated%20-%20Sepsis%20onset%20time%20calculation%20.ipynb">Sepsis onset time calculation</a></li>
+<li><a href="https://github.com/amitsaha/mimic-ml/blob/main/mimic-iii/sepsis-onset/Cardiovascular%20Score%20Standalone.ipynb">Cardiovascular score calculation</a></li>
+</ol>
+<h2 id="data-access">Data access</h2>
+<p>See <a href="https://mimic.mit.edu/docs/gettingstarted/">here</a>.</p>
+<h2 id="assumptions">Assumptions</h2>
+<ol>
+<li>The sepsis onset is determined at an admission level, rather than an ICU stay level</li>
+</ol>
+<h2 id="references">References</h2>
+<ol>
+<li><a href="https://mimic.mit.edu/docs/iii/tables/">MIMIC-III data description</a></li>
+<li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC11607445/">Supplementary material of An optimal antibiotic selection framework for Sepsis patients using Artificial Intelligence</a></li>
+</ol>
+</article>
+<footer id="footer">
+    Post managed in a <a href="https://github.com/amitsaha/echorand.me">git repo</a> | <a href="https://github.com/amitsaha/echorand.me/commit/0f41bd68cb5865c1fed247f6a2c78ad9ab87e203">Last Commit on this post </a>
+  | <a href="https://github.com/amitsaha/echorand.me/edit/master/content/posts/sepsis-onset-calcualation-mimic-iii.md">Edit post</a>
+    <p>
+    Blog managed via <a href="https://gohugo.io/">Hugo</a> and using a modified version of the <a href="https://themes.gohugo.io/etch/">Etch</a> theme.
+    </p>  
+</footer>
+
+        </main><footer id="footer">
+    
+</footer>
+</body>
+</html>

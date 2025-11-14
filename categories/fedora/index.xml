@@ -13,6 +13,18 @@
     
     
     <item>
+      <title>Sepsis onset calculation from MIMIC-III data using sepsis-3 criteria</title>
+      <link>https://echorand.me/posts/sepsis-onset-calcualation-mimic-iii/</link>
+      <pubDate>Mon, 10 Nov 2025 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/sepsis-onset-calcualation-mimic-iii/</guid>
+      <description>In this blog post, I am going to desribe how we can calculate sepsis onset time using sepsis-3 criteria for the MIMIC-III patient data.
+Reading the relevant tables Sepsis-3 Criteria Operationalization in code Identifying the onset of suspected infection Time of drawing of the first culture Time of administering of antibiotics Identifying infection onset Identifying organ failure/dsyfunction Calculation of total SOFA score Finding sepsis onset time Code Data access Assumptions References Reading the relevant tables We first read the data from the CSV files (corresponding to the relevant tables):</description>
+    </item>
+    
+    
+    
+    <item>
       <title>Slow down, Read API documentation and Tutorials</title>
       <link>https://echorand.me/posts/slowing-down-read-api-documentation/</link>
       <pubDate>Tue, 26 Aug 2025 00:00:00 +0000</pubDate>
