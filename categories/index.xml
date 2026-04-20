@@ -6,9 +6,22 @@
     <description>Recent content in Categories on Exploring Software</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 16 Mar 2026 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 19 Apr 2026 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://echorand.me/categories/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    
+    <item>
+      <title>DevOps Notes</title>
+      <link>https://echorand.me/posts/devops-notes/</link>
+      <pubDate>Sun, 19 Apr 2026 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/devops-notes/</guid>
+      <description>Some suggestions that i offered to someone else, looking for some general guidance around setting up their DevOps processes.
+Overall, the idea is that you run as many automated checks/processes as possible before the code is merged into your main/master repository and deployed to production so that you can:
+Prevent bad code from being merged - bringing down your systems post deployment Ensure code quality Ensure uniform code style Unit tests and integration tests are run before code is merged Code reviewers understand what they are reviewing Code mergers know how the change being merged can be reverted Secrets are not being committed accidentally to version control The techniques have come to be referred to &amp;ldquo;shifting left&amp;rdquo; (imagine that left is the developer&amp;rsquo;s laptop and the right is the production system): https://about.</description>
+    </item>
     
     
     

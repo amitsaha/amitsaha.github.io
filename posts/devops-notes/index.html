@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="echo $RANDOM. Exploring Software and writing about it.">
+    
+    <link rel="shortcut icon" href="https://echorand.me/favicon.ico">
+    
+    <link rel="stylesheet" href="/css/style.min.css">
+
+    <title>DevOps Notes</title>
+</head>
+<body><header id="banner">
+    <h2><a href="https://echorand.me">Exploring Software</a></h2>
+    <nav>
+        <ul>
+            <li>
+                <a href="/about" title="">About</a>
+            </li><li>
+                <a href="/posts" title="">Posts</a>
+            </li><li>
+                <a href="/talks" title="">Talks</a>
+            </li><li>
+                <a href="/writings-trainings" title="">Writings and Trainings</a>
+            </li><li>
+                <a href="/categories" title="">Categories</a>
+            </li><li>
+                <a href="/index.xml" title="">Subscribe (RSS)</a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main id="content">
+<article>
+    <header id="post-header">
+        <h1>DevOps Notes</h1><time>April 19, 2026</time></header><p>Some suggestions that i offered to someone else, looking for some general guidance around setting up their DevOps processes.</p>
+<p>Overall, the idea is that you run as many automated checks/processes as possible before the code is merged into your main/master repository and
+deployed to production so that you can:</p>
+<ol>
+<li>Prevent bad code from being merged - bringing down your systems post deployment</li>
+<li>Ensure code quality</li>
+<li>Ensure uniform code style</li>
+<li>Unit tests and integration tests are run before code is merged</li>
+<li>Code reviewers understand what they are reviewing</li>
+<li>Code mergers know how the change being merged can be reverted</li>
+<li>Secrets are not being committed accidentally to version control
+The techniques have come to be referred to &ldquo;shifting left&rdquo; (imagine that left is the developer&rsquo;s laptop and the right is the production system): <a href="https://about.gitlab.com/topics/ci-cd/shift-left-devops/">https://about.gitlab.com/topics/ci-cd/shift-left-devops/</a></li>
+</ol>
+<p><strong>Before the PR is created</strong></p>
+<ol>
+<li>linting, code formatting and unit-test (if cheap) - generally, you will only run these processes here for the directories/code files that was changed</li>
+<li>Setup an appropriate .gitignore file so that secrets are not accidentally committed</li>
+<li>Commit message templates</li>
+<li>PR templates: What will this change do, how will this change be reverted, is there any DB operation that is also being rolled out? Will this change work with both the previous and future version of the data? How is this change going to be monitored? HTTP status? Logs?</li>
+<li>Have appropriate developer guides so that their system is setup correctly to ensure the git hooks are run</li>
+</ol>
+<p>Please look for tools you can use to do this, but <a href="https://typicode.github.io/husky/">https://typicode.github.io/husky/</a> might be a good start for 1-3 and then for (4), github has their own guide.</p>
+<p><strong>After the PR is created</strong></p>
+<p>After a PR Is created, we will run the same checks we did for (1) above. In addition:</p>
+<ol>
+<li>We run more tests - perhaps integration tests</li>
+<li>We will run some code quality tools here - like codeql for example</li>
+<li>We might also run some test coverage tools here to ensure that the new code continues to have code coverage - this is tricky, as higher code coverage isn&rsquo;t necessarily an indication for working code, but it&rsquo;s a start</li>
+<li>You enforce how many approvals the PR needs and who can approve</li>
+</ol>
+<p><strong>After the PR is merged</strong></p>
+<p>Let&rsquo;s say your organization uses only two branches - develop and main/master.</p>
+<p>All code changes are first merged into develop which gets deployed to a development environment</p>
+<p>Then the change is promoted to production by creating a PR for the master branch, which when merged gets deployed into production.</p>
+<p>You configure the deployment environment based on the branch in your CI workflow.</p>
+<p>Either way, before the actual cut-over happens to the new code (new stack), you will run a bunch of checks - HTTP API checks that will directly be configured to hit the new stack, and only if the tests pass, is the traffic cut over.</p>
+<p>Note that you could also have a single &ldquo;master&rdquo; branch and then simply promote the change from development to production.</p>
+<p>You can implement manual reviews and checks using: <a href="https://docs.github.com/en/actions/how-tos/deploy/configure-and-manage-deployments/review-deployments">https://docs.github.com/en/actions/how-tos/deploy/configure-and-manage-deployments/review-deployments</a></p>
+<p><strong>Ongoing management</strong></p>
+<ol>
+<li>Secrets stored in the CI tool, and is retrieved at CI build time</li>
+<li>Any secrets that developers need access to are never committed - typically, via ensuring that <code>.env</code> files are in <code>.gitignore</code>. The secrets themselves are then only accessible by developers</li>
+<li>Vulnerability scanning in dependencies</li>
+<li>Vulnerability scanning in built artifacts - e.g. docker images</li>
+<li>Generally consider static checks for your application code as well as any infrastructure code if possible in your CI. For eg. <a href="https://learnkube.com/validating-kubernetes-yaml">https://learnkube.com/validating-kubernetes-yaml</a>  or <a href="https://github.com/CoverGenius/kubelint">https://github.com/CoverGenius/kubelint</a></li>
+</ol>
+<p>This is one book that really helped me understand devops/infrastructure in a very wholistic manner: <a href="https://www.amazon.com.au/Web-Operations-John-Allspaw/dp/1449377440">https://www.amazon.com.au/Web-Operations-John-Allspaw/dp/1449377440</a> and some talks by the writer: <a href="https://www.youtube.com/results?search_query=web%20operations%20john%20allspaw">https://www.youtube.com/results?search_query=web%20operations%20john%20allspaw</a></p>
+<p>At Atlassian i used to work on the development team for <a href="https://spinnaker.io/docs/concepts/">https://spinnaker.io/docs/concepts/</a> - which is a dedicated deployment platform, it is complex and you may not need it at this point, but it might help you learn a lot of new things, so happy to discuss it too.</p>
+</article>
+<footer id="footer">
+    Post managed in a <a href="https://github.com/amitsaha/echorand.me">git repo</a> | <a href="https://github.com/amitsaha/echorand.me/commit/3c3e960ab7fc282e537e955f3b5e974b3f1d9d1e">Last Commit on this post </a>
+  | <a href="https://github.com/amitsaha/echorand.me/edit/master/content/posts/devops-notes.md">Edit post</a>
+    <p>
+    Blog managed via <a href="https://gohugo.io/">Hugo</a> and using a modified version of the <a href="https://themes.gohugo.io/etch/">Etch</a> theme.
+    </p>  
+</footer>
+
+        </main><footer id="footer">
+    
+</footer>
+</body>
+</html>
