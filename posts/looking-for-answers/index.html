@@ -35,35 +35,35 @@
     <header id="post-header">
         <h1>Looking for answers without outsourcing</h1><time>May 4, 2026</time></header><p>I want to get access to the <code>subject_id</code> within my <a href="https://docs.pytorch.org/tutorials/beginner/basics/data_tutorial.html">Pytorch dataset</a>.</p>
 <p>Challenge: I don&rsquo;t want to ask the Internet, and may be only, a good old internet search, no LLM.</p>
-<pre tabindex="0"><code>(Pdb) eval_dataset
-&lt;__main__.Cardiomegaly object at 0x00000298DF1C8BC0&gt;
-(Pdb) dir(eval_dataset)
-[&#39;__add__&#39;, &#39;__class__&#39;, &#39;__class_getitem__&#39;, &#39;__delattr__&#39;, &#39;__dict__&#39;, &#39;__dir__&#39;, &#39;__doc__&#39;, &#39;__eq__&#39;, &#39;__format__&#39;, &#39;__ge__&#39;, &#39;__getattribute__&#39;, &#39;__getitem__&#39;, &#39;__getstate__&#39;, &#39;__gt__&#39;, &#39;__hash__&#39;, &#39;__init__&#39;, &#39;__init_subclass__&#39;, &#39;__le__&#39;, &#39;__len__&#39;, &#39;__lt__&#39;, &#39;__module__&#39;, &#39;__ne__&#39;, &#39;__new__&#39;, &#39;__orig_bases__&#39;, &#39;__parameters__&#39;, &#39;__reduce__&#39;, &#39;__reduce_ex__&#39;, &#39;__repr__&#39;, &#39;__setattr__&#39;, &#39;__sizeof__&#39;, &#39;__str__&#39;, &#39;__subclasshook__&#39;, &#39;__weakref__&#39;, &#39;df&#39;, &#39;img_dir&#39;, &#39;transform&#39;]
-(Pdb) eval_dataset[0]
-(tensor([....]]), tensor([0.]), {&#39;subject_id&#39;: &#39;10000032&#39;, &#39;study_id&#39;: np.int64(50414267)})
-(Pdb) type(eval_dataset[0])
-&lt;class &#39;tuple&#39;&gt;
-(Pdb) eval_dataset[0][0]
-tensor([[[ 0.9988,  0.5878,  0.1939,  ..., -0.0972, -0.1143, -0.1486],
-         [ 0.9817,  0.6392,  0.2796,  ..., -0.1143, -0.1314, -0.0801],
-         [ 1.0331,  0.6906,  0.4166,  ...,  0.0569,  0.0398,  0.0056],
-         ...,
-        
-         ...,
-         [-1.5430, -1.6650, -1.7522,  ..., -1.7696, -1.7696, -1.7696],
-         [-1.5430, -1.6302, -1.7522,  ..., -1.8044, -1.8044, -1.8044],
-         [-1.5430, -1.6476, -1.7347,  ..., -1.8044, -1.8044, -1.8044]]])
-(Pdb) eval_dataset[0][1]
-tensor([0.])
-(Pdb) eval_dataset[0][2]
-{&#39;subject_id&#39;: &#39;10000032&#39;, &#39;study_id&#39;: np.int64(50414267)}
-</code></pre><p>And there I have it, so now collecting the subject_ids is a matter of:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>(Pdb) eval_dataset
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;</span>__main__<span style="color:#f92672">.</span>Cardiomegaly object at <span style="color:#ae81ff">0x00000298DF1C8BC0</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>(Pdb) dir(eval_dataset)
+</span></span><span style="display:flex;"><span>[<span style="color:#e6db74">&#39;__add__&#39;</span>, <span style="color:#e6db74">&#39;__class__&#39;</span>, <span style="color:#e6db74">&#39;__class_getitem__&#39;</span>, <span style="color:#e6db74">&#39;__delattr__&#39;</span>, <span style="color:#e6db74">&#39;__dict__&#39;</span>, <span style="color:#e6db74">&#39;__dir__&#39;</span>, <span style="color:#e6db74">&#39;__doc__&#39;</span>, <span style="color:#e6db74">&#39;__eq__&#39;</span>, <span style="color:#e6db74">&#39;__format__&#39;</span>, <span style="color:#e6db74">&#39;__ge__&#39;</span>, <span style="color:#e6db74">&#39;__getattribute__&#39;</span>, <span style="color:#e6db74">&#39;__getitem__&#39;</span>, <span style="color:#e6db74">&#39;__getstate__&#39;</span>, <span style="color:#e6db74">&#39;__gt__&#39;</span>, <span style="color:#e6db74">&#39;__hash__&#39;</span>, <span style="color:#e6db74">&#39;__init__&#39;</span>, <span style="color:#e6db74">&#39;__init_subclass__&#39;</span>, <span style="color:#e6db74">&#39;__le__&#39;</span>, <span style="color:#e6db74">&#39;__len__&#39;</span>, <span style="color:#e6db74">&#39;__lt__&#39;</span>, <span style="color:#e6db74">&#39;__module__&#39;</span>, <span style="color:#e6db74">&#39;__ne__&#39;</span>, <span style="color:#e6db74">&#39;__new__&#39;</span>, <span style="color:#e6db74">&#39;__orig_bases__&#39;</span>, <span style="color:#e6db74">&#39;__parameters__&#39;</span>, <span style="color:#e6db74">&#39;__reduce__&#39;</span>, <span style="color:#e6db74">&#39;__reduce_ex__&#39;</span>, <span style="color:#e6db74">&#39;__repr__&#39;</span>, <span style="color:#e6db74">&#39;__setattr__&#39;</span>, <span style="color:#e6db74">&#39;__sizeof__&#39;</span>, <span style="color:#e6db74">&#39;__str__&#39;</span>, <span style="color:#e6db74">&#39;__subclasshook__&#39;</span>, <span style="color:#e6db74">&#39;__weakref__&#39;</span>, <span style="color:#e6db74">&#39;df&#39;</span>, <span style="color:#e6db74">&#39;img_dir&#39;</span>, <span style="color:#e6db74">&#39;transform&#39;</span>]
+</span></span><span style="display:flex;"><span>(Pdb) eval_dataset[<span style="color:#ae81ff">0</span>]
+</span></span><span style="display:flex;"><span>(tensor([<span style="color:#f92672">....</span>]]), tensor([<span style="color:#ae81ff">0.</span>]), {<span style="color:#e6db74">&#39;subject_id&#39;</span>: <span style="color:#e6db74">&#39;10000032&#39;</span>, <span style="color:#e6db74">&#39;study_id&#39;</span>: np<span style="color:#f92672">.</span>int64(<span style="color:#ae81ff">50414267</span>)})
+</span></span><span style="display:flex;"><span>(Pdb) type(eval_dataset[<span style="color:#ae81ff">0</span>])
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;</span><span style="color:#66d9ef">class</span> <span style="color:#960050;background-color:#1e0010">&#39;</span><span style="color:#a6e22e">tuple</span><span style="color:#e6db74">&#39;&gt;</span>
+</span></span><span style="display:flex;"><span>(Pdb) eval_dataset[<span style="color:#ae81ff">0</span>][<span style="color:#ae81ff">0</span>]
+</span></span><span style="display:flex;"><span>tensor([[[ <span style="color:#ae81ff">0.9988</span>,  <span style="color:#ae81ff">0.5878</span>,  <span style="color:#ae81ff">0.1939</span>,  <span style="color:#f92672">...</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">0.0972</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">0.1143</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">0.1486</span>],
+</span></span><span style="display:flex;"><span>         [ <span style="color:#ae81ff">0.9817</span>,  <span style="color:#ae81ff">0.6392</span>,  <span style="color:#ae81ff">0.2796</span>,  <span style="color:#f92672">...</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">0.1143</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">0.1314</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">0.0801</span>],
+</span></span><span style="display:flex;"><span>         [ <span style="color:#ae81ff">1.0331</span>,  <span style="color:#ae81ff">0.6906</span>,  <span style="color:#ae81ff">0.4166</span>,  <span style="color:#f92672">...</span>,  <span style="color:#ae81ff">0.0569</span>,  <span style="color:#ae81ff">0.0398</span>,  <span style="color:#ae81ff">0.0056</span>],
+</span></span><span style="display:flex;"><span>         <span style="color:#f92672">...</span>,
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>         <span style="color:#f92672">...</span>,
+</span></span><span style="display:flex;"><span>         [<span style="color:#f92672">-</span><span style="color:#ae81ff">1.5430</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">1.6650</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">1.7522</span>,  <span style="color:#f92672">...</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">1.7696</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">1.7696</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">1.7696</span>],
+</span></span><span style="display:flex;"><span>         [<span style="color:#f92672">-</span><span style="color:#ae81ff">1.5430</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">1.6302</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">1.7522</span>,  <span style="color:#f92672">...</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">1.8044</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">1.8044</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">1.8044</span>],
+</span></span><span style="display:flex;"><span>         [<span style="color:#f92672">-</span><span style="color:#ae81ff">1.5430</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">1.6476</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">1.7347</span>,  <span style="color:#f92672">...</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">1.8044</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">1.8044</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">1.8044</span>]]])
+</span></span><span style="display:flex;"><span>(Pdb) eval_dataset[<span style="color:#ae81ff">0</span>][<span style="color:#ae81ff">1</span>]
+</span></span><span style="display:flex;"><span>tensor([<span style="color:#ae81ff">0.</span>])
+</span></span><span style="display:flex;"><span>(Pdb) eval_dataset[<span style="color:#ae81ff">0</span>][<span style="color:#ae81ff">2</span>]
+</span></span><span style="display:flex;"><span>{<span style="color:#e6db74">&#39;subject_id&#39;</span>: <span style="color:#e6db74">&#39;10000032&#39;</span>, <span style="color:#e6db74">&#39;study_id&#39;</span>: np<span style="color:#f92672">.</span>int64(<span style="color:#ae81ff">50414267</span>)}
+</span></span></code></pre></div><p>And there I have it, so now collecting the subject_ids is a matter of:</p>
 <pre tabindex="0"><code>(Pdb) subject_ids = [row[2][&#34;subject_id&#34;] for row in eval_dataset]
 </code></pre><p>Python makes it easy to inspect objects and get things. Other languages, a bit trickier perhaps, but it&rsquo;s possible, we have the good old
 printing!</p>
 </article>
 <footer id="footer">
-    Post managed in a <a href="https://github.com/amitsaha/echorand.me">git repo</a> | <a href="https://github.com/amitsaha/echorand.me/commit/4c3f3e9bc1c585e5db937935b10f2caea6d95724">Last Commit on this post </a>
+    Post managed in a <a href="https://github.com/amitsaha/echorand.me">git repo</a> | <a href="https://github.com/amitsaha/echorand.me/commit/4d56c3c8530bf67ced0a83bc346d18f2362c7a0b">Last Commit on this post </a>
   | <a href="https://github.com/amitsaha/echorand.me/edit/master/content/posts/looking-for-answers.md">Edit post</a>
     <p>
     Blog managed via <a href="https://gohugo.io/">Hugo</a> and using a modified version of the <a href="https://themes.gohugo.io/etch/">Etch</a> theme.
