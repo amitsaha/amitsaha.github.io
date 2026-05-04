@@ -6,9 +6,22 @@
     <description>Recent content in Posts on Exploring Software</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 19 Apr 2026 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 04 May 2026 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://echorand.me/posts/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    
+    <item>
+      <title>Looking for answers without outsourcing</title>
+      <link>https://echorand.me/posts/looking-for-answers/</link>
+      <pubDate>Mon, 04 May 2026 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/looking-for-answers/</guid>
+      <description>I want to get access to the subject_id within my Pytorch dataset.
+Challenge: I don&amp;rsquo;t want to ask the Internet, and may be only, a good old internet search, no LLM.
+(Pdb) eval_dataset &amp;lt;__main__.Cardiomegaly object at 0x00000298DF1C8BC0&amp;gt; (Pdb) dir(eval_dataset) [&amp;#39;__add__&amp;#39;, &amp;#39;__class__&amp;#39;, &amp;#39;__class_getitem__&amp;#39;, &amp;#39;__delattr__&amp;#39;, &amp;#39;__dict__&amp;#39;, &amp;#39;__dir__&amp;#39;, &amp;#39;__doc__&amp;#39;, &amp;#39;__eq__&amp;#39;, &amp;#39;__format__&amp;#39;, &amp;#39;__ge__&amp;#39;, &amp;#39;__getattribute__&amp;#39;, &amp;#39;__getitem__&amp;#39;, &amp;#39;__getstate__&amp;#39;, &amp;#39;__gt__&amp;#39;, &amp;#39;__hash__&amp;#39;, &amp;#39;__init__&amp;#39;, &amp;#39;__init_subclass__&amp;#39;, &amp;#39;__le__&amp;#39;, &amp;#39;__len__&amp;#39;, &amp;#39;__lt__&amp;#39;, &amp;#39;__module__&amp;#39;, &amp;#39;__ne__&amp;#39;, &amp;#39;__new__&amp;#39;, &amp;#39;__orig_bases__&amp;#39;, &amp;#39;__parameters__&amp;#39;, &amp;#39;__reduce__&amp;#39;, &amp;#39;__reduce_ex__&amp;#39;, &amp;#39;__repr__&amp;#39;, &amp;#39;__setattr__&amp;#39;, &amp;#39;__sizeof__&amp;#39;, &amp;#39;__str__&amp;#39;, &amp;#39;__subclasshook__&amp;#39;, &amp;#39;__weakref__&amp;#39;, &amp;#39;df&amp;#39;, &amp;#39;img_dir&amp;#39;, &amp;#39;transform&amp;#39;] (Pdb) eval_dataset[0] (tensor([.</description>
+    </item>
     
     
     
