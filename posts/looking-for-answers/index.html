@@ -33,8 +33,17 @@
 <main id="content">
 <article>
     <header id="post-header">
-        <h1>Looking for answers without outsourcing</h1><time>May 4, 2026</time></header><p>I want to get access to the <code>subject_id</code> within my <a href="https://docs.pytorch.org/tutorials/beginner/basics/data_tutorial.html">Pytorch dataset</a>.</p>
-<p>Challenge: I don&rsquo;t want to ask the Internet, and may be only, a good old internet search, no LLM.</p>
+        <h1>Looking for answers without outsourcing</h1><time>May 4, 2026</time></header><p>Some examples of where i get limited by a specific programming language/framework&rsquo;s syntax/particular way of doing things, and how I navigate
+it by trying to see if i can solve it myself based on what i know or good old internet search, (i.e. manually looking at links/posts) and
+learning a bit more in the process.</p>
+<p>Navigation</p>
+<ul>
+<li><a href="#1">1</a></li>
+<li><a href="#2">2</a>.</li>
+</ul>
+<h2 id="1">1</h2>
+<p>I want to get access to the <code>subject_id</code> within my <a href="https://docs.pytorch.org/tutorials/beginner/basics/data_tutorial.html">Pytorch dataset</a>. I know that
+it is present in a dictionary for each row of my data.</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>(Pdb) eval_dataset
 </span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;</span>__main__<span style="color:#f92672">.</span>Cardiomegaly object at <span style="color:#ae81ff">0x00000298DF1C8BC0</span><span style="color:#f92672">&gt;</span>
 </span></span><span style="display:flex;"><span>(Pdb) dir(eval_dataset)
@@ -61,9 +70,16 @@
 <pre tabindex="0"><code>(Pdb) subject_ids = [row[2][&#34;subject_id&#34;] for row in eval_dataset]
 </code></pre><p>Python makes it easy to inspect objects and get things. Other languages, a bit trickier perhaps, but it&rsquo;s possible, we have the good old
 printing!</p>
+<h2 id="2">2</h2>
+<p>I have an integer and i want to just run a loop that many times.</p>
+<ol>
+<li>I search for <code>for loop javascript</code></li>
+<li>I pick the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Loops_and_iteration">MDN link</a></li>
+</ol>
+<p>I preferred MDN over w3schools since i am aware of the authority of MDN - similar to w3schools, of course for me, but just went with MDN.</p>
 </article>
 <footer id="footer">
-    Post managed in a <a href="https://github.com/amitsaha/echorand.me">git repo</a> | <a href="https://github.com/amitsaha/echorand.me/commit/4d56c3c8530bf67ced0a83bc346d18f2362c7a0b">Last Commit on this post </a>
+    Post managed in a <a href="https://github.com/amitsaha/echorand.me">git repo</a> | <a href="https://github.com/amitsaha/echorand.me/commit/69e2a843b56725953432abaaeab753107d767daa">Last Commit on this post </a>
   | <a href="https://github.com/amitsaha/echorand.me/edit/master/content/posts/looking-for-answers.md">Edit post</a>
     <p>
     Blog managed via <a href="https://gohugo.io/">Hugo</a> and using a modified version of the <a href="https://themes.gohugo.io/etch/">Etch</a> theme.
