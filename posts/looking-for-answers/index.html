@@ -83,18 +83,18 @@ printing!</p>
 <p>I preferred MDN over w3schools since i am aware of the authority of MDN - similar to w3schools, of course for me, but just went with MDN.</p>
 <h2 id="3">3</h2>
 <p>I have a dataframe which is multi indexed and i want to each each unique combination of index columns data:</p>
-<pre tabindex="0"><code>(Pdb) insurance_metrics
-                                                   n      tp       tn       fp      fn  accuracy  precision    recall        f1       auc    pr_auc
-dataset                    insurance
-eval_1_cardiomegaly.csv.gz Medicaid          14877.0  1816.0   9472.0   2897.0   692.0  0.758755   0.385317  0.724083  0.502977  0.826120  0.481929
-                           Medicare          45393.0  8678.0  21264.0  13126.0  2325.0  0.659617   0.398000  0.788694  0.529033  0.772568  0.493489
-...
-</code></pre><p>I want to get access to the data for each unique combination of <code>dataset</code> and <code>insurance</code>&quot;:</p>
-<pre tabindex="0"><code>insurance_metrics.index
-MultiIndex([(&#39;eval_1_cardiomegaly.csv.gz&#39;,         &#39;Medicaid&#39;),
-            (&#39;eval_1_cardiomegaly.csv.gz&#39;,         &#39;Medicare&#39;),
-            (&#39;eval_1_cardiomegaly.csv.gz&#39;,        &#39;No charge&#39;),
-</code></pre><p>Search query: &ldquo;pandas selecting by index value&rdquo;</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>(Pdb) insurance_metrics
+</span></span><span style="display:flex;"><span>                                                   n      tp       tn       fp      fn  accuracy  precision    recall        f1       auc    pr_auc
+</span></span><span style="display:flex;"><span>dataset                    insurance
+</span></span><span style="display:flex;"><span>eval_1_cardiomegaly<span style="color:#f92672">.</span>csv<span style="color:#f92672">.</span>gz Medicaid          <span style="color:#ae81ff">14877.0</span>  <span style="color:#ae81ff">1816.0</span>   <span style="color:#ae81ff">9472.0</span>   <span style="color:#ae81ff">2897.0</span>   <span style="color:#ae81ff">692.0</span>  <span style="color:#ae81ff">0.758755</span>   <span style="color:#ae81ff">0.385317</span>  <span style="color:#ae81ff">0.724083</span>  <span style="color:#ae81ff">0.502977</span>  <span style="color:#ae81ff">0.826120</span>  <span style="color:#ae81ff">0.481929</span>
+</span></span><span style="display:flex;"><span>                           Medicare          <span style="color:#ae81ff">45393.0</span>  <span style="color:#ae81ff">8678.0</span>  <span style="color:#ae81ff">21264.0</span>  <span style="color:#ae81ff">13126.0</span>  <span style="color:#ae81ff">2325.0</span>  <span style="color:#ae81ff">0.659617</span>   <span style="color:#ae81ff">0.398000</span>  <span style="color:#ae81ff">0.788694</span>  <span style="color:#ae81ff">0.529033</span>  <span style="color:#ae81ff">0.772568</span>  <span style="color:#ae81ff">0.493489</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">...</span>
+</span></span></code></pre></div><p>I want to get access to the data for each unique combination of <code>dataset</code> and <code>insurance</code>&quot;:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>insurance_metrics<span style="color:#f92672">.</span>index
+</span></span><span style="display:flex;"><span>MultiIndex([(<span style="color:#e6db74">&#39;eval_1_cardiomegaly.csv.gz&#39;</span>,         <span style="color:#e6db74">&#39;Medicaid&#39;</span>),
+</span></span><span style="display:flex;"><span>            (<span style="color:#e6db74">&#39;eval_1_cardiomegaly.csv.gz&#39;</span>,         <span style="color:#e6db74">&#39;Medicare&#39;</span>),
+</span></span><span style="display:flex;"><span>            (<span style="color:#e6db74">&#39;eval_1_cardiomegaly.csv.gz&#39;</span>,        <span style="color:#e6db74">&#39;No charge&#39;</span>),
+</span></span></code></pre></div><p>Search query: &ldquo;pandas selecting by index value&rdquo;</p>
 <p>Reading, <a href="https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#selection-by-label">https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#selection-by-label</a></p>
 <blockquote>
 <p>The .loc attribute is the primary access method. The following are valid inputs:
@@ -111,39 +111,39 @@ A single label, e.g. 5 or &lsquo;a&rsquo; (Note that 5 is interpreted as a label
 </blockquote>
 <p><strong>My brain goes. omg.</strong></p>
 <p>So, i start hacking around:</p>
-<pre tabindex="0"><code>(Pdb) insurance_metrics.get((&#39;eval_1_cardiomegaly.csv.gz&#39;, &#39;Medicaid&#39;))
-</code></pre><p>No dice.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>(Pdb) insurance_metrics<span style="color:#f92672">.</span>get((<span style="color:#e6db74">&#39;eval_1_cardiomegaly.csv.gz&#39;</span>, <span style="color:#e6db74">&#39;Medicaid&#39;</span>))
+</span></span></code></pre></div><p>No dice.</p>
 <p>Okay, I know, <code>loc</code>, and i know that i want to specify a tuple, since I have a <code>MultiIndex</code>:</p>
-<pre tabindex="0"><code>(Pdb) insurance_metrics.loc((&#39;eval_1_cardiomegaly.csv.gz&#39;, &#39;Medicaid&#39;))
-*** ValueError: No axis named (&#39;eval_1_cardiomegaly.csv.gz&#39;, &#39;Medicaid&#39;) for object type DataFrame
-
-(Pdb) insurance_metrics.loc[(&#34;eval_1_cardiomegaly.csv.gz&#34;, &#34;Medicare&#34;)]
-n            45393.000000
-tp            8678.000000
-tn           21264.000000
-fp           13126.000000
-fn            2325.000000
-accuracy         0.659617
-precision        0.398000
-recall           0.788694
-f1               0.529033
-auc              0.772568
-pr_auc           0.493489
-Name: (eval_1_cardiomegaly.csv.gz, Medicare), dtype: float64
-</code></pre><p>Okay, so i have what i needed. To automate it, i am just gonna use <code>groupby</code>:</p>
-<pre tabindex="0"><code>(Pdb) items=[(d, i) for d, i in insurance_metrics.groupby(by=[&#39;dataset&#39;, &#39;insurance&#39;])]
-(Pdb) type(items[0])
-&lt;class &#39;tuple&#39;&gt;
-(Pdb) items[0][0]
-(&#39;eval_1_cardiomegaly.csv.gz&#39;, &#39;Medicaid&#39;)
-(Pdb) items[0][1]
-                                            n      tp      tn      fp     fn  accuracy  precision    recall        f1      auc    pr_auc
-dataset                    insurance
-eval_1_cardiomegaly.csv.gz Medicaid   14877.0  1816.0  9472.0  2897.0  692.0  0.758755   0.385317  0.724083  0.502977  0.82612  0.481929
-</code></pre><p>Okay, so apparentely, <code>groupby</code> works with index columns too.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>(Pdb) insurance_metrics<span style="color:#f92672">.</span>loc((<span style="color:#e6db74">&#39;eval_1_cardiomegaly.csv.gz&#39;</span>, <span style="color:#e6db74">&#39;Medicaid&#39;</span>))
+</span></span><span style="display:flex;"><span><span style="color:#f92672">***</span> <span style="color:#a6e22e">ValueError</span>: No axis named (<span style="color:#e6db74">&#39;eval_1_cardiomegaly.csv.gz&#39;</span>, <span style="color:#e6db74">&#39;Medicaid&#39;</span>) <span style="color:#66d9ef">for</span> object type DataFrame
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>(Pdb) insurance_metrics<span style="color:#f92672">.</span>loc[(<span style="color:#e6db74">&#34;eval_1_cardiomegaly.csv.gz&#34;</span>, <span style="color:#e6db74">&#34;Medicare&#34;</span>)]
+</span></span><span style="display:flex;"><span>n            <span style="color:#ae81ff">45393.000000</span>
+</span></span><span style="display:flex;"><span>tp            <span style="color:#ae81ff">8678.000000</span>
+</span></span><span style="display:flex;"><span>tn           <span style="color:#ae81ff">21264.000000</span>
+</span></span><span style="display:flex;"><span>fp           <span style="color:#ae81ff">13126.000000</span>
+</span></span><span style="display:flex;"><span>fn            <span style="color:#ae81ff">2325.000000</span>
+</span></span><span style="display:flex;"><span>accuracy         <span style="color:#ae81ff">0.659617</span>
+</span></span><span style="display:flex;"><span>precision        <span style="color:#ae81ff">0.398000</span>
+</span></span><span style="display:flex;"><span>recall           <span style="color:#ae81ff">0.788694</span>
+</span></span><span style="display:flex;"><span>f1               <span style="color:#ae81ff">0.529033</span>
+</span></span><span style="display:flex;"><span>auc              <span style="color:#ae81ff">0.772568</span>
+</span></span><span style="display:flex;"><span>pr_auc           <span style="color:#ae81ff">0.493489</span>
+</span></span><span style="display:flex;"><span>Name: (eval_1_cardiomegaly<span style="color:#f92672">.</span>csv<span style="color:#f92672">.</span>gz, Medicare), dtype: float64
+</span></span></code></pre></div><p>Okay, so i have what i needed. To automate it, i am just gonna use <code>groupby</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>(Pdb) items<span style="color:#f92672">=</span>[(d, i) <span style="color:#66d9ef">for</span> d, i <span style="color:#f92672">in</span> insurance_metrics<span style="color:#f92672">.</span>groupby(by<span style="color:#f92672">=</span>[<span style="color:#e6db74">&#39;dataset&#39;</span>, <span style="color:#e6db74">&#39;insurance&#39;</span>])]
+</span></span><span style="display:flex;"><span>(Pdb) type(items[<span style="color:#ae81ff">0</span>])
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;</span><span style="color:#66d9ef">class</span> <span style="color:#960050;background-color:#1e0010">&#39;</span><span style="color:#a6e22e">tuple</span><span style="color:#e6db74">&#39;&gt;</span>
+</span></span><span style="display:flex;"><span>(Pdb) items[<span style="color:#ae81ff">0</span>][<span style="color:#ae81ff">0</span>]
+</span></span><span style="display:flex;"><span>(<span style="color:#e6db74">&#39;eval_1_cardiomegaly.csv.gz&#39;</span>, <span style="color:#e6db74">&#39;Medicaid&#39;</span>)
+</span></span><span style="display:flex;"><span>(Pdb) items[<span style="color:#ae81ff">0</span>][<span style="color:#ae81ff">1</span>]
+</span></span><span style="display:flex;"><span>                                            n      tp      tn      fp     fn  accuracy  precision    recall        f1      auc    pr_auc
+</span></span><span style="display:flex;"><span>dataset                    insurance
+</span></span><span style="display:flex;"><span>eval_1_cardiomegaly<span style="color:#f92672">.</span>csv<span style="color:#f92672">.</span>gz Medicaid   <span style="color:#ae81ff">14877.0</span>  <span style="color:#ae81ff">1816.0</span>  <span style="color:#ae81ff">9472.0</span>  <span style="color:#ae81ff">2897.0</span>  <span style="color:#ae81ff">692.0</span>  <span style="color:#ae81ff">0.758755</span>   <span style="color:#ae81ff">0.385317</span>  <span style="color:#ae81ff">0.724083</span>  <span style="color:#ae81ff">0.502977</span>  <span style="color:#ae81ff">0.82612</span>  <span style="color:#ae81ff">0.481929</span>
+</span></span></code></pre></div><p>Okay, so apparentely, <code>groupby</code> works with index columns too.</p>
 </article>
 <footer id="footer">
-    Post managed in a <a href="https://github.com/amitsaha/echorand.me">git repo</a> | <a href="https://github.com/amitsaha/echorand.me/commit/0d6d94d9e260f5c3fc64562714a3fc75d66c756c">Last Commit on this post </a>
+    Post managed in a <a href="https://github.com/amitsaha/echorand.me">git repo</a> | <a href="https://github.com/amitsaha/echorand.me/commit/40e53d1940122392dbc80b464f235f8c7758df87">Last Commit on this post </a>
   | <a href="https://github.com/amitsaha/echorand.me/edit/master/content/posts/looking-for-answers.md">Edit post</a>
     <p>
     Blog managed via <a href="https://gohugo.io/">Hugo</a> and using a modified version of the <a href="https://themes.gohugo.io/etch/">Etch</a> theme.
