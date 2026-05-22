@@ -47,6 +47,7 @@ learning a bit more in the process.</p>
 <li><a href="#4">4</a></li>
 <li><a href="#5">5</a></li>
 <li><a href="#6">6</a></li>
+<li><a href="#7">7</a></li>
 </ul>
 <h2 id="1">1</h2>
 <p>I want to get access to the <code>subject_id</code> within my <a href="https://docs.pytorch.org/tutorials/beginner/basics/data_tutorial.html">Pytorch dataset</a>. I know that
@@ -246,9 +247,48 @@ i can use <code>if..else</code> in list comprehension, so perhaps it works outsi
 </span></span><span style="display:flex;"><span>(Pdb) os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>exists(Path(os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>dirname(os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>dirname(Path(__file__)))) <span style="color:#f92672">/</span> <span style="color:#e6db74">&#34;feature-prep&#34;</span>)
 </span></span><span style="display:flex;"><span><span style="color:#66d9ef">True</span>
 </span></span><span style="display:flex;"><span>(Pdb) os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>exists(Path(os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>dirname(os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>dirname(Path(__file__)))) <span style="color:#f92672">/</span> <span style="color:#e6db74">&#34;feature-prep&#34;</span>)
-</span></span></code></pre></div></article>
+</span></span></code></pre></div><h2 id="7">7</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">userQueries</span> <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;foo&#34;</span>, <span style="color:#e6db74">&#34;bar&#34;</span>];
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">undefined</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">userQueries</span>)
+</span></span><span style="display:flex;"><span>[ <span style="color:#e6db74">&#39;foo&#39;</span>, <span style="color:#e6db74">&#39;bar&#39;</span> ]
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">undefined</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">item</span> <span style="color:#66d9ef">in</span> <span style="color:#a6e22e">userQueries</span>) {
+</span></span><span style="display:flex;"><span>... <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">item</span>)
+</span></span><span style="display:flex;"><span>... }
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">undefined</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">idx</span>, <span style="color:#a6e22e">item</span> <span style="color:#66d9ef">in</span> <span style="color:#a6e22e">userQueries</span>) {
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">idx</span>, <span style="color:#a6e22e">item</span> <span style="color:#66d9ef">in</span> <span style="color:#a6e22e">userQueries</span>) {
+</span></span><span style="display:flex;"><span>           <span style="color:#f92672">^^^</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">Uncaught</span> <span style="color:#a6e22e">SyntaxError</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">Missing</span> <span style="color:#a6e22e">initializer</span> <span style="color:#66d9ef">in</span> <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">declaration</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">const</span> {<span style="color:#a6e22e">idx</span>, <span style="color:#a6e22e">item</span>} <span style="color:#66d9ef">in</span> <span style="color:#a6e22e">userQueries</span>) {
+</span></span><span style="display:flex;"><span>... <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">item</span>)
+</span></span><span style="display:flex;"><span>... {
+</span></span><span style="display:flex;"><span>... }
+</span></span><span style="display:flex;"><span>... }
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">undefined</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">undefined</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">undefined</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">item</span> <span style="color:#66d9ef">in</span> Object.<span style="color:#a6e22e">entries</span>(<span style="color:#a6e22e">userQueries</span>)) {
+</span></span><span style="display:flex;"><span>... <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">item</span>)
+</span></span><span style="display:flex;"><span>... }
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">undefined</span>
+</span></span></code></pre></div><p>Then, i come across <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Loops_and_iteration#for...of_statement">https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Loops_and_iteration#for...of_statement</a> when I search again and in the Google AI summary.</p>
+<p>So, we have a <code>for..of</code> !? (why???)</p>
+<pre tabindex="0"><code>&gt; for (const item of userQueries) {
+... console.log(item)
+... }
+foo
+bar
+undefined```
+</code></pre></article>
 <footer id="footer">
-    Post managed in a <a href="https://github.com/amitsaha/echorand.me">git repo</a> | <a href="https://github.com/amitsaha/echorand.me/commit/36a60fe145ce667c747975ab49547e88e4998892">Last Commit on this post </a>
+    Post managed in a <a href="https://github.com/amitsaha/echorand.me">git repo</a> | <a href="https://github.com/amitsaha/echorand.me/commit/d43f0315776d201a2d93295faff5313f48ff94f3">Last Commit on this post </a>
   | <a href="https://github.com/amitsaha/echorand.me/edit/master/content/posts/looking-for-answers.md">Edit post</a>
     <p>
     Blog managed via <a href="https://gohugo.io/">Hugo</a> and using a modified version of the <a href="https://themes.gohugo.io/etch/">Etch</a> theme.
