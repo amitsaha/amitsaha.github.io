@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="echo $RANDOM. Exploring Software and writing about it.">
+    
+    <link rel="shortcut icon" href="https://echorand.me/favicon.ico">
+    
+    <link rel="stylesheet" href="/css/style.min.css">
+
+    <title></title>
+</head>
+<body><header id="banner">
+    <h2><a href="https://echorand.me">Exploring Software (since 1997)</a></h2>
+    <nav>
+        <ul>
+            <li>
+                <a href="/about" title="">About</a>
+            </li><li>
+                <a href="/posts" title="">Posts</a>
+            </li><li>
+                <a href="/talks" title="">Talks</a>
+            </li><li>
+                <a href="/writings-trainings" title="">Writings and Trainings</a>
+            </li><li>
+                <a href="/categories" title="">Categories</a>
+            </li><li>
+                <a href="/index.xml" title="">Subscribe (RSS)</a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main id="content">
+<article>
+    <header id="post-header">
+        <h1></h1></header><p>import torch
+from torch import nn
+from torch.utils.data import DataLoader
+from torchvision import datasets
+from torchvision.transforms import v2</p>
+<p>from early_stopping import EarlyStopping</p>
+<p>MAX_EPOCHS = 100</p>
+<p>training_data = datasets.FashionMNIST(
+root=&ldquo;data&rdquo;,
+train=True,
+download=True,
+transform=v2.Compose([v2.ToImage(), v2.ToDtype(torch.float32, scale=True)]),
+)</p>
+<p>test_data = datasets.FashionMNIST(
+root=&ldquo;data&rdquo;,
+train=False,
+download=True,
+transform=v2.Compose([v2.ToImage(), v2.ToDtype(torch.float32, scale=True)]),
+)</p>
+<p>train_dataloader = DataLoader(training_data, batch_size=64)
+test_dataloader = DataLoader(test_data, batch_size=64)</p>
+<p>class NeuralNetwork(nn.Module):
+def <strong>init</strong>(self):
+super().<strong>init</strong>()
+self.flatten = nn.Flatten()
+self.linear_relu_stack = nn.Sequential(
+nn.Linear(28 * 28, 512),
+nn.ReLU(),
+nn.Linear(512, 512),
+nn.ReLU(),
+nn.Linear(512, 10),
+)</p>
+<pre><code>def forward(self, x):
+    x = self.flatten(x)
+    logits = self.linear_relu_stack(x)
+    return logits
+</code></pre>
+<p>def train_loop(dataloader, model, loss_fn, optimizer):</p>
+<pre><code>model.train()
+
+running_loss = 0
+total_batches = len(dataloader)
+
+for batch, (X, y) in enumerate(dataloader):
+    # Compute prediction and loss
+    pred = model(X)
+    loss = loss_fn(pred, y)
+
+    # Backpropagation
+    loss.backward()
+    optimizer.step()
+    optimizer.zero_grad()
+
+    running_loss += loss.item()
+
+    # val_acc, val_loss, val_auc, records = evaluate(
+    #     model, val_loader, device, loss_criterion
+    # )
+avg_loss = running_loss / total_batches
+return avg_loss
+</code></pre>
+<p>def test_loop(dataloader, model):</p>
+<pre><code>model.eval()
+size = len(dataloader.dataset)
+num_batches = len(dataloader)
+test_loss, correct = 0, 0
+
+with torch.no_grad():
+    for X, y in dataloader:
+        pred = model(X)
+        test_loss += criterion(pred, y).item()
+        correct += (pred.argmax(1) == y).type(torch.float).sum().item()
+
+test_loss /= num_batches
+correct /= size
+print(
+    f&quot;Test Error: \n Accuracy: {(100 * correct):&gt;0.1f}%, Avg loss: {test_loss:&gt;8f} \n&quot;
+)
+return test_loss
+</code></pre>
+<p>if <strong>name</strong> == &ldquo;<strong>main</strong>&rdquo;:
+model = NeuralNetwork()</p>
+<pre><code>learning_rate = 1e-3
+batch_size = 64
+epochs = 5
+
+weight_ratio = torch.tensor([1] * 10, dtype=torch.float32)
+# criterion = nn.BCEWithLogitsLoss(pos_weight=weight_ratio)
+criterion = nn.CrossEntropyLoss(weight=weight_ratio)
+
+optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
+
+early_stopping = EarlyStopping(
+    patience=5, path=&quot;model.pth&quot;, class_weights=weight_ratio
+)
+for t in range(MAX_EPOCHS):
+    train_loss = train_loop(train_dataloader, model, criterion, optimizer)
+    test_loss = test_loop(test_dataloader, model)
+    print(f&quot;Epoch {t + 1} Train loss {train_loss} Test loss {test_loss}&quot;)
+    early_stopping(test_loss, model)
+    if early_stopping.early_stop:
+        print(&quot;Early stopping triggered! Training halted.&quot;)
+        break
+
+print(&quot;Done!&quot;)
+</code></pre>
+</article>
+<footer id="footer">
+    Post managed in a <a href="https://github.com/amitsaha/echorand.me">git repo</a> | <a href="https://github.com/amitsaha/echorand.me/commit/bf169234bf4937995f4725e3e6ab0e08e3a0e824">Last Commit on this post </a>
+  | <a href="https://github.com/amitsaha/echorand.me/edit/master/content/posts/early-stopping-demo-with-neural-network-pytorch.md">Edit post</a>
+    <p>
+    Blog managed via <a href="https://gohugo.io/">Hugo</a> and using a modified version of the <a href="https://themes.gohugo.io/etch/">Etch</a> theme.
+    </p>  
+</footer>
+
+        </main><footer id="footer">
+    
+</footer>
+</body>
+</html>

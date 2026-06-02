@@ -1576,6 +1576,23 @@ I have also updated the Fedora Scientific Guide to reflect the changes.</descrip
     
     
     
+    <item>
+      <title></title>
+      <link>https://echorand.me/posts/early-stopping-demo-with-neural-network-pytorch/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/early-stopping-demo-with-neural-network-pytorch/</guid>
+      <description>import torch from torch import nn from torch.utils.data import DataLoader from torchvision import datasets from torchvision.transforms import v2
+from early_stopping import EarlyStopping
+MAX_EPOCHS = 100
+training_data = datasets.FashionMNIST( root=&amp;ldquo;data&amp;rdquo;, train=True, download=True, transform=v2.Compose([v2.ToImage(), v2.ToDtype(torch.float32, scale=True)]), )
+test_data = datasets.FashionMNIST( root=&amp;ldquo;data&amp;rdquo;, train=False, download=True, transform=v2.Compose([v2.ToImage(), v2.ToDtype(torch.float32, scale=True)]), )
+train_dataloader = DataLoader(training_data, batch_size=64) test_dataloader = DataLoader(test_data, batch_size=64)
+class NeuralNetwork(nn.Module): def init(self): super().init() self.flatten = nn.Flatten() self.linear_relu_stack = nn.Sequential( nn.Linear(28 * 28, 512), nn.ReLU(), nn.Linear(512, 512), nn.</description>
+    </item>
+    
+    
+    
     
     
     
