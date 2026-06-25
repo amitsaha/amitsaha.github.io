@@ -50,6 +50,7 @@ learning a bit more in the process.</p>
 <li><a href="#7">7</a></li>
 <li><a href="#8">8</a></li>
 <li><a href="#9">9</a></li>
+<li><a href="#10">10</a></li>
 </ul>
 <h2 id="1">1</h2>
 <p>I want to get access to the <code>subject_id</code> within my <a href="https://docs.pytorch.org/tutorials/beginner/basics/data_tutorial.html">Pytorch dataset</a>. I know that
@@ -340,9 +341,40 @@ Name: recall, dtype: float64&gt;
 np.float64(0.4090909090909091)
 (Pdb) current_group_results[&#34;recall&#34;][&#34;AMERICAN INDIAN&#34;]
 np.float64(0.0)
-</code></pre></article>
+</code></pre><h2 id="10">10</h2>
+<p>I want to filter a pandas dataframe rows by combining two filters/conditions. I have done this many times, but everytime i have had to search or
+ask an LLM for the exact syntax, this time, i got it by brute force and now i know i will likely remember this:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>(Pdb) retraining_dataset[retraining_dataset[group] <span style="color:#f92672">==</span> min_recall_category]
+</span></span><span style="display:flex;"><span>        Unnamed: <span style="color:#ae81ff">0</span>                                      dicom_id  subject_id  study_id  Cardiomegaly    split             race gender insurance
+</span></span><span style="display:flex;"><span><span style="color:#f92672">..</span>
+</span></span><span style="display:flex;"><span>[<span style="color:#ae81ff">704</span> rows x <span style="color:#ae81ff">9</span> columns]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>(Pdb) retraining_dataset[retraining_dataset[group] <span style="color:#f92672">==</span> min_recall_category <span style="color:#f92672">&amp;&amp;</span> retraining_dataset[Cardiomegaly]]
+</span></span><span style="display:flex;"><span><span style="color:#f92672">***</span> <span style="color:#a6e22e">SyntaxError</span>: invalid syntax
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>(Pdb) retraining_dataset[retraining_dataset[group] <span style="color:#f92672">==</span> min_recall_category <span style="color:#f92672">&amp;</span> retraining_dataset[Cardiomegaly]]
+</span></span><span style="display:flex;"><span><span style="color:#f92672">***</span> <span style="color:#a6e22e">NameError</span>: name <span style="color:#e6db74">&#39;Cardiomegaly&#39;</span> <span style="color:#f92672">is</span> <span style="color:#f92672">not</span> defined
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>(Pdb) retraining_dataset[retraining_dataset[group] <span style="color:#f92672">==</span> min_recall_category <span style="color:#f92672">&amp;</span> retraining_dataset[<span style="color:#e6db74">&#39;Cardiomegaly&#39;</span>]]
+</span></span><span style="display:flex;"><span><span style="color:#f92672">***</span> <span style="color:#a6e22e">TypeError</span>: Cannot perform <span style="color:#e6db74">&#39;rand_&#39;</span> <span style="color:#66d9ef">with</span> a dtyped [float64] array <span style="color:#f92672">and</span> scalar of type [bool]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>(Pdb) retraining_dataset[(retraining_dataset[group] <span style="color:#f92672">==</span> min_recall_category) <span style="color:#f92672">&amp;&amp;</span> (retraining_dataset[<span style="color:#e6db74">&#39;Cardiomegaly&#39;</span>])]
+</span></span><span style="display:flex;"><span><span style="color:#f92672">***</span> <span style="color:#a6e22e">SyntaxError</span>: invalid syntax
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>(Pdb) retraining_dataset[(retraining_dataset[group] <span style="color:#f92672">==</span> min_recall_category) <span style="color:#f92672">&amp;&amp;</span> (retraining_dataset[<span style="color:#e6db74">&#39;Cardiomegaly&#39;</span>]<span style="color:#f92672">==</span><span style="color:#66d9ef">True</span>)]
+</span></span><span style="display:flex;"><span><span style="color:#f92672">***</span> <span style="color:#a6e22e">SyntaxError</span>: invalid syntax
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>(Pdb) retraining_dataset[(retraining_dataset[group] <span style="color:#f92672">==</span> min_recall_category) <span style="color:#f92672">&amp;</span> (retraining_dataset[<span style="color:#e6db74">&#39;Cardiomegaly&#39;</span>]<span style="color:#f92672">==</span><span style="color:#66d9ef">True</span>)]
+</span></span><span style="display:flex;"><span>WORKS
+</span></span></code></pre></div><p>So, the key is:</p>
+<ol>
+<li>Individual conditions in parentheses</li>
+<li>Combine them by <code>&amp;</code> (or <code>|</code> (for <code>or</code>)</li>
+</ol>
+</article>
 <footer id="footer">
-    Post managed in a <a href="https://github.com/amitsaha/echorand.me">git repo</a> | <a href="https://github.com/amitsaha/echorand.me/commit/e6a18a77a8bb9e99d0e058f27555eecc0c7cbad4">Last Commit on this post </a>
+    Post managed in a <a href="https://github.com/amitsaha/echorand.me">git repo</a> | <a href="https://github.com/amitsaha/echorand.me/commit/edc65f522ef745445bb25d87a2fe22407d12e1f2">Last Commit on this post </a>
   | <a href="https://github.com/amitsaha/echorand.me/edit/master/content/posts/looking-for-answers.md">Edit post</a>
     <p>
     Blog managed via <a href="https://gohugo.io/">Hugo</a> and using a modified version of the <a href="https://themes.gohugo.io/etch/">Etch</a> theme.
