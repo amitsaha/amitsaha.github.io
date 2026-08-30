@@ -52,6 +52,7 @@ learning a bit more in the process.</p>
 <li><a href="#9">9</a></li>
 <li><a href="#10">10</a></li>
 <li><a href="#11">11</a></li>
+<li><a href="#12">12</a></li>
 </ul>
 <h2 id="1">1</h2>
 <p>I want to get access to the <code>subject_id</code> within my <a href="https://docs.pytorch.org/tutorials/beginner/basics/data_tutorial.html">Pytorch dataset</a>. I know that
@@ -398,9 +399,57 @@ myself a chance, i have had to search or ask an LLM for the exact syntax.</p>
 </span></span></code></pre></div><p>My end goal is i want to extract the <code>recall</code> values per dataset, preserving the category specific data, and for my purposes I want an array of these dicts,
 one element per dataset - i want to ensure that the array is ordered i.e. <code>eval_1</code> must come before <code>eval_2</code> and so on.</p>
 <p>.. to be completed ..</p>
+<h2 id="12">12</h2>
+<p>I have used AI to create a matplotlib figure for me based on some text instructions, because i don&rsquo;t find it fun to write
+programs to generate matplotlib lib figures. I don&rsquo;t find it fun in expanded version means:</p>
+<ol>
+<li>My goal here is to get a visual description of my text specification quick so that i can iterate over it</li>
+<li>Hence, i don&rsquo;t want to look up matplotlib documentation for figuring out how to draw rectangles/patches, etc</li>
+<li>I have always found matplotlib design hard. It took me lots of solid sleuthing to get over the global design of <code>plt</code>, <code>ax</code> and so on. And I attribute a lot of learning that happened to me working on my &ldquo;Doing Math with Python&rdquo; book and i haven&rsquo;t tried to learn any of it again for the last 12 years at least</li>
+<li>Also, and perhaps this is important - i am generating it because i know that if i need to go and tweak the script to suit my needs, i know enough matplotlib to find my way around - the learning that happened in (3).</li>
+<li>So, basically, if i need to figure it out, i can. This is not completely something I don&rsquo;t know or have a hang of.</li>
+<li>Hence, I generate.</li>
+</ol>
+<p>Okay, so I have this snippet, which I wrote - replacing the hardcoded figure names that was generated:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>plt<span style="color:#f92672">.</span>savefig(
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>__name__<span style="color:#e6db74">}</span><span style="color:#e6db74">.pdf&#34;</span>,
+</span></span><span style="display:flex;"><span>    bbox_inches<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;tight&#34;</span>
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>plt<span style="color:#f92672">.</span>savefig(
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>__name__<span style="color:#e6db74">}</span><span style="color:#e6db74">.png&#34;</span>,
+</span></span><span style="display:flex;"><span>    dpi<span style="color:#f92672">=</span><span style="color:#ae81ff">600</span>,
+</span></span><span style="display:flex;"><span>    bbox_inches<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;tight&#34;</span>
+</span></span><span style="display:flex;"><span>)
+</span></span></code></pre></div><p>My intention is that i want the figures to be named after my file name, but the files are being named as:</p>
+<pre tabindex="0"><code>-a----        31/08/2026   9:06 AM          25330 __main__.pdf
+-a----        31/08/2026   9:06 AM         582014 __main__.png
+</code></pre><p>So obviously, i have made the mistake of assuming <code>__name__</code> points to the file name. So:</p>
+<ol>
+<li>The first time i saw this, the file names being <code>__main__</code> my brain assumed that the f-string expansion is not correct - and the fault in thinking that is that i am equating, <code>__name__</code> to <code>__main__</code>.</li>
+<li>As i was starting to write this post, the first thing that i occurred to me, yes, I should use <code>__file__</code> but the fallacy in (1) was still not corrected</li>
+<li>And now finally, when I just was finishing point (1), i realized, I used <code>__name__</code> here because I have often written <code>__name__==__main__</code> - i learned about <code>__name__</code> in some detail 15 years back, and I have forgotten any of it</li>
+</ol>
+<p>So, this is what i wanted:</p>
+<pre tabindex="0"><code>plt.savefig(
+    f&#34;{os.path.basename(__file__).split(&#34;.&#34;)[0]}.pdf&#34;,
+    bbox_inches=&#34;tight&#34;
+)
+
+plt.savefig(
+    f&#34;{os.path.basename(__file__).split(&#34;.&#34;)[0]}.png&#34;,
+    dpi=600,
+    bbox_inches=&#34;tight&#34;
+)
+</code></pre><p>I didn&rsquo;t query LLM or search the internet, I didn&rsquo;t have to. That is because I have been coding in Python in one form or the
+other for the last 15 years. And the grunt work, the trial and error involved in learning things has stayed with me,
+and I just needed to allow myself the time to retrieve all of that i already know.</p>
+<p>The work of understanding - is what I am reflecting on and understanding a system is essentially a way to know how
+to operate a system.</p>
 </article>
 <footer id="footer">
-    Post managed in a <a href="https://github.com/amitsaha/echorand.me">git repo</a> | <a href="https://github.com/amitsaha/echorand.me/commit/212204fe94f4243270649f398b19edbef12a1d65">Last Commit on this post </a>
+    Post managed in a <a href="https://github.com/amitsaha/echorand.me">git repo</a> | <a href="https://github.com/amitsaha/echorand.me/commit/a9a4b6f80cf84b278dfbee0b93347e8309f27394">Last Commit on this post </a>
   | <a href="https://github.com/amitsaha/echorand.me/edit/master/content/posts/looking-for-answers.md">Edit post</a>
     <p>
     Blog managed via <a href="https://gohugo.io/">Hugo</a> and using a modified version of the <a href="https://themes.gohugo.io/etch/">Etch</a> theme.
