@@ -431,25 +431,25 @@ programs to generate matplotlib lib figures. I don&rsquo;t find it fun in expand
 <li>As i was starting to write this post, the first thing that i occurred to me, yes, I should use <code>__file__</code> but the fallacy in (1) was still not corrected</li>
 <li>And now finally, when I just was finishing point (1), i realized, I used <code>__name__</code> here because I have often written <code>__name__==__main__</code> - i learned about <code>__name__</code> in some detail 15 years back, and I have not forgotten any of it.</li>
 </ol>
-<p>So, this is what i wanted:</p>
-<pre tabindex="0"><code>plt.savefig(
-    f&#34;{os.path.basename(__file__).split(&#34;.&#34;)[0]}.pdf&#34;,
-    bbox_inches=&#34;tight&#34;
-)
-
-plt.savefig(
-    f&#34;{os.path.basename(__file__).split(&#34;.&#34;)[0]}.png&#34;,
-    dpi=600,
-    bbox_inches=&#34;tight&#34;
-)
-</code></pre><p>I didn&rsquo;t query LLM or search the internet, I didn&rsquo;t have to. That is because I have been coding in Python in one form or the
+<p>So, this is the code that achieves what i wanted:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>plt<span style="color:#f92672">.</span>savefig(
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>basename(__file__)<span style="color:#f92672">.</span>split(<span style="color:#e6db74">&#34;.&#34;</span>)[<span style="color:#ae81ff">0</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">.pdf&#34;</span>,
+</span></span><span style="display:flex;"><span>    bbox_inches<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;tight&#34;</span>
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>plt<span style="color:#f92672">.</span>savefig(
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>basename(__file__)<span style="color:#f92672">.</span>split(<span style="color:#e6db74">&#34;.&#34;</span>)[<span style="color:#ae81ff">0</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">.png&#34;</span>,
+</span></span><span style="display:flex;"><span>    dpi<span style="color:#f92672">=</span><span style="color:#ae81ff">600</span>,
+</span></span><span style="display:flex;"><span>    bbox_inches<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;tight&#34;</span>
+</span></span><span style="display:flex;"><span>)
+</span></span></code></pre></div><p>I didn&rsquo;t query LLM or search the internet, I didn&rsquo;t have to. That is because I have been coding in Python in one form or the
 other for the last 15 years. And the grunt work, the trial and error involved in learning things has stayed with me,
 and I just needed to allow myself the time to retrieve all of that i already know.</p>
 <p>The work of understanding - is what I am reflecting on and understanding a system is essentially a way to know how
 to operate a system.</p>
 </article>
 <footer id="footer">
-    Post managed in a <a href="https://github.com/amitsaha/echorand.me">git repo</a> | <a href="https://github.com/amitsaha/echorand.me/commit/07fd73f0683bf3d58810c53541eb3528f9537361">Last Commit on this post </a>
+    Post managed in a <a href="https://github.com/amitsaha/echorand.me">git repo</a> | <a href="https://github.com/amitsaha/echorand.me/commit/3ac86d7a5a4161ea262d31ce1bb91b47065a8af6">Last Commit on this post </a>
   | <a href="https://github.com/amitsaha/echorand.me/edit/master/content/posts/looking-for-answers.md">Edit post</a>
     <p>
     Blog managed via <a href="https://gohugo.io/">Hugo</a> and using a modified version of the <a href="https://themes.gohugo.io/etch/">Etch</a> theme.
