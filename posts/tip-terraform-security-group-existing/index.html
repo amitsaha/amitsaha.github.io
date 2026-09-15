@@ -33,7 +33,7 @@
 <main id="content">
 <article>
     <header id="post-header">
-        <h1>Tip Terraform and AWS Security Group rules in EC2 classic</h1><time>January 5, 2018</time></header><p>When using Terraform&rsquo;s <code>aws_security_group_rule</code> with EC2 classic, you may get an error
+        <h1>Tip Terraform and AWS Security Group rules in EC2 classic</h1><time>January 5, 2018</time>· Updated: <time>June 17, 2019</time></header><p>When using Terraform&rsquo;s <code>aws_security_group_rule</code> with EC2 classic, you may get an error
 saying that the source security group doesn&rsquo;t exist, even though it does. That&rsquo;s probably
 because you (like me and <a href="https://github.com/hashicorp/terraform/issues/5532">others</a>)
 used the source security group ID and not the security group name, like so:</p>

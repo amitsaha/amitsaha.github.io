@@ -33,7 +33,7 @@
 <main id="content">
 <article>
     <header id="post-header">
-        <h1>Detecting RLO character in Python</h1><time>February 19, 2018</time></header><p>At work, I learned about how <a href="https://krebsonsecurity.com/2011/09/right-to-left-override-aids-email-attacks/">Right-to-Left Override</a> was being used to make actually malicious files to look harmless. For example,
+        <h1>Detecting RLO character in Python</h1><time>February 19, 2018</time>· Updated: <time>June 17, 2019</time></header><p>At work, I learned about how <a href="https://krebsonsecurity.com/2011/09/right-to-left-override-aids-email-attacks/">Right-to-Left Override</a> was being used to make actually malicious files to look harmless. For example,
 a <code>.exe</code> file was being made to appear as <code>.doc</code> files. We didn&rsquo;t want to allow uploading such files.
 This meant that I nedded to detect the presence of the <code>RLO</code> character in the filename.</p>
 <p>Then, I came across <a href="https://stackoverflow.com/questions/17684990/python-testing-for-utf-8-character-in-string">this</a> post, where I learned about <a href="https://www.w3.org/International/articles/inline-bidi-markup/uba-basics">unicode bidirectional class</a> and Python&rsquo;s <a href="https://docs.python.org/2/library/unicodedata.html#unicodedata.bidirectional">bidirectional()</a> method.</p>

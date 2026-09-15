@@ -33,7 +33,7 @@
 <main id="content">
 <article>
     <header id="post-header">
-        <h1>flyway, SQL server and non-empty schema?</h1><time>September 28, 2018</time></header><p>While attempting to use <a href="https://flywaydb.org/">flyway</a> for SQL server schema migrations, I was consistently getting
+        <h1>flyway, SQL server and non-empty schema?</h1><time>September 28, 2018</time>· Updated: <time>June 17, 2019</time></header><p>While attempting to use <a href="https://flywaydb.org/">flyway</a> for SQL server schema migrations, I was consistently getting
 an error of the form <code>Found non-empty schema xxx ithout metadata table! Use init() or set initOnMigrate to true to  initialize the metadata table.</code>. Okay, so easy - let me just delete the tables, drop the schema and we will be good.
 No luck!</p>
 <p>Okay, let&rsquo;s try cleaning it - a destructive process potentially, but the risks were low in my case. So, did a <code>flyway clean</code>

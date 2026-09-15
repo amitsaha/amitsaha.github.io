@@ -33,7 +33,7 @@
 <main id="content">
 <article>
     <header id="post-header">
-        <h1>Ephemeral source port ranges and docker build</h1><time>January 14, 2019</time></header><p>TLDR; If you are having trouble with <code>docker build</code> and ephemeral port ranges, we can use <code>iptables</code> to solve the issue:</p>
+        <h1>Ephemeral source port ranges and docker build</h1><time>January 14, 2019</time>· Updated: <time>August 19, 2020</time></header><p>TLDR; If you are having trouble with <code>docker build</code> and ephemeral port ranges, we can use <code>iptables</code> to solve the issue:</p>
 <pre tabindex="0"><code>$ sudo iptables -t nat -I POSTROUTING -p tcp -m tcp --sport 32768:61000 -j MASQUERADE --to-ports 49152-61000
 </code></pre><p>I have written <a href="https://echorand.me/aws-network-acls-and-ephemeral-port-ranges.html">previously</a> about how things get interesting with ephemeral port ranges in a Windows and Linux environment and AWS network acls. Today’s post is related to the same topic but specifically relevant if you are building docker images in such an environment.</p>
 <p>Let’s start with the Dockerfile:</p>

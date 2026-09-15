@@ -33,7 +33,7 @@
 <main id="content">
 <article>
     <header id="post-header">
-        <h1>Notes on Go</h1><time>August 7, 2019</time></header><h2 id="repeating-the-same-argument-to-printf">Repeating the same argument to Printf</h2>
+        <h1>Notes on Go</h1><time>August 7, 2019</time>· Updated: <time>December 12, 2020</time></header><h2 id="repeating-the-same-argument-to-printf">Repeating the same argument to Printf</h2>
 <p>If we wanted to repeat the same argument to a call to <code>fmt.Printf()</code>, we can make use of &ldquo;indexed&rdquo; arguments.
 That is, instead of writing <code>fmt.Printf(&quot;%s %s&quot;, &quot;Hello&quot;, &quot;Hello&quot;)</code>, we can write <code>fmt.Printf(&quot;%[1]s %[1]s&quot;, &quot;Hello&quot;)</code>.
 Learn about it in the <a href="https://golang.org/pkg/fmt/">docs</a>.</p>
