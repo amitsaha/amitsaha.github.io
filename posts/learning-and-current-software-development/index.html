@@ -8,7 +8,7 @@
     
     <link rel="stylesheet" href="/css/style.min.css">
 
-    <title>Software development as a learning activity</title>
+    <title>Computer programming as a process, not a means to an end</title>
 </head>
 <body><header id="banner">
     <h2><a href="https://echorand.me">Explorations - computing, research, etc.</a></h2>
@@ -33,7 +33,7 @@
 <main id="content">
 <article>
     <header id="post-header">
-        <h1>Software development as a learning activity</h1><time>September 15, 2026</time>· Updated: <time>September 18, 2026</time></header><p><a href="https://en.wikipedia.org/wiki/R._D._Laing">R.D.Laing</a> apparently said that we are all entitled to our thoughts. So,
+        <h1>Computer programming as a process, not a means to an end</h1><time>September 15, 2026</time>· Updated: <time>September 18, 2026</time></header><p><a href="https://en.wikipedia.org/wiki/R._D._Laing">R.D.Laing</a> apparently said that we are all entitled to our thoughts. So,
 like you, i also have a lot of thoughts. This post is about some self-reflective thoughts i have been having, and finally
 i have i think come closer to what i have been feeling about the way AI a.k.a. our agents have taken over software
 development.</p>
@@ -115,9 +115,72 @@ programming. At some point, i have desired to write my own programming language 
 inventing my own syntax. I also tried to write my own operating system back in the day, but never made it past booting
 a desktop from a floppy disk.</p>
 <h2 id="autocompletion-snippets-etc">Autocompletion, snippets etc</h2>
+<p>The next &ldquo;issue&rdquo; for me or the wall I ran into as I worked with larger projects was the problem
+of customising my editor or IDE to do fancy things or learning all the keyboard shortcuts.
+I used the word fancy because that&rsquo;s what they appear to me. What they really were, were ways to
+make the work of coding less cumbersome.</p>
+<p>Some famous person said that if they had a day to cut down
+a tree, they would spend 70% or 80% of the time to sharpen their axe. Well my brain is like,
+forget sharpening, i want to start cutting the tree.</p>
+<p>And so I continued writing my code, using the basic code completion and occassionally doing some minor
+&ldquo;fancy&rdquo; things, like when using Emacs <code>C-x C-p</code> would insert, <code>import pdb; pdb.set_trace()</code> when working
+with Python code. My favorite way to debug till is adding print statements, and i like <code>gdb</code>, <code>pdb</code> etc
+but really when I am working with applications such as servers, i don&rsquo;t know printing is the way to go.</p>
+<p>Besides the friction and the time needed to customize my IDE/editor - because I am simply not going to copy
+someone else&rsquo;s configuration - I need to know what&rsquo;s happening, I also was protecting myself from the distraction
+of suddently 10s of options coming up while I am coding, right in the middle of my thought process, I don&rsquo;t
+want any interruption - from my editor. I am in the zone, i might be struggling, but i want to power through
+the struggle. Hence, the era of auto completion, snippets, customising editors in the perfect manner, I
+didn&rsquo;t join that either. Of course, I made false starts, <code>dotfiles</code> etc, copied other people&rsquo;s <code>.vimrc</code> or <code>.nvim</code>
+and watched with admiration and jealousy with a mix of inferiroirity complex the efforts other people went to.</p>
 <h2 id="ai-and-inline-code-suggestions">AI and Inline code suggestions</h2>
+<p>Now, considering my relationship with not necessarily intelligent auto completion, i didn&rsquo;t fare well with the AI
+driven inline code suggestion and completion. I did it for a bit, and then once again I realized, i want
+no disruption to my workflow. So, I turned that off and started using manual chats/inline chats to generate code
+and then manually add them. That meant somewhere in there, i was still in the loop.</p>
+<p>In the last major project i worked on where I was building out the chat backend for my startup&rsquo;s products,
+I sparred the design manually, listing out the API endpoints and once I was sure of what was going to happen,
+I generated the blueprint without any interference from me. However, once the skeleton was generated, I then
+manually coded the implementation themselves, including the DB schema, the integration with a third party service
+provider we were relying on. I felt good about it, since the overarching design had me involved, in my head
+i know exactly what the call flows are like, and thus, crucially, the breaking points. Where can things fail,
+and if they do, where do I start looking.</p>
+<p>The exception to this me being in the loop workflow is frontend design/CSS code. I will try and not interfere
+or even try to understand the different coloring/positioning/opacity, only relying on the output. So, this is
+where again I make a careful choice of - what do I need to know? - I have chosen that I don&rsquo;t need to know any
+of the amazing engineering that&rsquo;s going on in the frontend.</p>
 <h2 id="agentic-software-development">Agentic software development</h2>
+<p>So, finally, I am here. I have finally decided that for some parts of projects, I am going to hand over things.
+For example, for the chat backend project, now that the basic infrastructure/design/blueprint is all in place
+and things work, any incremental work i now do i have stopped coding by hand.</p>
+<p>Part of it is i know the critical paths, so now the incremental work being done now is not something I will
+not know anything about when I need to look at it.</p>
+<p>The other part is, I am choosing at every point, &ldquo;is there anything I would like to learn here?&rdquo;. If no, hand
+it over. For example, when i code for my research work, I am coding by hand, but when I implement some software,
+that i might be building on top of my research, i am handing it over.</p>
+<p>A bit of it is the ability to claim to myself - that i know what&rsquo;s going on, and a bit of it is, this is my project,
+i want to work on it.</p>
+<p>Another overarching question that i keep asking myself when i make a choice is - what is my goal here? is it the outcome
+i am interested in here or is it the process that motivates me?</p>
+<p>When building a startup, i have finally realized (finally!) that it&rsquo;s the outcome, and some projects, or some parts
+of projects, it&rsquo;s the process, but some parts, it&rsquo;s the outcome. Perhaps it&rsquo;s a dance, a dance of flexibility.</p>
+<p>When working on my research, it&rsquo;s the process first and foremost, the rigor, the friction between what I know, what
+i don&rsquo;t know, and what I need to know to go where I want to go - that&rsquo;s where my joy lies.</p>
 <h2 id="writing-books-and-creating-teaching-materials">Writing books and creating teaching materials</h2>
+<p>I have alluded to my joy in the friction involved when I am writing code. I am also channeling well known people
+when I say that, to really learn something, I have always tried to teach somebody that. Somehow I read it after
+I had already started doing it. My initial motivation for publishing articles, and then books, and giving talks
+or creating training materials was to be known - become famous on the internet. Become somebody.</p>
+<p>That i have realized, since it hasn&rsquo;t happened yet, is not what I likely have been doing it.</p>
+<p>I feel the real reason I like it, and have liked it, is because the friction introduced in creating any kind
+of material for an audience is how I challenge, validate and clarify my own understanding. I looked at some trends
+in my writings over decades and the talks I gave, they all try to demystify something, or bring two areas together,
+or small deep dives into things that randomly walked into and then I wanted to shed more light on them.</p>
+<p>So, once again, it appears that the friction of coding, and anything to do with coding is what I seek in coding.
+The friction is where my learnings have happened and I know how valuable it is to me.</p>
+<p>Hence, i have this itch of working on a new book again, i have no idea what i want to write about, except for a few
+ideas. However, I know what I am seeking, it&rsquo;s the wrangling of the ideas, the wrangling of the unknowns and somehow
+make it all legible for someone else to consume.</p>
 <h2 id="conclusion">Conclusion</h2>
 <p>The turbulence started with me being angry about anyone telling me to use AI to write my applications.</p>
 <p>Then, I wanted to give my own anger a moral - societal voice - so i made it (in my head, of course) about
@@ -135,10 +198,9 @@ what they like to do - are they builders? Business persons? Or do they love the 
 <p>Now, what is my relationship going to be with software development/computer programming when the practicalities of
 life knock on my door? I will find out. I am less righteous about it and bringing the whole problem home - what am
 I gonna do about it? Perhaps that&rsquo;s a better way to tackle this problem (a very personal problem) than from anger.</p>
-<p><em>This post is in progress</em> (Last Updated: 17 September, 2026 AEST)</p>
 </article>
 <footer id="footer">
-    Post managed in a <a href="https://github.com/amitsaha/echorand.me">git repo</a> | <a href="https://github.com/amitsaha/echorand.me/commit/afe65891243613e2a3af0cc7445414ab9dcac2b3">Last Commit on this post </a>
+    Post managed in a <a href="https://github.com/amitsaha/echorand.me">git repo</a> | <a href="https://github.com/amitsaha/echorand.me/commit/8f33744194c1d77f698615ed9dfb9fd82374ce8b">Last Commit on this post </a>
   | <a href="https://github.com/amitsaha/echorand.me/edit/master/content/posts/learning-and-current-software-development.md">Edit post</a>
     <p>
     Blog managed via <a href="https://gohugo.io/">Hugo</a> and using a modified version of the <a href="https://themes.gohugo.io/etch/">Etch</a> theme.
