@@ -53,6 +53,7 @@ learning a bit more in the process.</p>
 <li><a href="#10">10</a></li>
 <li><a href="#11">11</a></li>
 <li><a href="#12">12</a></li>
+<li><a href="#13">13</a></li>
 </ul>
 <h2 id="1">1</h2>
 <p>I want to get access to the <code>subject_id</code> within my <a href="https://docs.pytorch.org/tutorials/beginner/basics/data_tutorial.html">Pytorch dataset</a>. I know that
@@ -483,11 +484,27 @@ array([1.0003e+04, 1.1000e-01, 2.2100e-01])
 array([1.e+04, 1.e-01, 2.e-01])
 &gt;&gt;&gt; X[2]
 array([1.0001e+04, 1.1100e-01, 1.1100e-01])
-</code></pre><p>We don&rsquo;t want to have the subject ID repeated between the train and the test set.</p>
+</code></pre><p>We don&rsquo;t want to have the subject ID repeated between the train and the test set while also preserving the class/label balance.</p>
 <p>So, what shall we do?</p>
+<p>So, this is where my brain wants to take short cuts:</p>
+<ol>
+<li>I want to ask AI chat</li>
+<li>I want to at least do a good old internet search</li>
+</ol>
+<p>I have already cursorily looked at the scikit learn model selection reference: <a href="https://scikit-learn.org/stable/api/sklearn.model_selection.html">https://scikit-learn.org/stable/api/sklearn.model_selection.html</a> - none of them appear to give me
+a straight and fast answer to take me out of this unknown I am finding myself in.</p>
+<p>I have implemented this or I think i have done the same in another experiment, where I used AI&rsquo;s help to simply copy paste the snippet it gave me. Hence I don&rsquo;t know what I
+did there.</p>
+<blockquote>
+<p>In fact, i probably used <code>StratifiedGroupKFold</code> there, but now looking at the reference documentation now, i can&rsquo;t help how it might have helped me there.
+So, may be the code works, but it isn&rsquo;t doing what i want it to do as this is another example of what happens to my brain and learning when I don&rsquo;t take the time to understand what
+I am doing.</p>
+</blockquote>
+<p>Looking at LeaveOneGroupOut. The documentation says:</p>
+<p>&ldquo;Provides train/test indices to split data such that each training set is comprised of all samples except ones belonging to one specific group. Arbitrary domain-specific group information is provided as an array of integers that encodes the group of each sample&rdquo;</p>
 </article>
 <footer id="footer">
-    Post managed in a <a href="https://github.com/amitsaha/echorand.me">git repo</a> | <a href="https://github.com/amitsaha/echorand.me/commit/3ea73510687c48533b485dc370a3f90c30fc1229">Last Commit on this post </a>
+    Post managed in a <a href="https://github.com/amitsaha/echorand.me">git repo</a> | <a href="https://github.com/amitsaha/echorand.me/commit/ad7e74c0c33d0cef7f27c63f57ba3f2140375131">Last Commit on this post </a>
   | <a href="https://github.com/amitsaha/echorand.me/edit/master/content/posts/looking-for-answers.md">Edit post</a>
     <p>
     Blog managed via <a href="https://gohugo.io/">Hugo</a> and using a modified version of the <a href="https://themes.gohugo.io/etch/">Etch</a> theme.
