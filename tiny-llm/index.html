@@ -35,8 +35,9 @@
 <main id="content">
 <article>
     <header id="post-header">
-        <h1>Tiny LLM Lab</h1></header><p>Try a tiny in-browser LLM to ask questions about any post text you paste below.
-If you came here from a post page, the post content will be loaded automatically.</p>
+        <h1>Tiny LLM Lab</h1></header><p>Try a tiny in-browser LLM to discuss any post text you paste below.
+If you came here from a post page, the post content will be loaded automatically.
+The model runs fully in your browser, so first load may be slow and long inputs are trimmed to fit the context window.</p>
 <p>
   <label for="post-context">Post text:</label><br />
   <textarea id="post-context" rows="10" cols="80" placeholder="Paste text from one of my posts here"></textarea>
@@ -46,10 +47,14 @@ If you came here from a post page, the post content will be loaded automatically
   <input id="question" type="text" size="80" placeholder="What is this post mainly about?" />
 </p>
 <p>
-  <button id="run-llm">Ask tiny LLM</button>
+  <button id="run-llm">Ask / Follow up</button>
+  <button id="summarize-llm">Summary & key insights</button>
+  <button id="bias-llm">Potential author biases</button>
+  <button id="clear-llm">Clear conversation</button>
 </p>
 <p id="llm-status">Model: not loaded</p>
-<pre id="llm-answer"></pre>
+<p id="llm-context-window"></p>
+<div id="llm-answer" style="border: 1px solid #ccc; border-radius: 6px; padding: 0.75rem; min-height: 8rem;" aria-live="polite"></div>
 <script type="module">
   import { env, pipeline } from "https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2";
 
@@ -58,96 +63,193 @@ If you came here from a post page, the post content will be loaded automatically
 
   const statusElement = document.getElementById("llm-status");
   const answerElement = document.getElementById("llm-answer");
+  const contextWindowElement = document.getElementById("llm-context-window");
   const buttonElement = document.getElementById("run-llm");
+  const summarizeButtonElement = document.getElementById("summarize-llm");
+  const biasButtonElement = document.getElementById("bias-llm");
+  const clearButtonElement = document.getElementById("clear-llm");
   const contextElement = document.getElementById("post-context");
   const questionElement = document.getElementById("question");
 
-  const modelName = "Xenova/distilgpt2";
+  const modelName = "Xenova/flan-t5-small";
+  const maxContextChars = 4000;
+  const maxConversationTurns = 4;
   let generator;
+  let conversation = [];
 
-  async function preloadPostFromQuery() {
-    const source = new URLSearchParams(window.location.search).get("source");
-    if (!source) {
+  function escapeHTML(value) {
+    return value
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+  }
+
+  function truncateContext(context) {
+    if (context.length <= maxContextChars) {
+      return { text: context, truncated: false };
+    }
+
+    return { text: context.slice(0, maxContextChars), truncated: true };
+  }
+
+  function setContextWindowStatus(context) {
+    const { truncated } = truncateContext(context);
+    contextWindowElement.textContent = truncated
+      ? `Input trimmed to ~${maxContextChars} characters to fit browser model context limits.`
+      : `Using full input (${context.length} characters).`;
+  }
+
+  function renderConversation() {
+    if (!conversation.length) {
+      answerElement.textContent = "No responses yet.";
       return;
     }
 
-    try {
-      const sourceUrl = new URL(source, window.location.origin);
-      if (sourceUrl.origin !== window.location.origin) {
-        return;
-      }
-
-      statusElement.textContent = "Loading post content...";
-      const response = await fetch(sourceUrl.toString());
-      if (!response.ok) {
-        statusElement.textContent = "Could not load post content";
-        return;
-      }
-
-      const html = await response.text();
-      const documentNode = new DOMParser().parseFromString(html, "text/html");
-      const article = documentNode.querySelector("article");
-      if (!article) {
-        statusElement.textContent = "Could not find post content";
-        return;
-      }
-
-      contextElement.value = article.textContent.trim();
-      statusElement.textContent = "Post content preloaded";
-    } catch (error) {
-      statusElement.textContent = "Could not preload post content";
-      console.error(error);
-    }
+    answerElement.innerHTML = conversation
+      .map(function (entry, index) {
+        return `<div style="margin-bottom: 1rem;">
+  <strong>${index + 1}. ${entry.title}</strong>
+  <pre style="white-space: pre-wrap; margin: 0.35rem 0 0;">${escapeHTML(entry.answer)}</pre>
+</div>`;
+      })
+      .join("");
+  }
+<p>async function preloadPostFromQuery() {
+const source = new URLSearchParams(window.location.search).get(&ldquo;source&rdquo;);
+if (!source) {
+return;
+}</p>
+<pre><code>try {
+  const sourceUrl = new URL(source, window.location.origin);
+  if (sourceUrl.origin !== window.location.origin) {
+    return;
   }
 
-  async function getGenerator() {
-    if (generator) {
-      return generator;
-    }
-
-    statusElement.textContent = "Loading tiny model in your browser...";
-    generator = await pipeline("text-generation", modelName);
-    statusElement.textContent = `Model loaded: ${modelName}`;
-    return generator;
+  statusElement.textContent = &quot;Loading post content...&quot;;
+  const response = await fetch(sourceUrl.toString());
+  if (!response.ok) {
+    statusElement.textContent = &quot;Could not load post content&quot;;
+    return;
   }
 
-  buttonElement.addEventListener("click", async function () {
-    const context = contextElement.value.trim();
-    const question = questionElement.value.trim();
+  const html = await response.text();
+  const documentNode = new DOMParser().parseFromString(html, &quot;text/html&quot;);
+  const article = documentNode.querySelector(&quot;article&quot;);
+  if (!article) {
+    statusElement.textContent = &quot;Could not find post content&quot;;
+    return;
+  }
 
-    if (!context || !question) {
-      answerElement.textContent = "Please provide both post text and a question.";
-      return;
-    }
+  contextElement.value = article.textContent.trim();
+  setContextWindowStatus(contextElement.value);
+  statusElement.textContent = &quot;Post content preloaded&quot;;
+} catch (error) {
+  statusElement.textContent = &quot;Could not preload post content&quot;;
+  console.error(error);
+}
+</code></pre>
+<p>}</p>
+<p>async function getGenerator() {
+if (generator) {
+return generator;
+}</p>
+<pre><code>statusElement.textContent = &quot;Loading tiny model in your browser (first run can take a bit)...&quot;;
+generator = await pipeline(&quot;text2text-generation&quot;, modelName);
+statusElement.textContent = `Model loaded: ${modelName}`;
+return generator;
+</code></pre>
+<p>}</p>
+<p>async function askModel(mode) {
+const context = contextElement.value.trim();
+const question = questionElement.value.trim();</p>
+<pre><code>if (!context) {
+  statusElement.textContent = &quot;Please provide post text.&quot;;
+  return;
+}
 
-    buttonElement.disabled = true;
-    statusElement.textContent = "Generating answer...";
-    answerElement.textContent = "";
+if (mode === &quot;question&quot; &amp;&amp; !question) {
+  statusElement.textContent = &quot;Please ask a question for a follow-up response.&quot;;
+  return;
+}
 
-    try {
-      const llm = await getGenerator();
-      const prompt = `Context:\n${context}\n\nQuestion:\n${question}\n\nAnswer:`;
-      const result = await llm(prompt, {
-        max_new_tokens: 120,
-        temperature: 0.7,
-        repetition_penalty: 1.1,
-      });
-      answerElement.textContent = result[0].generated_text.replace(prompt, "").trim();
-      statusElement.textContent = `Model loaded: ${modelName}`;
-    } catch (error) {
-      answerElement.textContent = "Failed to run model in this browser. Please check browser WebAssembly support and network access.";
-      statusElement.textContent = "Error running tiny model";
-      console.error(error);
-    } finally {
-      buttonElement.disabled = false;
-    }
+const { text: trimmedContext, truncated } = truncateContext(context);
+setContextWindowStatus(context);
+buttonElement.disabled = true;
+summarizeButtonElement.disabled = true;
+biasButtonElement.disabled = true;
+clearButtonElement.disabled = true;
+statusElement.textContent = truncated
+  ? &quot;Generating response from trimmed context...&quot;
+  : &quot;Generating response...&quot;;
+
+try {
+  const llm = await getGenerator();
+  const recentConversation = conversation.slice(-maxConversationTurns);
+  const historyText = recentConversation
+    .map(function (entry) {
+      return `${entry.title}\n${entry.answer}`;
+    })
+    .join(&quot;\n\n&quot;);
+
+  const promptByMode = {
+    question: `You are a concise technical reading assistant.\n\nPost excerpt:\n${trimmedContext}\n\nRecent conversation:\n${historyText || &quot;None&quot;}\n\nUser question: ${question}\n\nGive a helpful technical answer grounded in the post excerpt.`,
+    summary: `Summarize this post excerpt and conversation in concise bullet points.\n\nPost excerpt:\n${trimmedContext}\n\nConversation:\n${historyText || &quot;None&quot;}\n\nInclude:\n- Main ideas\n- Key technical insights\n- Open questions`,
+    bias: `Analyze potential author bias based only on this post excerpt and conversation.\n\nPost excerpt:\n${trimmedContext}\n\nConversation:\n${historyText || &quot;None&quot;}\n\nProvide:\n- Possible assumptions or blind spots\n- What viewpoints may be underrepresented\n- Confidence level (low/medium/high) and why`,
+  };
+
+  const result = await llm(promptByMode[mode], {
+    max_new_tokens: 220,
+    temperature: 0.2,
+    repetition_penalty: 1.1,
   });
-
-  preloadPostFromQuery();
-</script>
+  const answer = result[0].generated_text.trim();
+  const titles = {
+    question: `Q: ${question}`,
+    summary: &quot;Summary &amp; key insights&quot;,
+    bias: &quot;Potential author biases&quot;,
+  };
+  conversation.push({
+    title: titles[mode],
+    answer: answer || &quot;No response generated.&quot;,
+  });
+  renderConversation();
+  statusElement.textContent = `Model loaded: ${modelName}`;
+} catch (error) {
+  statusElement.textContent = &quot;Error running tiny model&quot;;
+  answerElement.textContent = &quot;Failed to run model in this browser. Please check browser WebAssembly support and network access.&quot;;
+  console.error(error);
+} finally {
+  buttonElement.disabled = false;
+  summarizeButtonElement.disabled = false;
+  biasButtonElement.disabled = false;
+  clearButtonElement.disabled = false;
+}
+</code></pre>
+<p>}</p>
+<p>buttonElement.addEventListener(&ldquo;click&rdquo;, function () {
+askModel(&ldquo;question&rdquo;);
+});</p>
+<p>summarizeButtonElement.addEventListener(&ldquo;click&rdquo;, function () {
+askModel(&ldquo;summary&rdquo;);
+});</p>
+<p>biasButtonElement.addEventListener(&ldquo;click&rdquo;, function () {
+askModel(&ldquo;bias&rdquo;);
+});</p>
+<p>clearButtonElement.addEventListener(&ldquo;click&rdquo;, function () {
+conversation = [];
+renderConversation();
+statusElement.textContent = <code>Model loaded: ${generator ? modelName : &quot;not loaded&quot;}</code>;
+});</p>
+<p>contextElement.addEventListener(&ldquo;input&rdquo;, function () {
+setContextWindowStatus(contextElement.value.trim());
+});</p>
+<p>setContextWindowStatus(contextElement.value.trim());
+renderConversation();
+preloadPostFromQuery();
+</script></p>
 </article>
 <footer id="footer">
-    Post managed in a <a href="https://github.com/amitsaha/echorand.me">git repo</a> | <a href="https://github.com/amitsaha/echorand.me/commit/fcc2367b597f03e7e7cb1cbfe61bd3f4b553ba78">Last Commit on this post </a>
+    Post managed in a <a href="https://github.com/amitsaha/echorand.me">git repo</a> | <a href="https://github.com/amitsaha/echorand.me/commit/5d4c8769aaf47fd6ca70699a9b6017145da11e83">Last Commit on this post </a>
   | <a href="https://github.com/amitsaha/echorand.me/edit/master/content/tiny-llm.md">Edit post</a>
     <p>
     Blog managed via <a href="https://gohugo.io/">Hugo</a> and using a modified version of the <a href="https://themes.gohugo.io/etch/">Etch</a> theme.
