@@ -1610,5 +1610,7 @@ class NeuralNetwork(nn.Module): def init(self): super().init() self.flatten = nn
     
     
     
+    
+    
   </channel>
 </rss>

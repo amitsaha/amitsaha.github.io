@@ -23,6 +23,8 @@
             </li><li>
                 <a href="/talks" title="">Talks</a>
             </li><li>
+                <a href="/tiny-llm" title="">Tiny LLM Lab</a>
+            </li><li>
                 <a href="/categories" title="">Categories</a>
             </li><li>
                 <a href="/index.xml" title="">Subscribe (RSS)</a>
@@ -125,7 +127,12 @@ that is where you want to pretend that a user entered a specific input interacti
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#a6e22e">input</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">strings</span>.<span style="color:#a6e22e">NewReader</span>(<span style="color:#e6db74">&#34;jane&#34;</span>)
 </span></span><span style="display:flex;"><span><span style="color:#a6e22e">scanner</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">bufio</span>.<span style="color:#a6e22e">NewScanner</span>(<span style="color:#a6e22e">input</span>)
 </span></span></code></pre></div><p>The key here is the <a href="https://pkg.go.dev/strings#NewReader">strings.NewReader()</a> function.</p>
-</article>
+<details>
+        <summary>Dive deeper with Tiny LLM (optional)</summary>
+        <p>
+            <a href="/tiny-llm/?source=%2Fposts%2Fgo-test-stdin%2F">Open Tiny LLM Lab with this post preloaded</a>
+        </p>
+    </details></article>
 <footer id="footer">
     Post managed in a <a href="https://github.com/amitsaha/echorand.me">git repo</a> | <a href="https://github.com/amitsaha/echorand.me/commit/4c9b7e6e34ab79705da63adce861054e978bb39e">Last Commit on this post </a>
   | <a href="https://github.com/amitsaha/echorand.me/edit/master/content/posts/go-test-stdin.md">Edit post</a>
