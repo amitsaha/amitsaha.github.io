@@ -48,36 +48,36 @@ how we can use a custom HTTP client to use the Go GitHub SDK and the
 <h2 id="introduction">Introduction</h2>
 <p>Let&rsquo;s create an example <code>*oauth2.Config</code> for communicating with <code>GitHub.com</code>
 oauth provider:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#a6e22e">oauthConf</span> = <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">oauth2</span>.<span style="color:#a6e22e">Config</span>{
-</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">ClientID</span>:     <span style="color:#a6e22e">getEnvironValue</span>(<span style="color:#e6db74">&#34;CLIENT_ID&#34;</span>),
-</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">ClientSecret</span>: <span style="color:#a6e22e">getEnvironValue</span>(<span style="color:#e6db74">&#34;CLIENT_SECRET&#34;</span>),
-</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">Scopes</span>:       []<span style="color:#66d9ef">string</span>{<span style="color:#e6db74">&#34;repo&#34;</span>, <span style="color:#e6db74">&#34;user&#34;</span>}, <span style="color:#75715e">// see the project desrciption for understandng why we need full scopes here
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>	<span style="color:#a6e22e">Endpoint</span>:     <span style="color:#a6e22e">github</span>.<span style="color:#a6e22e">Endpoint</span>,
+<div class="highlight"><pre tabindex="0" style="color:#ebdbb2;background-color:#282828;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span>oauthConf = <span style="color:#fe8019">&amp;</span>oauth2.Config{
+</span></span><span style="display:flex;"><span>	ClientID:     <span style="color:#fabd2f">getEnvironValue</span>(<span style="color:#b8bb26">&#34;CLIENT_ID&#34;</span>),
+</span></span><span style="display:flex;"><span>	ClientSecret: <span style="color:#fabd2f">getEnvironValue</span>(<span style="color:#b8bb26">&#34;CLIENT_SECRET&#34;</span>),
+</span></span><span style="display:flex;"><span>	Scopes:       []<span style="color:#fabd2f">string</span>{<span style="color:#b8bb26">&#34;repo&#34;</span>, <span style="color:#b8bb26">&#34;user&#34;</span>}, <span style="color:#928374;font-style:italic">// see the project desrciption for understandng why we need full scopes here
+</span></span></span><span style="display:flex;"><span><span style="color:#928374;font-style:italic"></span>	Endpoint:     github.Endpoint,
 </span></span><span style="display:flex;"><span>}
 </span></span></code></pre></div><p>One key step as part of the OAuth authorization process is to call the
 <code>Exchange(..)</code> method to obtain an access token:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#a6e22e">t</span>, <span style="color:#a6e22e">err</span>  = <span style="color:#a6e22e">oauthConf</span>.<span style="color:#a6e22e">Exchange</span>(<span style="color:#a6e22e">ctx</span>, ..)
+<div class="highlight"><pre tabindex="0" style="color:#ebdbb2;background-color:#282828;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span>t, err  = oauthConf.<span style="color:#fabd2f">Exchange</span>(ctx, ..)
 </span></span></code></pre></div><p>The above method call requires a HTTP client to communicate.</p>
 <p>The golang.org/x/oauth2 library looks for a HTTP client inside the
 context, <code>ctx</code> and if it doesn&rsquo;t find it using<code>ctx.Value(HTTPClient)</code>,
 it creates a <code>http.DefaultClient</code>:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">ContextKey</span> <span style="color:#66d9ef">struct</span>{}
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">HTTPClient</span> <span style="color:#a6e22e">ContextKey</span>
+<div class="highlight"><pre tabindex="0" style="color:#ebdbb2;background-color:#282828;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#fe8019">type</span> ContextKey <span style="color:#fe8019">struct</span>{}
+</span></span><span style="display:flex;"><span><span style="color:#fe8019">var</span> HTTPClient ContextKey
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> <span style="color:#a6e22e">ctx</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">hc</span>, <span style="color:#a6e22e">ok</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">ctx</span>.<span style="color:#a6e22e">Value</span>(<span style="color:#a6e22e">HTTPClient</span>).(<span style="color:#f92672">*</span><span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">Client</span>); <span style="color:#a6e22e">ok</span> {
-</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">hc</span>
+</span></span><span style="display:flex;"><span><span style="color:#fe8019">if</span> ctx <span style="color:#fe8019">!=</span> <span style="color:#fe8019">nil</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#fe8019">if</span> hc, ok <span style="color:#fe8019">:=</span> ctx.<span style="color:#fabd2f">Value</span>(HTTPClient).(<span style="color:#fe8019">*</span>http.Client); ok {
+</span></span><span style="display:flex;"><span>                <span style="color:#fe8019">return</span> hc
 </span></span><span style="display:flex;"><span>        }
 </span></span><span style="display:flex;"><span>}
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">return</span> <span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">DefaultClient</span>
+</span></span><span style="display:flex;"><span><span style="color:#fe8019">return</span> http.DefaultClient
 </span></span></code></pre></div><p>You can find the complete code <a href="https://cs.opensource.google/go/x/oauth2/+/f2134210:internal/transport.go;l=23">here</a>.</p>
 <h2 id="using-a-custom-http-client-with-golangorgxoauth2">Using a custom HTTP client with golang.org/x/oauth2</h2>
 <p>To use a custom HTTP client, we create a new <code>context.Context</code>
 value with oauth2.HTTPClient and then pass that as the context to
 the <code>Exchange()</code> method:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#a6e22e">customHttpClient</span> <span style="color:#f92672">:=</span> <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">Client</span>{}
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">ctx</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">context</span>.<span style="color:#a6e22e">WithValue</span>(<span style="color:#a6e22e">ctx</span>, <span style="color:#a6e22e">oauth2</span>.<span style="color:#a6e22e">HTTPClient</span>, <span style="color:#a6e22e">customHttpClient</span>)
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">t</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">oauthConf</span>.<span style="color:#a6e22e">Exchange</span>(<span style="color:#a6e22e">ctx</span>, <span style="color:#f92672">...</span>)
+<div class="highlight"><pre tabindex="0" style="color:#ebdbb2;background-color:#282828;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span>customHttpClient <span style="color:#fe8019">:=</span> <span style="color:#fe8019">&amp;</span>http.Client{}
+</span></span><span style="display:flex;"><span>ctx <span style="color:#fe8019">:=</span> context.<span style="color:#fabd2f">WithValue</span>(ctx, oauth2.HTTPClient, customHttpClient)
+</span></span><span style="display:flex;"><span>t, err <span style="color:#fe8019">:=</span> oauthConf.<span style="color:#fabd2f">Exchange</span>(ctx, <span style="color:#fe8019">...</span>)
 </span></span></code></pre></div><p>Now, the above code finds the configured HTTP client, <code>customHttpClient</code>
 and uses that to make the HTTP requests.</p>
 <h2 id="using-the-custom-http-client-with-go-github-sdk">Using the custom HTTP client with Go Github SDK</h2>
@@ -85,15 +85,15 @@ and uses that to make the HTTP requests.</p>
 Go GitHub SDK and using the access token obtained from the <code>Exchange()</code>
 method call above, all we need to do is continue using the
 same context above:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#75715e">// ctx is the same as we created above with the
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// value containing the custom HTTP client
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">ts</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">oauth2</span>.<span style="color:#a6e22e">StaticTokenSource</span>(
-</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">oauth2</span>.<span style="color:#a6e22e">Token</span>{<span style="color:#a6e22e">AccessToken</span>: <span style="color:#a6e22e">t</span>.<span style="color:#a6e22e">Token</span>},
+<div class="highlight"><pre tabindex="0" style="color:#ebdbb2;background-color:#282828;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#928374;font-style:italic">// ctx is the same as we created above with the
+</span></span></span><span style="display:flex;"><span><span style="color:#928374;font-style:italic">// value containing the custom HTTP client
+</span></span></span><span style="display:flex;"><span><span style="color:#928374;font-style:italic"></span>ts <span style="color:#fe8019">:=</span> oauth2.<span style="color:#fabd2f">StaticTokenSource</span>(
+</span></span><span style="display:flex;"><span>        <span style="color:#fe8019">&amp;</span>oauth2.Token{AccessToken: t.Token},
 </span></span><span style="display:flex;"><span>)
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">tc</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">oauth2</span>.<span style="color:#a6e22e">NewClient</span>(<span style="color:#a6e22e">ctx</span>, <span style="color:#a6e22e">ts</span>)
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">ghClient</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">github</span>.<span style="color:#a6e22e">NewClient</span>(<span style="color:#a6e22e">tc</span>)
+</span></span><span style="display:flex;"><span>tc <span style="color:#fe8019">:=</span> oauth2.<span style="color:#fabd2f">NewClient</span>(ctx, ts)
+</span></span><span style="display:flex;"><span>ghClient <span style="color:#fe8019">:=</span> github.<span style="color:#fabd2f">NewClient</span>(tc)
 </span></span></code></pre></div><p>Then, we can use the GitHub client as usual:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#a6e22e">u</span>, <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">ghClient</span>.<span style="color:#a6e22e">Users</span>.<span style="color:#a6e22e">Get</span>(<span style="color:#a6e22e">ctx</span>, <span style="color:#e6db74">&#34;&#34;</span>)
+<div class="highlight"><pre tabindex="0" style="color:#ebdbb2;background-color:#282828;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span>u, _, err <span style="color:#fe8019">:=</span> ghClient.Users.<span style="color:#fabd2f">Get</span>(ctx, <span style="color:#b8bb26">&#34;&#34;</span>)
 </span></span></code></pre></div><h2 id="summary">Summary</h2>
 <p>Configuring a custom HTTP client for use with golang.org/x/oauth2 also automatically
 ensures that the same client is used for accessing the GitHub API via the GitHub Go SDK.

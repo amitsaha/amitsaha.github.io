@@ -226,71 +226,71 @@ ConfigMap. Once we apply this manifest, you should see the nodes are ready when 
 <h1 id="secret-management">Secret management</h1>
 <h1 id="nginx-ingress-with-ssl-throughout">Nginx Ingress with SSL throughout</h1>
 <p>The following specification enables Nginx ingress with SSL to your backend as well:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">extensions/v1beta1</span>
-</span></span><span style="display:flex;"><span><span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Ingress</span>
-</span></span><span style="display:flex;"><span><span style="color:#f92672">metadata</span>:
-</span></span><span style="display:flex;"><span>  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">api-ingress</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#f92672">namespace</span>: <span style="color:#ae81ff">mynamespace</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#f92672">annotations</span>:
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">nginx.ingress.kubernetes.io/rewrite-target</span>: <span style="color:#ae81ff">/</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">kubernetes/ingress.class</span>: <span style="color:#ae81ff">nginx</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">nginx.ingress.kubernetes.io/backend-protocol</span>: <span style="color:#e6db74">&#34;HTTPS&#34;</span>
-</span></span><span style="display:flex;"><span><span style="color:#f92672">spec</span>:
-</span></span><span style="display:flex;"><span>  <span style="color:#f92672">tls</span>:
-</span></span><span style="display:flex;"><span>  - <span style="color:#f92672">hosts</span>:
-</span></span><span style="display:flex;"><span>    - <span style="color:#e6db74">&#34;myhost.dns.com&#34;</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">secretName</span>: <span style="color:#ae81ff">myhost-tls</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#f92672">rules</span>:
-</span></span><span style="display:flex;"><span>    - <span style="color:#f92672">host</span>: <span style="color:#ae81ff">myhost.dns.com</span>
-</span></span><span style="display:flex;"><span>      <span style="color:#f92672">http</span>:
-</span></span><span style="display:flex;"><span>        <span style="color:#f92672">paths</span>:
-</span></span><span style="display:flex;"><span>        - <span style="color:#f92672">path</span>: <span style="color:#ae81ff">/</span>
-</span></span><span style="display:flex;"><span>          <span style="color:#f92672">backend</span>:
-</span></span><span style="display:flex;"><span>            <span style="color:#f92672">serviceName</span>: <span style="color:#ae81ff">xledger</span>
-</span></span><span style="display:flex;"><span>            <span style="color:#f92672">servicePort</span>: <span style="color:#ae81ff">443</span>
+<div class="highlight"><pre tabindex="0" style="color:#ebdbb2;background-color:#282828;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#fb4934">apiVersion</span>: extensions/v1beta1
+</span></span><span style="display:flex;"><span><span style="color:#fb4934">kind</span>: Ingress
+</span></span><span style="display:flex;"><span><span style="color:#fb4934">metadata</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#fb4934">name</span>: api-ingress
+</span></span><span style="display:flex;"><span>  <span style="color:#fb4934">namespace</span>: mynamespace
+</span></span><span style="display:flex;"><span>  <span style="color:#fb4934">annotations</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#fb4934">nginx.ingress.kubernetes.io/rewrite-target</span>: /
+</span></span><span style="display:flex;"><span>    <span style="color:#fb4934">kubernetes/ingress.class</span>: nginx
+</span></span><span style="display:flex;"><span>    <span style="color:#fb4934">nginx.ingress.kubernetes.io/backend-protocol</span>: <span style="color:#b8bb26">&#34;HTTPS&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#fb4934">spec</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#fb4934">tls</span>:
+</span></span><span style="display:flex;"><span>  - <span style="color:#fb4934">hosts</span>:
+</span></span><span style="display:flex;"><span>    - <span style="color:#b8bb26">&#34;myhost.dns.com&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#fb4934">secretName</span>: myhost-tls
+</span></span><span style="display:flex;"><span>  <span style="color:#fb4934">rules</span>:
+</span></span><span style="display:flex;"><span>    - <span style="color:#fb4934">host</span>: myhost.dns.com
+</span></span><span style="display:flex;"><span>      <span style="color:#fb4934">http</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#fb4934">paths</span>:
+</span></span><span style="display:flex;"><span>        - <span style="color:#fb4934">path</span>: /
+</span></span><span style="display:flex;"><span>          <span style="color:#fb4934">backend</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#fb4934">serviceName</span>: xledger
+</span></span><span style="display:flex;"><span>            <span style="color:#fb4934">servicePort</span>: <span style="color:#d3869b">443</span>
 </span></span></code></pre></div><p>However when trying to use the above with AWS ELB, I had to:</p>
 <ul>
 <li>Follow the docs <a href="https://kubernetes.github.io/ingress-nginx/deploy/">here</a> for AWS ELB L7</li>
 <li>Update config map with the following:</li>
 </ul>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">kind</span>: <span style="color:#ae81ff">ConfigMap</span>
-</span></span><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">v1</span>
-</span></span><span style="display:flex;"><span><span style="color:#f92672">metadata</span>:
-</span></span><span style="display:flex;"><span>  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">nginx-configuration</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#f92672">namespace</span>: <span style="color:#ae81ff">ingress-nginx</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#f92672">labels</span>:
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">app.kubernetes.io/name</span>: <span style="color:#ae81ff">ingress-nginx</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">app.kubernetes.io/part-of</span>: <span style="color:#ae81ff">ingress-nginx</span>
-</span></span><span style="display:flex;"><span><span style="color:#f92672">data</span>:
-</span></span><span style="display:flex;"><span>  <span style="color:#f92672">use-proxy-protocol</span>: <span style="color:#e6db74">&#34;false&#34;</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#f92672">use-forwarded-headers</span>: <span style="color:#e6db74">&#34;true&#34;</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#f92672">proxy-real-ip-cidr</span>: <span style="color:#e6db74">&#34;0.0.0.0/0&#34;</span> <span style="color:#75715e"># restrict this to the IP addresses of ELB</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#f92672">ssl-ciphers</span>: <span style="color:#e6db74">&#34;ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-DSS-AES128-GCM-SHA256:kEDH+AESGCM:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA:ECDHE-ECDSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-DSS-AES128-SHA256:DHE-RSA-AES256-SHA256:DHE-DSS-AES256-SHA:DHE-RSA-AES256-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:AES:CAMELLIA:DES-CBC3-SHA:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!PSK:!aECDH:!EDH-DSS-DES-CBC3-SHA:!EDH-RSA-DES-CBC3-SHA:!KRB5-DES-CBC3-SHA&#34;</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#f92672">ssl-protocols</span>: <span style="color:#e6db74">&#34;TLSv1 TLSv1.1 TLSv1.2&#34;</span>
+<div class="highlight"><pre tabindex="0" style="color:#ebdbb2;background-color:#282828;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#fb4934">kind</span>: ConfigMap
+</span></span><span style="display:flex;"><span><span style="color:#fb4934">apiVersion</span>: v1
+</span></span><span style="display:flex;"><span><span style="color:#fb4934">metadata</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#fb4934">name</span>: nginx-configuration
+</span></span><span style="display:flex;"><span>  <span style="color:#fb4934">namespace</span>: ingress-nginx
+</span></span><span style="display:flex;"><span>  <span style="color:#fb4934">labels</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#fb4934">app.kubernetes.io/name</span>: ingress-nginx
+</span></span><span style="display:flex;"><span>    <span style="color:#fb4934">app.kubernetes.io/part-of</span>: ingress-nginx
+</span></span><span style="display:flex;"><span><span style="color:#fb4934">data</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#fb4934">use-proxy-protocol</span>: <span style="color:#b8bb26">&#34;false&#34;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#fb4934">use-forwarded-headers</span>: <span style="color:#b8bb26">&#34;true&#34;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#fb4934">proxy-real-ip-cidr</span>: <span style="color:#b8bb26">&#34;0.0.0.0/0&#34;</span> <span style="color:#928374;font-style:italic"># restrict this to the IP addresses of ELB</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#fb4934">ssl-ciphers</span>: <span style="color:#b8bb26">&#34;ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-DSS-AES128-GCM-SHA256:kEDH+AESGCM:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA:ECDHE-ECDSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-DSS-AES128-SHA256:DHE-RSA-AES256-SHA256:DHE-DSS-AES256-SHA:DHE-RSA-AES256-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:AES:CAMELLIA:DES-CBC3-SHA:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!PSK:!aECDH:!EDH-DSS-DES-CBC3-SHA:!EDH-RSA-DES-CBC3-SHA:!KRB5-DES-CBC3-SHA&#34;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#fb4934">ssl-protocols</span>: <span style="color:#b8bb26">&#34;TLSv1 TLSv1.1 TLSv1.2&#34;</span>
 </span></span></code></pre></div><p>The key parts that I struggled with was having to set <code>ssl-ciphers</code> and <code>ssl-protocols</code>. Without those, the connections
 from ALB was just hanging and eventually would give me a 408. For reference, here&rsquo;s a <code>service-l7.yaml</code> I used:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">kind</span>: <span style="color:#ae81ff">Service</span>
-</span></span><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">v1</span>
-</span></span><span style="display:flex;"><span><span style="color:#f92672">metadata</span>:
-</span></span><span style="display:flex;"><span>  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">ingress-nginx</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#f92672">namespace</span>: <span style="color:#ae81ff">ingress-nginx</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#f92672">labels</span>:
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">app.kubernetes.io/name</span>: <span style="color:#ae81ff">ingress-nginx</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">app.kubernetes.io/part-of</span>: <span style="color:#ae81ff">ingress-nginx</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#f92672">annotations</span>:
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">service.beta.kubernetes.io/aws-load-balancer-ssl-cert</span>: <span style="color:#e6db74">&#34;your certificate arn&#34;</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">service.beta.kubernetes.io/aws-load-balancer-backend-protocol</span>: <span style="color:#e6db74">&#34;https&#34;</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">service.beta.kubernetes.io/aws-load-balancer-ssl-ports</span>: <span style="color:#e6db74">&#34;https&#34;</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout</span>: <span style="color:#e6db74">&#34;60&#34;</span>
-</span></span><span style="display:flex;"><span><span style="color:#f92672">spec</span>:
-</span></span><span style="display:flex;"><span>  <span style="color:#f92672">type</span>: <span style="color:#ae81ff">LoadBalancer</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#f92672">selector</span>:
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">app.kubernetes.io/name</span>: <span style="color:#ae81ff">ingress-nginx</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">app.kubernetes.io/part-of</span>: <span style="color:#ae81ff">ingress-nginx</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#f92672">ports</span>:
-</span></span><span style="display:flex;"><span>   - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">https</span>
-</span></span><span style="display:flex;"><span>     <span style="color:#f92672">port</span>: <span style="color:#ae81ff">443</span>
-</span></span><span style="display:flex;"><span>     <span style="color:#f92672">targetPort</span>: <span style="color:#ae81ff">443</span>
+<div class="highlight"><pre tabindex="0" style="color:#ebdbb2;background-color:#282828;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#fb4934">kind</span>: Service
+</span></span><span style="display:flex;"><span><span style="color:#fb4934">apiVersion</span>: v1
+</span></span><span style="display:flex;"><span><span style="color:#fb4934">metadata</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#fb4934">name</span>: ingress-nginx
+</span></span><span style="display:flex;"><span>  <span style="color:#fb4934">namespace</span>: ingress-nginx
+</span></span><span style="display:flex;"><span>  <span style="color:#fb4934">labels</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#fb4934">app.kubernetes.io/name</span>: ingress-nginx
+</span></span><span style="display:flex;"><span>    <span style="color:#fb4934">app.kubernetes.io/part-of</span>: ingress-nginx
+</span></span><span style="display:flex;"><span>  <span style="color:#fb4934">annotations</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#fb4934">service.beta.kubernetes.io/aws-load-balancer-ssl-cert</span>: <span style="color:#b8bb26">&#34;your certificate arn&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#fb4934">service.beta.kubernetes.io/aws-load-balancer-backend-protocol</span>: <span style="color:#b8bb26">&#34;https&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#fb4934">service.beta.kubernetes.io/aws-load-balancer-ssl-ports</span>: <span style="color:#b8bb26">&#34;https&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#fb4934">service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout</span>: <span style="color:#b8bb26">&#34;60&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#fb4934">spec</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#fb4934">type</span>: LoadBalancer
+</span></span><span style="display:flex;"><span>  <span style="color:#fb4934">selector</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#fb4934">app.kubernetes.io/name</span>: ingress-nginx
+</span></span><span style="display:flex;"><span>    <span style="color:#fb4934">app.kubernetes.io/part-of</span>: ingress-nginx
+</span></span><span style="display:flex;"><span>  <span style="color:#fb4934">ports</span>:
+</span></span><span style="display:flex;"><span>   - <span style="color:#fb4934">name</span>: https
+</span></span><span style="display:flex;"><span>     <span style="color:#fb4934">port</span>: <span style="color:#d3869b">443</span>
+</span></span><span style="display:flex;"><span>     <span style="color:#fb4934">targetPort</span>: <span style="color:#d3869b">443</span>
 </span></span></code></pre></div><h1 id="jobs">Jobs</h1>
 <p>Jobs are useful for running one off tasks - database migrations for example. Here&rsquo;s a sample spec:</p>
 <pre tabindex="0"><code>apiVersion: batch/v1
@@ -323,36 +323,36 @@ spec:
   backoffLimit: 4
 </code></pre><h1 id="cron-jobs">Cron jobs</h1>
 <p>Cron jobs are useful for running scheduled jobs:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">apiVersion</span>: <span style="color:#ae81ff">batch/v1beta1</span>
-</span></span><span style="display:flex;"><span><span style="color:#f92672">kind</span>: <span style="color:#ae81ff">CronJob</span>
-</span></span><span style="display:flex;"><span><span style="color:#f92672">metadata</span>:
-</span></span><span style="display:flex;"><span>  <span style="color:#f92672">name</span>: <span style="color:#ae81ff">cron</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#f92672">namespace</span>: <span style="color:#ae81ff">my-namespace</span>
-</span></span><span style="display:flex;"><span><span style="color:#f92672">spec</span>:
-</span></span><span style="display:flex;"><span>  <span style="color:#f92672">schedule</span>: <span style="color:#e6db74">&#34;* * * * *&#34;</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#f92672">jobTemplate</span>:
-</span></span><span style="display:flex;"><span>    <span style="color:#f92672">spec</span>:
-</span></span><span style="display:flex;"><span>      <span style="color:#f92672">template</span>:
-</span></span><span style="display:flex;"><span>        <span style="color:#f92672">spec</span>:
-</span></span><span style="display:flex;"><span>          <span style="color:#f92672">containers</span>:
-</span></span><span style="display:flex;"><span>          - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">cron</span>
-</span></span><span style="display:flex;"><span>            <span style="color:#f92672">image</span>: <span style="color:#ae81ff">myproject/cron-job</span>
-</span></span><span style="display:flex;"><span>            <span style="color:#f92672">args</span>:
-</span></span><span style="display:flex;"><span>            - <span style="color:#ae81ff">bash</span>
-</span></span><span style="display:flex;"><span>            - -<span style="color:#ae81ff">c</span>
-</span></span><span style="display:flex;"><span>            - <span style="color:#ae81ff">/schedule.sh</span>
-</span></span><span style="display:flex;"><span>            <span style="color:#f92672">env</span>:
-</span></span><span style="display:flex;"><span>              - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">ENVIRONMENT</span>
-</span></span><span style="display:flex;"><span>                <span style="color:#f92672">value</span>: <span style="color:#ae81ff">qa</span>
-</span></span><span style="display:flex;"><span>              - <span style="color:#f92672">name</span>: <span style="color:#ae81ff">TOKEN</span>
-</span></span><span style="display:flex;"><span>                <span style="color:#f92672">valueFrom</span>:
-</span></span><span style="display:flex;"><span>                  <span style="color:#f92672">secretKeyRef</span>:
-</span></span><span style="display:flex;"><span>                    <span style="color:#f92672">name</span>: <span style="color:#ae81ff">secret-token</span>
-</span></span><span style="display:flex;"><span>                    <span style="color:#f92672">key</span>: <span style="color:#ae81ff">token</span>
-</span></span><span style="display:flex;"><span>          <span style="color:#f92672">restartPolicy</span>: <span style="color:#ae81ff">OnFailure</span>
-</span></span><span style="display:flex;"><span>          <span style="color:#f92672">nodeSelector</span>:
-</span></span><span style="display:flex;"><span>            <span style="color:#f92672">nodegroup</span>: <span style="color:#e6db74">&#34;services&#34;</span>
-</span></span><span style="display:flex;"><span>            <span style="color:#f92672">environment</span>: <span style="color:#e6db74">&#34;qa&#34;</span>
+<div class="highlight"><pre tabindex="0" style="color:#ebdbb2;background-color:#282828;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#fb4934">apiVersion</span>: batch/v1beta1
+</span></span><span style="display:flex;"><span><span style="color:#fb4934">kind</span>: CronJob
+</span></span><span style="display:flex;"><span><span style="color:#fb4934">metadata</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#fb4934">name</span>: cron
+</span></span><span style="display:flex;"><span>  <span style="color:#fb4934">namespace</span>: my-namespace
+</span></span><span style="display:flex;"><span><span style="color:#fb4934">spec</span>:
+</span></span><span style="display:flex;"><span>  <span style="color:#fb4934">schedule</span>: <span style="color:#b8bb26">&#34;* * * * *&#34;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#fb4934">jobTemplate</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#fb4934">spec</span>:
+</span></span><span style="display:flex;"><span>      <span style="color:#fb4934">template</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#fb4934">spec</span>:
+</span></span><span style="display:flex;"><span>          <span style="color:#fb4934">containers</span>:
+</span></span><span style="display:flex;"><span>          - <span style="color:#fb4934">name</span>: cron
+</span></span><span style="display:flex;"><span>            <span style="color:#fb4934">image</span>: myproject/cron-job
+</span></span><span style="display:flex;"><span>            <span style="color:#fb4934">args</span>:
+</span></span><span style="display:flex;"><span>            - bash
+</span></span><span style="display:flex;"><span>            - -c
+</span></span><span style="display:flex;"><span>            - /schedule.sh
+</span></span><span style="display:flex;"><span>            <span style="color:#fb4934">env</span>:
+</span></span><span style="display:flex;"><span>              - <span style="color:#fb4934">name</span>: ENVIRONMENT
+</span></span><span style="display:flex;"><span>                <span style="color:#fb4934">value</span>: qa
+</span></span><span style="display:flex;"><span>              - <span style="color:#fb4934">name</span>: TOKEN
+</span></span><span style="display:flex;"><span>                <span style="color:#fb4934">valueFrom</span>:
+</span></span><span style="display:flex;"><span>                  <span style="color:#fb4934">secretKeyRef</span>:
+</span></span><span style="display:flex;"><span>                    <span style="color:#fb4934">name</span>: secret-token
+</span></span><span style="display:flex;"><span>                    <span style="color:#fb4934">key</span>: token
+</span></span><span style="display:flex;"><span>          <span style="color:#fb4934">restartPolicy</span>: OnFailure
+</span></span><span style="display:flex;"><span>          <span style="color:#fb4934">nodeSelector</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#fb4934">nodegroup</span>: <span style="color:#b8bb26">&#34;services&#34;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#fb4934">environment</span>: <span style="color:#b8bb26">&#34;qa&#34;</span>
 </span></span></code></pre></div><h1 id="accessing-internal-network-services">Accessing internal network services</h1>
 <p><code>kubectl exec</code> allows us to exec into a pod and run arbitrary commands inside the pod. However, let&rsquo;s say
 we wanted to run a graphical database client locally and wanted to connect to a database pod. We cannot make
