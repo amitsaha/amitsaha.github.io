@@ -14,23 +14,12 @@
     <h2><a href="https://echorand.me">Explorations - computing, research, etc.</a></h2>
     <nav>
         <ul>
-            <li>
-                <a href="/about" title="">About</a>
-            </li><li>
-                <a href="/llm-based-decision-making" title="">LLM based decision making</a>
-            </li><li>
-                <a href="/posts" title="">Posts</a>
-            </li><li>
-                <a href="/writings-trainings" title="">Publications and Trainings</a>
-            </li><li>
-                <a href="/talks" title="">Talks</a>
-            </li><li>
-                <a href="/tiny-llm" title="">Tiny LLM Lab</a>
-            </li><li>
-                <a href="/categories" title="">Categories</a>
-            </li><li>
-                <a href="/index.xml" title="">Subscribe (RSS)</a>
-            </li>
+            <li><a href="/about" title="">About</a></li><li><a href="/posts" title="">Posts</a></li><li><a href="/writings-trainings" title="">Publications and Trainings</a></li><li><a href="/talks" title="">Talks</a></li><li><details>
+                    <summary>Client side LLM demos</summary>
+                    <ul>
+                        <li><a href="/tiny-llm" title="">Tiny LLM Lab</a></li><li><a href="/llm-based-decision-making" title="">LLM based decision making</a></li>
+                    </ul>
+                </details></li><li><a href="/categories" title="">Categories</a></li><li><a href="/index.xml" title="">Subscribe (RSS)</a></li>
         </ul>
     </nav>
 </header>
@@ -39,7 +28,8 @@
     <header id="post-header">
         <h1>LLM based decision making</h1>
     </header>
-    <p>A decision model does not write a reply. You give it a state and a few questions whose answers you already named. It returns a probability for every option, and ordinary code picks the action.</p>
+    <p>This page was generated with assistance from an LLM. The other pages on this site are handwritten.</p>
+<p>A decision model does not write a reply. You give it a state and a few questions whose answers you already named. It returns a probability for every option, and ordinary code picks the action.</p>
 <p>The three question types below are the ones used by <a href="https://github.com/lawrence3699/jev-style">Jev-style</a> models: a choice among options, a yes probability (noul), and a score on an ordered scale. This page runs that pattern in your browser with a small zero-shot classifier. These probabilities are not from Jev, and they are not calibrated, so the cutoffs only show where code would branch.</p>
 
     <div class="jev-form">
@@ -74,7 +64,7 @@
     </section>
 </article>
 <footer id="footer">
-    Post managed in a <a href="https://github.com/amitsaha/echorand.me">git repo</a> | <a href="https://github.com/amitsaha/echorand.me/commit/26f17974db124c9e72177115d2eb8a87f2e0ca09">Last Commit on this post </a>
+    Post managed in a <a href="https://github.com/amitsaha/echorand.me">git repo</a> | <a href="https://github.com/amitsaha/echorand.me/commit/bc00ee97ffd8bc31ca68be977f51d86a7d1de858">Last Commit on this post </a>
   | <a href="https://github.com/amitsaha/echorand.me/edit/master/content/llm-based-decision-making.md">Edit post</a>
     <p>
     Blog managed via <a href="https://gohugo.io/">Hugo</a> and using a modified version of the <a href="https://themes.gohugo.io/etch/">Etch</a> theme.
