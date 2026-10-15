@@ -440,6 +440,9 @@
     <loc>https://echorand.me/posts/early-stopping-demo-with-neural-network-pytorch/</loc>
     <lastmod>2026-06-03T07:59:06+10:00</lastmod>
   </url><url>
+    <loc>https://echorand.me/llm-based-decision-making/</loc>
+    <lastmod>2026-10-16T00:34:31+11:00</lastmod>
+  </url><url>
     <loc>https://echorand.me/admin/</loc>
     <lastmod>2021-09-16T09:50:46+10:00</lastmod>
   </url><url>
@@ -452,6 +455,6 @@
     <lastmod>2026-06-30T14:18:48+10:00</lastmod>
   </url><url>
     <loc>https://echorand.me/tiny-llm/</loc>
-    <lastmod>2026-10-14T14:16:07+11:00</lastmod>
+    <lastmod>2026-10-16T00:34:31+11:00</lastmod>
   </url>
 </urlset>
