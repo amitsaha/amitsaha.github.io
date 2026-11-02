@@ -6,9 +6,23 @@
     <description>Recent content in software on Explorations - computing, research, etc.</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 29 Oct 2026 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 01 Nov 2026 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://echorand.me/categories/software/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    
+    <item>
+      <title>Local LLM notes</title>
+      <link>https://echorand.me/posts/git-commit-local-llm/</link>
+      <pubDate>Sun, 01 Nov 2026 00:00:00 +0000</pubDate>
+      
+      <guid>https://echorand.me/posts/git-commit-local-llm/</guid>
+      <description>I am using ollama on Windows PC.
+Generate git commit message Powershell:
+git commit -am (ollama run qwen3-coder:30b &amp;#34;create a single line commit message for $(git diff)&amp;#34;).Trim() What&amp;rsquo;s interesting (perhaps not) is that when git diff is empty, it prints some boilerplate:
+ollama run qwen3-coder:30b &amp;#34;create a single line commit message for $(git diff)&amp;#34; &amp;#34;feat: add new feature to improve user experience&amp;#34; PS C:\Users\amits\work\personal-gitea\therapy-counselling-profession&amp;gt; ollama run qwen3-coder:30b &amp;#34;create a single line commit message for $(git diff)&amp;#34; &amp;#34;Add user authentication and authorization features&amp;#34; Changing the prompt to this, helps:</description>
+    </item>
     
     
     

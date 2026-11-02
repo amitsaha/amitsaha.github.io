@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="echo $RANDOM. Exploring Software and writing about it.">
+    
+    <link rel="shortcut icon" href="https://echorand.me/favicon.ico">
+    
+    <link rel="stylesheet" href="/css/style.min.css">
+
+    <title>Local LLM notes</title>
+</head>
+<body><header id="banner">
+    <h2><a href="https://echorand.me">Explorations - computing, research, etc.</a></h2>
+    <nav>
+        <ul>
+            <li><a href="/about" title="">About</a></li><li><a href="/posts" title="">Posts</a></li><li><a href="/writings-trainings" title="">Publications and Trainings</a></li><li><a href="/talks" title="">Talks</a></li><li><details>
+                    <summary>Client side LLM demos</summary>
+                    <ul>
+                        <li><a href="/tiny-llm" title="">Tiny LLM Lab</a></li><li><a href="/llm-based-decision-making" title="">LLM based decision making</a></li>
+                    </ul>
+                </details></li><li><a href="/categories" title="">Categories</a></li><li><a href="/index.xml" title="">Subscribe (RSS)</a></li>
+        </ul>
+    </nav>
+</header>
+<main id="content">
+<article>
+    <header id="post-header">
+        <h1>Local LLM notes</h1><time>November 1, 2026</time>· Updated: <time>November 2, 2026</time></header><p>I am using <code>ollama</code> on Windows PC.</p>
+<h1 id="generate-git-commit-message">Generate git commit message</h1>
+<p>Powershell:</p>
+<pre tabindex="0"><code>git commit -am (ollama run qwen3-coder:30b &#34;create a single line commit message for $(git diff)&#34;).Trim()
+</code></pre><p>What&rsquo;s interesting (perhaps not) is that when <code>git diff</code> is empty, it prints some boilerplate:</p>
+<pre tabindex="0"><code>ollama run qwen3-coder:30b &#34;create a single line commit message for $(git diff)&#34;
+&#34;feat: add new feature to improve user experience&#34;
+
+PS C:\Users\amits\work\personal-gitea\therapy-counselling-profession&gt; ollama run qwen3-coder:30b &#34;create a single line commit message for $(git diff)&#34;
+&#34;Add user authentication and authorization features&#34;
+</code></pre><p>Changing the prompt to this, helps:</p>
+<pre tabindex="0"><code>ollama run qwen3-coder:30b &#34;create a single line commit message for this git diff: $(git diff). If
+no change is provided, print a message saying so&#34;
+</code></pre><p>Now, we see this when provided an empty git diff</p>
+<pre tabindex="0"><code>I&#39;d be happy to help you create a commit message, but I don&#39;t see any git diff provided in your request. Could you please share
+the git diff you&#39;d like me to analyze and create a single-line commit message for?
+
+If you don&#39;t have a specific change to provide, I can show you what the message would look like in that case:
+
+No changes provided - please supply a git diff to generate a commit message
+</code></pre><details>
+        <summary>Ask Tiny LLM about this post (optional)</summary>
+        <p>
+            <a href="/tiny-llm/?source=%2Fposts%2Fgit-commit-local-llm%2F">Open Tiny LLM Lab with this post preloaded</a>
+        </p>
+    </details></article>
+<footer id="footer">
+    Post managed in a <a href="https://github.com/amitsaha/echorand.me">git repo</a> | <a href="https://github.com/amitsaha/echorand.me/commit/0cd9febbff643fff76d5a464445577ca49e7f36d">Last Commit on this post </a>
+  | <a href="https://github.com/amitsaha/echorand.me/edit/master/content/posts/git-commit-local-llm.md">Edit post</a>
+    <p>
+    Blog managed via <a href="https://gohugo.io/">Hugo</a> and using a modified version of the <a href="https://themes.gohugo.io/etch/">Etch</a> theme.
+    </p>  
+</footer>
+
+        </main><footer id="footer">
+    
+</footer>
+</body>
+</html>
