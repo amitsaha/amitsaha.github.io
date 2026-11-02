@@ -18,7 +18,8 @@
       
       <guid>https://echorand.me/posts/git-commit-local-llm/</guid>
       <description>I am using ollama on Windows PC.
-Generate git commit message Powershell:
+Generate git commit message Uses qwen3-coder:30b:
+Powershell:
 git commit -am (ollama run qwen3-coder:30b &amp;#34;create a single line commit message for $(git diff)&amp;#34;).Trim() What&amp;rsquo;s interesting (perhaps not) is that when git diff is empty, it prints some boilerplate:
 ollama run qwen3-coder:30b &amp;#34;create a single line commit message for $(git diff)&amp;#34; &amp;#34;feat: add new feature to improve user experience&amp;#34; PS C:\Users\amits\work\personal-gitea\therapy-counselling-profession&amp;gt; ollama run qwen3-coder:30b &amp;#34;create a single line commit message for $(git diff)&amp;#34; &amp;#34;Add user authentication and authorization features&amp;#34; Changing the prompt to this, helps:</description>
     </item>

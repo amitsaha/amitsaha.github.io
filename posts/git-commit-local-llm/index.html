@@ -28,6 +28,7 @@
     <header id="post-header">
         <h1>Local LLM notes</h1><time>November 1, 2026</time>· Updated: <time>November 2, 2026</time></header><p>I am using <code>ollama</code> on Windows PC.</p>
 <h2 id="generate-git-commit-message">Generate git commit message</h2>
+<p>Uses <a href="https://ollama.com/library/qwen3-coder:30b">qwen3-coder:30b</a>:</p>
 <p>Powershell:</p>
 <pre tabindex="0"><code>git commit -am (ollama run qwen3-coder:30b &#34;create a single line commit message for $(git diff)&#34;).Trim()
 </code></pre><p>What&rsquo;s interesting (perhaps not) is that when <code>git diff</code> is empty, it prints some boilerplate:</p>
@@ -53,7 +54,7 @@ No changes provided - please supply a git diff to generate a commit message
         </p>
     </details></article>
 <footer id="footer">
-    Post managed in a <a href="https://github.com/amitsaha/echorand.me">git repo</a> | <a href="https://github.com/amitsaha/echorand.me/commit/72405f9c9e789c1cd1e4cece2adeee8bd3e8fc0b">Last Commit on this post </a>
+    Post managed in a <a href="https://github.com/amitsaha/echorand.me">git repo</a> | <a href="https://github.com/amitsaha/echorand.me/commit/38ab1fdaa178306814a31c9b240df98128974752">Last Commit on this post </a>
   | <a href="https://github.com/amitsaha/echorand.me/edit/master/content/posts/git-commit-local-llm.md">Edit post</a>
     <p>
     Blog managed via <a href="https://gohugo.io/">Hugo</a> and using a modified version of the <a href="https://themes.gohugo.io/etch/">Etch</a> theme.
