@@ -26,7 +26,7 @@
 <main id="content">
 <article>
     <header id="post-header">
-        <h1>Looking for answers without outsourcing to LLM</h1><time>May 4, 2026</time>· Updated: <time>November 6, 2026</time></header><p>Some examples of where i get limited by a specific programming language/framework&rsquo;s syntax/particular way of doing things, and how I navigate
+        <h1>Looking for answers without outsourcing to LLM</h1><time>May 4, 2026</time>· Updated: <time>November 10, 2026</time></header><p>Some examples of where i get limited by a specific programming language/framework&rsquo;s syntax/particular way of doing things, and how I navigate
 it by trying to see if i can solve it myself based on what i know or good old internet search, (i.e. manually looking at links/posts) and
 learning a bit more in the process.</p>
 <blockquote>
@@ -48,6 +48,7 @@ learning a bit more in the process.</p>
 <li><a href="#12">12</a></li>
 <li><a href="#13">13</a></li>
 <li><a href="#14">14</a></li>
+<li><a href="#15">15</a></li>
 </ul>
 <h2 id="1">1</h2>
 <p>I want to get access to the <code>subject_id</code> within my <a href="https://docs.pytorch.org/tutorials/beginner/basics/data_tutorial.html">Pytorch dataset</a>. I know that
@@ -521,6 +522,73 @@ but I sorted them all manually. Once again, I had set an intention to do it manu
 <p>After my analysis in <a href="https://echorand.me/posts/learning-and-current-software-development/">https://echorand.me/posts/learning-and-current-software-development/</a> - i am slowly deciding what I want to be involved in - and one way
 I am doing that based on my primary objective - here my primary objective was to fix up the code and publish a blog post sharing the updates and i did both of
 that manually. Getting access to the data and making it available to my readers and fixing up CI workflow were not my primary goals, so I let &ldquo;AI&rdquo; do it.</p>
+<h2 id="15">15</h2>
+<p>This is different from all the above tips, since here I am trying to understand a code that I used LLM to generate. I used LLM to generate this
+piece of code for creating a decision tree using <code>scikit-learn</code>. I had generated it because I was in a rush - which is I have realized most of my
+outsourcing tends to happen. Once a human being, for example, me knows that there is a quicker/easier way to do it, i have to try really hard to
+do it the hard way. Hence, before I first tried to learn how the generated code was working, I manually first learned what I needed to know by writing a decision tree
+by following the documentation and good old internet searches. (See <a href="https://github.com/amitsaha/ml-stat-learnings/blob/main/decision-tree/model.py">code</a> and <code>gvim</code> as
+my editor with no AI support.</p>
+<p>Now that I have fairly good idea of how it all works and is implemented due to me going through that disciplined process of not outsourcing any of my thinking
+to LLM, I wanted to better understand the generated code.</p>
+<p>I get most of it, I simplify it first, write my own comments and then a specific piece of code stands out that i don&rsquo;t follow.</p>
+<div class="highlight"><pre tabindex="0" style="color:#ebdbb2;background-color:#282828;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#fe8019">def</span> <span style="color:#fabd2f">leaf_counts</span>(assigned_leaves, error_targets):
+</span></span><span style="display:flex;"><span>    <span style="color:#b8bb26">&#34;&#34;&#34;Exact missed/sepsis counts for each leaf id in `assigned`.&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>    counts <span style="color:#fe8019">=</span> {}
+</span></span><span style="display:flex;"><span>    <span style="color:#928374;font-style:italic"># assigned_leaves is a pandas series indexed by feautre indices</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#928374;font-style:italic"># a leaf can be a terminating point for multiple features, so we</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#928374;font-style:italic"># do a groupby to iterate over each (leaf_id, members) combination</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#fe8019">for</span> leaf_id, members <span style="color:#fe8019">in</span> assigned_leaves<span style="color:#fe8019">.</span>groupby(assigned_leaves):
+</span></span><span style="display:flex;"><span>        missed <span style="color:#fe8019">=</span> <span style="color:#fabd2f">int</span>(error_targets<span style="color:#fe8019">.</span>loc[members<span style="color:#fe8019">.</span>index]<span style="color:#fe8019">.</span>sum())
+</span></span><span style="display:flex;"><span>        counts[<span style="color:#fabd2f">int</span>(leaf_id)] <span style="color:#fe8019">=</span> (missed, <span style="color:#fabd2f">int</span>(<span style="color:#fabd2f">len</span>(members)))
+</span></span><span style="display:flex;"><span>    <span style="color:#fe8019">return</span> counts
+</span></span></code></pre></div><p>From my first reading I get what it&rsquo;s trying to do, but i don&rsquo;t <strong>really</strong> get how it is doing it. I have used <code>groupby()</code> for various things, but this usage
+of <code>groupby</code> feels unfamiliar to me, since it is a <code>Series</code> of int-like values.</p>
+<p>So, I insert <code>import pdb; pdb.set_trace()</code> just after <code>counts</code> and i see this:</p>
+<div class="highlight"><pre tabindex="0" style="color:#ebdbb2;background-color:#282828;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>(Pdb) assigned
+</span></span><span style="display:flex;"><span><span style="color:#d3869b">131</span>       <span style="color:#d3869b">4</span>
+</span></span><span style="display:flex;"><span><span style="color:#d3869b">142</span>      <span style="color:#d3869b">11</span>
+</span></span><span style="display:flex;"><span><span style="color:#d3869b">162</span>      <span style="color:#d3869b">10</span>
+</span></span><span style="display:flex;"><span><span style="color:#d3869b">240</span>      <span style="color:#d3869b">11</span>
+</span></span><span style="display:flex;"><span><span style="color:#d3869b">257</span>       <span style="color:#d3869b">4</span>
+</span></span><span style="display:flex;"><span>         <span style="color:#fe8019">..</span>
+</span></span><span style="display:flex;"><span><span style="color:#d3869b">28741</span>    <span style="color:#d3869b">10</span>
+</span></span><span style="display:flex;"><span><span style="color:#d3869b">28757</span>    <span style="color:#d3869b">10</span>
+</span></span><span style="display:flex;"><span><span style="color:#d3869b">28766</span>     <span style="color:#d3869b">4</span>
+</span></span><span style="display:flex;"><span><span style="color:#d3869b">28799</span>    <span style="color:#d3869b">10</span>
+</span></span><span style="display:flex;"><span><span style="color:#d3869b">28847</span>    <span style="color:#d3869b">10</span>
+</span></span><span style="display:flex;"><span>Name: leaf_id, Length: <span style="color:#d3869b">621</span>, dtype: int64
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>(Pdb) assigned<span style="color:#fe8019">.</span>value_counts(normalize<span style="color:#fe8019">=</span><span style="color:#fe8019">True</span>)
+</span></span><span style="display:flex;"><span>leaf_id
+</span></span><span style="display:flex;"><span><span style="color:#d3869b">4</span>     <span style="color:#d3869b">0.481481</span>
+</span></span><span style="display:flex;"><span><span style="color:#d3869b">10</span>    <span style="color:#d3869b">0.257649</span>
+</span></span><span style="display:flex;"><span><span style="color:#d3869b">11</span>    <span style="color:#d3869b">0.173913</span>
+</span></span><span style="display:flex;"><span><span style="color:#d3869b">14</span>    <span style="color:#d3869b">0.041868</span>
+</span></span><span style="display:flex;"><span><span style="color:#d3869b">3</span>     <span style="color:#d3869b">0.020934</span>
+</span></span><span style="display:flex;"><span><span style="color:#d3869b">7</span>     <span style="color:#d3869b">0.016103</span>
+</span></span><span style="display:flex;"><span><span style="color:#d3869b">6</span>     <span style="color:#d3869b">0.004831</span>
+</span></span><span style="display:flex;"><span><span style="color:#d3869b">13</span>    <span style="color:#d3869b">0.003221</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>(Pdb) <span style="color:#fabd2f">type</span>(assigned)
+</span></span><span style="display:flex;"><span><span style="color:#fe8019">&lt;</span><span style="color:#fe8019">class</span> &#39;pandas<span style="color:#fe8019">.</span>core<span style="color:#fe8019">.</span>series<span style="color:#fe8019">.</span>Series<span style="color:#b8bb26">&#39;&gt;</span>
+</span></span></code></pre></div><p>Looking around the code, I see, that the <code>Series</code> has an index set to the element IDs, so basically what this series is a collection of leaf indices, with the index
+being the element ID, sort of like a hash table implemented using a linked list, where the key is the leaf id and the list contains all the element IDs that end up in that
+leaf. Okay cool! But here&rsquo;s the thing, I got this intuitive idea by experimenting with a demo Series, as follows:</p>
+<div class="highlight"><pre tabindex="0" style="color:#ebdbb2;background-color:#282828;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#fe8019">&gt;&gt;&gt;</span> <span style="color:#fe8019">import</span> pandas <span style="color:#fe8019">as</span> pd
+</span></span><span style="display:flex;"><span><span style="color:#fe8019">&gt;&gt;&gt;</span> demo_series <span style="color:#fe8019">=</span> pd<span style="color:#fe8019">.</span>Series([<span style="color:#d3869b">1</span>, <span style="color:#d3869b">2</span>, <span style="color:#d3869b">6</span>, <span style="color:#d3869b">6</span>, <span style="color:#d3869b">1</span>], index<span style="color:#fe8019">=</span>[<span style="color:#d3869b">1</span>, <span style="color:#d3869b">2</span>, <span style="color:#d3869b">3</span>, <span style="color:#d3869b">4</span>, <span style="color:#d3869b">6</span>])
+</span></span></code></pre></div><p>The series is basically this using my hash table/linked list analogy:</p>
+<pre tabindex="0"><code>1 -&gt; [1, 6]
+2 -&gt; [2]
+6 -&gt; [3, 4]
+</code></pre><p>And so now when we do the <code>groupby()</code> on this print out the element and the index, we get this:</p>
+<div class="highlight"><pre tabindex="0" style="color:#ebdbb2;background-color:#282828;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#fe8019">&gt;&gt;&gt;</span> <span style="color:#fe8019">for</span> i, j <span style="color:#fe8019">in</span> demo_series<span style="color:#fe8019">.</span>groupby(demo_series):
+</span></span><span style="display:flex;"><span><span style="color:#fe8019">...</span>     <span style="color:#fabd2f">print</span>(i, j<span style="color:#fe8019">.</span>index)
+</span></span><span style="display:flex;"><span><span style="color:#fe8019">...</span>
+</span></span><span style="display:flex;"><span><span style="color:#d3869b">1</span> Index([<span style="color:#d3869b">1</span>, <span style="color:#d3869b">6</span>], dtype<span style="color:#fe8019">=</span><span style="color:#b8bb26">&#39;int64&#39;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#d3869b">2</span> Index([<span style="color:#d3869b">2</span>], dtype<span style="color:#fe8019">=</span><span style="color:#b8bb26">&#39;int64&#39;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#d3869b">6</span> Index([<span style="color:#d3869b">3</span>, <span style="color:#d3869b">4</span>], dtype<span style="color:#fe8019">=</span><span style="color:#b8bb26">&#39;int64&#39;</span>)
+</span></span></code></pre></div><p>So, this is how I end up understanding this code.</p>
 <details>
         <summary>Ask Tiny LLM about this post (optional)</summary>
         <p>
@@ -528,7 +596,7 @@ that manually. Getting access to the data and making it available to my readers 
         </p>
     </details></article>
 <footer id="footer">
-    Post managed in a <a href="https://github.com/amitsaha/echorand.me">git repo</a> | <a href="https://github.com/amitsaha/echorand.me/commit/11f478501f49abada16e6b2a58ab241afe70fe37">Last Commit on this post </a>
+    Post managed in a <a href="https://github.com/amitsaha/echorand.me">git repo</a> | <a href="https://github.com/amitsaha/echorand.me/commit/76e2a69bd21ebaa83035f06a1e168ac12c68f554">Last Commit on this post </a>
   | <a href="https://github.com/amitsaha/echorand.me/edit/master/content/posts/looking-for-answers.md">Edit post</a>
     <p>
     Blog managed via <a href="https://gohugo.io/">Hugo</a> and using a modified version of the <a href="https://themes.gohugo.io/etch/">Etch</a> theme.
