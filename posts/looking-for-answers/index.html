@@ -535,9 +535,6 @@ to LLM, I wanted to better understand the generated code.</p>
 <div class="highlight"><pre tabindex="0" style="color:#ebdbb2;background-color:#282828;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#fe8019">def</span> <span style="color:#fabd2f">leaf_counts</span>(assigned_leaves, error_targets):
 </span></span><span style="display:flex;"><span>    <span style="color:#b8bb26">&#34;&#34;&#34;Exact missed/sepsis counts for each leaf id in `assigned`.&#34;&#34;&#34;</span>
 </span></span><span style="display:flex;"><span>    counts <span style="color:#fe8019">=</span> {}
-</span></span><span style="display:flex;"><span>    <span style="color:#928374;font-style:italic"># assigned_leaves is a pandas series indexed by feautre indices</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#928374;font-style:italic"># a leaf can be a terminating point for multiple features, so we</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#928374;font-style:italic"># do a groupby to iterate over each (leaf_id, members) combination</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#fe8019">for</span> leaf_id, members <span style="color:#fe8019">in</span> assigned_leaves<span style="color:#fe8019">.</span>groupby(assigned_leaves):
 </span></span><span style="display:flex;"><span>        missed <span style="color:#fe8019">=</span> <span style="color:#fabd2f">int</span>(error_targets<span style="color:#fe8019">.</span>loc[members<span style="color:#fe8019">.</span>index]<span style="color:#fe8019">.</span>sum())
 </span></span><span style="display:flex;"><span>        counts[<span style="color:#fabd2f">int</span>(leaf_id)] <span style="color:#fe8019">=</span> (missed, <span style="color:#fabd2f">int</span>(<span style="color:#fabd2f">len</span>(members)))
@@ -598,7 +595,7 @@ done this detour, I would have had no clue really!</p>
         </p>
     </details></article>
 <footer id="footer">
-    Post managed in a <a href="https://github.com/amitsaha/echorand.me">git repo</a> | <a href="https://github.com/amitsaha/echorand.me/commit/7d2f94e9ffe69d6d99b391b7aa2efc02f084e97d">Last Commit on this post </a>
+    Post managed in a <a href="https://github.com/amitsaha/echorand.me">git repo</a> | <a href="https://github.com/amitsaha/echorand.me/commit/5c152bb4ac5eca6070c4d21255345ed0dbe96082">Last Commit on this post </a>
   | <a href="https://github.com/amitsaha/echorand.me/edit/master/content/posts/looking-for-answers.md">Edit post</a>
     <p>
     Blog managed via <a href="https://gohugo.io/">Hugo</a> and using a modified version of the <a href="https://themes.gohugo.io/etch/">Etch</a> theme.
